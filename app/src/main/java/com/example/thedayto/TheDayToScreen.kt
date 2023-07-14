@@ -2,9 +2,7 @@ package com.example.thedayto
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,8 +14,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -31,6 +27,8 @@ enum class TheDayToScreen(@StringRes val title: Int) {
 @Composable
 fun TheDayToApp() {
     val navController = rememberNavController()
+    var mood: String = ""
+
     NavHost(
         navController = navController,
         startDestination = TheDayToScreen.Home.name,
@@ -40,12 +38,12 @@ fun TheDayToApp() {
             HomeScreen(
                 onSubmitMoodButtonClicked = {
                     navController.navigate(TheDayToScreen.Mood.name)
-
+                    mood = it
                 },
             )
         }
         composable(TheDayToScreen.Mood.name) {
-            MoodScreen("")
+            MoodScreen(mood)
         }
     }
 }
@@ -90,9 +88,7 @@ fun HomeScreenPreview() {
     HomeScreen(
         onSubmitMoodButtonClicked = {},
         modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp)
-    )
+            .fillMaxSize())
 }
 
 @Composable
