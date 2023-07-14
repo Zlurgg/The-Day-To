@@ -1,3 +1,7 @@
 <resources>
     <string name="app_name">The Day To</string>
+    <string name="mood">Mood\n</string>
+    <string name="back_button">Back\n</string>
+    <string name="calender">Calender\n</string>
+    <string name="home">Home</string>
 </resources>
