@@ -21,13 +21,13 @@ import androidx.navigation.compose.rememberNavController
 /** screen names **/
 enum class TheDayToScreen(@StringRes val title: Int) {
     Home(title = R.string.home),
-    Mood(title = R.string.mood),
+    Calender(title = R.string.calender),
 }
 
 @Composable
 fun TheDayToApp() {
     val navController = rememberNavController()
-    var mood: String = ""
+    var mood = ""
 
     NavHost(
         navController = navController,
@@ -37,19 +37,15 @@ fun TheDayToApp() {
         composable(TheDayToScreen.Home.name) {
             HomeScreen(
                 onSubmitMoodButtonClicked = {
-                    navController.navigate(TheDayToScreen.Mood.name)
+                    navController.navigate(TheDayToScreen.Calender.name)
                     mood = it
                 },
             )
         }
-        composable(TheDayToScreen.Mood.name) {
-            MoodScreen(mood)
+        composable(TheDayToScreen.Calender.name) {
+            CalenderScreen(mood)
         }
     }
-}
-
-class MoodViewModel {
-
 }
 
 @Composable
@@ -64,19 +60,19 @@ fun HomeScreen(
             .padding(8.dp)
     ) {
         Button(
-            onClick = { onSubmitMoodButtonClicked("Happy") },
+            onClick = { onSubmitMoodButtonClicked("happy_face") },
         ) {
             Image(
                 painter = painterResource(R.drawable.happy_face),
-                contentDescription = "Happy face"
+                contentDescription = "happy mood"
             )
         }
         Button(
-            onClick = { onSubmitMoodButtonClicked("Sad") },
+            onClick = { onSubmitMoodButtonClicked("sad_face") },
         ) {
             Image(
                 painter = painterResource(R.drawable.sad_face),
-                contentDescription = "Sad face"
+                contentDescription = "sad mood"
             )
         }
     }
@@ -92,14 +88,22 @@ fun HomeScreenPreview() {
 }
 
 @Composable
-fun MoodScreen(mood: String) {
-    Text("Mood = $mood")
+fun CalenderScreen(mood: String) {
+    val id = if (mood == "sad_face") {
+        R.drawable.sad_face
+    } else {
+        R.drawable.happy_face
+    }
+    Image(
+        painter = painterResource(id = id),
+        contentDescription = "displayed mood"
+    )
 }
 
 
 @Preview(showBackground = true)
 @Composable
-fun MoodScreenPreview() {
-    MoodScreen("")
+fun CalenderScreenPreview() {
+    CalenderScreen("")
 }
 
