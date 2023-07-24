@@ -2,24 +2,30 @@ package com.example.thedayto
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.thedayto.ui.theme.white
+import kotlin.random.Random
 
 /** screen names **/
 enum class TheDayToScreen(@StringRes val title: Int) {
@@ -27,11 +33,28 @@ enum class TheDayToScreen(@StringRes val title: Int) {
     Calender(title = R.string.calender),
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TheDayToApp() {
     val navController = rememberNavController()
-    var mood = ""
+
+    val calendarInputList by remember {
+        mutableStateOf(createCalendarList())
+    }
+
+    var clickedCalendarElem by remember {
+        mutableStateOf<CalendarInput?>(null)
+    }
+
+    /** instance of a mood class to set mood on a specific day
+     * and pass it to the calender (best to store it in data base and retrieve it
+     * **/
+    val status = Status()
+    status.id = Random.nextInt(10).toLong()
+    status.date = DateUtil().getCurrentDate()
+
+    /** get current month to create calender **/
+    val month = DateUtil().getCurrentMonthName()
+
     NavHost(
         navController = navController,
         startDestination = TheDayToScreen.Home.name,
@@ -41,63 +64,57 @@ fun TheDayToApp() {
             HomeScreen(
                 onSubmitMoodButtonClicked = {
                     navController.navigate(TheDayToScreen.Calender.name)
-                    mood = it
+                    status.mood = it
                 }
             )
         }
         composable(TheDayToScreen.Calender.name) {
-            CalenderScreen(
-                mood = mood,
-                onReturnButtonClicked = {
-                backToHome(navController)
-            })
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.TopCenter
+            ){
+                CalenderScreen(
+                    calendarInput = calendarInputList,
+                    onDayClick = { day->
+                        clickedCalendarElem = calendarInputList.first { it.day == day }
+                    },
+                    month = month,
+                    modifier = Modifier
+                        .padding(10.dp)
+                        .fillMaxWidth()
+                        .aspectRatio(1.3f),
+                    status = status,
+                    onReturnButtonClicked = {
+                    backToHome(navController)
+                })
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(10.dp)
+                        .align(Alignment.Center)
+                ){
+                    clickedCalendarElem?.toDos?.forEach {
+                        Text(
+                            if(it.contains("Day")) it else "- $it",
+                            color = white,
+                            fontWeight = FontWeight.SemiBold,
+                            fontSize = if(it.contains("Day")) 25.sp else 18.sp
+                        )
+                        val id = if (status.mood == "sad_face") {
+                            R.drawable.sad_face
+                        } else {
+                            R.drawable.happy_face
+                        }
+                        Image(
+                            painter = painterResource(id = id),
+                            contentDescription = "display mood"
+                        )
+                    }
+                }
+            }
         }
     }
-}
-
-@Composable
-fun HomeScreen(
-    onSubmitMoodButtonClicked: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column() {
-        Text(
-            modifier = Modifier.fillMaxWidth(),
-            text = "How're you feeling today?")
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(8.dp)
-        ) {
-            Button(
-                onClick = { onSubmitMoodButtonClicked("happy_face") },
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.happy_face),
-                    contentDescription = "happy mood"
-                )
-            }
-            Button(
-                onClick = { onSubmitMoodButtonClicked("sad_face") },
-            ) {
-                Image(
-                    painter = painterResource(R.drawable.sad_face),
-                    contentDescription = "sad mood"
-                )
-            }
-        }
-    }
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun HomeScreenPreview() {
-    HomeScreen(
-        onSubmitMoodButtonClicked = {},
-        modifier = Modifier
-            .fillMaxSize())
 }
 
 private fun backToHome(
