@@ -36,14 +36,8 @@ enum class TheDayToScreen(@StringRes val title: Int) {
 @Composable
 fun TheDayToApp() {
     val navController = rememberNavController()
-
-    val calendarInputList by remember {
-        mutableStateOf(createCalendarList())
-    }
-
-    var clickedCalendarElem by remember {
-        mutableStateOf<CalendarInput?>(null)
-    }
+    val calendarInputList by remember { mutableStateOf(createCalendarList()) }
+    var clickedCalendarElem by remember { mutableStateOf<CalendarInput?>(null) }
 
     /** instance of a mood class to set mood on a specific day
      * and pass it to the calender (best to store it in data base and retrieve it
@@ -52,8 +46,10 @@ fun TheDayToApp() {
     status.id = Random.nextInt(10).toLong()
     status.date = DateUtil().getCurrentDate()
 
+    println("check current date: " + DateUtil().getCurrentDate())
+
     /** get current month to create calender **/
-    val month = DateUtil().getCurrentMonthName()
+    val month = DateUtil().getCurrentMonthInMMMMFormat()
 
     NavHost(
         navController = navController,
@@ -73,10 +69,10 @@ fun TheDayToApp() {
                 modifier = Modifier
                     .fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
-            ){
+            ) {
                 CalenderScreen(
                     calendarInput = calendarInputList,
-                    onDayClick = { day->
+                    onDayClick = { day ->
                         clickedCalendarElem = calendarInputList.first { it.day == day }
                     },
                     month = month,
@@ -86,30 +82,47 @@ fun TheDayToApp() {
                         .aspectRatio(1.3f),
                     status = status,
                     onReturnButtonClicked = {
-                    backToHome(navController)
-                })
+                        backToHome(navController)
+                    })
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(10.dp)
                         .align(Alignment.Center)
-                ){
+                ) {
                     clickedCalendarElem?.toDos?.forEach {
                         Text(
-                            if(it.contains("Day")) it else "- $it",
+                            if (it.contains("Day")) it else "- $it",
                             color = white,
                             fontWeight = FontWeight.SemiBold,
-                            fontSize = if(it.contains("Day")) 25.sp else 18.sp
+                            fontSize = if (it.contains("Day")) 25.sp else 18.sp
                         )
-                        val id = if (status.mood == "sad_face") {
-                            R.drawable.sad_face
-                        } else {
-                            R.drawable.happy_face
+
+                        /** get the value of the mood from status on that day
+                         * using the date
+                         *
+                         * check the date + month + year and then match with the status for that date
+                         * this needs moving to the dayToScreen, calender screen is really just the calender
+                         */
+                        val day = it.substringAfterLast(" ")
+                        val day2 = day.substringBefore(":")
+
+                        val clickedDate = "2023" + "-" +
+                                DateUtil().changeMonthFromMMMMToMMFormat(month) + "-" +
+                                day2
+                        println("date: ${status.date} versus $clickedDate")
+
+                        if (clickedDate == status.date) {
+                            val id = if (status.mood == "sad_face") {
+                                R.drawable.sad_face
+                            } else {
+                                R.drawable.happy_face
+                            }
+                            Image(
+                                painter = painterResource(id = id),
+                                contentDescription = "display mood"
+                            )
                         }
-                        Image(
-                            painter = painterResource(id = id),
-                            contentDescription = "display mood"
-                        )
                     }
                 }
             }
