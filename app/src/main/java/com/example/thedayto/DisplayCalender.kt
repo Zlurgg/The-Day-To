@@ -34,7 +34,6 @@ import androidx.compose.ui.unit.sp
 import com.example.thedayto.ui.theme.gray
 import com.example.thedayto.ui.theme.orange
 import kotlinx.coroutines.launch
-import kotlin.math.ceil
 
 
 @Composable
@@ -94,6 +93,9 @@ fun CalenderScreen(
                                 if (day <= calendarInput.size) {
                                     onDayClick(day)
                                     clickAnimationOffset = offset
+
+                                    /** animation for calender squares
+                                     */
                                     scope.launch {
                                         animate(0f, 225f, animationSpec = tween(300)) { value, _ ->
                                             animationRadius = value
