@@ -6,9 +6,8 @@ import java.util.Calendar
 import java.util.Locale
 
 class DateUtil() {
-
+    private val c: Calendar = Calendar.getInstance()
     fun getCurrentDate(): String {
-        val c: Calendar = Calendar.getInstance()
         val year = c.get(Calendar.YEAR)
         val month = c.get(Calendar.MONTH) + 1
         val day = c.get(Calendar.DAY_OF_MONTH)
@@ -16,7 +15,6 @@ class DateUtil() {
     }
 
     fun getCurrentMonthInMMMMFormat(): String {
-        val c: Calendar = Calendar.getInstance()
         val date = SimpleDateFormat("MMMM", Locale.ENGLISH)
         return date.format(c.time)
     }
@@ -40,7 +38,6 @@ class DateUtil() {
     }
 
     fun getNumberOfDaysInCurrentMonth(): Int {
-        val c: Calendar = Calendar.getInstance()
         return c.getActualMaximum(Calendar.DAY_OF_MONTH)
     }
 }

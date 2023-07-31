@@ -45,9 +45,6 @@ fun TheDayToApp() {
     val status = Status()
     status.id = Random.nextInt(10).toLong()
     status.date = DateUtil().getCurrentDate()
-
-    println("check current date: " + DateUtil().getCurrentDate())
-
     /** get current month to create calender **/
     val month = DateUtil().getCurrentMonthInMMMMFormat()
 
@@ -70,7 +67,7 @@ fun TheDayToApp() {
                     .fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
-                CalenderScreen(
+                Calender(
                     calendarInput = calendarInputList,
                     onDayClick = { day ->
                         clickedCalendarElem = calendarInputList.first { it.day == day }
@@ -104,14 +101,18 @@ fun TheDayToApp() {
                          * check the date + month + year and then match with the status for that date
                          * this needs moving to the dayToScreen, calender screen is really just the calender
                          */
+
+                        /** date should be fetched along with status and id
+                         * formatting it here to remove extras
+                         * */
                         val day = it.substringAfterLast(" ")
                         val day2 = day.substringBefore(":")
 
                         val clickedDate = "2023" + "-" +
                                 DateUtil().changeMonthFromMMMMToMMFormat(month) + "-" +
                                 day2
-                        println("date: ${status.date} versus $clickedDate")
 
+                        /** display the mood from status if the status date matches the selected one **/
                         if (clickedDate == status.date) {
                             val id = if (status.mood == "sad_face") {
                                 R.drawable.sad_face
