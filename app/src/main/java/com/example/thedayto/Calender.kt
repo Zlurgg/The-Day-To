@@ -37,7 +37,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun CalenderScreen(
+fun Calender(
     modifier: Modifier = Modifier,
     calendarInput: List<CalendarInput>,
     onDayClick:(Int)->Unit,
