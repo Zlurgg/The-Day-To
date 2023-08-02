@@ -1,8 +1,10 @@
-package com.example.thedayto
+package com.example.thedayto.calender
 
-import android.content.Context
-import android.graphics.Bitmap
+import android.graphics.Paint
+import androidx.compose.animation.core.animate
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,34 +18,27 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
-import com.example.thedayto.ui.theme.gray
-import android.graphics.Canvas
-import android.graphics.Paint
-import androidx.compose.animation.core.animate
-import androidx.compose.animation.core.tween
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.thedayto.Entry
+import com.example.thedayto.R
+import com.example.thedayto.ui.theme.gray
 import com.example.thedayto.ui.theme.orange
+import com.example.thedayto.util.CalenderUtil
+import com.example.thedayto.util.DateUtil
 import kotlinx.coroutines.launch
-
 
 @Composable
 fun Calender(
@@ -51,8 +46,7 @@ fun Calender(
     calendarInput: List<CalendarInput>,
     onDayClick:(Int)->Unit,
     strokeWidth:Float = 15f,
-    month:String,
-    status: Status,
+    entry: Entry,
     onReturnButtonClicked: () -> Unit
 ) {
 
@@ -63,7 +57,6 @@ fun Calender(
     } else {
         DateUtil().getNumberOfDaysInCurrentMonth() / 7
     }
-
 
     var canvasSize by remember {
         mutableStateOf(Size.Zero)
@@ -80,14 +73,13 @@ fun Calender(
 
     val ctx = LocalContext.current
 
-
     Column() {
         Column(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
             androidx.compose.material.Text(
-                text = month,
+                text = DateUtil().getCurrentMonthInMMMMFormat(),
                 fontWeight = FontWeight.SemiBold,
                 color = gray,
                 fontSize = 40.sp
@@ -177,7 +169,7 @@ fun Calender(
                     val textPositionX = xSteps * (i% columns) + strokeWidth
                     val textPositionY = (i / columns) * ySteps + textHeight + strokeWidth/2
 
-                    val mood = status.mood
+                    val mood = entry.mood
 
                     drawContext.canvas.nativeCanvas.apply {
                         /** Put number in the calender **/
@@ -191,9 +183,19 @@ fun Calender(
                                 isFakeBoldText = true
                             }
                         )
-                        drawImage(
-                            topLeft = Offset(x = textPositionX+40, y = textPositionY-15),
-                            image = getBitmapFromImage(ctx, R.drawable.small_sad_face))
+
+                        if (DateUtil().getDayFromDate(entry.date) == i+1) {
+                            val id = if (entry.mood == "sad_face") {
+                                R.drawable.small_sad_face
+                            } else {
+                                R.drawable.small_happy_face
+                            }
+                            drawImage(
+                                topLeft = Offset(x = textPositionX+40, y = textPositionY-15),
+                                image = CalenderUtil().getBitmapFromImage(ctx, id)
+                            )
+                        }
+
                     }
                 }
             }
@@ -205,54 +207,4 @@ fun Calender(
             Text("Home")
         }
     }
-
-}
-
-
-data class CalendarInput(
-    val day:Int,
-    val toDos:List<String> = emptyList()
-)
-
-fun createCalendarList(): List<CalendarInput> {
-    val calendarInputs = mutableListOf<CalendarInput>()
-    for (i in 1..31) {
-        calendarInputs.add(
-            CalendarInput(
-                i,
-                toDos = listOf(
-                    "Day $i:",
-                )
-            )
-        )
-    }
-    return calendarInputs
-}
-
-// on below line we are creating a function to get bitmap
-// from image and passing params as context and an int for drawable.
-private fun getBitmapFromImage(context: Context, drawable: Int): ImageBitmap {
-
-    // on below line we are getting drawable
-    val db = ContextCompat.getDrawable(context, drawable)
-
-    // in below line we are creating our bitmap and initializing it.
-    val bit = Bitmap.createBitmap(
-        db!!.intrinsicWidth, db.intrinsicHeight, Bitmap.Config.ARGB_8888
-    )
-
-    // on below line we are
-    // creating a variable for canvas.
-    val canvas = Canvas(bit)
-
-    // on below line we are setting bounds for our bitmap.
-    db.setBounds(0, 0, canvas.width, canvas.height)
-
-    // on below line we are simply
-    // calling draw to draw our canvas.
-    db.draw(canvas)
-
-    // on below line we are
-    // returning our bitmap.
-    return bit.asImageBitmap()
 }
