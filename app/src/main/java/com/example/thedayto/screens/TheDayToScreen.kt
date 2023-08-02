@@ -1,4 +1,4 @@
-package com.example.thedayto
+package com.example.thedayto.screens
 
 import androidx.annotation.StringRes
 import androidx.compose.foundation.Image
@@ -24,7 +24,13 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.thedayto.Entry
+import com.example.thedayto.R
+import com.example.thedayto.calender.CalendarInput
+import com.example.thedayto.calender.Calender
 import com.example.thedayto.ui.theme.white
+import com.example.thedayto.util.CalenderUtil
+import com.example.thedayto.util.DateUtil
 import kotlin.random.Random
 
 /** screen names **/
@@ -36,15 +42,15 @@ enum class TheDayToScreen(@StringRes val title: Int) {
 @Composable
 fun TheDayToApp() {
     val navController = rememberNavController()
-    val calendarInputList by remember { mutableStateOf(createCalendarList()) }
+    val calendarInputList by remember { mutableStateOf(CalenderUtil().createCalendarList()) }
     var clickedCalendarElem by remember { mutableStateOf<CalendarInput?>(null) }
 
     /** instance of a mood class to set mood on a specific day
      * and pass it to the calender (best to store it in data base and retrieve it
      * **/
-    val status = Status()
-    status.id = Random.nextInt(10).toLong()
-    status.date = DateUtil().getCurrentDate()
+    val entry = Entry()
+    entry.id = Random.nextInt(10).toLong()
+    entry.date = DateUtil().getCurrentDate()
     /** get current month to create calender **/
     val month = DateUtil().getCurrentMonthInMMMMFormat()
 
@@ -57,7 +63,7 @@ fun TheDayToApp() {
             HomeScreen(
                 onSubmitMoodButtonClicked = {
                     navController.navigate(TheDayToScreen.Calender.name)
-                    status.mood = it
+                    entry.mood = it
                 }
             )
         }
@@ -72,12 +78,11 @@ fun TheDayToApp() {
                     onDayClick = { day ->
                         clickedCalendarElem = calendarInputList.first { it.day == day }
                     },
-                    month = month,
                     modifier = Modifier
                         .padding(10.dp)
                         .fillMaxWidth()
                         .aspectRatio(1.3f),
-                    status = status,
+                    entry = entry,
                     onReturnButtonClicked = {
                         backToHome(navController)
                     })
@@ -112,17 +117,20 @@ fun TheDayToApp() {
                                 DateUtil().changeMonthFromMMMMToMMFormat(month) + "-" +
                                 day2
 
-                        /** display the mood from status if the status date matches the selected one **/
-                        if (clickedDate == status.date) {
-                            val id = if (status.mood == "sad_face") {
-                                R.drawable.sad_face
-                            } else {
-                                R.drawable.happy_face
-                            }
-                            Image(
-                                painter = painterResource(id = id),
-                                contentDescription = "display mood"
-                            )
+                        /** display the mood from status if the status date matches the selected one
+                         *
+                         * rather than displaying the mood here display the note from entry**/
+                        if (clickedDate == entry.date) {
+//                            val id = if (entry.mood == "sad_face") {
+//                                R.drawable.sad_face
+//                            } else {
+//                                R.drawable.happy_face
+//                            }
+//                            Image(
+//                                painter = painterResource(id = id),
+//                                contentDescription = "display mood"
+//                            )
+                            Text(text = entry.note)
                         }
                     }
                 }

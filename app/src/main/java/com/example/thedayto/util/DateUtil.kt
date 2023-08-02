@@ -1,11 +1,10 @@
-package com.example.thedayto
+package com.example.thedayto.util
 
 import java.text.SimpleDateFormat
-import java.time.Month
 import java.util.Calendar
 import java.util.Locale
 
-class DateUtil() {
+class DateUtil {
     private val c: Calendar = Calendar.getInstance()
     fun getCurrentDate(): String {
         val year = c.get(Calendar.YEAR)
@@ -39,5 +38,9 @@ class DateUtil() {
 
     fun getNumberOfDaysInCurrentMonth(): Int {
         return c.getActualMaximum(Calendar.DAY_OF_MONTH)
+    }
+
+    fun getDayFromDate(date: String): Int {
+        return date.substringAfterLast("-").toInt()
     }
 }
