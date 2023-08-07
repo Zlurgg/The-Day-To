@@ -1,9 +1,9 @@
-package com.example.thedayto.data
+package com.example.thedayto.data.entries
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "daily_entries")
+@Entity(tableName = "entries")
 data class Entry(
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0,

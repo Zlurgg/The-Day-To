@@ -6,7 +6,7 @@ import android.graphics.Canvas
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.core.content.ContextCompat
-import com.example.thedayto.data.CalendarInput
+import com.example.thedayto.data.calender.CalendarInput
 
 class CalenderUtil {
 

@@ -1,4 +1,4 @@
-package com.example.thedayto.data
+package com.example.thedayto.data.entries
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -20,11 +20,11 @@ interface EntryDao {
     @Delete
     suspend fun delete(entry: Entry)
 
-    @Query("SELECT * from daily_entries WHERE id = :id")
-    fun getDailyEntry(id: Int): Flow<Entry>
+    @Query("SELECT * from entries WHERE id = :id")
+    fun getEntry(id: Int): Flow<Entry>
 
-    @Query("SELECT * from daily_entries ORDER BY date ASC")
-    fun getAllDailyEntries(): Flow<List<Entry>>
+    @Query("SELECT * from entries ORDER BY date ASC")
+    fun getAllEntries(): Flow<List<Entry>>
 
     /* method to get mood from date to populate table, for each day in month of year get mood */
 }

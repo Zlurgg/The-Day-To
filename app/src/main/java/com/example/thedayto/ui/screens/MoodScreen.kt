@@ -13,7 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.thedayto.R
 
 @Composable
@@ -26,9 +28,10 @@ fun MoodScreen(
         .padding(8.dp)
     ) {
         Text(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             text = "How're you feeling today?",
-
+            fontWeight = FontWeight.Bold,
+            fontSize =  25.sp
         )
         Spacer(modifier = Modifier.height(10.dp))
         Row(
