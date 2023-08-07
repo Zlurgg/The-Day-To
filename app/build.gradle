@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.example.thedayto'
-    compileSdk 34
+    compileSdk 33
 
     defaultConfig {
         applicationId "com.example.thedayto"
         minSdk 24
-        targetSdk 34
+        targetSdk 33
         versionCode 1
         versionName "1.0"
 
@@ -69,5 +69,7 @@ dependencies {
     implementation "androidx.navigation:navigation-compose:2.6.0"
     implementation "androidx.compose.material:material:1.4.3"
 
-
+    //Room
+    implementation("androidx.room:room-runtime:2.5.2")
+    implementation("androidx.room:room-ktx:2.5.2")
 }
