@@ -23,8 +23,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.thedayto.R
-import com.example.thedayto.data.Entry
-import com.example.thedayto.data.CalendarInput
+import com.example.thedayto.data.entries.Entry
+import com.example.thedayto.data.calender.CalendarInput
 import com.example.thedayto.ui.screens.CalenderScreen
 import com.example.thedayto.ui.screens.MoodScreen
 import com.example.thedayto.ui.screens.NoteScreen
@@ -75,6 +75,8 @@ fun TheDayToApp() {
                 }
             )
         }
+        /** move calender screen into the calender screen class (that at the moment just holds the calender layout
+         * possible two screens what is currently calender screen as calender layout util and the below as the screen calling it**/
         composable(TheDayToScreen.Calender.name) {
             Box(
                 modifier = Modifier
@@ -117,6 +119,7 @@ fun TheDayToApp() {
 
                         /** date should be fetched along with status and id
                          * formatting it here to remove extras
+                         * move this into date util to be one method that gets the current month in MMMMM from date
                          * */
                         val day = it.substringAfterLast(" ")
                         val day2 = day.substringBefore(":")
@@ -143,8 +146,14 @@ fun TheDayToApp() {
                              * if user had anything else to add that day
                              **/
                             if (entry.note != "") {
-                                Text(text = "Extra thoughts from that day!")
-                                Text(text = entry.note)
+                                Text(text = "Extra thoughts from ${entry.date}!",
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize =  25.sp,
+                                    modifier = Modifier.padding(16.dp)
+                                    )
+                                Text(text = entry.note,
+                                    fontSize =  25.sp,
+                                    modifier = Modifier.padding(16.dp))
                             }
                         }
                     }

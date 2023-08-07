@@ -32,9 +32,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.thedayto.data.Entry
+import com.example.thedayto.data.entries.Entry
 import com.example.thedayto.R
-import com.example.thedayto.data.CalendarInput
+import com.example.thedayto.data.calender.CalendarInput
 import com.example.thedayto.ui.theme.gray
 import com.example.thedayto.ui.theme.orange
 import com.example.thedayto.util.CalenderUtil
