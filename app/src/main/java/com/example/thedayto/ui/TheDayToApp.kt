@@ -1,7 +1,6 @@
-package com.example.thedayto.screens
+package com.example.thedayto.ui
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -16,7 +15,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -24,18 +22,20 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.thedayto.Entry
 import com.example.thedayto.R
-import com.example.thedayto.calender.CalendarInput
-import com.example.thedayto.calender.Calender
+import com.example.thedayto.data.Entry
+import com.example.thedayto.data.CalendarInput
+import com.example.thedayto.ui.screens.CalenderScreen
+import com.example.thedayto.ui.screens.MoodScreen
+import com.example.thedayto.ui.screens.NoteScreen
 import com.example.thedayto.ui.theme.white
 import com.example.thedayto.util.CalenderUtil
 import com.example.thedayto.util.DateUtil
-import kotlin.random.Random
 
 /** screen names **/
 enum class TheDayToScreen(@StringRes val title: Int) {
-    Home(title = R.string.home),
+    Mood(title = R.string.mood),
+    Note(title = R.string.note),
     Calender(title = R.string.calender),
 }
 
@@ -49,21 +49,29 @@ fun TheDayToApp() {
      * and pass it to the calender (best to store it in data base and retrieve it
      * **/
     val entry = Entry()
-    entry.id = Random.nextInt(10).toLong()
     entry.date = DateUtil().getCurrentDate()
+    
     /** get current month to create calender **/
     val month = DateUtil().getCurrentMonthInMMMMFormat()
 
     NavHost(
         navController = navController,
-        startDestination = TheDayToScreen.Home.name,
+        startDestination = TheDayToScreen.Mood.name,
         modifier = Modifier.padding(24.dp)
     ) {
-        composable(TheDayToScreen.Home.name) {
-            HomeScreen(
+        composable(TheDayToScreen.Mood.name) {
+            MoodScreen(
                 onSubmitMoodButtonClicked = {
-                    navController.navigate(TheDayToScreen.Calender.name)
                     entry.mood = it
+                    navController.navigate(TheDayToScreen.Note.name)
+                }
+            )
+        }
+        composable(TheDayToScreen.Note.name) {
+            NoteScreen(
+                onSubmitNoteButtonClicked = {
+                    entry.note = it
+                    navController.navigate(TheDayToScreen.Calender.name)
                 }
             )
         }
@@ -73,7 +81,7 @@ fun TheDayToApp() {
                     .fillMaxSize(),
                 contentAlignment = Alignment.TopCenter
             ) {
-                Calender(
+                CalenderScreen(
                     calendarInput = calendarInputList,
                     onDayClick = { day ->
                         clickedCalendarElem = calendarInputList.first { it.day == day }
@@ -117,9 +125,10 @@ fun TheDayToApp() {
                                 DateUtil().changeMonthFromMMMMToMMFormat(month) + "-" +
                                 day2
 
-                        /** display the mood from status if the status date matches the selected one
-                         *
-                         * rather than displaying the mood here display the note from entry**/
+                        /**
+                         * display the mood from status if the status date matches the selected one
+                         * rather than displaying the mood here display the note from entry
+                         **/
                         if (clickedDate == entry.date) {
 //                            val id = if (entry.mood == "sad_face") {
 //                                R.drawable.sad_face
@@ -130,7 +139,13 @@ fun TheDayToApp() {
 //                                painter = painterResource(id = id),
 //                                contentDescription = "display mood"
 //                            )
-                            Text(text = entry.note)
+                            /**
+                             * if user had anything else to add that day
+                             **/
+                            if (entry.note != "") {
+                                Text(text = "Extra thoughts from that day!")
+                                Text(text = entry.note)
+                            }
                         }
                     }
                 }
@@ -142,5 +157,5 @@ fun TheDayToApp() {
 private fun backToHome(
     navController: NavHostController
 ) {
-    navController.popBackStack(TheDayToScreen.Home.name, inclusive = false)
+    navController.popBackStack(TheDayToScreen.Mood.name, inclusive = false)
 }

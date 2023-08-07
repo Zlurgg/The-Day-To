@@ -1,4 +1,4 @@
-package com.example.thedayto.calender
+package com.example.thedayto.data
 
 data class CalendarInput(
     val day:Int,

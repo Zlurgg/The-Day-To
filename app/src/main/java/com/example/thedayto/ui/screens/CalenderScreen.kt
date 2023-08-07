@@ -1,4 +1,4 @@
-package com.example.thedayto.calender
+package com.example.thedayto.ui.screens
 
 import android.graphics.Paint
 import androidx.compose.animation.core.animate
@@ -32,8 +32,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.thedayto.Entry
+import com.example.thedayto.data.Entry
 import com.example.thedayto.R
+import com.example.thedayto.data.CalendarInput
 import com.example.thedayto.ui.theme.gray
 import com.example.thedayto.ui.theme.orange
 import com.example.thedayto.util.CalenderUtil
@@ -41,7 +42,7 @@ import com.example.thedayto.util.DateUtil
 import kotlinx.coroutines.launch
 
 @Composable
-fun Calender(
+fun CalenderScreen(
     modifier: Modifier = Modifier,
     calendarInput: List<CalendarInput>,
     onDayClick:(Int)->Unit,
@@ -184,6 +185,7 @@ fun Calender(
                             }
                         )
 
+                        /** Put mood in the calender **/
                         if (DateUtil().getDayFromDate(entry.date) == i+1) {
                             val id = if (entry.mood == "sad_face") {
                                 R.drawable.small_sad_face
