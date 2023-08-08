@@ -1,4 +1,4 @@
-package com.example.thedayto.data.entries
+package com.example.thedayto.data.entry
 
 import android.content.Context
 import androidx.room.Database

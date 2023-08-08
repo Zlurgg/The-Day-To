@@ -1,5 +1,6 @@
-package com.example.thedayto.ui
+package com.example.thedayto
 
+import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,25 +13,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.thedayto.R
-import com.example.thedayto.data.entries.Entry
+import com.example.thedayto.data.entry.Entry
 import com.example.thedayto.data.calender.CalendarInput
+import com.example.thedayto.data.entry.EntryDao
+import com.example.thedayto.data.entry.EntryRepo
+import com.example.thedayto.ui.TheDayToViewModelProvider
 import com.example.thedayto.ui.screens.CalenderScreen
+import com.example.thedayto.ui.screens.EntryViewModel
 import com.example.thedayto.ui.screens.MoodScreen
 import com.example.thedayto.ui.screens.NoteScreen
-import com.example.thedayto.ui.theme.white
 import com.example.thedayto.util.CalenderUtil
 import com.example.thedayto.util.DateUtil
+import kotlinx.coroutines.launch
+import androidx.compose.runtime.collectAsState
 
 /** screen names **/
 enum class TheDayToScreen(@StringRes val title: Int) {
@@ -40,7 +47,9 @@ enum class TheDayToScreen(@StringRes val title: Int) {
 }
 
 @Composable
-fun TheDayToApp() {
+fun TheDayToApp(
+   viewModel: EntryViewModel = viewModel(factory = TheDayToViewModelProvider.Factory)
+) {
     val navController = rememberNavController()
     val calendarInputList by remember { mutableStateOf(CalenderUtil().createCalendarList()) }
     var clickedCalendarElem by remember { mutableStateOf<CalendarInput?>(null) }
@@ -48,11 +57,13 @@ fun TheDayToApp() {
     /** instance of a mood class to set mood on a specific day
      * and pass it to the calender (best to store it in data base and retrieve it
      * **/
-    val entry = Entry()
-    entry.date = DateUtil().getCurrentDate()
+//    entry.date = DateUtil().getCurrentDate()
     
     /** get current month to create calender **/
     val month = DateUtil().getCurrentMonthInMMMMFormat()
+
+    val coroutineScope = rememberCoroutineScope()
+
 
     NavHost(
         navController = navController,
@@ -62,16 +73,32 @@ fun TheDayToApp() {
         composable(TheDayToScreen.Mood.name) {
             MoodScreen(
                 onSubmitMoodButtonClicked = {
-                    entry.mood = it
+//                    entry.mood = it
                     navController.navigate(TheDayToScreen.Note.name)
+                },
+                entryUiState = viewModel.entriesUiState,
+                onEntryValueChange = viewModel::updateUiState,
+                onSaveClick = {
+                    coroutineScope.launch {
+                        viewModel.saveEntry()
+                        navController.navigate(TheDayToScreen.Note.name)
+                    }
                 }
             )
         }
         composable(TheDayToScreen.Note.name) {
             NoteScreen(
                 onSubmitNoteButtonClicked = {
-                    entry.note = it
+//                    entry.note = it
                     navController.navigate(TheDayToScreen.Calender.name)
+                },
+                entryUiState = viewModel.entriesUiState,
+                onEntryValueChange = viewModel::updateUiState,
+                onSaveClick = {
+                    coroutineScope.launch {
+                        viewModel.saveEntry()
+                        navController.navigate(TheDayToScreen.Calender.name)
+                    }
                 }
             )
         }
@@ -92,7 +119,8 @@ fun TheDayToApp() {
                         .padding(10.dp)
                         .fillMaxWidth()
                         .aspectRatio(1.3f),
-                    entry = entry,
+//                    entry = entry,
+//                    entryList = entryUi,
                     onReturnButtonClicked = {
                         backToHome(navController)
                     })
@@ -103,12 +131,12 @@ fun TheDayToApp() {
                         .align(Alignment.Center)
                 ) {
                     clickedCalendarElem?.toDos?.forEach {
-                        Text(
-                            if (it.contains("Day")) it else "- $it",
-                            color = white,
-                            fontWeight = FontWeight.SemiBold,
-                            fontSize = if (it.contains("Day")) 25.sp else 18.sp
-                        )
+//                        Text(
+//                            if (it.contains("Day")) it else "- $it",
+//                            color = white,
+//                            fontWeight = FontWeight.SemiBold,
+//                            fontSize = if (it.contains("Day")) 25.sp else 18.sp
+//                        )
 
                         /** get the value of the mood from status on that day
                          * using the date
@@ -132,7 +160,7 @@ fun TheDayToApp() {
                          * display the mood from status if the status date matches the selected one
                          * rather than displaying the mood here display the note from entry
                          **/
-                        if (clickedDate == entry.date) {
+//                        if (clickedDate == entry.date) {
 //                            val id = if (entry.mood == "sad_face") {
 //                                R.drawable.sad_face
 //                            } else {
@@ -145,17 +173,18 @@ fun TheDayToApp() {
                             /**
                              * if user had anything else to add that day
                              **/
-                            if (entry.note != "") {
-                                Text(text = "Extra thoughts from ${entry.date}!",
-                                    fontWeight = FontWeight.Bold,
-                                    fontSize =  25.sp,
-                                    modifier = Modifier.padding(16.dp)
-                                    )
-                                Text(text = entry.note,
-                                    fontSize =  25.sp,
-                                    modifier = Modifier.padding(16.dp))
-                            }
-                        }
+                            println("entry id:" + viewModel.entriesUiState.entryDetails.toString())
+//                            if (entry.note != "") {
+//                                Text(text = "Extra thoughts from ${entry.date}!",
+//                                    fontWeight = FontWeight.Bold,
+//                                    fontSize =  25.sp,
+//                                    modifier = Modifier.padding(16.dp)
+//                                    )
+//                                Text(text = entry.note,
+//                                    fontSize =  25.sp,
+//                                    modifier = Modifier.padding(16.dp))
+//                            }
+//                        }
                     }
                 }
             }

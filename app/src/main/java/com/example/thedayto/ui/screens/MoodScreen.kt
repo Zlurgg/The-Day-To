@@ -21,6 +21,9 @@ import com.example.thedayto.R
 @Composable
 fun MoodScreen(
     onSubmitMoodButtonClicked: (String) -> Unit,
+    onSaveClick: () -> Unit,
+    onEntryValueChange: (EntryDetails) -> Unit,
+    entryUiState: EntryUiState,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -28,7 +31,9 @@ fun MoodScreen(
         .padding(8.dp)
     ) {
         Text(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
             text = "How're you feeling today?",
             fontWeight = FontWeight.Bold,
             fontSize =  25.sp
@@ -39,16 +44,21 @@ fun MoodScreen(
             modifier = Modifier
                 .fillMaxWidth()
         ) {
+            val mood = "happy_face"
             Button(
-                onClick = { onSubmitMoodButtonClicked("happy_face") },
-            ) {
+//                onClick = { onSubmitMoodButtonClicked("happy_face")},
+                onClick = { onSaveClick() },
+//                enabled = entryUiState.isEntryValid
+                ) {
                 Image(
                     painter = painterResource(R.drawable.happy_face),
                     contentDescription = "happy mood"
                 )
             }
             Button(
-                onClick = { onSubmitMoodButtonClicked("sad_face") },
+//                onClick = { onSubmitMoodButtonClicked("sad_face") },
+                onClick = { onSaveClick() },
+//                enabled = entryUiState.isEntryValid
             ) {
                 Image(
                     painter = painterResource(R.drawable.sad_face),
