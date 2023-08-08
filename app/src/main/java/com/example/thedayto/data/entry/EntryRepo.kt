@@ -1,8 +1,8 @@
-package com.example.thedayto.data.entries
+package com.example.thedayto.data.entry
 
 import kotlinx.coroutines.flow.Flow
 
-interface EntriesRepo {
+interface EntryRepo {
     /**
      * Retrieve all the entries from the the given data source.
      */

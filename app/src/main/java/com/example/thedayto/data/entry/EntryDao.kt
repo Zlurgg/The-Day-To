@@ -1,4 +1,4 @@
-package com.example.thedayto.data.entries
+package com.example.thedayto.data.entry
 
 import androidx.room.Dao
 import androidx.room.Delete

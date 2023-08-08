@@ -1,8 +1,8 @@
-package com.example.thedayto.data.entries
+package com.example.thedayto.data.entry
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflineEntriesRepo(private val entryDao: EntryDao) : EntriesRepo {
+class OfflineEntryRepo(private val entryDao: EntryDao) : EntryRepo {
     override fun getAllEntriesStream(): Flow<List<Entry>> = entryDao.getAllEntries()
 
     override fun getEntryStream(id: Int): Flow<Entry?> = entryDao.getEntry(id)

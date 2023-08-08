@@ -32,7 +32,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.thedayto.data.entries.Entry
+import com.example.thedayto.data.entry.Entry
 import com.example.thedayto.R
 import com.example.thedayto.data.calender.CalendarInput
 import com.example.thedayto.ui.theme.gray
@@ -47,7 +47,7 @@ fun CalenderScreen(
     calendarInput: List<CalendarInput>,
     onDayClick:(Int)->Unit,
     strokeWidth:Float = 15f,
-    entry: Entry,
+//    entry: Entry,
     onReturnButtonClicked: () -> Unit
 ) {
 
@@ -170,7 +170,7 @@ fun CalenderScreen(
                     val textPositionX = xSteps * (i% columns) + strokeWidth
                     val textPositionY = (i / columns) * ySteps + textHeight + strokeWidth/2
 
-                    val mood = entry.mood
+//                    val mood = entry.mood
 
                     drawContext.canvas.nativeCanvas.apply {
                         /** Put number in the calender **/
@@ -186,7 +186,7 @@ fun CalenderScreen(
                         )
 
                         /** Put mood in the calender **/
-                        if (DateUtil().getDayFromDate(entry.date) == i+1) {
+                        /*if (DateUtil().getDayFromDate(entry.date) == i+1) {
                             val id = if (entry.mood == "sad_face") {
                                 R.drawable.small_sad_face
                             } else {
@@ -196,7 +196,7 @@ fun CalenderScreen(
                                 topLeft = Offset(x = textPositionX+40, y = textPositionY-15),
                                 image = CalenderUtil().getBitmapFromImage(ctx, id)
                             )
-                        }
+                        }*/
 
                     }
                 }
