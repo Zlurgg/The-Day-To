@@ -1,6 +1,5 @@
 package com.example.thedayto
 
-import android.widget.Toast
 import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -8,7 +7,6 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,18 +15,13 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.thedayto.data.entry.Entry
 import com.example.thedayto.data.calender.CalendarInput
-import com.example.thedayto.data.entry.EntryDao
-import com.example.thedayto.data.entry.EntryRepo
 import com.example.thedayto.ui.TheDayToViewModelProvider
 import com.example.thedayto.ui.screens.CalenderScreen
 import com.example.thedayto.ui.screens.EntryViewModel
@@ -37,9 +30,8 @@ import com.example.thedayto.ui.screens.NoteScreen
 import com.example.thedayto.util.CalenderUtil
 import com.example.thedayto.util.DateUtil
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.collectAsState
 
-/** screen names **/
+/** screen names replace with navhost and topbar moving below into a navhost class to navigate the app **/
 enum class TheDayToScreen(@StringRes val title: Int) {
     Mood(title = R.string.mood),
     Note(title = R.string.note),
@@ -63,7 +55,6 @@ fun TheDayToApp(
     val month = DateUtil().getCurrentMonthInMMMMFormat()
 
     val coroutineScope = rememberCoroutineScope()
-
 
     NavHost(
         navController = navController,
@@ -173,7 +164,7 @@ fun TheDayToApp(
                             /**
                              * if user had anything else to add that day
                              **/
-                            println("entry id:" + viewModel.entriesUiState.entryDetails.toString())
+                        println("entry id:" + viewModel.entriesUiState.entryDetails.toString())
 //                            if (entry.note != "") {
 //                                Text(text = "Extra thoughts from ${entry.date}!",
 //                                    fontWeight = FontWeight.Bold,

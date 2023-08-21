@@ -11,6 +11,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface EntryDao {
 
+    @Query("SELECT * from entries WHERE id = :id")
+    fun getEntry(id: Int): Flow<Entry>
+
+    /** Get all entries in date order **/
+    @Query("SELECT * from entries ORDER BY date ASC")
+    fun getAllEntries(): Flow<List<Entry>>
+
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun insert(entry: Entry)
 
@@ -20,11 +27,11 @@ interface EntryDao {
     @Delete
     suspend fun delete(entry: Entry)
 
-    @Query("SELECT * from entries WHERE id = :id")
-    fun getEntry(id: Int): Flow<Entry>
+    /** Get entry from date for use in calender **/
+    @Query("SELECT * from entries WHERE date = :date")
+    fun getEntryFromDate(date: String): Flow<Entry>
 
-    @Query("SELECT * from entries ORDER BY date ASC")
-    fun getAllEntries(): Flow<List<Entry>>
+    @Query("DELETE FROM entries")
+    suspend fun deleteAll()
 
-    /* method to get mood from date to populate table, for each day in month of year get mood */
 }

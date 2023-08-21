@@ -3,23 +3,29 @@ package com.example.thedayto.ui.screens
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.thedayto.data.entry.EntryRepo
+import com.example.thedayto.data.entry.EntryRepository
 import com.example.thedayto.data.entry.Entry
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
-class EntryViewModel(private val entryRepo: EntryRepo): ViewModel() {
+class EntryViewModel(
+    savedStateHandle: SavedStateHandle,
+    val entryRepository: EntryRepository
+): ViewModel() {
 
     /**
      * Holds current entry ui state
      */
     var entriesUiState by mutableStateOf(EntryUiState())
         private set
+
 
     /**
      * Updates the [entriesUiState] with the value provided in the argument. This method also triggers
@@ -35,7 +41,7 @@ class EntryViewModel(private val entryRepo: EntryRepo): ViewModel() {
      */
     suspend fun saveEntry() {
         if (validateInput()) {
-            entryRepo.insertEntry(entriesUiState.entryDetails.toEntry())
+            entryRepository.insertEntry(entriesUiState.entryDetails.toEntry())
         }
     }
 
@@ -46,7 +52,7 @@ class EntryViewModel(private val entryRepo: EntryRepo): ViewModel() {
     }
 
     val uiState: StateFlow<EntryUiState> =
-        entryRepo.getEntryStream(id = 1)
+        entryRepository.getEntryStream(id = 1)
             .filterNotNull()
             .map {
                 EntryUiState(isEntryValid = true, entryDetails = it.toEntryDetails())
@@ -70,9 +76,9 @@ data class EntryUiState(
 
 data class EntryDetails(
     var id: Int = 0,
-    var date: String? = "",
-    var mood: String? = "",
-    var note: String? = ""
+    var date: String = "",
+    var mood: String = "",
+    var note: String = ""
 )
 /**
  * Extension function to convert [EntryDetails] to [Entry]

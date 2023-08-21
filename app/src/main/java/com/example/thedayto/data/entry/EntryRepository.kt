@@ -2,7 +2,7 @@ package com.example.thedayto.data.entry
 
 import kotlinx.coroutines.flow.Flow
 
-interface EntryRepo {
+interface EntryRepository {
     /**
      * Retrieve all the entries from the the given data source.
      */
@@ -27,4 +27,9 @@ interface EntryRepo {
      * Update entry in the data source
      */
     suspend fun updateEntry(entry: Entry)
+
+    /**
+     * Retrieve an entry from the given data source that matches with the [date].
+     */
+    suspend fun getEntryFromDateStream(date: String): Flow<Entry?>
 }

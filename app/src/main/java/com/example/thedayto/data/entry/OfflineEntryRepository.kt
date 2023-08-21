@@ -2,7 +2,7 @@ package com.example.thedayto.data.entry
 
 import kotlinx.coroutines.flow.Flow
 
-class OfflineEntryRepo(private val entryDao: EntryDao) : EntryRepo {
+class OfflineEntryRepository(private val entryDao: EntryDao) : EntryRepository {
     override fun getAllEntriesStream(): Flow<List<Entry>> = entryDao.getAllEntries()
 
     override fun getEntryStream(id: Int): Flow<Entry?> = entryDao.getEntry(id)
@@ -12,4 +12,6 @@ class OfflineEntryRepo(private val entryDao: EntryDao) : EntryRepo {
     override suspend fun deleteEntry(entry: Entry) = entryDao.delete(entry)
 
     override suspend fun updateEntry(entry: Entry) = entryDao.update(entry)
+
+    override suspend fun getEntryFromDateStream(date: String): Flow<Entry?> = entryDao.getEntryFromDate(date)
 }

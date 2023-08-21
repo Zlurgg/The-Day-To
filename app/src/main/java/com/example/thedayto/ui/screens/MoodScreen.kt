@@ -47,7 +47,7 @@ fun MoodScreen(
             val mood = "happy_face"
             Button(
 //                onClick = { onSubmitMoodButtonClicked("happy_face")},
-                onClick = { onSaveClick() },
+                onClick = onSaveClick,
 //                enabled = entryUiState.isEntryValid
                 ) {
                 Image(
@@ -57,7 +57,7 @@ fun MoodScreen(
             }
             Button(
 //                onClick = { onSubmitMoodButtonClicked("sad_face") },
-                onClick = { onSaveClick() },
+                onClick = onSaveClick,
 //                enabled = entryUiState.isEntryValid
             ) {
                 Image(
