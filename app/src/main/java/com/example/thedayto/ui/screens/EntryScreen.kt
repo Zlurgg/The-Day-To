@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,15 +41,22 @@ import com.example.thedayto.ui.EntryUiState
 import com.example.thedayto.util.DateUtil
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.text.style.TextAlign
+import com.example.thedayto.ui.screens.destinations.NoteScreenDestination
+import com.ramcosta.composedestinations.annotation.Destination
+import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
+@Destination(start = true)
 @Composable
 fun EntryScreen(
-    context: Context = LocalContext.current,
-    entryViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
-    ),
-) {
+    navigator: DestinationsNavigator,
 
+) {
+    val context: Context = LocalContext.current
+    val entryViewModel: EntryViewModel = viewModel(
+    factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+    )
     /** fetch all entries via the view-model **/
     val entries: List<JournalEntry> by entryViewModel.allEntries.observeAsState(listOf())
     val coroutineScope = rememberCoroutineScope()
@@ -69,9 +77,24 @@ fun EntryScreen(
                 entryDetails = entryDetails
             )
         }
-
-        /** update entry with a note **/
         Row {
+            Button(onClick = {
+                navigator.navigate(
+                    NoteScreenDestination(
+                        JournalEntry(
+                            id = 99,
+                            mood = "example_mood",
+                            note = "example_note",
+                            date = DateUtil().getCurrentDate()
+                        )
+                    )
+                )
+            }) {
+                Text("Go to Note Screen")
+            }
+        }
+        /** update entry with a note **/
+       /* Row {
             AddNoteCard(
                 entryUiState = entryViewModel.entriesUiState,
                 onEntryValueChange = entryViewModel::updateUiState,
@@ -79,7 +102,7 @@ fun EntryScreen(
             )
         }
 
-        /** save the entry **/
+        *//** save the entry **//*
         Row {
             SaveCard(
                 onSaveClick = {
@@ -90,7 +113,7 @@ fun EntryScreen(
             )
         }
 
-        /** display all database entries **/
+        *//** display all database entries **//*
         Text(
             modifier = Modifier
                 .fillMaxWidth()
@@ -107,7 +130,22 @@ fun EntryScreen(
                     DisplayEntriesCard(journalEntry = it)
                 }
             }
-        }
+        }*/
+    }
+}
+
+@Destination
+@Composable
+fun NoteScreen(
+    navigator: DestinationsNavigator,
+    journalEntry: JournalEntry
+) {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text("Profile Screen: ${journalEntry.mood}", textAlign = TextAlign.Center)
     }
 }
 
