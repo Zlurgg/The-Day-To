@@ -1,6 +1,7 @@
 package com.example.thedayto.ui
 
 import androidx.lifecycle.ViewModelProvider.AndroidViewModelFactory
+import androidx.lifecycle.createSavedStateHandle
 import androidx.lifecycle.viewmodel.CreationExtras
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -11,7 +12,10 @@ object TheDayToViewModelProvider {
     val Factory = viewModelFactory {
 
         initializer {
-            EntryViewModel(entryApp().container.entryRepo)
+            EntryViewModel(
+                this.createSavedStateHandle(),
+                entryApp().container.entryRepository
+            )
         }
     }
 }

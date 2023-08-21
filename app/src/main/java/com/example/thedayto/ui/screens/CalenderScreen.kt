@@ -79,7 +79,7 @@ fun CalenderScreen(
             modifier = modifier,
             verticalArrangement = Arrangement.spacedBy(10.dp)
         ) {
-            androidx.compose.material.Text(
+            Text(
                 text = DateUtil().getCurrentMonthInMMMMFormat(),
                 fontWeight = FontWeight.SemiBold,
                 color = gray,
