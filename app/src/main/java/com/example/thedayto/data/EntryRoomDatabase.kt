@@ -1,4 +1,4 @@
-package com.example.thedayto.data.entry
+package com.example.thedayto.data
 
 import android.content.Context
 import androidx.room.Database
@@ -8,8 +8,9 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [Entry::class], version = 1, exportSchema = false)
-abstract class EntryDatabase() : RoomDatabase() {
+@Database(entities = [JournalEntry::class], version = 1, exportSchema = false)
+abstract class EntryRoomDatabase: RoomDatabase() {
+
     abstract fun entryDao(): EntryDao
 
     private class EntryDatabaseCallback(
@@ -26,23 +27,22 @@ abstract class EntryDatabase() : RoomDatabase() {
             }
         }
     }
-
     companion object {
         @Volatile
-        private var INSTANCE: EntryDatabase? = null
+        private var INSTANCE: EntryRoomDatabase? = null
 
         fun getDatabase(
             context: Context,
             scope: CoroutineScope
-        ): EntryDatabase {
+        ): EntryRoomDatabase {
             return INSTANCE ?: synchronized(this) {
                 val instance = Room.databaseBuilder(
                     context.applicationContext,
-                    EntryDatabase::class.java,
+                    EntryRoomDatabase::class.java,
                     "thedayto_database"
                 )
-                    .addCallback(EntryDatabaseCallback(scope))
-                    .build()
+                .addCallback(EntryDatabaseCallback(scope))
+                .build()
                 INSTANCE = instance
                 instance
             }
@@ -55,6 +55,7 @@ suspend fun populateDatabase(entryDao: EntryDao) {
     entryDao.deleteAll()
 
     // Add sample words.
-    val journalEntry = Entry(1, "sample mood", "sample note", "1973-01-01")
+    val journalEntry = JournalEntry(1, "sample mood", "sample note", "1973-01-01")
     entryDao.insert(journalEntry)
 }
+

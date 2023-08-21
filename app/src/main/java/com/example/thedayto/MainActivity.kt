@@ -3,7 +3,6 @@ package com.example.thedayto
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.example.thedayto.data.entry.Entry
 import com.example.thedayto.ui.theme.TheDayToTheme
 
 class MainActivity : ComponentActivity() {
