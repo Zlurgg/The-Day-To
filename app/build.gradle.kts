@@ -76,6 +76,7 @@ dependencies {
     implementation ("androidx.compose.ui:ui-graphics")
     implementation ("androidx.compose.ui:ui-tooling-preview")
     implementation ("androidx.compose.material3:material3")
+    implementation("androidx.compose.runtime:runtime-livedata:1.5.0")
 
     //Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
@@ -83,6 +84,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
     implementation("androidx.lifecycle:lifecycle-common-java8:2.6.1")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.6.1")
 
     // Testing
     testImplementation ("junit:junit:4.13.2")
