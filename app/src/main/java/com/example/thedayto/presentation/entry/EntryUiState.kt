@@ -1,6 +1,6 @@
-package com.example.thedayto.ui
+package com.example.thedayto.presentation.entry
 
-import com.example.thedayto.data.JournalEntry
+import com.example.thedayto.data.local.TheDayToEntity
 
 data class EntryUiState(
     val entryDetails: EntryDetails = EntryDetails(),
@@ -14,7 +14,7 @@ data class EntryDetails(
     var note: String = ""
 )
 
-fun EntryDetails.toEntry(): JournalEntry = JournalEntry(
+fun EntryDetails.toEntry(): TheDayToEntity = TheDayToEntity(
     id = id,
     date = date,
     mood = mood,
