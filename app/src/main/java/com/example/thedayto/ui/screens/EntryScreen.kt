@@ -1,6 +1,8 @@
 package com.example.thedayto.ui.screens
 
+import android.content.ContentValues.TAG
 import android.content.Context
+import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,7 +19,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -33,7 +34,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.example.thedayto.data.EntryApplication
 import com.example.thedayto.data.JournalEntry
 import com.example.thedayto.ui.EntryDetails
@@ -42,34 +42,60 @@ import com.example.thedayto.util.DateUtil
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.text.style.TextAlign
+import androidx.lifecycle.ViewModelProvider
+import com.example.thedayto.ui.screens.destinations.DisplayEntryScreenDestination
+import com.example.thedayto.ui.screens.destinations.EntryScreenDestination
+import com.example.thedayto.ui.screens.destinations.MoodScreenDestination
 import com.example.thedayto.ui.screens.destinations.NoteScreenDestination
+import com.example.thedayto.ui.screens.destinations.SaveScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
 @Destination(start = true)
 @Composable
 fun EntryScreen(
-    navigator: DestinationsNavigator,
+    navigator: DestinationsNavigator
+) {
+    Column(
+        modifier = Modifier
+            .padding(8.dp)
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+        ) {
+            Row {
+                Button(onClick = {
+                    navigator.navigate(
+                        MoodScreenDestination()
+                    )
+                }) {
+                    Text("Create an entry for today?")
+                }
+            }
+        }
+    }
+}
 
+@Composable
+@Destination
+fun MoodScreen(
+    navigator: DestinationsNavigator
 ) {
     val context: Context = LocalContext.current
     val entryViewModel: EntryViewModel = viewModel(
-    factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
     )
-    /** fetch all entries via the view-model **/
-    val entries: List<JournalEntry> by entryViewModel.allEntries.observeAsState(listOf())
-    val coroutineScope = rememberCoroutineScope()
-
-    /** create an instance of entry details **/
     val entryDetails = entryViewModel.entriesUiState.entryDetails
-
-    /** set current date for entry **/
     val date = DateUtil().getCurrentDate()
     entryDetails.date = date
 
-    Column(verticalArrangement = Arrangement.SpaceBetween) {
-        /** update entry with a mood **/
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row {
             AddMoodCard(
                 entryUiState = entryViewModel.entriesUiState,
@@ -79,41 +105,110 @@ fun EntryScreen(
         }
         Row {
             Button(onClick = {
+                Log.i(TAG, "Mood entryDetails: $entryDetails");
                 navigator.navigate(
-                    NoteScreenDestination(
-                        JournalEntry(
-                            id = 99,
-                            mood = "example_mood",
-                            note = "example_note",
-                            date = DateUtil().getCurrentDate()
-                        )
-                    )
+                    NoteScreenDestination(date)
                 )
             }) {
                 Text("Go to Note Screen")
             }
         }
-        /** update entry with a note **/
-       /* Row {
+    }
+}
+@Composable
+@Destination
+fun NoteScreen(
+    navigator: DestinationsNavigator,
+    date: String
+) {
+    val context: Context = LocalContext.current
+    val entryViewModel: EntryViewModel = viewModel(
+        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+    )
+
+    Log.i(TAG, "Note: entriesUiState date: ${entryViewModel.entriesUiState.entryDetails.date}")
+    Log.i(TAG, "Note: entryViewModel: ${entryViewModel.entryFromDate(date)}")
+
+    val entryDetails = entryViewModel.entriesUiState.entryDetails
+    Log.i(TAG, "Note: entryDetails: ${entryDetails}")
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Row {
             AddNoteCard(
                 entryUiState = entryViewModel.entriesUiState,
                 onEntryValueChange = entryViewModel::updateUiState,
                 entryDetails = entryDetails
             )
         }
+        Row {
+            Button(onClick = {
+                Log.i(TAG, "Note: entryDetails: After card: $entryDetails");
+                navigator.navigate(
+                    SaveScreenDestination(date)
+                )
+            }) {
+                Text("Go to Save Screen")
+            }
+        }
+    }
+}
 
-        *//** save the entry **//*
+@Composable
+@Destination
+fun SaveScreen(
+    navigator: DestinationsNavigator,
+    date: String
+) {
+    val context: Context = LocalContext.current
+    val entryViewModel: EntryViewModel = viewModel(
+        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+    )
+    entryViewModel.entryFromDate(date)
+    Log.i(TAG, "Save: entryViewModel: $entryViewModel")
+    val coroutineScope = rememberCoroutineScope()
+    Log.i(TAG, "Save: entryDetails: ${entryViewModel.entriesUiState.entryDetails}");
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Row {
             SaveCard(
                 onSaveClick = {
+                    Log.i(TAG, "Save: entryDetails: After card:${entryViewModel.entriesUiState.entryDetails}");
                     coroutineScope.launch {
                         entryViewModel.saveEntry()
                     }
+                    navigator.navigate(
+                        DisplayEntryScreenDestination()
+                    )
                 }
             )
         }
+    }
+}
 
-        *//** display all database entries **//*
+@Composable
+@Destination
+fun DisplayEntryScreen(
+    navigator: DestinationsNavigator,
+) {
+    val context: Context = LocalContext.current
+    val entryViewModel: EntryViewModel = viewModel(
+        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+    )
+    val entries: List<JournalEntry> by entryViewModel.allEntries.observeAsState(listOf())
+
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Text(
             modifier = Modifier
                 .fillMaxWidth()
@@ -130,27 +225,20 @@ fun EntryScreen(
                     DisplayEntriesCard(journalEntry = it)
                 }
             }
-        }*/
+        }
+        Button(
+            onClick = {
+                Log.i(TAG, "Display entry: ${entryViewModel.entriesUiState.entryDetails}");
+
+                // Navigates back to 1st screen
+                navigator.navigate(EntryScreenDestination())
+            }
+        ) {
+            Text(text = "Navigate back")
+        }
     }
 }
 
-@Destination
-@Composable
-fun NoteScreen(
-    navigator: DestinationsNavigator,
-    journalEntry: JournalEntry
-) {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text("Profile Screen: ${journalEntry.mood}", textAlign = TextAlign.Center)
-    }
-}
-
-
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMoodCard(
     entryUiState: EntryUiState,
@@ -192,7 +280,6 @@ fun AddMoodCard(
 }
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNoteCard(
     entryUiState: EntryUiState,
