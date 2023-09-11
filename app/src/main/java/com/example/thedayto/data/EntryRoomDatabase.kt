@@ -42,6 +42,7 @@ abstract class EntryRoomDatabase: RoomDatabase() {
                     "thedayto_database"
                 )
                 .addCallback(EntryDatabaseCallback(scope))
+                .allowMainThreadQueries()
                 .build()
                 INSTANCE = instance
                 instance

@@ -6,6 +6,5 @@ import com.ramcosta.composedestinations.DestinationsNavHost
 
 @Composable
 fun TheDayToApp() {
-    DestinationsNavHost(navGraph = NavGraphs.root)
+    DestinationsNavHost(navGraph = NavGraphs.root, )
 }
-

@@ -43,7 +43,6 @@ class EntryViewModel(private val entryRepository: EntryRepository): ViewModel() 
     fun insert(journalEntry: JournalEntry) = viewModelScope.launch {
         entryRepository.insert(journalEntry)
     }
-
     suspend fun saveEntry() {
         if (validateInput()) {
             entryRepository.insert(entriesUiState.entryDetails.toEntry())

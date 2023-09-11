@@ -6,7 +6,6 @@ import kotlinx.coroutines.flow.Flow
 class EntryRepository(private val entryDao: EntryDao) {
 
     val allEntries: Flow<List<JournalEntry>> = entryDao.getEntriesOrderedByDate()
-
     fun getEntryFromDate(date: String): JournalEntry = entryDao.getEntryFromDate(date)
 
     @Suppress("RedundantSuspendModifier")
