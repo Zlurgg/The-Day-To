@@ -1,4 +1,4 @@
-package com.example.thedayto.data
+package com.example.thedayto.data.local
 
 import android.content.Context
 import androidx.room.Database
@@ -8,10 +8,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@Database(entities = [JournalEntry::class], version = 1, exportSchema = false)
+@Database(entities = [TheDayToEntity::class], version = 1, exportSchema = false)
 abstract class EntryRoomDatabase: RoomDatabase() {
 
-    abstract fun entryDao(): EntryDao
+    abstract fun entryDao(): TheDayToDao
 
     private class EntryDatabaseCallback(
         private val scope: CoroutineScope
@@ -51,12 +51,12 @@ abstract class EntryRoomDatabase: RoomDatabase() {
     }
 }
 
-suspend fun populateDatabase(entryDao: EntryDao) {
+suspend fun populateDatabase(theDayToDao: TheDayToDao) {
     // Delete all content here.
-    entryDao.deleteAll()
+    theDayToDao.deleteAll()
 
     // Add sample words.
-    val journalEntry = JournalEntry(1, "sample mood", "sample note", "1973-01-01")
-    entryDao.insert(journalEntry)
+    val theDayToEntity = TheDayToEntity(1, "sample mood", "sample note", "1973-01-01")
+    theDayToDao.insert(theDayToEntity)
 }
 

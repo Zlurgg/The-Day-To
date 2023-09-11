@@ -1,4 +1,4 @@
-package com.example.thedayto.data
+package com.example.thedayto.data.local
 
 import android.os.Parcelable
 import androidx.room.ColumnInfo
@@ -8,7 +8,7 @@ import kotlinx.parcelize.Parcelize
 
 @Entity(tableName = "entries_table")
 @Parcelize
-class JournalEntry(
+class TheDayToEntity(
     @PrimaryKey(autoGenerate = true) val id: Int,
     @ColumnInfo(name = "mood") val mood: String,
     @ColumnInfo(name = "note") val note: String,

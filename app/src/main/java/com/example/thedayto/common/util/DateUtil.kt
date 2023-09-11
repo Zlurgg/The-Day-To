@@ -1,4 +1,4 @@
-package com.example.thedayto.util
+package com.example.thedayto.common.util
 
 import java.text.SimpleDateFormat
 import java.util.Calendar

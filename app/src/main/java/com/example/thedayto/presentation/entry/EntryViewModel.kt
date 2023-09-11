@@ -1,4 +1,4 @@
-package com.example.thedayto.ui.screens
+package com.example.thedayto.presentation.entry
 
 import android.util.Log
 import androidx.compose.runtime.getValue
@@ -9,16 +9,13 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.viewModelScope
-import com.example.thedayto.data.EntryRepository
-import com.example.thedayto.data.JournalEntry
-import com.example.thedayto.ui.EntryDetails
-import com.example.thedayto.ui.EntryUiState
-import com.example.thedayto.ui.toEntry
+import com.example.thedayto.domain.repository.TheDayToRepository
+import com.example.thedayto.data.local.TheDayToEntity
 import kotlinx.coroutines.launch
 
 private const val TAG = "EntryViewModel"
 
-class EntryViewModel(private val entryRepository: EntryRepository): ViewModel() {
+class EntryViewModel(private val theDayToRepository: TheDayToRepository): ViewModel() {
 
     /**
      * Holds current entry ui state
@@ -35,17 +32,17 @@ class EntryViewModel(private val entryRepository: EntryRepository): ViewModel() 
             EntryUiState(entryDetails = entryDetails, isEntryValid = validateInput(entryDetails))
     }
 
-    val allEntries: LiveData<List<JournalEntry>> = entryRepository.allEntries.asLiveData()
+    val allEntries: LiveData<List<TheDayToEntity>> = theDayToRepository.allEntries.asLiveData()
 
     /**
      * Inserts an [Entry] in the Room database
      */
-    fun insert(journalEntry: JournalEntry) = viewModelScope.launch {
-        entryRepository.insert(journalEntry)
+    fun insert(theDayToEntity: TheDayToEntity) = viewModelScope.launch {
+        theDayToRepository.insert(theDayToEntity)
     }
     suspend fun saveEntry() {
         if (validateInput()) {
-            entryRepository.insert(entriesUiState.entryDetails.toEntry())
+            theDayToRepository.insert(entriesUiState.entryDetails.toEntry())
         } else {
             Log.i(TAG, "Input not valid: " + entriesUiState.entryDetails);
         }
@@ -58,11 +55,11 @@ class EntryViewModel(private val entryRepository: EntryRepository): ViewModel() 
     }
 
     fun entryFromDate(date: String) = viewModelScope.launch {
-        entryRepository.getEntryFromDate(date)
+        theDayToRepository.getEntryFromDate(date)
     }
 }
 
-class EntryViewModelFactory(private val repository: EntryRepository) : ViewModelProvider.Factory {
+class EntryViewModelFactory(private val repository: TheDayToRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
         if (modelClass.isAssignableFrom(EntryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")

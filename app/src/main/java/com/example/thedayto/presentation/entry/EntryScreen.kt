@@ -1,4 +1,4 @@
-package com.example.thedayto.ui.screens
+package com.example.thedayto.presentation.entry
 
 import android.content.ContentValues.TAG
 import android.content.Context
@@ -19,6 +19,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -34,20 +35,17 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.thedayto.data.EntryApplication
-import com.example.thedayto.data.JournalEntry
-import com.example.thedayto.ui.EntryDetails
-import com.example.thedayto.ui.EntryUiState
-import com.example.thedayto.util.DateUtil
+import com.example.thedayto.TheDayToApplication
+import com.example.thedayto.data.local.TheDayToEntity
+import com.example.thedayto.common.util.DateUtil
 import kotlinx.coroutines.launch
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
-import androidx.lifecycle.ViewModelProvider
-import com.example.thedayto.ui.screens.destinations.DisplayEntryScreenDestination
-import com.example.thedayto.ui.screens.destinations.EntryScreenDestination
-import com.example.thedayto.ui.screens.destinations.MoodScreenDestination
-import com.example.thedayto.ui.screens.destinations.NoteScreenDestination
-import com.example.thedayto.ui.screens.destinations.SaveScreenDestination
+import com.example.thedayto.presentation.entry.destinations.DisplayEntryScreenDestination
+import com.example.thedayto.presentation.entry.destinations.EntryScreenDestination
+import com.example.thedayto.presentation.entry.destinations.MoodScreenDestination
+import com.example.thedayto.presentation.entry.destinations.NoteScreenDestination
+import com.example.thedayto.presentation.entry.destinations.SaveScreenDestination
 import com.ramcosta.composedestinations.annotation.Destination
 import com.ramcosta.composedestinations.navigation.DestinationsNavigator
 
@@ -85,7 +83,7 @@ fun MoodScreen(
 ) {
     val context: Context = LocalContext.current
     val entryViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+        factory = EntryViewModelFactory((context.applicationContext as TheDayToApplication).repository)
     )
     val entryDetails = entryViewModel.entriesUiState.entryDetails
     val date = DateUtil().getCurrentDate()
@@ -123,7 +121,7 @@ fun NoteScreen(
 ) {
     val context: Context = LocalContext.current
     val entryViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+        factory = EntryViewModelFactory((context.applicationContext as TheDayToApplication).repository)
     )
 
     Log.i(TAG, "Note: entriesUiState date: ${entryViewModel.entriesUiState.entryDetails.date}")
@@ -165,7 +163,7 @@ fun SaveScreen(
 ) {
     val context: Context = LocalContext.current
     val entryViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+        factory = EntryViewModelFactory((context.applicationContext as TheDayToApplication).repository)
     )
     entryViewModel.entryFromDate(date)
     Log.i(TAG, "Save: entryViewModel: $entryViewModel")
@@ -200,9 +198,9 @@ fun DisplayEntryScreen(
 ) {
     val context: Context = LocalContext.current
     val entryViewModel: EntryViewModel = viewModel(
-        factory = EntryViewModelFactory((context.applicationContext as EntryApplication).repository)
+        factory = EntryViewModelFactory((context.applicationContext as TheDayToApplication).repository)
     )
-    val entries: List<JournalEntry> by entryViewModel.allEntries.observeAsState(listOf())
+    val entries: List<TheDayToEntity> by entryViewModel.allEntries.observeAsState(listOf())
 
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -222,7 +220,7 @@ fun DisplayEntryScreen(
                 items(
                     entries
                 ) {
-                    DisplayEntriesCard(journalEntry = it)
+                    DisplayEntriesCard(theDayToEntity = it)
                 }
             }
         }
@@ -239,6 +237,7 @@ fun DisplayEntryScreen(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMoodCard(
     entryUiState: EntryUiState,
@@ -280,6 +279,7 @@ fun AddMoodCard(
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddNoteCard(
     entryUiState: EntryUiState,
@@ -349,7 +349,7 @@ fun SaveCard(
 
 
 @Composable
-fun DisplayEntriesCard(journalEntry: JournalEntry) {
+fun DisplayEntriesCard(theDayToEntity: TheDayToEntity) {
     Card(
         modifier = Modifier
             .padding(4.dp)
@@ -365,28 +365,28 @@ fun DisplayEntriesCard(journalEntry: JournalEntry) {
                 .padding(4.dp),
         ) {
             Text(
-                text = journalEntry.id.toString() + " | ",
+                text = theDayToEntity.id.toString() + " | ",
                 style = TextStyle(
                     color = Color.Black,
                     fontSize = 15.sp
                 ),
             )
             Text(
-                text = journalEntry.date + " | ",
+                text = theDayToEntity.date + " | ",
                 style = TextStyle(
                     color = Color.Black,
                     fontSize = 15.sp
                 )
             )
             Text(
-                text = journalEntry.mood + " | ",
+                text = theDayToEntity.mood + " | ",
                 style = TextStyle(
                     color = Color.Black,
                     fontSize = 15.sp
                 )
             )
             Text(
-                text = journalEntry.note,
+                text = theDayToEntity.note,
                 style = TextStyle(
                     color = Color.Black,
                     fontSize = 15.sp
