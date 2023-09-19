@@ -124,6 +124,9 @@ dependencies {
     implementation ("com.opencsv:opencsv:5.5.2")
 
     // Coil
-    implementation("io.coil-kt:coil-compose:1.4.0")
+    implementation("io.coil-kt:coil-compose:2.2.2")
+
+    //Date Picker
+    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
 
 }

@@ -12,12 +12,29 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import java.time.LocalDate
 
 @Composable
 fun CalenderScreen(
     navController: NavController,
     modifier: Modifier
 ) {
+
+    /** Get dimensions for calender (on refresh update rows) **/
+    val date = LocalDate.now()
+    val columns = 7
+    val rows = 5
+
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Text("current date: $date")
+    }
+
+
     Row(
         modifier = modifier
             .fillMaxWidth()
@@ -30,14 +47,6 @@ fun CalenderScreen(
             }
         ) {
             Text("Add Entry")
-        }
-        Spacer(modifier = modifier.padding(16.dp))
-        Button(
-            onClick = {
-                navController.navigate(route = Screen.EntryScreen.route)
-            }
-        ) {
-            Text("Edit Entry")
         }
     }
 }
