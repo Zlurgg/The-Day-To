@@ -9,5 +9,5 @@ fun EntryScreen(
     navController: NavController,
     modifier: Modifier
 ) {
-    // Depending on if adding new or editing existing mood display correct screen
+    // Display list of current entries
 }

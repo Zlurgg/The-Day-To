@@ -5,6 +5,11 @@ import androidx.room.Room
 import com.jbrightman.thedayto.feature_thedayto.data.data_source.TheDayToDatabase
 import com.jbrightman.thedayto.feature_thedayto.data.repository.TheDayToRepositoryImpl
 import com.jbrightman.thedayto.feature_thedayto.domain.repository.TheDayToRepository
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.AddEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.DeleteEntryUseCase
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntriesUseCase
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntry
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -31,12 +36,14 @@ object AppModule {
         return TheDayToRepositoryImpl(db.theDayToDao)
     }
 
-    //TODO Use Cases
-/*    @Provides
+    @Provides
     @Singleton
-    fun provideTheDayToUseCases(theDayToRepository: TheDayToRepository): TheDayToUseCases {
-        return TheDayToUseCases(
-            addMood = GetTheDayToUseCases(repository = theDayToRepository),
+    fun provideTheDayToEntryUseCases(theDayToRepository: TheDayToRepository): EntryUseCases {
+        return EntryUseCases(
+            getEntries = GetEntriesUseCase(repository = theDayToRepository),
+            getEntry = GetEntry(repository = theDayToRepository),
+            deleteEntry = DeleteEntryUseCase(repository = theDayToRepository),
+            addEntry = AddEntry(repository = theDayToRepository)
         )
-    }*/
+    }
 }

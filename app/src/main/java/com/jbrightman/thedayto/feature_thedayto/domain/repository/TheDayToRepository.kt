@@ -6,6 +6,6 @@ import kotlinx.coroutines.flow.Flow
 interface TheDayToRepository {
     fun getTheDayToEntries(): Flow<List<TheDayToEntry>>
     suspend fun  getTheDayToEntryById(id: Int): TheDayToEntry?
-    suspend fun insertNote(entry: TheDayToEntry)
-    suspend fun deleteNote(entry: TheDayToEntry)
+    suspend fun insertEntry(entry: TheDayToEntry)
+    suspend fun deleteEntry(entry: TheDayToEntry)
 }

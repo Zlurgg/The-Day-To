@@ -16,11 +16,11 @@ class TheDayToRepositoryImpl (
         return dao.getTheDayToEntryById(id)
     }
 
-    override suspend fun insertNote(entry: TheDayToEntry) {
+    override suspend fun insertEntry(entry: TheDayToEntry) {
         return dao.insertEntry(entry)
     }
 
-    override suspend fun deleteNote(entry: TheDayToEntry) {
+    override suspend fun deleteEntry(entry: TheDayToEntry) {
         return dao.deleteEntry(entry)
     }
 }

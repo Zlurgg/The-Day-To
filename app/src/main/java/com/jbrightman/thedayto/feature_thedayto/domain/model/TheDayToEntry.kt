@@ -6,9 +6,9 @@ import androidx.room.PrimaryKey
 @Entity
 data class TheDayToEntry(
     val mood: String,
-    val note: String,
-    val timeStamp: Long,
+    val content: String,
+    val dateStamp: Long,
     @PrimaryKey val id: Int? = null
 )
 
-class InvalidTheDayToException(message: String): Exception(message)
+class InvalidTheDayToEntryException(message: String): Exception(message)
