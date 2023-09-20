@@ -100,8 +100,8 @@ dependencies {
     ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")
 
     //Dagger - Hilt
-    implementation("com.google.dagger:hilt-android:2.48")
-    ksp("com.google.dagger:hilt-android-compiler:2.48")
+    implementation("com.google.dagger:hilt-android:2.47")
+    ksp("com.google.dagger:hilt-android-compiler:2.47")
     ksp("androidx.hilt:hilt-compiler:1.0.0")
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
 

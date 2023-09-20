@@ -13,20 +13,20 @@ class GetEntriesUseCase(
     operator fun invoke(
         entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending)
     ): Flow<List<TheDayToEntry>> {
-        return repository.getTheDayToEntries().map { notes ->
+        return repository.getTheDayToEntries().map { entries ->
             when (entryOrder.orderType) {
                 is OrderType.Ascending -> {
                     when (entryOrder) {
-                        is EntryOrder.Date -> notes.sortedBy { it.dateStamp }
-                        is EntryOrder.Title -> notes.sortedBy { it.mood.lowercase() }
-                        is EntryOrder.Color -> notes.sortedBy { it.content }
+                        is EntryOrder.Date -> entries.sortedBy { it.dateStamp }
+                        is EntryOrder.Title -> entries.sortedBy { it.mood.lowercase() }
+                        is EntryOrder.Color -> entries.sortedBy { it.content }
                     }
                 }
                 is OrderType.Descending -> {
                     when (entryOrder) {
-                        is EntryOrder.Date -> notes.sortedByDescending { it.dateStamp }
-                        is EntryOrder.Title -> notes.sortedByDescending { it.mood.lowercase() }
-                        is EntryOrder.Color -> notes.sortedByDescending { it.content }
+                        is EntryOrder.Date -> entries.sortedByDescending { it.dateStamp }
+                        is EntryOrder.Title -> entries.sortedByDescending { it.mood.lowercase() }
+                        is EntryOrder.Color -> entries.sortedByDescending { it.content }
                     }
                 }
             }

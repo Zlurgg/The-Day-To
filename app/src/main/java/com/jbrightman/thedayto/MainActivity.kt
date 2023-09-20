@@ -8,7 +8,7 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.TheDayToApp
 import com.jbrightman.thedayto.ui.theme.TheDayToTheme
 import dagger.hilt.android.AndroidEntryPoint
 
-//@AndroidEntryPoint
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

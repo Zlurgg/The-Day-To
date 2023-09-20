@@ -10,7 +10,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.calendar.CalenderScreen
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.EntryScreen
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryScreen
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 
 @Composable
@@ -24,20 +25,26 @@ fun TheDayToApp(
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = Screen.CalenderScreen.route
+            startDestination = Screen.EntriesScreen.route
         ) {
+            composable(route = Screen.EntriesScreen.route) {
+                EntriesScreen(
+                    navController = navController,
+                    modifier = Modifier
+                )
+            }
+            composable(route = Screen.AddEditEntryScreen.route) {
+                AddEditEntryScreen(
+                    navController = navController
+                )
+            }
             composable(route = Screen.CalenderScreen.route) {
                 CalenderScreen(
                     modifier = Modifier,
                     navController = navController
                 )
             }
-            composable(route = Screen.EntryScreen.route) {
-                EntryScreen(
-                    navController = navController,
-                    modifier = Modifier
-                )
-            }
+
         }
     }
 }
