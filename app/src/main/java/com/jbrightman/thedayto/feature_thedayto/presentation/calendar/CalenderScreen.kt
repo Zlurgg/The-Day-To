@@ -43,7 +43,7 @@ fun CalenderScreen(
     ) {
         Button(
             onClick = {
-                navController.navigate(route = Screen.EntryScreen.route)
+                navController.navigate(route = Screen.EntriesScreen.route)
             }
         ) {
             Text("Add Entry")
