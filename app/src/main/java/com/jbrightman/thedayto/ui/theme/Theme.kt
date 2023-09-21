@@ -16,15 +16,19 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val darkColorScheme = darkColorScheme(
-    primary = Purple80,
-    secondary = PurpleGrey80,
-    tertiary = Pink80
+    primary = white,
+    background = darkGray,
+    onBackground = white,
+    surface = orange,
+    onSurface = darkGray
 )
 
 private val lightColorScheme = lightColorScheme(
-    primary = Purple40,
-    secondary = PurpleGrey40,
-    tertiary = Pink40
+    primary = darkGray,
+    background = white,
+    onBackground = darkGray,
+    surface = orange,
+    onSurface = darkGray
 )
 
 @Composable
@@ -54,6 +58,7 @@ fun TheDayToTheme(
 
     MaterialTheme(
         colorScheme = colorScheme,
+        shapes = shapes,
         typography = Typography,
         content = content
     )
