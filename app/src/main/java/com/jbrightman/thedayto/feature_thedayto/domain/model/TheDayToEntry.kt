@@ -6,7 +6,6 @@ import com.jbrightman.thedayto.ui.theme.*
 
 @Entity
 data class TheDayToEntry(
-    val title: String,
     val mood: String,
     val content: String,
     val dateStamp: Long,
@@ -15,6 +14,7 @@ data class TheDayToEntry(
 ) {
     companion object {
         val entryColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
+        val defaultMoods = listOf("Happy", "Sad", "Meh", "Depressed", "Heart-Broken", "Angry", "Overjoyed")
     }
 }
 class InvalidTheDayToEntryException(message: String): Exception(message)

@@ -18,14 +18,14 @@ class GetEntriesUseCase(
                 is OrderType.Ascending -> {
                     when (entryOrder) {
                         is EntryOrder.Date -> entries.sortedBy { it.dateStamp }
-                        is EntryOrder.Title -> entries.sortedBy { it.mood.lowercase() }
+                        is EntryOrder.Mood -> entries.sortedBy { it.mood.lowercase() }
                         is EntryOrder.Color -> entries.sortedBy { it.content }
                     }
                 }
                 is OrderType.Descending -> {
                     when (entryOrder) {
                         is EntryOrder.Date -> entries.sortedByDescending { it.dateStamp }
-                        is EntryOrder.Title -> entries.sortedByDescending { it.mood.lowercase() }
+                        is EntryOrder.Mood -> entries.sortedByDescending { it.mood.lowercase() }
                         is EntryOrder.Color -> entries.sortedByDescending { it.content }
                     }
                 }

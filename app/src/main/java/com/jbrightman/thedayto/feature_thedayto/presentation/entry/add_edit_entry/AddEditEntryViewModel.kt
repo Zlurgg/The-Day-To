@@ -31,21 +31,14 @@ class AddEditEntryViewModel @Inject constructor(
 
     private val _entryMood = mutableStateOf(
         EntryMoodState(
-            mood = ""
+            hint = "How're you feeling today?"
         )
     )
     val entryMood: State<EntryMoodState> = _entryMood
 
-    private val _entryTitle = mutableStateOf(
-        EntryTextFieldState(
-            hint = "Enter title..."
-        )
-    )
-    val entryTitle: State<EntryTextFieldState> = _entryTitle
-
     private val _entryContent = mutableStateOf(
         EntryTextFieldState(
-            hint = "Enter some content..."
+            hint = "Anything else to add?"
         )
     )
     val entryContent: State<EntryTextFieldState> = _entryContent
@@ -69,9 +62,6 @@ class AddEditEntryViewModel @Inject constructor(
                         )
                         _entryMood.value = entryMood.value.copy(
                             mood = entry.mood,
-                        )
-                        _entryTitle.value = entryTitle.value.copy(
-                            text = entry.title,
                             isHintVisible = false
                         )
                         _entryContent.value = entryContent.value.copy(
@@ -97,15 +87,10 @@ class AddEditEntryViewModel @Inject constructor(
                     mood = event.mood
                 )
             }
-            is AddEditEntryEvent.EnteredTitle -> {
-                _entryTitle.value = entryTitle.value.copy(
-                    text = event.value
-                )
-            }
-            is AddEditEntryEvent.ChangeTitleFocus -> {
-                _entryTitle.value = entryTitle.value.copy(
+            is AddEditEntryEvent.ChangeMoodFocus -> {
+                _entryMood.value = entryMood.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
-                            entryTitle.value.text.isBlank()
+                            entryMood.value.mood.isBlank()
                 )
             }
             is AddEditEntryEvent.EnteredContent -> {
@@ -129,7 +114,6 @@ class AddEditEntryViewModel @Inject constructor(
 
                         entryUseCases.addEntry(
                             TheDayToEntry(
-                                title = entryTitle.value.text,
                                 content = entryContent.value.text,
                                 color = entryColor.value,
                                 dateStamp = entryDate.value.date,
