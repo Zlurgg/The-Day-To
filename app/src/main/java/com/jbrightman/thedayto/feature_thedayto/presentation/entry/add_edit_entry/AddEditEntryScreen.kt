@@ -105,19 +105,19 @@ fun AddEditEntryScreen(
     }
 
     Scaffold(
-        topBar = {
-            Row {
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .padding(16.dp)
-                        .clickable {
-                            navController.popBackStack()
-                        }
-                )
-            }
-        },
+//        topBar = {
+//            Row {
+//                Icon(
+//                    imageVector = Icons.Filled.ArrowBack,
+//                    contentDescription = "Back",
+//                    modifier = Modifier
+//                        .padding(16.dp)
+//                        .clickable {
+//                            navController.popBackStack()
+//                        }
+//                )
+//            }
+//        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
