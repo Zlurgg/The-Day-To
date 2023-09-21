@@ -41,9 +41,9 @@ object AppModule {
     fun provideTheDayToEntryUseCases(theDayToRepository: TheDayToRepository): EntryUseCases {
         return EntryUseCases(
             getEntries = GetEntriesUseCase(repository = theDayToRepository),
-            getEntry = GetEntry(repository = theDayToRepository),
             deleteEntry = DeleteEntryUseCase(repository = theDayToRepository),
-            addEntry = AddEntry(repository = theDayToRepository)
+            addEntry = AddEntry(repository = theDayToRepository),
+            getEntry = GetEntry(repository = theDayToRepository)
         )
     }
 }
