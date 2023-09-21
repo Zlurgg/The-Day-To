@@ -28,7 +28,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ColorSelector
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DateItem
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
 import kotlinx.coroutines.flow.collectLatest
 
@@ -100,7 +100,7 @@ fun AddEditEntryScreen(
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 // Date Picker
-                DateItem(viewModel = viewModel)
+                DatePickerItem(viewModel = viewModel)
                 Spacer(modifier = Modifier.height(16.dp))
                 // Mood
                 MoodItem(viewModel = viewModel)
