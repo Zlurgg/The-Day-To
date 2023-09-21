@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -55,26 +56,29 @@ class AddEditEntryViewModel @Inject constructor(
     init {
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
             if (entryId != -1) {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     entryUseCases.getEntry(entryId)?.also { entry ->
-                        currentEntryId = entry.id
-                        _entryDate.value = entryDate.value.copy(
-                            date = entry.dateStamp,
-                        )
-                        _entryMood.value = entryMood.value.copy(
-                            mood = entry.mood,
-                            isHintVisible = false
-                        )
-                        _entryContent.value = entryContent.value.copy(
-                            text = entry.content,
-                            isHintVisible = false
-                        )
-                        _entryColor.value = entry.color
+                        withContext(Dispatchers.Main) {
+                            currentEntryId = entry.id
+                            _entryDate.value = entryDate.value.copy(
+                                    date = entry.dateStamp,
+                                )
+                            }
+                            _entryMood.value = entryMood.value.copy(
+                                mood = entry.mood,
+                                isHintVisible = false
+                            )
+                            _entryContent.value = entryContent.value.copy(
+                                text = entry.content,
+                                isHintVisible = false
+                            )
+                            _entryColor.value = entry.color
+                        }
                     }
                 }
             }
         }
-    }
+
 
     fun onEvent(event: AddEditEntryEvent) {
         when (event) {
