@@ -24,9 +24,9 @@ fun OrderSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-             text = "Title",
-             selected = entryOrder is EntryOrder.Title,
-             onSelect = { onOrderChange(EntryOrder.Title(entryOrder.orderType)) }
+             text = "Mood",
+             selected = entryOrder is EntryOrder.Mood,
+             onSelect = { onOrderChange(EntryOrder.Mood(entryOrder.orderType)) }
             )
             Spacer(modifier = Modifier.width(8.dp))
             DefaultRadioButton(
