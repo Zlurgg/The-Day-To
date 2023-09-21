@@ -31,7 +31,7 @@ class AddEditEntryViewModel @Inject constructor(
 
     private val _entryMood = mutableStateOf(
         EntryMoodState(
-            mood = ""
+            hint = "How're you feeling today?"
         )
     )
     val entryMood: State<EntryMoodState> = _entryMood
@@ -69,6 +69,7 @@ class AddEditEntryViewModel @Inject constructor(
                         )
                         _entryMood.value = entryMood.value.copy(
                             mood = entry.mood,
+                            isHintVisible = false
                         )
                         _entryTitle.value = entryTitle.value.copy(
                             text = entry.title,
@@ -95,6 +96,12 @@ class AddEditEntryViewModel @Inject constructor(
             is AddEditEntryEvent.EnteredMood -> {
                 _entryMood.value = entryMood.value.copy(
                     mood = event.mood
+                )
+            }
+            is AddEditEntryEvent.ChangeMoodFocus -> {
+                _entryMood.value = entryMood.value.copy(
+                    isHintVisible = !event.focusState.isFocused &&
+                            entryMood.value.mood.isBlank()
                 )
             }
             is AddEditEntryEvent.EnteredTitle -> {
