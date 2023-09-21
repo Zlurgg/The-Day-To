@@ -31,7 +31,7 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 @Composable
-fun DateItem(
+fun DatePickerItem(
     viewModel: AddEditEntryViewModel
 ) {
     val dateDialogState = rememberMaterialDialogState()
