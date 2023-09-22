@@ -14,6 +14,7 @@ import androidx.navigation.navArgument
 import com.jbrightman.thedayto.feature_thedayto.presentation.calendar.CalenderScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesScreen
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.LocalDim
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 
 @Composable
@@ -25,6 +26,8 @@ fun TheDayToApp(
             .background(MaterialTheme.colorScheme.background)
     ) {
         val navController = rememberNavController()
+        val dimensions = LocalDim.current
+
         NavHost(
             navController = navController,
             startDestination = Screen.EntriesScreen.route
@@ -32,7 +35,7 @@ fun TheDayToApp(
             composable(route = Screen.EntriesScreen.route) {
                 EntriesScreen(
                     navController = navController,
-                    modifier = Modifier
+                    dimensions = dimensions
                 )
             }
             composable(route = Screen.AddEditEntryScreen.route +
@@ -55,13 +58,15 @@ fun TheDayToApp(
                 val color = it.arguments?.getInt("entryColor") ?: -1
                 AddEditEntryScreen(
                     navController = navController,
-                    entryColor = color
+                    entryColor = color,
+                    dimensions = dimensions
                 )
             }
             composable(route = Screen.CalenderScreen.route) {
                 CalenderScreen(
                     modifier = Modifier,
-                    navController = navController
+                    navController = navController,
+                    dimensions = dimensions
                 )
             }
 

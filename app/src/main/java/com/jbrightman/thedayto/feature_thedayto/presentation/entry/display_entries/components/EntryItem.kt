@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.longToFormattedDateText
 
 @Composable
@@ -37,7 +38,8 @@ fun EntryItem(
     modifier: Modifier,
     cornerRadius: Dp = 10.dp,
     cutCornerSize: Dp = 30.dp,
-    onDeleteClick: () -> Unit
+    onDeleteClick: () -> Unit,
+    dimensions: Dimensions
 ) {
     Box(
         modifier = modifier
@@ -73,8 +75,8 @@ fun EntryItem(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp)
-                .padding(end = 32.dp)
+                .padding(dimensions.paddingMedium)
+                .padding(end = dimensions.paddingLarge)
         ) {
             Text(
                 text = longToFormattedDateText(entry.dateStamp),
@@ -82,14 +84,14 @@ fun EntryItem(
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensions.paddingSmall))
             Text(
                 text = entry.mood,
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensions.paddingSmall))
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge,

@@ -38,8 +38,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.jbrightman.thedayto.R
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import kotlinx.coroutines.launch
 
@@ -47,13 +49,53 @@ import kotlinx.coroutines.launch
 fun EntriesScreen(
     navController: NavController,
     viewModel: EntriesViewModel = hiltViewModel(),
-    modifier: Modifier
+    dimensions: Dimensions
 ) {
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
     Scaffold(
+        topBar = {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensions.paddingSmall),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Your entries",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(EntriesEvent.ToggleOrderSection)
+                    },
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = "Sort"
+                    )
+                }
+            }
+            AnimatedVisibility(
+                visible = state.isOrderSectionVisible,
+                enter = fadeIn() + slideInVertically(),
+                exit = fadeOut() + slideOutVertically()
+            ) {
+                OrderSection(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = dimensions.paddingVeryLarge),
+                    entryOrder = state.entryOrder,
+                    onOrderChange = {
+                        viewModel.onEvent(EntriesEvent.Order(it))
+                    },
+                    dimensions = dimensions
+                )
+            }
+        },
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
@@ -69,44 +111,9 @@ fun EntriesScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(padding)
+                    .padding(dimensions.paddingMedium)
             ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Your entries",
-                        style = MaterialTheme.typography.headlineMedium
-                    )
-                    IconButton(
-                        onClick = {
-                            viewModel.onEvent(EntriesEvent.ToggleOrderSection)
-                        },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.List,
-                            contentDescription = "Sort"
-                        )
-                    }
-                }
-                AnimatedVisibility(
-                    visible = state.isOrderSectionVisible,
-                    enter = fadeIn() + slideInVertically(),
-                    exit = fadeOut() + slideOutVertically()
-                ) {
-                    OrderSection(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 16.dp),
-                        entryOrder = state.entryOrder,
-                        onOrderChange = {
-                            viewModel.onEvent(EntriesEvent.Order(it))
-                        }
-                    )
-                }
-                Spacer(modifier = Modifier.height(16.dp))
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.entries) { entry ->
                         EntryItem(
@@ -130,9 +137,10 @@ fun EntriesScreen(
                                         viewModel.onEvent(EntriesEvent.RestoreEntry)
                                     }
                                 }
-                            }
+                            },
+                            dimensions = dimensions
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensions.paddingMedium))
                     }
                 }
             }

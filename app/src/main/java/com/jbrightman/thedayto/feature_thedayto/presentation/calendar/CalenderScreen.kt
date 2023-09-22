@@ -11,13 +11,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import java.time.LocalDate
 
 @Composable
 fun CalenderScreen(
     navController: NavController,
-    modifier: Modifier
+    modifier: Modifier,
+    dimensions: Dimensions
 ) {
 
     /** Get dimensions for calender (on refresh update rows) **/
@@ -28,7 +30,7 @@ fun CalenderScreen(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(dimensions.paddingMedium),
         verticalAlignment = Alignment.Top
     ) {
         Text("current date: $date")
@@ -38,7 +40,7 @@ fun CalenderScreen(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .padding(dimensions.paddingMedium),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Button(

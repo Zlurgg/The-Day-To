@@ -30,13 +30,15 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entr
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
 fun AddEditEntryScreen(
     navController: NavController,
     entryColor: Int,
-    viewModel: AddEditEntryViewModel = hiltViewModel()
+    viewModel: AddEditEntryViewModel = hiltViewModel(),
+    dimensions: Dimensions
 ) {
     val entryBackgroundAnimatatable = remember {
         Animatable(
@@ -67,7 +69,7 @@ fun AddEditEntryScreen(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
                     modifier = Modifier
-                        .padding(16.dp)
+                        .padding(dimensions.paddingMedium)
                         .clickable {
                             navController.popBackStack()
                         }
@@ -91,20 +93,20 @@ fun AddEditEntryScreen(
                     .fillMaxSize()
                     .background(entryBackgroundAnimatatable.value)
                     .padding(padding)
-                    .padding(16.dp)
+                    .padding(dimensions.paddingMedium)
             ) {
                 // Entry Color Selection
                 ColorSelector(
                     entryBackgroundAnimatatable =  entryBackgroundAnimatatable,
                     viewModel = viewModel
                 )
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
                 // Date Picker
                 DatePickerItem(viewModel = viewModel)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
                 // Mood
                 MoodItem(viewModel = viewModel)
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
                 // Content
                 ContentItem(viewModel = viewModel)
             }
