@@ -3,12 +3,10 @@ package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entr
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
@@ -29,8 +27,10 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.longToFormattedDateText
+import com.jbrightman.thedayto.ui.theme.paddingLarge
+import com.jbrightman.thedayto.ui.theme.paddingMedium
+import com.jbrightman.thedayto.ui.theme.paddingSmall
 
 @Composable
 fun EntryItem(
@@ -38,8 +38,7 @@ fun EntryItem(
     modifier: Modifier,
     cornerRadius: Dp = 10.dp,
     cutCornerSize: Dp = 30.dp,
-    onDeleteClick: () -> Unit,
-    dimensions: Dimensions
+    onDeleteClick: () -> Unit
 ) {
     Box(
         modifier = modifier
@@ -75,8 +74,8 @@ fun EntryItem(
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(dimensions.paddingMedium)
-                .padding(end = dimensions.paddingLarge)
+                .padding(paddingMedium)
+                .padding(end = paddingLarge)
         ) {
             Text(
                 text = longToFormattedDateText(entry.dateStamp),
@@ -84,14 +83,14 @@ fun EntryItem(
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(dimensions.paddingSmall))
+            Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.mood,
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
             )
-            Spacer(modifier = Modifier.height(dimensions.paddingSmall))
+            Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge,

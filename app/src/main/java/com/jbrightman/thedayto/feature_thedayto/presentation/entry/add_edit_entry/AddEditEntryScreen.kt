@@ -23,14 +23,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ColorSelector
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
+import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
 
 @Composable
@@ -38,7 +37,6 @@ fun AddEditEntryScreen(
     navController: NavController,
     entryColor: Int,
     viewModel: AddEditEntryViewModel = hiltViewModel(),
-    dimensions: Dimensions
 ) {
     val entryBackgroundAnimatatable = remember {
         Animatable(
@@ -69,7 +67,7 @@ fun AddEditEntryScreen(
                     imageVector = Icons.Filled.ArrowBack,
                     contentDescription = "Back",
                     modifier = Modifier
-                        .padding(dimensions.paddingMedium)
+                        .padding(paddingMedium)
                         .clickable {
                             navController.popBackStack()
                         }
@@ -93,20 +91,20 @@ fun AddEditEntryScreen(
                     .fillMaxSize()
                     .background(entryBackgroundAnimatatable.value)
                     .padding(padding)
-                    .padding(dimensions.paddingMedium)
+                    .padding(paddingMedium)
             ) {
                 // Entry Color Selection
                 ColorSelector(
                     entryBackgroundAnimatatable =  entryBackgroundAnimatatable,
                     viewModel = viewModel
                 )
-                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
+                Spacer(modifier = Modifier.height(paddingMedium))
                 // Date Picker
                 DatePickerItem(viewModel = viewModel)
-                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
+                Spacer(modifier = Modifier.height(paddingMedium))
                 // Mood
                 MoodItem(viewModel = viewModel)
-                Spacer(modifier = Modifier.height(dimensions.paddingMedium))
+                Spacer(modifier = Modifier.height(paddingMedium))
                 // Content
                 ContentItem(viewModel = viewModel)
             }

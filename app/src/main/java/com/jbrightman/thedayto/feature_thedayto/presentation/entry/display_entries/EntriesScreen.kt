@@ -19,7 +19,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -35,21 +34,20 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.jbrightman.thedayto.R
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.Dimensions
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import com.jbrightman.thedayto.ui.theme.paddingMedium
+import com.jbrightman.thedayto.ui.theme.paddingSmall
+import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
 import kotlinx.coroutines.launch
 
 @Composable
 fun EntriesScreen(
     navController: NavController,
     viewModel: EntriesViewModel = hiltViewModel(),
-    dimensions: Dimensions
 ) {
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
@@ -60,7 +58,7 @@ fun EntriesScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(dimensions.paddingSmall),
+                    .padding(paddingSmall),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -87,12 +85,11 @@ fun EntriesScreen(
                 OrderSection(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = dimensions.paddingVeryLarge),
+                        .padding(vertical = paddingVeryLarge),
                     entryOrder = state.entryOrder,
                     onOrderChange = {
                         viewModel.onEvent(EntriesEvent.Order(it))
-                    },
-                    dimensions = dimensions
+                    }
                 )
             }
         },
@@ -112,7 +109,7 @@ fun EntriesScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(dimensions.paddingMedium)
+                    .padding(paddingMedium)
             ) {
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.entries) { entry ->
@@ -137,10 +134,9 @@ fun EntriesScreen(
                                         viewModel.onEvent(EntriesEvent.RestoreEntry)
                                     }
                                 }
-                            },
-                            dimensions = dimensions
+                            }
                         )
-                        Spacer(modifier = Modifier.height(dimensions.paddingMedium))
+                        Spacer(modifier = Modifier.height(paddingMedium))
                     }
                 }
             }
