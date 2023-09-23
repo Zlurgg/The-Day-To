@@ -28,7 +28,7 @@ fun TheDayToApp(
 
         NavHost(
             navController = navController,
-            startDestination = Screen.EntriesScreen.route
+            startDestination = Screen.CalenderScreen.route
         ) {
             composable(route = Screen.EntriesScreen.route) {
                 EntriesScreen(

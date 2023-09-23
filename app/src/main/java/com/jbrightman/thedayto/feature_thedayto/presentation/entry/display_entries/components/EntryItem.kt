@@ -27,7 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.longToFormattedDateText
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDateText
 import com.jbrightman.thedayto.ui.theme.paddingLarge
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
@@ -78,7 +78,7 @@ fun EntryItem(
                 .padding(end = paddingLarge)
         ) {
             Text(
-                text = longToFormattedDateText(entry.dateStamp),
+                text = datestampToFormattedDateText(entry.dateStamp),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis
