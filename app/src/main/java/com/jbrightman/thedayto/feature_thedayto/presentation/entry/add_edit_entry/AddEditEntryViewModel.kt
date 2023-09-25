@@ -113,7 +113,7 @@ class AddEditEntryViewModel @Inject constructor(
                 _entryColor.intValue = event.color
             }
             is AddEditEntryEvent.SaveEntry -> {
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     try {
                         println("AddEditEntryEvent Save: ${entryDate.value.date}")
 
