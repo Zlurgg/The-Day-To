@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDateText
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -57,7 +57,7 @@ fun DatePickerItem(
         Text(
             style = MaterialTheme.typography.headlineSmall,
             color = Color.DarkGray,
-            text = datestampToFormattedDateText(dateState.date),
+            text = datestampToFormattedDate(dateState.date),
         )
         Icon(
             imageVector = icon,

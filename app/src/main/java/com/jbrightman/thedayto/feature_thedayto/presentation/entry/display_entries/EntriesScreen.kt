@@ -1,5 +1,6 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -8,13 +9,16 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -37,15 +41,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.jbrightman.thedayto.feature_thedayto.presentation.calendar.content.CalenderDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDay
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToMonthValue
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToYearValue
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
 import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @Composable
 fun EntriesScreen(
@@ -55,6 +66,10 @@ fun EntriesScreen(
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+
+    val currentDate = LocalDate.now()
+    val daysInMonth = currentDate.lengthOfMonth()
+    val dates = MutableList(daysInMonth) { it }
 
     Scaffold(
         topBar = {
@@ -115,33 +130,80 @@ fun EntriesScreen(
                     .padding(paddingMedium)
             ) {
                 LazyVerticalGrid(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .systemBarsPadding(),
+
                     columns = GridCells.Fixed(7),
+                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    items(state.entries) { entry ->
-                        EntryItem(
-                            entry = entry,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    navController.navigate(
-                                        Screen.AddEditEntryScreen.route +
-                                                "?entryId=${entry.id}&entryColor=${entry.color}"
+
+                    items(dates) {
+                        /** first time just show calender **/
+//                        state.entries.any { entry ->
+//                            navController.navigate(
+//                                Screen.AddEditEntryScreen.route
+//                            )
+//                        }
+                        state.entries.forEach { entry ->
+                            if ((it+1).toString() == datestampToFormattedDay(entry.dateStamp)
+                                && currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
+                                && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)
+                            ) {
+                                CalenderDay(
+                                    entry = entry,
+                                    modifier = Modifier
+                                        .clickable {
+                                            navController.navigate(
+                                                Screen.AddEditEntryScreen.route +
+                                                        "?entryId=${entry.id}&entryColor=${entry.color}"
+                                            )
+                                        }
+                                )
+                            } else {
+                                Box(contentAlignment = Alignment.Center) {
+                                    Text(
+                                        text = "${it + 1}",
+                                        style = MaterialTheme.typography.headlineSmall,
+                                        color = MaterialTheme.colorScheme.onSurface,
+                                        overflow = TextOverflow.Ellipsis
                                     )
-                                },
-                            onDeleteClick = {
-                                viewModel.onEvent(EntriesEvent.DeleteEntry(entry))
-                                scope.launch {
-                                    val result = snackbarHostState.showSnackbar(
-                                        message = "Entry deleted",
-                                        actionLabel = "Undo"
-                                    )
-                                    if (result == SnackbarResult.ActionPerformed) {
-                                        viewModel.onEvent(EntriesEvent.RestoreEntry)
-                                    }
                                 }
                             }
-                        )
+                        }
+
+                    }
+                }
+                Spacer(modifier = Modifier.height(paddingMedium))
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(state.entries) { entry ->
+                        if (currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
+                            && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)) {
+                            EntryItem(
+                                entry = entry,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        navController.navigate(
+                                            Screen.AddEditEntryScreen.route +
+                                                    "?entryId=${entry.id}&entryColor=${entry.color}"
+                                        )
+                                    },
+                                onDeleteClick = {
+                                    viewModel.onEvent(EntriesEvent.DeleteEntry(entry))
+                                    scope.launch {
+                                        val result = snackbarHostState.showSnackbar(
+                                            message = "Entry deleted",
+                                            actionLabel = "Undo"
+                                        )
+                                        if (result == SnackbarResult.ActionPerformed) {
+                                            viewModel.onEvent(EntriesEvent.RestoreEntry)
+                                        }
+                                    }
+                                }
+                            )
+                        }
                         Spacer(modifier = Modifier.height(paddingMedium))
                     }
                 }

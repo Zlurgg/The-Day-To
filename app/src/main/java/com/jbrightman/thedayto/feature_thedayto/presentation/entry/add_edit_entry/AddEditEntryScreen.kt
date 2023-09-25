@@ -37,6 +37,7 @@ fun AddEditEntryScreen(
     navController: NavController,
     entryColor: Int,
     viewModel: AddEditEntryViewModel = hiltViewModel(),
+    firstTime: Boolean
 ) {
     val entryBackgroundAnimatatable = remember {
         Animatable(

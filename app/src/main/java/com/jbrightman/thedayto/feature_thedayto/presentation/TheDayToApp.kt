@@ -1,10 +1,12 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation
 
+import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -18,6 +20,7 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 
 @Composable
 fun TheDayToApp(
+
 ) {
     Surface(
         modifier = Modifier
@@ -28,7 +31,7 @@ fun TheDayToApp(
 
         NavHost(
             navController = navController,
-            startDestination = Screen.CalenderScreen.route
+            startDestination = Screen.EntriesScreen.route
         ) {
             composable(route = Screen.EntriesScreen.route) {
                 EntriesScreen(
@@ -55,7 +58,8 @@ fun TheDayToApp(
                 val color = it.arguments?.getInt("entryColor") ?: -1
                 AddEditEntryScreen(
                     navController = navController,
-                    entryColor = color
+                    entryColor = color,
+                    firstTime = false
                 )
             }
             composable(route = Screen.CalenderScreen.route) {
