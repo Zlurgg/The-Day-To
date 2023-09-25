@@ -3,6 +3,8 @@ package com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_ent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -25,12 +27,12 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.toSize
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoodItem(
     viewModel: AddEditEntryViewModel,
@@ -46,6 +48,7 @@ fun MoodItem(
     OutlinedTextField(
         value = moodState.mood,
         onValueChange = { viewModel.onEvent(AddEditEntryEvent.EnteredMood(it)) },
+//        onValueChange = {  },
         textStyle = MaterialTheme.typography.headlineSmall,
         colors = OutlinedTextFieldDefaults.colors(
             cursorColor = MaterialTheme.colorScheme.primary,
@@ -53,12 +56,16 @@ fun MoodItem(
             unfocusedBorderColor = MaterialTheme.colorScheme.background,
             focusedLabelColor = MaterialTheme.colorScheme.background,
         ),
+        keyboardOptions = KeyboardOptions(
+            keyboardType = KeyboardType.Ascii,
+        ),
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .onGloballyPositioned { coordinates ->
                 mMoodFieldSize = coordinates.size.toSize()
-            },
+            }
+            .clickable { mExpanded = !mExpanded },
         label = {
             Text(
                 text = moodState.hint,

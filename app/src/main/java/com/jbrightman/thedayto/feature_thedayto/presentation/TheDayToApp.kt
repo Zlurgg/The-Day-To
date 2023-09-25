@@ -1,27 +1,37 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation
 
-import android.content.SharedPreferences
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.jbrightman.thedayto.feature_thedayto.presentation.calendar.CalenderScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesScreen
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesViewModel
+import com.jbrightman.thedayto.feature_thedayto.presentation.login.LoginScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
-
+    entriesViewModel: EntriesViewModel = hiltViewModel()
 ) {
+    val state = entriesViewModel.state.value
+    var startDestination = Screen.AddEditEntryScreen.route
+
+    state.entries.forEach { entry ->
+        if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+            startDestination = Screen.EntriesScreen.route
+        }
+    }
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -31,12 +41,10 @@ fun TheDayToApp(
 
         NavHost(
             navController = navController,
-            startDestination = Screen.EntriesScreen.route
+            startDestination = startDestination
         ) {
-            composable(route = Screen.EntriesScreen.route) {
-                EntriesScreen(
-                    navController = navController
-                )
+            composable(route = Screen.LoginScreen.route) {
+                LoginScreen(navController = navController)
             }
             composable(route = Screen.AddEditEntryScreen.route +
                     "?entryId={entryId}&entryColor={entryColor}",
@@ -59,16 +67,13 @@ fun TheDayToApp(
                 AddEditEntryScreen(
                     navController = navController,
                     entryColor = color,
-                    firstTime = false
                 )
             }
-            composable(route = Screen.CalenderScreen.route) {
-                CalenderScreen(
-                    modifier = Modifier,
+            composable(route = Screen.EntriesScreen.route) {
+                EntriesScreen(
                     navController = navController
                 )
             }
-
         }
     }
 }

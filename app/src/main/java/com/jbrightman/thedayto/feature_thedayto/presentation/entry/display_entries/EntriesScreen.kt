@@ -1,6 +1,5 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
-import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -37,15 +36,18 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.jbrightman.thedayto.feature_thedayto.presentation.calendar.content.CalenderDay
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.CalenderDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
@@ -57,6 +59,7 @@ import com.jbrightman.thedayto.ui.theme.paddingSmall
 import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
 import kotlinx.coroutines.launch
 import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun EntriesScreen(
@@ -66,6 +69,7 @@ fun EntriesScreen(
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var isAddButtonVisible by remember { mutableStateOf(true) }
 
     val currentDate = LocalDate.now()
     val daysInMonth = currentDate.lengthOfMonth()
@@ -112,13 +116,16 @@ fun EntriesScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.AddEditEntryScreen.route)
-                },
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
+            /** if statement for controlling fab visibility set below when entries are created **/
+            if (isAddButtonVisible) {
+                FloatingActionButton(
+                    onClick = {
+                        navController.navigate(Screen.AddEditEntryScreen.route)
+                    },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
+                }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -140,12 +147,6 @@ fun EntriesScreen(
                 ) {
 
                     items(dates) {
-                        /** first time just show calender **/
-//                        state.entries.any { entry ->
-//                            navController.navigate(
-//                                Screen.AddEditEntryScreen.route
-//                            )
-//                        }
                         state.entries.forEach { entry ->
                             if ((it+1).toString() == datestampToFormattedDay(entry.dateStamp)
                                 && currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
@@ -171,8 +172,12 @@ fun EntriesScreen(
                                     )
                                 }
                             }
-                        }
+                            if (entry.dateStamp == currentDate.atStartOfDay().toEpochSecond(
+                                    ZoneOffset.UTC)) {
+                                isAddButtonVisible = false
+                            }
 
+                        }
                     }
                 }
                 Spacer(modifier = Modifier.height(paddingMedium))

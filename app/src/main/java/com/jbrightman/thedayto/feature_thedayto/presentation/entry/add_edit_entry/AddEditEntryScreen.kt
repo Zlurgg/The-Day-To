@@ -20,7 +20,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -29,15 +32,18 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entr
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesViewModel
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun AddEditEntryScreen(
     navController: NavController,
     entryColor: Int,
     viewModel: AddEditEntryViewModel = hiltViewModel(),
-    firstTime: Boolean
 ) {
     val entryBackgroundAnimatatable = remember {
         Animatable(
@@ -46,6 +52,15 @@ fun AddEditEntryScreen(
     }
     val snackbarHostState = remember { SnackbarHostState() }
 
+    var isBackButtonVisible by remember { mutableStateOf(false) }
+//    val state = entriesViewModel.state.value
+//
+//    state.entries.forEach { entry ->
+//        if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+//            navController.navigate(Screen.EntriesScreen.route)
+//        }
+//    }
+    isBackButtonVisible = entryColor != -1
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -55,7 +70,7 @@ fun AddEditEntryScreen(
                     )
                 }
                 is AddEditEntryViewModel.UiEvent.SaveEntry -> {
-                    navController.navigateUp()
+                    navController.navigate(Screen.EntriesScreen.route)
                 }
             }
         }
@@ -63,16 +78,18 @@ fun AddEditEntryScreen(
 
     Scaffold(
         topBar = {
-            Row{
-                Icon(
-                    imageVector = Icons.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    modifier = Modifier
-                        .padding(paddingMedium)
-                        .clickable {
-                            navController.popBackStack()
-                        }
-                )
+            if (isBackButtonVisible) {
+                Row{
+                    Icon(
+                        imageVector = Icons.Filled.ArrowBack,
+                        contentDescription = "Back",
+                        modifier = Modifier
+                            .padding(paddingMedium)
+                            .clickable {
+                                navController.navigate(Screen.EntriesScreen.route)
+                            }
+                    )
+                }
             }
         },
         floatingActionButton = {
