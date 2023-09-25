@@ -16,6 +16,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.time.LocalDate
+import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -25,25 +27,25 @@ class AddEditEntryViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val _entryDate = mutableStateOf(
-        EntryDateState(
+        EntryDateFieldState(
             date = 0L
         )
     )
-    val entryDate: State<EntryDateState> = _entryDate
+    val entryDate: State<EntryDateFieldState> = _entryDate
 
     private val _entryMood = mutableStateOf(
-        EntryMoodState(
+        EntryMoodFieldState(
             hint = "How're you feeling today?"
         )
     )
-    val entryMood: State<EntryMoodState> = _entryMood
+    val entryMood: State<EntryMoodFieldState> = _entryMood
 
     private val _entryContent = mutableStateOf(
-        EntryTextFieldState(
+        EntryContentFieldState(
             hint = "Anything else to add?"
         )
     )
-    val entryContent: State<EntryTextFieldState> = _entryContent
+    val entryContent: State<EntryContentFieldState> = _entryContent
 
     private val _entryColor = mutableIntStateOf(TheDayToEntry.entryColors.random().toArgb())
     val entryColor: State<Int> = _entryColor
@@ -52,6 +54,8 @@ class AddEditEntryViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentEntryId: Int? = null
+
+    private val date = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
 
     init {
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
@@ -142,6 +146,6 @@ class AddEditEntryViewModel @Inject constructor(
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
-        object SaveEntry : UiEvent()
+        data object SaveEntry : UiEvent()
     }
 }

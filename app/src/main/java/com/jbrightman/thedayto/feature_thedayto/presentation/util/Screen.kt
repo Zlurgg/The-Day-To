@@ -5,5 +5,5 @@ sealed class Screen(
 ) {
     data object EntriesScreen: Screen("entries_screen")
     data object AddEditEntryScreen: Screen("add_edit_entry_screen")
-    data object CalenderScreen: Screen("calender_screen")
+    data object LoginScreen: Screen("login_screen")
 }

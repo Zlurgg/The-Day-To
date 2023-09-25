@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_thedayto.presentation.calendar.content
+package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components
 
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box

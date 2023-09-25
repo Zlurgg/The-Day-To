@@ -95,7 +95,7 @@ fun EntryItem(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                maxLines = 10,
+                maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
