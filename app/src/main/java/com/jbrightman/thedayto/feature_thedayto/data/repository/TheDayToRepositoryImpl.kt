@@ -16,6 +16,10 @@ class TheDayToRepositoryImpl (
         return dao.getTheDayToEntryById(id)
     }
 
+    override suspend fun getTheDayToEntryByDate(date: Long): TheDayToEntry? {
+        return dao.getTheDayToEntryByDate(date)
+    }
+
     override suspend fun insertEntry(entry: TheDayToEntry) {
         return dao.insertEntry(entry)
     }

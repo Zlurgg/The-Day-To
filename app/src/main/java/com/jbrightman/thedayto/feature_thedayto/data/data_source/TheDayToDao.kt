@@ -17,6 +17,9 @@ interface TheDayToDao {
     @Query("SELECT * FROM thedaytoentry WHERE id = :id")
     fun getTheDayToEntryById(id: Int): TheDayToEntry?
 
+    @Query("SELECT * FROM thedaytoentry WHERE dateStamp = :date")
+    fun getTheDayToEntryByDate(date: Long): TheDayToEntry?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(theDayToEntry: TheDayToEntry)
 
