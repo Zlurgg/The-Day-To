@@ -4,7 +4,7 @@ import java.time.Instant
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-fun datestampToFormattedDateText(date: Long): String {
+fun datestampToFormattedDate(date: Long): String {
     val dt = Instant.ofEpochSecond(date)
         .atZone(ZoneId.systemDefault())
         .toLocalDateTime()

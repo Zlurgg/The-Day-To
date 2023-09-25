@@ -48,9 +48,10 @@ fun CalenderScreen(
 ) {
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
-    /** Get dimensions for calender (on refresh update rows) **/
-    val date = LocalDate.now()
-    val daysInMonth = date.lengthOfMonth()
+    /**
+     * change to a remember mutable state that is updated by a list of all dates refresh page to show other months, years **/
+    val currentDate = LocalDate.now()
+    val daysInMonth = currentDate.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
     Scaffold(
         topBar = {
@@ -86,8 +87,8 @@ fun CalenderScreen(
                     items(dates) {
                         state.entries.forEach { entry ->
                             if ((it+1).toString() == datestampToFormattedDay(entry.dateStamp)
-                            && date.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
-                            && date.year.toString() == datestampToYearValue(entry.dateStamp)
+                            && currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
+                            && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)
                             ) {
                                 CalenderDay(
                                     entry = entry,

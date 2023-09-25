@@ -16,9 +16,9 @@ class AddEntry(
         if (entry.mood.isBlank()) {
             throw InvalidTheDayToEntryException("The mood of the entry can't be empty.")
         }
-        if (entry.content.isBlank()) {
-            throw InvalidTheDayToEntryException("The content of the entry can't be empty.")
-        }
+//        if (entry.content.isBlank()) {
+//            throw InvalidTheDayToEntryException("The content of the entry can't be empty.")
+//        }
         repository.insertEntry(entry)
     }
 }
