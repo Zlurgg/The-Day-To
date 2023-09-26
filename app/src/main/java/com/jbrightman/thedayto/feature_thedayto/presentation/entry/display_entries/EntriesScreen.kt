@@ -1,5 +1,6 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
+import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -43,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -51,6 +53,7 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entri
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToMonthValue
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToYearValue
@@ -158,12 +161,22 @@ fun EntriesScreen(
                                         .clickable {
                                             navController.navigate(
                                                 Screen.AddEditEntryScreen.route +
-                                                        "?entryId=${entry.id}&entryColor=${entry.color}"
+                                                        "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
                                             )
                                         }
                                 )
                             } else {
-                                Box(contentAlignment = Alignment.Center) {
+                            Box(modifier = Modifier
+                                    .clickable {
+                                        if ((it+1) < datestampToDay(currentDate.atStartOfDay().toEpochSecond(
+                                                ZoneOffset.UTC)
+                                        )) {
+                                            navController.navigate(
+                                                Screen.AddEditEntryScreen.route +
+                                                        "?showBackButton=${true}&entryDate=${it + 1}")
+                                        }
+                                    },
+                                    contentAlignment = Alignment.Center) {
                                     Text(
                                         text = "${it + 1}",
                                         style = MaterialTheme.typography.headlineSmall,
@@ -192,7 +205,7 @@ fun EntriesScreen(
                                     .clickable {
                                         navController.navigate(
                                             Screen.AddEditEntryScreen.route +
-                                                    "?entryId=${entry.id}&entryColor=${entry.color}"
+                                                    "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
                                         )
                                     },
                                 onDeleteClick = {

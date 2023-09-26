@@ -13,6 +13,13 @@ data class TheDayToEntry(
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
+        val entryMoodWithColor = listOf(
+                Pair("Happy", RedOrange),
+                Pair("Overjoyed", RedPink),
+                Pair("Sad", BabyBlue),
+                Pair("Angry", Violet),
+                Pair("Depressed", LightGreen),
+            )
         val entryColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
         val defaultMoods = listOf("Happy", "Sad", "Meh", "Depressed", "Heart-Broken", "Angry", "Overjoyed")
     }

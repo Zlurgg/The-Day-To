@@ -32,17 +32,17 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entr
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @Composable
 fun AddEditEntryScreen(
     navController: NavController,
     entryColor: Int,
+    showBackButton: Boolean,
+    entryDate: Int,
     viewModel: AddEditEntryViewModel = hiltViewModel(),
 ) {
     val entryBackgroundAnimatatable = remember {
@@ -52,15 +52,6 @@ fun AddEditEntryScreen(
     }
     val snackbarHostState = remember { SnackbarHostState() }
 
-    var isBackButtonVisible by remember { mutableStateOf(false) }
-//    val state = entriesViewModel.state.value
-//
-//    state.entries.forEach { entry ->
-//        if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
-//            navController.navigate(Screen.EntriesScreen.route)
-//        }
-//    }
-    isBackButtonVisible = entryColor != -1
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -78,7 +69,7 @@ fun AddEditEntryScreen(
 
     Scaffold(
         topBar = {
-            if (isBackButtonVisible) {
+            if (showBackButton) {
                 Row{
                     Icon(
                         imageVector = Icons.Filled.ArrowBack,
@@ -118,7 +109,7 @@ fun AddEditEntryScreen(
                 )
                 Spacer(modifier = Modifier.height(paddingMedium))
                 // Date Picker
-                DatePickerItem(viewModel = viewModel)
+                DatePickerItem(viewModel = viewModel, entryDate = entryDate)
                 Spacer(modifier = Modifier.height(paddingMedium))
                 // Mood
                 MoodItem(viewModel = viewModel)

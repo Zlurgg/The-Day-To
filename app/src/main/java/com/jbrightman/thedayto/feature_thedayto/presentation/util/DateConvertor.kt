@@ -1,8 +1,11 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.util
 
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+
 
 fun datestampToFormattedDate(date: Long): String {
     val dt = Instant.ofEpochSecond(date)
@@ -18,6 +21,19 @@ fun datestampToFormattedDay(date: Long): String {
         .toLocalDateTime()
     val formatter = DateTimeFormatter.ofPattern("d")
     return formatter.format(dt)
+}
+
+fun datestampToDay(date: Long): Int {
+    val dt = Instant.ofEpochSecond(date)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDateTime()
+    val formatter = DateTimeFormatter.ofPattern("d")
+    return formatter.format(dt).toInt()
+}
+
+fun dayToDatestampForCurrentMonthAndYear(day: Int, month: Int, year: Int): Long {
+    val localDate = LocalDate.of(year, month, day)
+    return localDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC)
 }
 
 fun datestampToMonthValue(date: Long): String {
