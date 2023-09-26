@@ -35,14 +35,15 @@ class AddEditEntryViewModel @Inject constructor(
 
     private val _entryMood = mutableStateOf(
         EntryMoodFieldState(
-            hint = "How're you feeling today?"
+            todayHint = "How're you feeling today?",
+            previousDayHint = "How're were you feeling that day?"
         )
     )
     val entryMood: State<EntryMoodFieldState> = _entryMood
 
     private val _entryContent = mutableStateOf(
         EntryContentFieldState(
-            hint = "Anything else to add?"
+            hint = "Any additional info?"
         )
     )
     val entryContent: State<EntryContentFieldState> = _entryContent
@@ -54,8 +55,6 @@ class AddEditEntryViewModel @Inject constructor(
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentEntryId: Int? = null
-
-    private val date = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
 
     init {
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
@@ -119,8 +118,6 @@ class AddEditEntryViewModel @Inject constructor(
             is AddEditEntryEvent.SaveEntry -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
-                        println("AddEditEntryEvent Save: ${entryDate.value.date}")
-
                         entryUseCases.addEntry(
                             TheDayToEntry(
                                 content = entryContent.value.text,

@@ -2,6 +2,7 @@ package com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_ent
 
 data class EntryMoodFieldState(
     var mood: String = "",
-    val hint: String = "",
+    val todayHint: String = "",
+    val previousDayHint: String = "",
     val isHintVisible: Boolean = true
 )

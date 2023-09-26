@@ -64,8 +64,8 @@ fun TheDayToApp(
                     navArgument(
                         name = "entryDate"
                     ) {
-                        type = NavType.IntType
-                        defaultValue = -1
+                        type = NavType.LongType
+                        defaultValue = -1L
                     },
                     navArgument(
                         name = "showBackButton"
@@ -76,12 +76,12 @@ fun TheDayToApp(
                 )
             ) {
                 val color = it.arguments?.getInt("entryColor") ?: -1
-                val day = it.arguments?.getInt("entryDate") ?: -1
+                val date = it.arguments?.getLong("entryDate") ?: -1L
                 val backButton = it.arguments?.getBoolean("showBackButton") ?: false
                 AddEditEntryScreen(
                     navController = navController,
                     entryColor = color,
-                    entryDate = day,
+                    entryDate = date,
                     showBackButton = backButton
                 )
             }
