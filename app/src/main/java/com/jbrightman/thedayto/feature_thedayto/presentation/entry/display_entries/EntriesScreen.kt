@@ -1,6 +1,5 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
-import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -44,7 +43,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -54,9 +52,9 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entri
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.OrderSection
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToMonthValue
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToYearValue
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
 import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
@@ -77,6 +75,8 @@ fun EntriesScreen(
     val currentDate = LocalDate.now()
     val daysInMonth = currentDate.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
+    val month = currentDate.monthValue
+    val year = currentDate.year
 
     Scaffold(
         topBar = {
@@ -120,16 +120,16 @@ fun EntriesScreen(
         },
         floatingActionButton = {
             /** if statement for controlling fab visibility set below when entries are created **/
-            if (isAddButtonVisible) {
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(Screen.AddEditEntryScreen.route)
-                    },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-                ) {
-                    Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
-                }
+//            if (isAddButtonVisible) {
+            FloatingActionButton(
+                onClick = {
+                    navController.navigate(Screen.AddEditEntryScreen.route)
+                },
+                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+            ) {
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
             }
+//            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
@@ -148,13 +148,13 @@ fun EntriesScreen(
                     verticalArrangement = Arrangement.spacedBy(8.dp),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-
+                    var addNumberToCalenderIfNoEntryForDateExists = true
                     items(dates) {
+                        val entryDate =
+                            dayToDatestampForCurrentMonthAndYear(it + 1, month, year)
+
                         state.entries.forEach { entry ->
-                            if ((it+1).toString() == datestampToFormattedDay(entry.dateStamp)
-                                && currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
-                                && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)
-                            ) {
+                            if (entryDate == entry.dateStamp) {
                                 CalenderDay(
                                     entry = entry,
                                     modifier = Modifier
@@ -165,17 +165,18 @@ fun EntriesScreen(
                                             )
                                         }
                                 )
-                            } else {
-                            Box(modifier = Modifier
-                                    .clickable {
-                                        if ((it+1) < datestampToDay(currentDate.atStartOfDay().toEpochSecond(
-                                                ZoneOffset.UTC)
-                                        )) {
-                                            navController.navigate(
-                                                Screen.AddEditEntryScreen.route +
-                                                        "?showBackButton=${true}&entryDate=${it + 1}")
-                                        }
-                                    },
+                            } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+                                addNumberToCalenderIfNoEntryForDateExists = false
+                                Box(
+                                    modifier = Modifier
+                                        .clickable {
+                                            if ((it+1) <= datestampToDay(currentDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC))) {
+                                                    navController.navigate(
+                                                        Screen.AddEditEntryScreen.route +
+                                                                "?showBackButton=${true}&entryDate=${entryDate}"
+                                                    )
+                                                }
+                                        },
                                     contentAlignment = Alignment.Center) {
                                     Text(
                                         text = "${it + 1}",
@@ -185,19 +186,16 @@ fun EntriesScreen(
                                     )
                                 }
                             }
-                            if (entry.dateStamp == currentDate.atStartOfDay().toEpochSecond(
-                                    ZoneOffset.UTC)) {
-                                isAddButtonVisible = false
-                            }
-
                         }
+                        addNumberToCalenderIfNoEntryForDateExists = true
                     }
                 }
                 Spacer(modifier = Modifier.height(paddingMedium))
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.entries) { entry ->
                         if (currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
-                            && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)) {
+                            && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)
+                        ) {
                             EntryItem(
                                 entry = entry,
                                 modifier = Modifier

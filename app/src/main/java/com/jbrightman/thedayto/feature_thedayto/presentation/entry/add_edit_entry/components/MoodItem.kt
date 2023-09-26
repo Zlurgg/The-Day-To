@@ -11,6 +11,8 @@ import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -32,7 +34,10 @@ import androidx.compose.ui.unit.toSize
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
+import java.time.LocalDate
+import java.time.ZoneOffset
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoodItem(
     viewModel: AddEditEntryViewModel,
@@ -40,62 +45,67 @@ fun MoodItem(
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
     val moodState = viewModel.entryMood.value
-    val icon = if (mExpanded)
-        Icons.Filled.KeyboardArrowUp
-    else
-        Icons.Filled.KeyboardArrowDown
 
-    OutlinedTextField(
-        value = moodState.mood,
-        onValueChange = { viewModel.onEvent(AddEditEntryEvent.EnteredMood(it)) },
-//        onValueChange = {  },
-        textStyle = MaterialTheme.typography.headlineSmall,
-        colors = OutlinedTextFieldDefaults.colors(
-            cursorColor = MaterialTheme.colorScheme.primary,
-            focusedBorderColor = MaterialTheme.colorScheme.background,
-            unfocusedBorderColor = MaterialTheme.colorScheme.background,
-            focusedLabelColor = MaterialTheme.colorScheme.background,
-        ),
-        keyboardOptions = KeyboardOptions(
-            keyboardType = KeyboardType.Ascii,
-        ),
-        singleLine = true,
-        modifier = Modifier
-            .fillMaxWidth()
-            .onGloballyPositioned { coordinates ->
-                mMoodFieldSize = coordinates.size.toSize()
-            }
-            .clickable { mExpanded = !mExpanded },
-        label = {
-            Text(
-                text = moodState.hint,
-                color = MaterialTheme.colorScheme.primary
-            )
-        },
-        trailingIcon = {
-            Icon(
-                imageVector = icon,
-                contentDescription = "mood dropdown button",
-                modifier = Modifier.clickable { mExpanded = !mExpanded })
-        }
-    )
-    DropdownMenu(
+    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC))
+        moodState.todayHint
+    else
+        moodState.previousDayHint
+
+    ExposedDropdownMenuBox(
         expanded = mExpanded,
-        onDismissRequest = {
-            mExpanded = false
-        },
-        modifier = Modifier
-            .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
+        onExpandedChange = {
+            mExpanded = !mExpanded
+        }
     ) {
-        TheDayToEntry.defaultMoods.forEach { mood ->
-            DropdownMenuItem(
-                onClick = {
-                    moodState.mood = mood
-                    viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
-                    mExpanded = false
+        OutlinedTextField(
+            value = moodState.mood,
+            onValueChange = { },
+            textStyle = MaterialTheme.typography.headlineSmall,
+            colors = OutlinedTextFieldDefaults.colors(
+                cursorColor = MaterialTheme.colorScheme.primary,
+                focusedBorderColor = MaterialTheme.colorScheme.background,
+                unfocusedBorderColor = MaterialTheme.colorScheme.background,
+                focusedLabelColor = MaterialTheme.colorScheme.background,
+            ),
+            keyboardOptions = KeyboardOptions(
+                keyboardType = KeyboardType.Ascii,
+            ),
+            readOnly = true,
+            singleLine = true,
+            modifier = Modifier
+                .fillMaxWidth()
+                .menuAnchor()
+                .onGloballyPositioned { coordinates ->
+                    mMoodFieldSize = coordinates.size.toSize()
                 },
-                text = { Text(text = mood) }
-            )
+            label = {
+                Text(
+                    text = hint,
+                    color = MaterialTheme.colorScheme.primary
+                )
+            },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded)
+            }
+        )
+        ExposedDropdownMenu(
+            expanded = mExpanded,
+            onDismissRequest = {
+                mExpanded = false
+            },
+            modifier = Modifier
+                .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
+        ) {
+            TheDayToEntry.defaultMoods.forEach { mood ->
+                DropdownMenuItem(
+                    onClick = {
+                        moodState.mood = mood
+                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
+                        mExpanded = false
+                    },
+                    text = { Text(text = mood) }
+                )
+            }
         }
     }
 }

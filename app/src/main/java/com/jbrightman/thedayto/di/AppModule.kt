@@ -10,6 +10,7 @@ import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.DeleteEntr
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntriesUseCase
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.UpdateEntry
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -43,7 +44,8 @@ object AppModule {
             getEntries = GetEntriesUseCase(repository = theDayToRepository),
             deleteEntry = DeleteEntryUseCase(repository = theDayToRepository),
             addEntry = AddEntry(repository = theDayToRepository),
-            getEntry = GetEntry(repository = theDayToRepository)
+            getEntry = GetEntry(repository = theDayToRepository),
+            updateEntry = UpdateEntry(repository = theDayToRepository)
         )
     }
 }

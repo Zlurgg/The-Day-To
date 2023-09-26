@@ -23,28 +23,36 @@ import androidx.compose.ui.window.DialogProperties
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.ZoneOffset
+
 
 @Composable
 fun DatePickerItem(
     viewModel: AddEditEntryViewModel,
-    entryDate: Int
+    entryDate: Long
 ) {
     val dateDialogState = rememberMaterialDialogState()
     var mExpanded by remember { mutableStateOf(false) }
 
     /** will change entry date to contain month and year going foward and pass around the long value **/
-    val date =  if (entryDate != -1 ) {
-        dayToDatestampForCurrentMonthAndYear(entryDate, 9, 2023)
+    val dateState = viewModel.entryDate.value
+    dateState.date =  if (entryDate != -1L ) {
+        entryDate
     } else {
         viewModel.entryDate.value.date
     }
+
+    val date = Instant.ofEpochSecond(dateState.date)
+        .atZone(ZoneId.systemDefault())
+        .toLocalDate()
+
 
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
@@ -66,7 +74,7 @@ fun DatePickerItem(
         Text(
             style = MaterialTheme.typography.headlineSmall,
             color = Color.DarkGray,
-            text = datestampToFormattedDate(date),
+            text = datestampToFormattedDate(dateState.date),
         )
         Icon(
             imageVector = icon,
@@ -87,7 +95,7 @@ fun DatePickerItem(
             }
         ) {
             datepicker(
-                initialDate = LocalDate.now(),
+                initialDate = date,
                 title = "Pick a date",
                 colors = DatePickerDefaults.colors(),
                 allowedDateValidator = {
@@ -103,7 +111,7 @@ fun DatePickerItem(
                 )
             }
         }
-        if (date == 0L) {
+        if (dateState.date == 0L) {
             viewModel.onEvent(
                 AddEditEntryEvent.EnteredDate(
                     LocalDate.now().atStartOfDay().toEpochSecond(

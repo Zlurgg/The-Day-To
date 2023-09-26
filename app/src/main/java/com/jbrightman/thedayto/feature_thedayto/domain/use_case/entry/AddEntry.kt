@@ -20,5 +20,10 @@ class AddEntry(
             throw InvalidTheDayToEntryException("The mood of the entry can't be empty.")
         }
         repository.insertEntry(entry)
+//        if (repository.getTheDayToEntryByDate(entry.dateStamp) == null) {
+//            repository.insertEntry(entry)
+//        } else {
+//            throw InvalidTheDayToEntryException("Entry already exists for this date.")
+//        }
     }
 }

@@ -27,4 +27,8 @@ class TheDayToRepositoryImpl (
     override suspend fun deleteEntry(entry: TheDayToEntry) {
         return dao.deleteEntry(entry)
     }
+
+    override suspend fun updateEntry(entry: TheDayToEntry) {
+        return dao.updateEntry(entry)
+    }
 }

@@ -5,4 +5,5 @@ data class EntryUseCases(
     val deleteEntry: DeleteEntryUseCase,
     val addEntry: AddEntry,
     val getEntry: GetEntry,
+    val updateEntry: UpdateEntry
 )

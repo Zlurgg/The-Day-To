@@ -9,4 +9,6 @@ interface TheDayToRepository {
     suspend fun  getTheDayToEntryByDate(date: Long): TheDayToEntry?
     suspend fun insertEntry(entry: TheDayToEntry)
     suspend fun deleteEntry(entry: TheDayToEntry)
+    suspend fun  updateEntry(entry: TheDayToEntry)
+
 }
