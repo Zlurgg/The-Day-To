@@ -23,6 +23,7 @@ import androidx.compose.ui.window.DialogProperties
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
@@ -32,11 +33,19 @@ import java.time.ZoneOffset
 
 @Composable
 fun DatePickerItem(
-    viewModel: AddEditEntryViewModel
+    viewModel: AddEditEntryViewModel,
+    entryDate: Int
 ) {
     val dateDialogState = rememberMaterialDialogState()
     var mExpanded by remember { mutableStateOf(false) }
-    val dateState = viewModel.entryDate.value
+
+    /** will change entry date to contain month and year going foward and pass around the long value **/
+    val date =  if (entryDate != -1 ) {
+        dayToDatestampForCurrentMonthAndYear(entryDate, 9, 2023)
+    } else {
+        viewModel.entryDate.value.date
+    }
+
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
     else
@@ -57,7 +66,7 @@ fun DatePickerItem(
         Text(
             style = MaterialTheme.typography.headlineSmall,
             color = Color.DarkGray,
-            text = datestampToFormattedDate(dateState.date),
+            text = datestampToFormattedDate(date),
         )
         Icon(
             imageVector = icon,
@@ -94,7 +103,7 @@ fun DatePickerItem(
                 )
             }
         }
-        if (dateState.date == 0L) {
+        if (date == 0L) {
             viewModel.onEvent(
                 AddEditEntryEvent.EnteredDate(
                     LocalDate.now().atStartOfDay().toEpochSecond(
