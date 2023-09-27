@@ -16,7 +16,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDay
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
 
 @Composable
 fun CalenderDay(
@@ -48,7 +48,7 @@ fun CalenderDay(
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = datestampToFormattedDay(entry.dateStamp),
+                text = datestampToDay(entry.dateStamp).toString(),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
                 overflow = TextOverflow.Ellipsis

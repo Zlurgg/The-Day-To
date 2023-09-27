@@ -7,6 +7,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -37,12 +38,14 @@ import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,6 +64,7 @@ import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneOffset
+import kotlin.math.abs
 
 @Composable
 fun EntriesScreen(
@@ -73,10 +77,13 @@ fun EntriesScreen(
     var isAddButtonVisible by remember { mutableStateOf(true) }
 
     val currentDate = LocalDate.now()
-    val daysInMonth = currentDate.lengthOfMonth()
+    var date by remember {
+        mutableStateOf(currentDate)
+    }
+    val daysInMonth = date.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
-    val month = currentDate.monthValue
-    val year = currentDate.year
+
+    var calenderSwipeDirection by remember { mutableIntStateOf(-1) }
 
     Scaffold(
         topBar = {
@@ -119,8 +126,6 @@ fun EntriesScreen(
             }
         },
         floatingActionButton = {
-            /** if statement for controlling fab visibility set below when entries are created **/
-//            if (isAddButtonVisible) {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screen.AddEditEntryScreen.route)
@@ -129,7 +134,6 @@ fun EntriesScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
             }
-//            }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
@@ -139,57 +143,113 @@ fun EntriesScreen(
                     .padding(padding)
                     .padding(paddingMedium)
             ) {
-                LazyVerticalGrid(
-                    modifier = Modifier
-                        .systemBarsPadding(),
-
-                    columns = GridCells.Fixed(7),
-                    contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    var addNumberToCalenderIfNoEntryForDateExists = true
-                    items(dates) {
-                        val entryDate =
-                            dayToDatestampForCurrentMonthAndYear(it + 1, month, year)
+                    Text(text = date.month.toString() + " " + date.year.toString())
+                }
+                Spacer(modifier = Modifier.padding(paddingSmall))
 
-                        state.entries.forEach { entry ->
-                            if (entryDate == entry.dateStamp) {
-                                CalenderDay(
-                                    entry = entry,
-                                    modifier = Modifier
-                                        .clickable {
-                                            navController.navigate(
-                                                Screen.AddEditEntryScreen.route +
-                                                        "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
-                                            )
+                Box(
+                    modifier = Modifier
+                        .pointerInput(Unit) {
+                            detectDragGestures(
+                                onDrag = { change, dragAmount ->
+                                    change.consume()
+                                    val (x, y) = dragAmount
+                                    if (abs(x) > abs(y)) {
+                                        when {
+                                            x > 0 -> {
+                                                //right
+                                                calenderSwipeDirection = 0
+                                            }
+                                            x < 0 -> {
+                                                // left
+                                                calenderSwipeDirection = 1
+                                            }
                                         }
+                                    }
+                                },
+                                onDragEnd = {
+                                    when (calenderSwipeDirection) {
+                                        0 -> {
+                                            // right
+                                            if (date.monthValue < currentDate.monthValue && date.year <= currentDate.year) {
+                                                date = date.plusMonths(1)
+                                            }
+                                        }
+                                        1 -> {
+                                            // left
+                                            date = date.minusMonths(1)
+                                        }
+                                    }
+                                })
+                        }
+                ) {
+                    LazyVerticalGrid(
+                        modifier = Modifier
+                            .systemBarsPadding(),
+                        columns = GridCells.Fixed(7),
+                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        var addNumberToCalenderIfNoEntryForDateExists = true
+                        items(dates) {
+                            val entryDate =
+                                dayToDatestampForCurrentMonthAndYear(
+                                    it + 1,
+                                    date.monthValue,
+                                    date.year
                                 )
-                            } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
-                                addNumberToCalenderIfNoEntryForDateExists = false
-                                Box(
-                                    modifier = Modifier
-                                        .clickable {
-                                            if ((it+1) <= datestampToDay(currentDate.atStartOfDay().toEpochSecond(ZoneOffset.UTC))) {
+
+                            state.entries.forEach { entry ->
+                                if (entryDate == entry.dateStamp) {
+                                    CalenderDay(
+                                        entry = entry,
+                                        modifier = Modifier
+                                            .clickable {
+                                                navController.navigate(
+                                                    Screen.AddEditEntryScreen.route +
+                                                            "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
+                                                )
+                                            }
+                                    )
+                                } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay()
+                                        .toEpochSecond(ZoneOffset.UTC)
+                                ) {
+                                    addNumberToCalenderIfNoEntryForDateExists = false
+                                    Box(
+                                        modifier = Modifier
+                                            .clickable {
+                                                if ((it + 1) <= datestampToDay(
+                                                        currentDate.atStartOfDay()
+                                                            .toEpochSecond(ZoneOffset.UTC)
+                                                    )
+                                                ) {
                                                     navController.navigate(
                                                         Screen.AddEditEntryScreen.route +
                                                                 "?showBackButton=${true}&entryDate=${entryDate}"
                                                     )
                                                 }
-                                        },
-                                    contentAlignment = Alignment.Center) {
-                                    Text(
-                                        text = "${it + 1}",
-                                        style = MaterialTheme.typography.headlineSmall,
-                                        color = MaterialTheme.colorScheme.onSurface,
-                                        overflow = TextOverflow.Ellipsis
-                                    )
+                                            },
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Text(
+                                            text = "${it + 1}",
+                                            style = MaterialTheme.typography.headlineSmall,
+                                            color = MaterialTheme.colorScheme.onSurface,
+                                            overflow = TextOverflow.Ellipsis
+                                        )
+                                    }
                                 }
                             }
+                            addNumberToCalenderIfNoEntryForDateExists = true
                         }
-                        addNumberToCalenderIfNoEntryForDateExists = true
                     }
                 }
+
+
                 Spacer(modifier = Modifier.height(paddingMedium))
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.entries) { entry ->
