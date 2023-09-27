@@ -15,20 +15,11 @@ fun datestampToFormattedDate(date: Long): String {
     return formatter.format(dt)
 }
 
-fun datestampToFormattedDay(date: Long): String {
-    val dt = Instant.ofEpochSecond(date)
-        .atZone(ZoneId.systemDefault())
-        .toLocalDateTime()
-    val formatter = DateTimeFormatter.ofPattern("d")
-    return formatter.format(dt)
-}
-
 fun datestampToDay(date: Long): Int {
     val dt = Instant.ofEpochSecond(date)
         .atZone(ZoneId.systemDefault())
         .toLocalDateTime()
-    val formatter = DateTimeFormatter.ofPattern("d")
-    return formatter.format(dt).toInt()
+    return dt.dayOfMonth
 }
 
 fun dayToDatestampForCurrentMonthAndYear(day: Int, month: Int, year: Int): Long {
