@@ -175,12 +175,13 @@ fun EntriesScreen(
                                         0 -> {
                                             // right
                                             if (date.monthValue < currentDate.monthValue && date.year <= currentDate.year) {
-                                                date = date.plusMonths(1)
+                                                date = date.minusMonths(1)
                                             }
                                         }
                                         1 -> {
                                             // left
-                                            date = date.minusMonths(1)
+                                            date = date.plusMonths(1)
+
                                         }
                                     }
                                 })
