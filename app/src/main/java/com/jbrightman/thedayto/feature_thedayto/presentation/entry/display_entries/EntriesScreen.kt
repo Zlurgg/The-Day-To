@@ -1,12 +1,16 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,6 +28,10 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PageSize
+import androidx.compose.foundation.pager.PagerDefaults
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
@@ -37,15 +45,19 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -61,11 +73,13 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestamp
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
 import com.jbrightman.thedayto.ui.theme.paddingVeryLarge
+import com.jbrightman.thedayto.ui.theme.paddingXXSmall
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlin.math.abs
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun EntriesScreen(
     navController: NavController,
@@ -74,7 +88,6 @@ fun EntriesScreen(
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
-    var isAddButtonVisible by remember { mutableStateOf(true) }
 
     val currentDate = LocalDate.now()
     var date by remember {
@@ -82,8 +95,6 @@ fun EntriesScreen(
     }
     val daysInMonth = date.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
-
-    var calenderSwipeDirection by remember { mutableIntStateOf(-1) }
 
     Scaffold(
         topBar = {
@@ -144,118 +155,123 @@ fun EntriesScreen(
                     .padding(paddingMedium)
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(text = date.month.toString() + " " + date.year.toString())
-                }
-                Spacer(modifier = Modifier.padding(paddingSmall))
-
-                Box(
                     modifier = Modifier
-                        .pointerInput(Unit) {
-                            detectDragGestures(
-                                onDrag = { change, dragAmount ->
-                                    change.consume()
-                                    val (x, y) = dragAmount
-                                    if (abs(x) > abs(y)) {
-                                        when {
-                                            x > 0 -> {
-                                                //right
-                                                calenderSwipeDirection = 0
-                                            }
-                                            x < 0 -> {
-                                                // left
-                                                calenderSwipeDirection = 1
-                                            }
-                                        }
-                                    }
-                                },
-                                onDragEnd = {
-                                    when (calenderSwipeDirection) {
-                                        0 -> {
-                                            // right
-                                            if (date.monthValue < currentDate.monthValue && date.year <= currentDate.year) {
-                                                date = date.minusMonths(1)
-                                            }
-                                        }
-                                        1 -> {
-                                            // left
-                                            date = date.plusMonths(1)
-
-                                        }
-                                    }
-                                })
-                        }
+                        .fillMaxWidth()
+                        .padding(paddingXXSmall)
                 ) {
-                    LazyVerticalGrid(
-                        modifier = Modifier
-                            .systemBarsPadding(),
-                        columns = GridCells.Fixed(7),
-                        contentPadding = PaddingValues(horizontal = 16.dp, vertical = 16.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        var addNumberToCalenderIfNoEntryForDateExists = true
-                        items(dates) {
-                            val entryDate =
-                                dayToDatestampForCurrentMonthAndYear(
-                                    it + 1,
-                                    date.monthValue,
-                                    date.year
-                                )
-
-                            state.entries.forEach { entry ->
-                                if (entryDate == entry.dateStamp) {
-                                    CalenderDay(
-                                        entry = entry,
-                                        modifier = Modifier
-                                            .clickable {
-                                                navController.navigate(
-                                                    Screen.AddEditEntryScreen.route +
-                                                            "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
-                                                )
-                                            }
-                                    )
-                                } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay()
-                                        .toEpochSecond(ZoneOffset.UTC)
-                                ) {
-                                    addNumberToCalenderIfNoEntryForDateExists = false
-                                    Box(
-                                        modifier = Modifier
-                                            .clickable {
-                                                if ((it + 1) <= datestampToDay(
-                                                        currentDate.atStartOfDay()
-                                                            .toEpochSecond(ZoneOffset.UTC)
-                                                    )
-                                                ) {
-                                                    navController.navigate(
-                                                        Screen.AddEditEntryScreen.route +
-                                                                "?showBackButton=${true}&entryDate=${entryDate}"
-                                                    )
-                                                }
-                                            },
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Text(
-                                            text = "${it + 1}",
-                                            style = MaterialTheme.typography.headlineSmall,
-                                            color = MaterialTheme.colorScheme.onSurface,
-                                            overflow = TextOverflow.Ellipsis
-                                        )
-                                    }
-                                }
-                            }
-                            addNumberToCalenderIfNoEntryForDateExists = true
-                        }
+                    /** add drop down list to select year **/
+                    Row {
+                        Text(text = date.month.toString())
+                        Spacer(modifier = Modifier.padding(horizontal = paddingXXSmall))
+                        Text(text = date.year.toString())
                     }
                 }
+                Box(
+                    modifier = Modifier.padding(paddingXXSmall)
+                ) {
+                    /** pages are indexed so 12 months as 0-12 but month
+                     * value isn't so -1 from month value for initial **/
+                    val pagerState = rememberPagerState(
+                        initialPage = date.monthValue - 1,
+                        initialPageOffsetFraction = 0f,
+                        pageCount = { 12 }
+                    )
+                    LaunchedEffect(pagerState) {
+                        snapshotFlow { pagerState.currentPage }.collect { calenderPage ->
+                            if (calenderPage < (date.monthValue-1)) {
+                                    date = date.minusMonths(1)
+                            } else if (calenderPage > (date.monthValue-1)) {
+                                    date = date.plusMonths(1)
+                            }
 
+                        }
+                    }
+                    HorizontalPager(
+                        modifier = Modifier,
+                        state = pagerState,
+                        pageSpacing = 0.dp,
+                        userScrollEnabled = true,
+                        reverseLayout = false,
+                        contentPadding = PaddingValues(0.dp),
+                        beyondBoundsPageCount = 0,
+                        key = { it },
+                        pageSize = PageSize.Fill,
+                        flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
+                        pageNestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
+                            Orientation.Horizontal
+                        ),
+                        pageContent = { _ ->
+                            LazyVerticalGrid(
+                                modifier = Modifier
+                                    .systemBarsPadding(),
+                                columns = GridCells.Fixed(7),
+                                contentPadding = PaddingValues(
+                                    horizontal = 16.dp,
+                                    vertical = 16.dp
+                                ),
+                                verticalArrangement = Arrangement.spacedBy(8.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                var addNumberToCalenderIfNoEntryForDateExists = true
+                                items(dates) {
+                                    val entryDate =
+                                        dayToDatestampForCurrentMonthAndYear(
+                                            it + 1,
+                                            date.monthValue,
+                                            date.year
+                                        )
+                                    state.entries.forEach { entry ->
+                                        if (entryDate == entry.dateStamp) {
+                                            CalenderDay(
+                                                entry = entry,
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        navController.navigate(
+                                                            Screen.AddEditEntryScreen.route +
+                                                                    "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
+                                                        )
+                                                    }
+                                            )
+                                        } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay()
+                                                .toEpochSecond(ZoneOffset.UTC)) {
+                                            addNumberToCalenderIfNoEntryForDateExists = false
+                                            Box(
+                                                modifier = Modifier
+                                                    .clickable {
+                                                        if ((it + 1) <= datestampToDay(
+                                                                currentDate.atStartOfDay()
+                                                                    .toEpochSecond(ZoneOffset.UTC)
+                                                            )
+                                                        ) {
+                                                            navController.navigate(
+                                                                Screen.AddEditEntryScreen.route +
+                                                                        "?showBackButton=${true}&entryDate=${entryDate}"
+                                                            )
+                                                        }
+                                                    },
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    text = "${it + 1}",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = MaterialTheme.colorScheme.onSurface,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
+                                        }
+                                    }
+                                    addNumberToCalenderIfNoEntryForDateExists = true
+                                }
+                            }
+                        }
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(paddingMedium))
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
                     items(state.entries) { entry ->
-                        if (currentDate.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
-                            && currentDate.year.toString() == datestampToYearValue(entry.dateStamp)
+                        if (date.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
+                            && date.year.toString() == datestampToYearValue(entry.dateStamp)
                         ) {
                             EntryItem(
                                 entry = entry,
