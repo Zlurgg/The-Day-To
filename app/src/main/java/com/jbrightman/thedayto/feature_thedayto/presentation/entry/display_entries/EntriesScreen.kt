@@ -230,7 +230,7 @@ fun EntriesScreen(
                                                     .clickable {
                                                         navController.navigate(
                                                             Screen.AddEditEntryScreen.route +
-                                                                    "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
+                                                                    "?entryId=${entry.id}&showBackButton=${true}"
                                                         )
                                                     }
                                             )
@@ -238,19 +238,19 @@ fun EntriesScreen(
                                                 .toEpochSecond(ZoneOffset.UTC)) {
                                             addNumberToCalenderIfNoEntryForDateExists = false
                                             Box(
-                                                modifier = Modifier
-                                                    .clickable {
-                                                        if ((it + 1) <= datestampToDay(
-                                                                currentDate.atStartOfDay()
-                                                                    .toEpochSecond(ZoneOffset.UTC)
-                                                            )
-                                                        ) {
-                                                            navController.navigate(
-                                                                Screen.AddEditEntryScreen.route +
-                                                                        "?showBackButton=${true}&entryDate=${entryDate}"
-                                                            )
-                                                        }
-                                                    },
+                                                modifier = Modifier,
+//                                                    .clickable {
+//                                                        if ((it + 1) <= datestampToDay(
+//                                                                currentDate.atStartOfDay()
+//                                                                    .toEpochSecond(ZoneOffset.UTC)
+//                                                            )
+//                                                        ) {
+//                                                            navController.navigate(
+//                                                                Screen.AddEditEntryScreen.route +
+//                                                                        "?showBackButton=${true}&entryDate=${entryDate}"
+//                                                            )
+//                                                        }
+//                                                    },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
@@ -282,7 +282,7 @@ fun EntriesScreen(
                                     .clickable {
                                         navController.navigate(
                                             Screen.AddEditEntryScreen.route +
-                                                    "?entryId=${entry.id}&entryColor=${entry.color}&showBackButton=${true}"
+                                                    "?entryId=${entry.id}&showBackButton=${true}"
                                         )
                                     },
                                 onDeleteClick = {
