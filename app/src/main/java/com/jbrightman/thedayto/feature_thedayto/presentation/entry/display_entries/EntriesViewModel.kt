@@ -8,13 +8,13 @@ import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
 import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
 import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntriesYearFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.LocalDate
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,6 +28,13 @@ class EntriesViewModel @Inject constructor(
     private var recentlyDeletedEntry: TheDayToEntry? = null
 
     private var getEntriesJob: Job? = null
+
+/*    private val _entriesYear = mutableStateOf(
+        EntriesYearFieldState(
+            year = LocalDate.now().year
+        )
+    )
+    private val entriesYear: State<EntriesYearFieldState> = _entriesYear*/
 
     init {
         getEntries(EntryOrder.Date(OrderType.Descending))
@@ -60,6 +67,11 @@ class EntriesViewModel @Inject constructor(
                     isOrderSectionVisible = !state.value.isOrderSectionVisible
                 )
             }
+//            is EntriesEvent.ChangeYear -> {
+//                _entriesYear.value = entriesYear.value.copy(
+//                    year = event.year
+//                )
+//            }
         }
     }
 

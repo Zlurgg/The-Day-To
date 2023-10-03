@@ -33,7 +33,6 @@ import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entr
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
 

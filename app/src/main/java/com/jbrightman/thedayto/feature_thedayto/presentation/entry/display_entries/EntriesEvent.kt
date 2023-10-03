@@ -8,4 +8,5 @@ sealed class EntriesEvent {
     data class DeleteEntry(val entry: TheDayToEntry): EntriesEvent()
     data object RestoreEntry: EntriesEvent()
     data object ToggleOrderSection: EntriesEvent()
+//    data class ChangeYear(val year: Int) : EntriesEvent()
 }
