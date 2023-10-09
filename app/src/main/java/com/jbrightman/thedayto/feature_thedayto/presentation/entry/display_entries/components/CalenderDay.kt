@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.getColorFromMood
 
 @Composable
 fun CalenderDay(
@@ -24,7 +24,7 @@ fun CalenderDay(
     modifier: Modifier,
     cornerRadius: Dp = 10.dp,
 ) {
-    val color = MoodConvertor.getColorFromMood(entry.mood)
+    val color = getColorFromMood(entry.mood)
     Box(
         modifier = modifier
     ) {
@@ -54,7 +54,7 @@ fun CalenderDay(
                 text = datestampToDay(entry.dateStamp).toString(),
                 style = MaterialTheme.typography.headlineSmall,
                 color = MaterialTheme.colorScheme.onSurface,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         }
     }

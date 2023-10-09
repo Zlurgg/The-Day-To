@@ -2,14 +2,12 @@ package com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_ent
 
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.feature_thedayto.domain.model.InvalidTheDayToEntryException
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow

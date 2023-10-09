@@ -2,17 +2,12 @@ package com.jbrightman.thedayto.feature_thedayto.presentation.util
 
 import androidx.compose.ui.graphics.Color
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-
-class MoodConvertor {
-    companion object {
-        fun getColorFromMood(mood: String): Color? {
-            var color: Color? = null
-            TheDayToEntry.entryMoodWithColor.forEach {
-                if (it.first == mood) {
-                    color = it.second
-                }
-            }
-            return color
+fun getColorFromMood(mood: String): Color? {
+    var color: Color? = null
+    TheDayToEntry.entryMoodWithColor.forEach {
+        if (it.first == mood) {
+            color = it.second
         }
     }
+    return color
 }
