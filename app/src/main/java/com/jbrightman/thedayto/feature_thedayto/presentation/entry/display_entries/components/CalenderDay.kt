@@ -9,13 +9,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
 
 @Composable
@@ -24,6 +24,7 @@ fun CalenderDay(
     modifier: Modifier,
     cornerRadius: Dp = 10.dp,
 ) {
+    val color = MoodConvertor.getColorFromMood(entry.mood)
     Box(
         modifier = modifier
     ) {
@@ -36,11 +37,13 @@ fun CalenderDay(
                 close()
             }
             clipPath(clipPath) {
-                drawRoundRect(
-                    color = Color(entry.color),
-                    size = size,
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
-                )
+                if (color != null) {
+                    drawRoundRect(
+                        color = color,
+                        size = size,
+                        cornerRadius = CornerRadius(cornerRadius.toPx())
+                    )
+                }
             }
         }
         Box(
@@ -56,3 +59,5 @@ fun CalenderDay(
         }
     }
 }
+
+

@@ -9,7 +9,6 @@ data class TheDayToEntry(
     val mood: String,
     val content: String,
     val dateStamp: Long,
-    val color: Int,
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
@@ -20,8 +19,7 @@ data class TheDayToEntry(
                 Pair("Angry", Violet),
                 Pair("Depressed", LightGreen),
             )
-        val entryColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
-        val defaultMoods = listOf("Happy", "Sad", "Meh", "Depressed", "Heart-Broken", "Angry", "Overjoyed")
+        val defaultMoods = listOf("Happy", "Overjoyed", "Sad", "Angry", "Depressed")
     }
 }
 class InvalidTheDayToEntryException(message: String): Exception(message)

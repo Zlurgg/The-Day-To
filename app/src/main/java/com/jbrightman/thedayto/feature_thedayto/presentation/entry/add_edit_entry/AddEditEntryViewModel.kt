@@ -1,23 +1,21 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry
 
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.feature_thedayto.domain.model.InvalidTheDayToEntryException
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.time.LocalDate
-import java.time.ZoneOffset
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,12 +32,12 @@ class AddEditEntryViewModel @Inject constructor(
     val entryDate: State<EntryDateFieldState> = _entryDate
 
     private val _entryMood = mutableStateOf(
-        EntryMoodFieldState(
+        EntryMoodState(
             todayHint = "How're you feeling today?",
             previousDayHint = "How're were you feeling that day?"
         )
     )
-    val entryMood: State<EntryMoodFieldState> = _entryMood
+    val entryMood: State<EntryMoodState> = _entryMood
 
     private val _entryContent = mutableStateOf(
         EntryContentFieldState(
@@ -47,9 +45,6 @@ class AddEditEntryViewModel @Inject constructor(
         )
     )
     val entryContent: State<EntryContentFieldState> = _entryContent
-
-    private val _entryColor = mutableIntStateOf(TheDayToEntry.entryColors.random().toArgb())
-    val entryColor: State<Int> = _entryColor
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
@@ -75,13 +70,11 @@ class AddEditEntryViewModel @Inject constructor(
                                 text = entry.content,
                                 isHintVisible = false
                             )
-                            _entryColor.value = entry.color
                         }
                     }
                 }
             }
         }
-
 
     fun onEvent(event: AddEditEntryEvent) {
         when (event) {
@@ -112,16 +105,12 @@ class AddEditEntryViewModel @Inject constructor(
                             _entryContent.value.text.isBlank()
                 )
             }
-            is AddEditEntryEvent.ChangeColor -> {
-                _entryColor.intValue = event.color
-            }
             is AddEditEntryEvent.SaveEntry -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
                         entryUseCases.addEntry(
                             TheDayToEntry(
                                 content = entryContent.value.text,
-                                color = entryColor.value,
                                 dateStamp = entryDate.value.date,
                                 mood = entryMood.value.mood,
                                 id = currentEntryId
@@ -139,7 +128,6 @@ class AddEditEntryViewModel @Inject constructor(
             }
         }
     }
-
 
     sealed class UiEvent {
         data class ShowSnackbar(val message: String) : UiEvent()
