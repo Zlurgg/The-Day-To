@@ -56,6 +56,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -254,6 +255,7 @@ fun EntriesScreen(
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
+                                                    modifier = Modifier.alpha(0.5f),
                                                     text = "${it + 1}",
                                                     style = MaterialTheme.typography.headlineSmall,
                                                     color = MaterialTheme.colorScheme.onSurface,

@@ -27,8 +27,8 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.getColorFromMood
 import com.jbrightman.thedayto.ui.theme.paddingLarge
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
@@ -41,7 +41,7 @@ fun EntryItem(
     cutCornerSize: Dp = 30.dp,
     onDeleteClick: () -> Unit
 ) {
-    val color = MoodConvertor.getColorFromMood(mood = entry.mood)
+    val color = getColorFromMood(mood = entry.mood)
     Box(
         modifier = modifier
     ) {

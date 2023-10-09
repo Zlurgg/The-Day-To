@@ -20,9 +20,6 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -31,8 +28,8 @@ import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
-import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.getColorFromMood
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
 
@@ -44,14 +41,8 @@ fun AddEditEntryScreen(
     viewModel: AddEditEntryViewModel = hiltViewModel(),
 ) {
     val moodState = viewModel.entryMood.value
-    var moodColor = MoodConvertor.getColorFromMood(moodState.mood)
+    var moodColor = getColorFromMood(moodState.mood)
     moodColor = moodColor ?: Color.White
-
-    val moodColor2 by remember {
-        mutableStateOf(
-            moodColor
-        )
-    }
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
