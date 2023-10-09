@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
 import com.jbrightman.thedayto.ui.theme.paddingLarge
 import com.jbrightman.thedayto.ui.theme.paddingMedium
@@ -40,6 +41,7 @@ fun EntryItem(
     cutCornerSize: Dp = 30.dp,
     onDeleteClick: () -> Unit
 ) {
+    val color = MoodConvertor.getColorFromMood(mood = entry.mood)
     Box(
         modifier = modifier
     ) {
@@ -53,21 +55,28 @@ fun EntryItem(
             }
 
             clipPath(clipPath) {
-                drawRoundRect(
-                    color = Color(entry.color),
-                    size = size,
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
-                )
+                if (color != null) {
+                    drawRoundRect(
+                        color = color,
+                        size = size,
+                        cornerRadius = CornerRadius(cornerRadius.toPx())
+                    )
+                }
+
             }
             clipPath(clipPath) {
                 drawRoundRect(
-                    color = Color(
-                        ColorUtils.blendARGB(entry.color, 0x000000, 0.3f)
+                    color =
+                        Color(ColorUtils.blendARGB(color.hashCode(),
+                            0x000000,
+                            0.3f
+                        )
                     ),
                     topLeft = Offset(size.width - cutCornerSize.toPx(), -100f),
                     size = Size(cutCornerSize.toPx() + 100f, cutCornerSize.toPx() + 100f),
                     cornerRadius = CornerRadius(cornerRadius.toPx())
                 )
+
             }
         }
 

@@ -138,7 +138,7 @@ fun EntriesScreen(
                 )
             }
         },
-        floatingActionButton = {
+/*        floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screen.AddEditEntryScreen.route)
@@ -147,7 +147,7 @@ fun EntriesScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
             }
-        },
+        },*/
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(

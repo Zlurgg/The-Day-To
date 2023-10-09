@@ -47,16 +47,10 @@ fun TheDayToApp(
                 LoginScreen(navController = navController)
             }
             composable(route = Screen.AddEditEntryScreen.route +
-                    "?entryId={entryId}&entryColor={entryColor}&entryDate={entryDate}&showBackButton={showBackButton}",
+                    "?entryId={entryId}&&entryDate={entryDate}&showBackButton={showBackButton}",
                 arguments = listOf(
                     navArgument(
                         name = "entryId"
-                    ) {
-                        type = NavType.IntType
-                        defaultValue = -1
-                    },
-                    navArgument(
-                        name = "entryColor"
                     ) {
                         type = NavType.IntType
                         defaultValue = -1
@@ -75,12 +69,10 @@ fun TheDayToApp(
                     }
                 )
             ) {
-                val color = it.arguments?.getInt("entryColor") ?: -1
                 val date = it.arguments?.getLong("entryDate") ?: -1L
                 val backButton = it.arguments?.getBoolean("showBackButton") ?: false
                 AddEditEntryScreen(
                     navController = navController,
-                    entryColor = color,
                     entryDate = date,
                     showBackButton = backButton
                 )

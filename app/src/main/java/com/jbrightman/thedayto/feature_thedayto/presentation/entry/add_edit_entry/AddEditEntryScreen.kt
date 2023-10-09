@@ -21,17 +21,17 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ColorSelector
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.ContentItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.DatePickerItem
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components.MoodItem
+import com.jbrightman.thedayto.feature_thedayto.presentation.util.MoodConvertor
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
@@ -39,18 +39,21 @@ import kotlinx.coroutines.flow.collectLatest
 @Composable
 fun AddEditEntryScreen(
     navController: NavController,
-    entryColor: Int,
     showBackButton: Boolean,
     entryDate: Long,
     viewModel: AddEditEntryViewModel = hiltViewModel(),
 ) {
-    val entryBackgroundAnimatatable = remember {
-        Animatable(
-            Color(if (entryColor != -1) entryColor else viewModel.entryColor.value)
+    val moodState = viewModel.entryMood.value
+    var moodColor = MoodConvertor.getColorFromMood(moodState.mood)
+    moodColor = moodColor ?: Color.White
+
+    val moodColor2 by remember {
+        mutableStateOf(
+            moodColor
         )
     }
-    val snackbarHostState = remember { SnackbarHostState() }
 
+    val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -66,6 +69,11 @@ fun AddEditEntryScreen(
         }
     }
 
+    val entryBackgroundAnimatatable = remember {
+        Animatable(
+            moodColor
+        )
+    }
     Scaffold(
         topBar = {
             if (showBackButton) {
@@ -97,16 +105,10 @@ fun AddEditEntryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(entryBackgroundAnimatatable.value)
+                    .background(moodColor)
                     .padding(padding)
                     .padding(paddingMedium)
             ) {
-                // Entry Color Selection
-                ColorSelector(
-                    entryBackgroundAnimatatable =  entryBackgroundAnimatatable,
-                    viewModel = viewModel
-                )
-                Spacer(modifier = Modifier.height(paddingMedium))
                 // Date Picker
                 DatePickerItem(viewModel = viewModel, entryDate = entryDate)
                 Spacer(modifier = Modifier.height(paddingMedium))
