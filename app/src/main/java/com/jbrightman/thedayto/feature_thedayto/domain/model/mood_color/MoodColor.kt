@@ -11,7 +11,7 @@ import com.jbrightman.thedayto.ui.theme.Violet
 @Entity
 data class MoodColor(
     val mood: String,
-    val color: Int,
+    val color: Float,
     val dateStamp: Long,
     @PrimaryKey val id: Int? = null
 ) {

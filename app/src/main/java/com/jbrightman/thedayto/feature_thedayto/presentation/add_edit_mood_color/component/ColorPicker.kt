@@ -25,8 +25,7 @@ fun ColorPicker(
             .padding(10.dp),
         controller = controller,
         onColorChanged = { colorEnvelope: ColorEnvelope ->
-            // update vm with changed color value
-            viewModel.onEvent(AddEditMoodColorEvent.EnteredColor(colorEnvelope.color.component1().toInt()))
+            viewModel.onEvent(AddEditMoodColorEvent.EnteredColor(colorEnvelope.color))
         }
     )
 }

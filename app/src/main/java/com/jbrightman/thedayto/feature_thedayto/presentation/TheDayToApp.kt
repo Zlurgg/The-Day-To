@@ -42,8 +42,7 @@ fun TheDayToApp(
 
         NavHost(
             navController = navController,
-//            startDestination = startDestination
-            startDestination = Screen.AddEditMoodColorScreen.route
+            startDestination = startDestination
         ) {
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(navController = navController)
