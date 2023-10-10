@@ -18,27 +18,44 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_thedayto.presentation.add_edit_mood_color.component.ColorPicker
 import com.jbrightman.thedayto.feature_thedayto.presentation.add_edit_mood_color.component.MoodCreator
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
+import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
+import kotlinx.coroutines.flow.collectLatest
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun AddEditMoodColorScreen(
     navController: NavController,
-//    viewModel: AddEditMoodColorViewModel = hiltViewModel()
+    viewModel: AddEditMoodColorViewModel = hiltViewModel()
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    var entryBackgroundAnimatatable = remember {
-        Animatable(
-            Color.White
-        )
+    LaunchedEffect(key1 = true) {
+        viewModel.eventFlow.collectLatest { event ->
+            when (event) {
+                is AddEditMoodColorViewModel.UiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(
+                        message = event.message
+                    )
+                }
+                is AddEditMoodColorViewModel.UiEvent.SaveMoodColor -> {
+                    navController.navigate(Screen.EntriesScreen.route)
+                }
+            }
+        }
     }
     Scaffold(
         topBar = {
@@ -57,7 +74,7 @@ fun AddEditMoodColorScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-//                    viewModel.onEvent(AddEditMoodColorViewModel.SaveEntry)
+                    viewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.primary)
             ) {
@@ -70,13 +87,22 @@ fun AddEditMoodColorScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .padding(paddingMedium)
             ) {
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    ColorPicker()
                     Spacer(modifier = Modifier.padding(paddingSmall))
-                    MoodCreator()
+                    ColorPicker(viewModel = viewModel)
+                    Spacer(modifier = Modifier.padding(paddingSmall))
+                    MoodCreator(viewModel = viewModel)
+                    viewModel.onEvent(
+                        AddEditMoodColorEvent.EnteredDate(
+                            LocalDate.now().atStartOfDay().toEpochSecond(
+                                ZoneOffset.UTC
+                            )
+                        )
+                    )
                 }
             }
         }

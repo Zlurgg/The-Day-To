@@ -13,7 +13,7 @@ data class MoodColor(
     val mood: String,
     val color: Int,
     val dateStamp: Long,
-    @PrimaryKey val id: Int
+    @PrimaryKey val id: Int? = null
 ) {
     companion object {
         val defaultColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
