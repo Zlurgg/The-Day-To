@@ -1,16 +1,16 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.add_edit_mood_color
 
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.graphics.toArgb
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.feature_thedayto.domain.model.mood_color.InvalidMoodColorException
 import com.jbrightman.thedayto.feature_thedayto.domain.model.mood_color.MoodColor
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.MoodColorUseCases
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -31,10 +31,10 @@ class AddEditMoodColorViewModel @Inject constructor(
     private val _moodColorMood = mutableStateOf(MoodTextFieldState(hint = "Enter a new mood"))
     val moodColorMood: State<MoodTextFieldState> = _moodColorMood
 
-    private val _moodColorColor = mutableIntStateOf(MoodColor.defaultColors.random().toArgb())
-    val moodColorColor: State<Int> = _moodColorColor
+    private val _moodColorColor = mutableFloatStateOf(1f)
+    val moodColorColor: MutableFloatState = _moodColorColor
 
-    private val _eventFlow = MutableSharedFlow<AddEditMoodColorViewModel.UiEvent>()
+    private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentMoodColorId: Int? = null
@@ -80,7 +80,9 @@ class AddEditMoodColorViewModel @Inject constructor(
                 )
             }
             is AddEditMoodColorEvent.EnteredColor -> {
-                _moodColorColor.intValue = event.color
+                println("color: ${event.color}")
+                println("value: ${event.color.component1()}")
+                _moodColorColor.value = event.color.component1()
             }
             is AddEditMoodColorEvent.SaveMoodColor -> {
                 viewModelScope.launch(Dispatchers.IO) {

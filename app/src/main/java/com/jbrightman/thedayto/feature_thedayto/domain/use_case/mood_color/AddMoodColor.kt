@@ -16,7 +16,7 @@ class AddMoodColor(
         if (moodColor.mood.isBlank()) {
             throw InvalidMoodColorException("The mood of the new mood color selection can't be empty.")
         }
-        if (moodColor.color == -1) {
+        if (moodColor.color == -1f) {
             throw InvalidMoodColorException("The color of the new mood color selection can't be empty.")
         }
         repository.insertMoodColor(moodColor)
