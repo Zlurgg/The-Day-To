@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -76,9 +77,11 @@ fun AddEditMoodColorScreen(
                 onClick = {
                     viewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                 },
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(MaterialTheme.colorScheme.primary)
             ) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Save entry")
+                Icon(imageVector = Icons.Default.Save, contentDescription = "Save entry")
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -92,10 +95,9 @@ fun AddEditMoodColorScreen(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    MoodCreator(viewModel = viewModel)
                     Spacer(modifier = Modifier.padding(paddingSmall))
                     ColorPicker(viewModel = viewModel)
-                    Spacer(modifier = Modifier.padding(paddingSmall))
-                    MoodCreator(viewModel = viewModel)
                     viewModel.onEvent(
                         AddEditMoodColorEvent.EnteredDate(
                             LocalDate.now().atStartOfDay().toEpochSecond(

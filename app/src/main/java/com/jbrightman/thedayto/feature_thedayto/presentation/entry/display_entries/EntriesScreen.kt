@@ -139,16 +139,16 @@ fun EntriesScreen(
                 )
             }
         },
-/*        floatingActionButton = {
+        floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    navController.navigate(Screen.AddEditEntryScreen.route)
+                    navController.navigate(Screen.AddEditMoodColorScreen.route)
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.primary)
             ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Add Entry")
+                Icon(imageVector = Icons.Default.Add, contentDescription = "Create new mood color")
             }
-        },*/
+        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(
