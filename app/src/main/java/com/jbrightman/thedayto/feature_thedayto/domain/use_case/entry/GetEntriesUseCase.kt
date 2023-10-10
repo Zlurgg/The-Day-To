@@ -1,7 +1,7 @@
 package com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry
 
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.TheDayToRepository
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.repository.entry.TheDayToRepository
 import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
 import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
 import kotlinx.coroutines.flow.Flow

@@ -1,8 +1,8 @@
-package com.jbrightman.thedayto.feature_thedayto.data.repository
+package com.jbrightman.thedayto.feature_thedayto.data.repository.entry
 
-import com.jbrightman.thedayto.feature_thedayto.data.data_source.TheDayToDao
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.TheDayToRepository
+import com.jbrightman.thedayto.feature_thedayto.data.data_source.entry.TheDayToDao
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.repository.entry.TheDayToRepository
 import kotlinx.coroutines.flow.Flow
 
 class TheDayToRepositoryImpl (

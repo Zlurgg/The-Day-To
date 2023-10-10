@@ -12,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.jbrightman.thedayto.feature_thedayto.presentation.add_edit_mood_color.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.EntriesViewModel
@@ -25,8 +26,8 @@ fun TheDayToApp(
     entriesViewModel: EntriesViewModel = hiltViewModel()
 ) {
     val state = entriesViewModel.state.value
-    var startDestination = Screen.AddEditEntryScreen.route
 
+    var startDestination = Screen.AddEditEntryScreen.route
     state.entries.forEach { entry ->
         if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
             startDestination = Screen.EntriesScreen.route
@@ -41,7 +42,8 @@ fun TheDayToApp(
 
         NavHost(
             navController = navController,
-            startDestination = startDestination
+//            startDestination = startDestination
+            startDestination = Screen.AddEditMoodColorScreen.route
         ) {
             composable(route = Screen.LoginScreen.route) {
                 LoginScreen(navController = navController)
@@ -81,6 +83,9 @@ fun TheDayToApp(
                 EntriesScreen(
                     navController = navController
                 )
+            }
+            composable(route = Screen.AddEditMoodColorScreen.route) {
+                AddEditMoodColorScreen(navController = navController)
             }
         }
     }

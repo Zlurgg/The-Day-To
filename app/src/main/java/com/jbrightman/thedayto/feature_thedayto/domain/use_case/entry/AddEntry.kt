@@ -1,11 +1,8 @@
 package com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry
 
-import com.jbrightman.thedayto.feature_thedayto.domain.model.InvalidTheDayToEntryException
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.TheDayToRepository
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.ZoneOffset
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.InvalidTheDayToEntryException
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.repository.entry.TheDayToRepository
 import kotlin.jvm.Throws
 
 class AddEntry(

@@ -20,7 +20,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -41,8 +44,6 @@ fun AddEditEntryScreen(
     viewModel: AddEditEntryViewModel = hiltViewModel(),
 ) {
     val moodState = viewModel.entryMood.value
-    var moodColor = getColorFromMood(moodState.mood)
-    moodColor = moodColor ?: Color.White
 
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {
@@ -60,11 +61,13 @@ fun AddEditEntryScreen(
         }
     }
 
+    var moodColor = getColorFromMood(moodState.mood) ?: Color.White
     val entryBackgroundAnimatatable = remember {
         Animatable(
-            moodColor
+            getColorFromMood(moodState.mood) ?: Color.White
         )
     }
+
     Scaffold(
         topBar = {
             if (showBackButton) {

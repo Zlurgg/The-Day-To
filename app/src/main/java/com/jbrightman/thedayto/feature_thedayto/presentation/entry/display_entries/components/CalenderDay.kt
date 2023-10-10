@@ -14,7 +14,7 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToDay
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.getColorFromMood
 

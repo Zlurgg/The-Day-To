@@ -1,6 +1,6 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries
 
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
 
 sealed class EntriesEvent {

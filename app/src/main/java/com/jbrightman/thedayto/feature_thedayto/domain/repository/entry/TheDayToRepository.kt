@@ -1,6 +1,6 @@
-package com.jbrightman.thedayto.feature_thedayto.domain.repository
+package com.jbrightman.thedayto.feature_thedayto.domain.repository.entry
 
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import kotlinx.coroutines.flow.Flow
 
 interface TheDayToRepository {

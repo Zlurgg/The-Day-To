@@ -4,17 +4,15 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
 import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
 import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
-import com.jbrightman.thedayto.feature_thedayto.presentation.entry.display_entries.components.EntriesYearFieldState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
-import java.time.LocalDate
 import javax.inject.Inject
 
 @HiltViewModel
