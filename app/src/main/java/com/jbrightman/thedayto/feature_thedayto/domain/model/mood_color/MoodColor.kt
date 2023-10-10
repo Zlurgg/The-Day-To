@@ -16,7 +16,7 @@ data class MoodColor(
     @PrimaryKey val id: Int
 ) {
     companion object {
-        val entryColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
+        val defaultColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
         val defaultMoods = listOf("Happy", "Sad", "Meh", "Depressed", "Heart-Broken", "Angry", "Overjoyed")
     }
 }
