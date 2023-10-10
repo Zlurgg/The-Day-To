@@ -13,6 +13,12 @@ import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCa
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntriesUseCase
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.UpdateEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.AddMoodColor
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.DeleteMoodColorUseCase
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.GetMoodColor
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.GetMoodColorsUseCase
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.MoodColorUseCases
+import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.UpdateMoodColor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -55,5 +61,17 @@ object AppModule {
     @Singleton
     fun providesMoodColorRepository(db: TheDayToDatabase): MoodColorRepository {
         return MoodColorRepositoryImpl(db.moodColorDao)
+    }
+
+    @Provides
+    @Singleton
+    fun providesMoodColorUseCases(moodColorRepository: MoodColorRepository): MoodColorUseCases {
+        return MoodColorUseCases(
+            getMoodColors = GetMoodColorsUseCase(repository = moodColorRepository),
+            deleteMoodColor = DeleteMoodColorUseCase(repository = moodColorRepository),
+            addMoodColor = AddMoodColor(repository = moodColorRepository),
+            getMoodColor = GetMoodColor(repository = moodColorRepository),
+            updateMoodColor = UpdateMoodColor(repository = moodColorRepository)
+        )
     }
 }

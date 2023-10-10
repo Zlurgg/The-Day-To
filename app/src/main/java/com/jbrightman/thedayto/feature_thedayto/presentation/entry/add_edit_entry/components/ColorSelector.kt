@@ -37,7 +37,7 @@ fun ColorSelector(
             .padding(8.dp),
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        MoodColor.entryColors.forEach { color ->
+        MoodColor.defaultColors.forEach { color ->
             val colorInt = color.toArgb()
             Box(
                 modifier = Modifier

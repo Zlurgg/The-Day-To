@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
-import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
+import com.jbrightman.thedayto.feature_thedayto.domain.util.entry.EntryOrder
 import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job

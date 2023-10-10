@@ -1,4 +1,6 @@
-package com.jbrightman.thedayto.feature_thedayto.domain.util
+package com.jbrightman.thedayto.feature_thedayto.domain.util.entry
+
+import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
 
 sealed class EntryOrder(val orderType: OrderType) {
     class Date(orderType: OrderType): EntryOrder(orderType)

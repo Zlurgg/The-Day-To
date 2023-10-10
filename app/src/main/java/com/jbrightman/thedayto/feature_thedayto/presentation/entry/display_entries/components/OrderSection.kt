@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.jbrightman.thedayto.feature_thedayto.domain.util.EntryOrder
+import com.jbrightman.thedayto.feature_thedayto.domain.util.entry.EntryOrder
 import com.jbrightman.thedayto.feature_thedayto.domain.util.OrderType
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall
