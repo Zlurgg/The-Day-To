@@ -129,4 +129,6 @@ dependencies {
     //Date Picker
     implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
 
+    //Color Picker
+    implementation("com.github.skydoves:colorpicker-compose:1.0.5")
 }

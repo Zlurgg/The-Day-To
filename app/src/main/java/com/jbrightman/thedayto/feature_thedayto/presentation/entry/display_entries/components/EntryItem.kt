@@ -26,7 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.getColorFromMood
 import com.jbrightman.thedayto.ui.theme.paddingLarge

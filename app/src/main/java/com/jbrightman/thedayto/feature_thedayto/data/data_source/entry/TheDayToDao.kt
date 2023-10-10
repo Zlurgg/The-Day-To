@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_thedayto.data.data_source
+package com.jbrightman.thedayto.feature_thedayto.data.data_source.entry
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -6,7 +6,7 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -26,6 +26,7 @@ interface TheDayToDao {
 
     @Delete
     suspend fun deleteEntry(theDayToEntry: TheDayToEntry)
+
     @Update
     suspend fun updateEntry(theDayToEntry: TheDayToEntry)
 }

@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_thedayto.presentation.entry.add_edit_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_thedayto.presentation.util.datestampToFormattedDate
@@ -35,7 +36,7 @@ import java.time.ZoneOffset
 
 @Composable
 fun DatePickerItem(
-    viewModel: AddEditEntryViewModel,
+    viewModel: AddEditEntryViewModel = hiltViewModel(),
     entryDate: Long
 ) {
     val dateDialogState = rememberMaterialDialogState()

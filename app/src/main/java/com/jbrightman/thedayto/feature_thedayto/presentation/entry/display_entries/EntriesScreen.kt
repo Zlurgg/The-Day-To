@@ -109,7 +109,7 @@ fun EntriesScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Your entries",
+                    text = "The Color of your Month",
                     style = MaterialTheme.typography.headlineMedium
                 )
                 IconButton(

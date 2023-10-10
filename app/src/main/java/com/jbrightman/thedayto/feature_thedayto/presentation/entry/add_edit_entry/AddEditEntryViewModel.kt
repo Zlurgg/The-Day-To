@@ -5,8 +5,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jbrightman.thedayto.feature_thedayto.domain.model.InvalidTheDayToEntryException
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.InvalidTheDayToEntryException
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers

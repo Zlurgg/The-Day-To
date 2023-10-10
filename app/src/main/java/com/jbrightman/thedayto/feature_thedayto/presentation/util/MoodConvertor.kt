@@ -1,7 +1,7 @@
 package com.jbrightman.thedayto.feature_thedayto.presentation.util
 
 import androidx.compose.ui.graphics.Color
-import com.jbrightman.thedayto.feature_thedayto.domain.model.TheDayToEntry
+import com.jbrightman.thedayto.feature_thedayto.domain.model.entry.TheDayToEntry
 fun getColorFromMood(mood: String): Color? {
     var color: Color? = null
     TheDayToEntry.entryMoodWithColor.forEach {

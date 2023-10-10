@@ -3,8 +3,10 @@ package com.jbrightman.thedayto.di
 import android.app.Application
 import androidx.room.Room
 import com.jbrightman.thedayto.feature_thedayto.data.data_source.TheDayToDatabase
-import com.jbrightman.thedayto.feature_thedayto.data.repository.TheDayToRepositoryImpl
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.TheDayToRepository
+import com.jbrightman.thedayto.feature_thedayto.data.repository.mood_color.MoodColorRepositoryImpl
+import com.jbrightman.thedayto.feature_thedayto.data.repository.entry.TheDayToRepositoryImpl
+import com.jbrightman.thedayto.feature_thedayto.domain.repository.mood_color.MoodColorRepository
+import com.jbrightman.thedayto.feature_thedayto.domain.repository.entry.TheDayToRepository
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.AddEntry
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.DeleteEntryUseCase
 import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
@@ -47,5 +49,11 @@ object AppModule {
             getEntry = GetEntry(repository = theDayToRepository),
             updateEntry = UpdateEntry(repository = theDayToRepository)
         )
+    }
+
+    @Provides
+    @Singleton
+    fun providesMoodColorRepository(db: TheDayToDatabase): MoodColorRepository {
+        return MoodColorRepositoryImpl(db.moodColorDao)
     }
 }
