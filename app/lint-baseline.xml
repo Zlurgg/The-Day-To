@@ -3,8 +3,8 @@
 
     <issue
         id="MissingClass"
-        message="Class referenced in the manifest, `com.jbrightman.thedayto.feature_thedayto.TheDayToApplication`, was not found in the project or the libraries"
-        errorLine1="        android:name=&quot;com.jbrightman.thedayto.feature_thedayto.TheDayToApplication&quot;"
+        message="Class referenced in the manifest, `com.jbrightman.thedayto.TheDayToApplication`, was not found in the project or the libraries"
+        errorLine1="        android:name=&quot;com.jbrightman.thedayto.TheDayToApplication&quot;"
         errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
         <location
             file="src/main/AndroidManifest.xml"

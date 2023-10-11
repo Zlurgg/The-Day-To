@@ -2,23 +2,23 @@ package com.jbrightman.thedayto.di
 
 import android.app.Application
 import androidx.room.Room
-import com.jbrightman.thedayto.feature_thedayto.data.data_source.TheDayToDatabase
-import com.jbrightman.thedayto.feature_thedayto.data.repository.mood_color.MoodColorRepositoryImpl
-import com.jbrightman.thedayto.feature_thedayto.data.repository.entry.TheDayToRepositoryImpl
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.mood_color.MoodColorRepository
-import com.jbrightman.thedayto.feature_thedayto.domain.repository.entry.TheDayToRepository
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.AddEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.DeleteEntryUseCase
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.EntryUseCases
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntriesUseCase
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.GetEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.entry.UpdateEntry
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.AddMoodColor
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.DeleteMoodColorUseCase
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.GetMoodColor
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.GetMoodColorsUseCase
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.MoodColorUseCases
-import com.jbrightman.thedayto.feature_thedayto.domain.use_case.mood_color.UpdateMoodColor
+import com.jbrightman.thedayto.data.data_source.TheDayToDatabase
+import com.jbrightman.thedayto.feature_mood_color.data.repository.MoodColorRepositoryImpl
+import com.jbrightman.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
+import com.jbrightman.thedayto.feature_mood_color.domain.repository.MoodColorRepository
+import com.jbrightman.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.AddDailyEntry
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.DeleteDailyEntryUseCase
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.GetDailyEntriesUseCase
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.GetDailyEntry
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.UpdateDailyEntry
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.AddMoodColor
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.DeleteMoodColorUseCase
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.GetMoodColor
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.GetMoodColorsUseCase
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
+import com.jbrightman.thedayto.feature_mood_color.domain.use_case.UpdateMoodColor
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -41,19 +41,19 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun providesTheDayToRepository(db: TheDayToDatabase): TheDayToRepository {
-        return TheDayToRepositoryImpl(db.theDayToDao)
+    fun providesTheDayToRepository(db: TheDayToDatabase): DailyEntryRepository {
+        return DailyEntryRepositoryImpl(db.dailyEntryDao)
     }
 
     @Provides
     @Singleton
-    fun provideTheDayToEntryUseCases(theDayToRepository: TheDayToRepository): EntryUseCases {
-        return EntryUseCases(
-            getEntries = GetEntriesUseCase(repository = theDayToRepository),
-            deleteEntry = DeleteEntryUseCase(repository = theDayToRepository),
-            addEntry = AddEntry(repository = theDayToRepository),
-            getEntry = GetEntry(repository = theDayToRepository),
-            updateEntry = UpdateEntry(repository = theDayToRepository)
+    fun provideTheDayToEntryUseCases(dailyEntryRepository: DailyEntryRepository): DailyEntryUseCases {
+        return DailyEntryUseCases(
+            getEntries = GetDailyEntriesUseCase(repository = dailyEntryRepository),
+            deleteEntry = DeleteDailyEntryUseCase(repository = dailyEntryRepository),
+            addDailyEntry = AddDailyEntry(repository = dailyEntryRepository),
+            getDailyEntry = GetDailyEntry(repository = dailyEntryRepository),
+            updateDailyEntry = UpdateDailyEntry(repository = dailyEntryRepository)
         )
     }
 
