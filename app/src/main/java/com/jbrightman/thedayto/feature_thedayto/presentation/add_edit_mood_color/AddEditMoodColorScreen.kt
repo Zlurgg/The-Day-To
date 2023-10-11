@@ -78,7 +78,6 @@ fun AddEditMoodColorScreen(
                     viewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                 },
                 modifier = Modifier
-                    .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.primary)
             ) {
                 Icon(imageVector = Icons.Default.Save, contentDescription = "Save entry")
