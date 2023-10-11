@@ -15,7 +15,7 @@ import androidx.navigation.navArgument
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.AddEditMoodColorScreen
+import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_login.presentation.LoginScreen
 import com.jbrightman.thedayto.presentation.util.Screen
 import java.time.LocalDate

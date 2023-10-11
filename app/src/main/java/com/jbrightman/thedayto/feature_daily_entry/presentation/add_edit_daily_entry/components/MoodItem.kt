@@ -1,5 +1,7 @@
 package com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
@@ -18,16 +20,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
+import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.AddEditMoodColorViewModel
+import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor.Companion.defaultMoods
+import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
+import com.jbrightman.thedayto.presentation.util.getColorFromMood
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -92,27 +96,48 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            DailyEntry.defaultMoods.forEach { mood ->
+            defaultMoods.forEach { mood ->
                 DropdownMenuItem(
                     onClick = {
                         moodState.mood = mood
-                        viewModel.onEvent(com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent.EnteredMood(moodState.mood))
+                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
                         mExpanded = false
                     },
-                    text = { Text(text = mood) }
+                    text = {
+                        getColorFromMood(mood)?.let {
+                            Text(
+                                modifier = Modifier
+                                    .background(it)
+                                    .fillMaxSize(),
+                                text = mood,
+                            )
+                        }
+                    }
                 )
             }
-            val mcState = mcViewModel
-            MoodColor.defaultMoods.forEach { mood ->
-                DropdownMenuItem(
+
+            mcViewModel.state.value.moodColors.forEach { moodColors ->
+                    DropdownMenuItem(
                     onClick = {
-                        moodState.mood = mood
-                        viewModel.onEvent(com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent.EnteredMood(moodState.mood))
+                        moodState.mood = moodColors.mood
+                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
                         mExpanded = false
                     },
-                    text = { Text(text = mood) }
+                    text = {
+                        Text(
+                            modifier = Modifier
+                                .background(getColor(moodColors.color))
+                                .fillMaxSize(),
+                            text = moodColors.mood
+                        )
+                    }
+
                 )
             }
         }
     }
+}
+
+private fun getColor(colorString: String): Color {
+    return Color(android.graphics.Color.parseColor("#$colorString"))
 }
