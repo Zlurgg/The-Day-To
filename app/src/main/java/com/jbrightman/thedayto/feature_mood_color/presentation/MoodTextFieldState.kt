@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color
+package com.jbrightman.thedayto.feature_mood_color.presentation
 
 data class MoodTextFieldState(
     val mood: String = "",

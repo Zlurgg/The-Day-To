@@ -1,10 +1,10 @@
-package com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.component
+package com.jbrightman.thedayto.feature_mood_color.presentation.component
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.AddEditMoodColorEvent
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.AddEditMoodColorViewModel
+import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
+import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
 
 @Composable
 fun MoodCreator(

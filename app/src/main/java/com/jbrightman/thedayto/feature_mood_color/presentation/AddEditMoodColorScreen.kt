@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color
+package com.jbrightman.thedayto.feature_mood_color.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,8 +23,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.component.ColorPicker
-import com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.component.MoodCreator
+import com.jbrightman.thedayto.feature_mood_color.presentation.component.ColorPicker
+import com.jbrightman.thedayto.feature_mood_color.presentation.component.MoodCreator
 import com.jbrightman.thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall

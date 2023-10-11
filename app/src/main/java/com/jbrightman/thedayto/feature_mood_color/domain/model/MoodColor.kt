@@ -11,13 +11,19 @@ import com.jbrightman.thedayto.ui.theme.Violet
 @Entity
 data class MoodColor(
     val mood: String,
-    val color: Float,
+    val color: String,
     val dateStamp: Long,
     @PrimaryKey val id: Int? = null
 ) {
     companion object {
-        val defaultColors = listOf(RedOrange, LightGreen, Violet, RedPink, BabyBlue)
-        val defaultMoods = listOf("Happy", "Sad", "Meh", "Depressed", "Heart-Broken", "Angry", "Overjoyed")
+        val entryMoodWithColor = listOf(
+            Pair("Happy", RedOrange),
+            Pair("Overjoyed", RedPink),
+            Pair("Sad", BabyBlue),
+            Pair("Angry", Violet),
+            Pair("Depressed", LightGreen),
+        )
+        val defaultMoods = listOf("Happy", "Overjoyed", "Sad", "Angry", "Depressed")
     }
 }
 

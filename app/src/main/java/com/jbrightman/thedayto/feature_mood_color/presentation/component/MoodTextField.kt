@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color.component
+package com.jbrightman.thedayto.feature_mood_color.presentation.component
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

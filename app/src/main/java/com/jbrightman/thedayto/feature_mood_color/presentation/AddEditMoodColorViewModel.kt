@@ -1,19 +1,25 @@
-package com.jbrightman.thedayto.feature_mood_color.presentation.add_edit_mood_color
+package com.jbrightman.thedayto.feature_mood_color.presentation
 
 import androidx.compose.runtime.MutableFloatState
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.jbrightman.thedayto.domain.util.OrderType
 import com.jbrightman.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor
 import com.jbrightman.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
+import com.jbrightman.thedayto.feature_mood_color.domain.util.MoodColorOrder
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -30,15 +36,22 @@ class AddEditMoodColorViewModel @Inject constructor(
     private val _moodColorMood = mutableStateOf(MoodTextFieldState(hint = "Enter a new mood"))
     val moodColorMood: State<MoodTextFieldState> = _moodColorMood
 
-    private val _moodColorColor = mutableFloatStateOf(1f)
-    val moodColorColor: MutableFloatState = _moodColorColor
+    private val _moodColorColor = mutableStateOf("#000000")
+    val moodColorColor: MutableState<String> = _moodColorColor
 
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
     private var currentMoodColorId: Int? = null
 
+    private val _state = mutableStateOf(MoodColorState())
+    val state: State<MoodColorState> = _state
+
+    private var getMoodColorsJob: Job? = null
+
     init {
+        getMoodColors(MoodColorOrder.Date(OrderType.Descending))
+
         savedStateHandle.get<Int>("moodColorId")?.let { moodColorId ->
             if (moodColorId != -1) {
                 viewModelScope.launch {
@@ -53,7 +66,7 @@ class AddEditMoodColorViewModel @Inject constructor(
                             mood = moodColor.mood,
                             isHintVisible = false
                         )
-                        _moodColorColor.value = moodColor.color
+                        _moodColorColor.value = moodColor.color.toString()
                     }
                 }
             }
@@ -79,9 +92,7 @@ class AddEditMoodColorViewModel @Inject constructor(
                 )
             }
             is AddEditMoodColorEvent.EnteredColor -> {
-                println("color: ${event.color}")
-                println("value: ${event.color.component1()}")
-                _moodColorColor.value = event.color.component1()
+                _moodColorColor.value = event.colorEnvelope.hexCode
             }
             is AddEditMoodColorEvent.SaveMoodColor -> {
                 viewModelScope.launch(Dispatchers.IO) {
@@ -105,6 +116,18 @@ class AddEditMoodColorViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    private fun getMoodColors(moodColorOrder: MoodColorOrder) {
+        getMoodColorsJob?.cancel()
+        getMoodColorsJob = moodColorUseCases.getMoodColors(moodColorOrder)
+            .onEach { moodColors ->
+                _state.value = state.value.copy(
+                    moodColors = moodColors,
+                    moodColorOrder = moodColorOrder
+                )
+            }
+            .launchIn(viewModelScope)
     }
 
     sealed class UiEvent {
