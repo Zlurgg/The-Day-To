@@ -66,7 +66,7 @@ class AddEditMoodColorViewModel @Inject constructor(
                             mood = moodColor.mood,
                             isHintVisible = false
                         )
-                        _moodColorColor.value = moodColor.color.toString()
+                        _moodColorColor.value = moodColor.color
                     }
                 }
             }

@@ -41,7 +41,7 @@ fun EntryItem(
     cutCornerSize: Dp = 30.dp,
     onDeleteClick: () -> Unit
 ) {
-    val color = getColorFromMood(mood = entry.mood)
+    val color = getColor(entry.color)
     Box(
         modifier = modifier
     ) {
@@ -55,13 +55,11 @@ fun EntryItem(
             }
 
             clipPath(clipPath) {
-                if (color != null) {
-                    drawRoundRect(
-                        color = color,
-                        size = size,
-                        cornerRadius = CornerRadius(cornerRadius.toPx())
-                    )
-                }
+                drawRoundRect(
+                    color = color,
+                    size = size,
+                    cornerRadius = CornerRadius(cornerRadius.toPx())
+                )
 
             }
             clipPath(clipPath) {
@@ -118,4 +116,10 @@ fun EntryItem(
             )
         }
     }
+}
+
+
+// Conversion method for getting color from Colour env
+private fun getColor(colorString: String): Color {
+    return Color(android.graphics.Color.parseColor("#$colorString"))
 }

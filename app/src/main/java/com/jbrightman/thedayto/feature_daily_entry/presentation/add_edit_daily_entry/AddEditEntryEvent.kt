@@ -8,5 +8,6 @@ sealed class AddEditEntryEvent {
     data class ChangeMoodFocus(val focusState: FocusState): AddEditEntryEvent()
     data class EnteredContent(val value: String): AddEditEntryEvent()
     data class ChangeContentFocus(val focusState: FocusState): AddEditEntryEvent()
+    data class EnteredColor(val color: String): AddEditEntryEvent()
     data object SaveEntry: AddEditEntryEvent()
 }

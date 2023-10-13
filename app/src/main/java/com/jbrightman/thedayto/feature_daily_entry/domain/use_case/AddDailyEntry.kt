@@ -16,6 +16,9 @@ class AddDailyEntry(
         if (entry.mood.isBlank()) {
             throw InvalidDailyEntryException("The mood of the entry can't be empty.")
         }
+        if (entry.color.isBlank()) {
+            throw InvalidDailyEntryException("The color of the entry can't be empty.")
+        }
         repository.insertDailyEntry(entry)
 //        if (repository.getTheDayToEntryByDate(entry.dateStamp) == null) {
 //            repository.insertEntry(entry)

@@ -23,6 +23,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
@@ -59,11 +60,17 @@ fun AddEditEntryScreen(
     }
 
     var moodColor = getColorFromMood(moodState.mood) ?: Color.White
-    val entryBackgroundAnimatatable = remember {
-        Animatable(
-            getColorFromMood(moodState.mood) ?: Color.White
-        )
-    }
+//    val entryBackgroundAnimatatable = remember {
+//        Animatable(
+//            getColorFromMood(moodState.mood) ?: Color.White
+//        )
+//    }
+//    var moodColor = Color(viewModel.entryColor.value.toColorInt())
+//    val entryBackgroundAnimatatable = remember {
+//        Animatable(
+//            moodColor
+//        )
+//    }
 
     Scaffold(
         topBar = {
@@ -84,7 +91,7 @@ fun AddEditEntryScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
-                    viewModel.onEvent(com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent.SaveEntry)
+                    viewModel.onEvent(AddEditEntryEvent.SaveEntry)
                 },
                 modifier = Modifier.background(MaterialTheme.colorScheme.primary)
             ) {
@@ -96,7 +103,7 @@ fun AddEditEntryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(moodColor)
+//                    .background(moodColor)
                     .padding(padding)
                     .padding(paddingMedium)
             ) {
