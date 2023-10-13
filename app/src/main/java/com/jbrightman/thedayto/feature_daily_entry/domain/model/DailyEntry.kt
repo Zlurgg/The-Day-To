@@ -9,6 +9,7 @@ data class DailyEntry(
     val mood: String,
     val content: String,
     val dateStamp: Long,
+    val color: String,
     @PrimaryKey val id: Int? = null
 )
 class InvalidDailyEntryException(message: String): Exception(message)

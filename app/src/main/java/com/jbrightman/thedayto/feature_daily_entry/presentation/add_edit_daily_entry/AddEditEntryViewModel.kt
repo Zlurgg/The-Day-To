@@ -1,6 +1,8 @@
 package com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry
 
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -44,6 +46,9 @@ class AddEditEntryViewModel @Inject constructor(
     )
     val entryContent: State<EntryContentFieldState> = _entryContent
 
+    private val _entryColor = mutableStateOf("#000000")
+    val entryColor: State<String> = _entryColor
+
     private val _eventFlow = MutableSharedFlow<UiEvent>()
     val eventFlow = _eventFlow.asSharedFlow()
 
@@ -68,6 +73,7 @@ class AddEditEntryViewModel @Inject constructor(
                                 text = entry.content,
                                 isHintVisible = false
                             )
+                             _entryColor.value = entry.color
                         }
                     }
                 }
@@ -103,6 +109,9 @@ class AddEditEntryViewModel @Inject constructor(
                             _entryContent.value.text.isBlank()
                 )
             }
+            is AddEditEntryEvent.EnteredColor -> {
+                _entryColor.value = event.color
+            }
             is AddEditEntryEvent.SaveEntry -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
@@ -111,6 +120,7 @@ class AddEditEntryViewModel @Inject constructor(
                                 content = entryContent.value.text,
                                 dateStamp = entryDate.value.date,
                                 mood = entryMood.value.mood,
+                                color = entryColor.value,
                                 id = currentEntryId
                             )
                         )

@@ -1,8 +1,11 @@
 package com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.DropdownMenuItem
@@ -21,9 +24,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,7 +40,7 @@ import com.jbrightman.thedayto.presentation.util.getColorFromMood
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun MoodItem(
     viewModel: AddEditEntryViewModel = hiltViewModel(),
@@ -97,41 +102,65 @@ fun MoodItem(
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
             defaultMoods.forEach { mood ->
+                val color = getColorFromMood(mood)
                 DropdownMenuItem(
                     onClick = {
                         moodState.mood = mood
                         viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
+                        viewModel.onEvent(
+                            AddEditEntryEvent.EnteredColor(
+                                color.toArgb().toHexString()
+                            )
+                        )
                         mExpanded = false
                     },
                     text = {
-                        getColorFromMood(mood)?.let {
+                        Row(
+                            modifier = Modifier.fillMaxSize()
+                            ) {
                             Text(
+                                modifier = Modifier.weight(0.5f),
+                                text = mood
+                            )
+                            Box(
                                 modifier = Modifier
-                                    .background(it)
-                                    .fillMaxSize(),
-                                text = mood,
+                                    .background(color)
+                                    .size(12.dp)
+                                    .weight(0.5f)
                             )
                         }
                     }
                 )
             }
-
             mcViewModel.state.value.moodColors.forEach { moodColors ->
+                val color  = getColor(moodColors.color)
                     DropdownMenuItem(
                     onClick = {
                         moodState.mood = moodColors.mood
                         viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
+                        viewModel.onEvent(
+                            AddEditEntryEvent.EnteredColor(
+                                color.toArgb().toHexString()
+                            )
+                        )
                         mExpanded = false
                     },
                     text = {
-                        Text(
-                            modifier = Modifier
-                                .background(getColor(moodColors.color))
-                                .fillMaxSize(),
-                            text = moodColors.mood
-                        )
+                        Row(
+                            modifier = Modifier.fillMaxSize()
+                        ) {
+                            Text(
+                                modifier = Modifier.weight(0.5f),
+                                text = moodColors.mood
+                            )
+                            Box(
+                                modifier = Modifier
+                                    .background(color)
+                                    .size(12.dp)
+                                    .weight(0.5f)
+                            )
+                        }
                     }
-
                 )
             }
         }

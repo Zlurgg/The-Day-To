@@ -6,10 +6,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
 
+/** this should be done correctly, start in the database using mood to get id and then get color from that
+ * use use-cases and state vm etc correctly and then can call it via the state rather than manually
+ */
 fun getColorFromMood(
     mood: String,
-): Color? {
-    var color: Color? = null
+): Color {
+    var color: Color = Color.White
     var isDefaultMood = false
     MoodColor.entryMoodWithColor.forEach {
         if (it.first == mood) {
@@ -17,16 +20,7 @@ fun getColorFromMood(
             isDefaultMood = true
         }
     }
-//    if (!isDefaultMood) {
-//        mcViewModel.state.value.moodColors.forEach { moodColors ->
-//            if (moodColors.mood == mood) {
-//                color = getColor(moodColors.color)
-//            }
-//        }
-//    }
+
     return color
 }
 
-private fun getColor(colorString: String): Color {
-    return Color(android.graphics.Color.parseColor("#$colorString"))
-}
