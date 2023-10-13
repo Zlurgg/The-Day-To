@@ -46,14 +46,15 @@ fun AddEditMoodColorScreen(
                         message = event.message
                     )
                 }
-                is AddEditMoodColorViewModel.UiEvent.SaveMoodColor -> {
-                    navController.navigate(Screen.EntriesScreen.route)
-                }
+//                is AddEditMoodColorViewModel.UiEvent.SaveMoodColor -> {
+//                    navController.navigate(Screen.EntriesScreen.route)
+//                }
+                else -> {}
             }
         }
     }
     Scaffold(
-        topBar = {
+/*        topBar = {
             Row {
                 Icon(
                     imageVector = Icons.Filled.ArrowBack,
@@ -65,7 +66,7 @@ fun AddEditMoodColorScreen(
                         }
                 )
             }
-        },
+        },*/
         floatingActionButton = {
             FloatingActionButton(
                 onClick = {
