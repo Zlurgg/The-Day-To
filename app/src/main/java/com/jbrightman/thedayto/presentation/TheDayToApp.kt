@@ -84,7 +84,7 @@ fun TheDayToApp(
                 )
             }
             composable(route = Screen.AddEditMoodColorScreen.route) {
-                AddEditMoodColorScreen(navController = navController)
+                AddEditMoodColorScreen()
             }
         }
     }

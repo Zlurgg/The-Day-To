@@ -98,7 +98,7 @@ fun EntriesScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "The Color of your Month",
+                    text = "Your month in colour",
                     style = MaterialTheme.typography.headlineMedium
                 )
                 IconButton(
@@ -128,16 +128,6 @@ fun EntriesScreen(
                 )
             }
         },
-/*        floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    navController.navigate(Screen.AddEditMoodColorScreen.route)
-                },
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(imageVector = Icons.Default.Add, contentDescription = "Create new mood color")
-            }
-        },*/
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(
@@ -229,18 +219,6 @@ fun EntriesScreen(
                                             addNumberToCalenderIfNoEntryForDateExists = false
                                             Box(
                                                 modifier = Modifier,
-//                                                    .clickable {
-//                                                        if ((it + 1) <= datestampToDay(
-//                                                                currentDate.atStartOfDay()
-//                                                                    .toEpochSecond(ZoneOffset.UTC)
-//                                                            )
-//                                                        ) {
-//                                                            navController.navigate(
-//                                                                Screen.AddEditEntryScreen.route +
-//                                                                        "?showBackButton=${true}&entryDate=${entryDate}"
-//                                                            )
-//                                                        }
-//                                                    },
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(

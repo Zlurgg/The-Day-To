@@ -106,7 +106,8 @@ fun EntryItem(
                 overflow = TextOverflow.Ellipsis
             )
         }
-        IconButton(
+        /** Should we allow for deleting entries **/
+/*        IconButton(
             onClick = onDeleteClick,
             modifier = Modifier.align(Alignment.BottomEnd)
         ) {
@@ -114,7 +115,7 @@ fun EntryItem(
                 imageVector = Icons.Default.Delete,
                 contentDescription = "Delete Entry"
             )
-        }
+        }*/
     }
 }
 

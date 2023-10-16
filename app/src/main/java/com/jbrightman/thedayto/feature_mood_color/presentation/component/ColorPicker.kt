@@ -21,7 +21,7 @@ fun ColorPicker(
     HsvColorPicker(
         modifier = Modifier
             .fillMaxWidth()
-            .height(450.dp)
+            .height(250.dp)
             .padding(10.dp),
         controller = controller,
         onColorChanged = { colorEnvelope: ColorEnvelope ->

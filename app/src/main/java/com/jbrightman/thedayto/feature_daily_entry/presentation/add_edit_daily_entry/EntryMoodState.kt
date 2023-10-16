@@ -4,5 +4,5 @@ data class EntryMoodState(
     var mood: String = "",
     val todayHint: String = "",
     val previousDayHint: String = "",
-    val isHintVisible: Boolean = true,
+    val isHintVisible: Boolean = true
 )
