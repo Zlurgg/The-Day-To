@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
@@ -154,8 +156,10 @@ fun MoodItem(
                                 onClick = {
 
                             }) {
-                                Icon(imageVector = Icons.Default.Delete,
-                                    contentDescription = "delete default mood colors")
+                                Icon(
+                                    imageVector = Icons.Default.Cancel,
+                                    contentDescription = "delete custom mood color"
+                                )
                             }
                         }
                     }
@@ -194,21 +198,25 @@ fun MoodItem(
                             onClick = {
                                 mcViewModel.onEvent(AddEditMoodColorEvent.DeleteMoodColor(moodColors))
                             }) {
-                            Icon(imageVector = Icons.Default.Delete,
-                                contentDescription = "delete custom mood color")
+                            Icon(
+                                imageVector = Icons.Default.Cancel,
+                                contentDescription = "delete custom mood color"
+                            )
                         }
                     }
                 }
             )}
             // Button to add a new mood color
-            Button(
+            IconButton(
+                modifier = Modifier.fillMaxSize(),
                 onClick = {
                     viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
                     mExpanded = false
                 },
             ) {
-                Text(
-                    text = "Add new Mood Color"
+                Icon(
+                    imageVector = Icons.Default.AddCircle,
+                    contentDescription = "add custom mood color"
                 )
             }
         }
