@@ -192,7 +192,7 @@ fun MoodItem(
                         IconButton(
                             modifier = Modifier.weight(0.2f),
                             onClick = {
-
+                                mcViewModel.onEvent(AddEditMoodColorEvent.DeleteMoodColor(moodColors))
                             }) {
                             Icon(imageVector = Icons.Default.Delete,
                                 contentDescription = "delete custom mood color")
