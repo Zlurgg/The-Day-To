@@ -1,6 +1,5 @@
 package com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry
 
-import androidx.compose.animation.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -14,7 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -26,8 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
@@ -121,6 +118,7 @@ fun AddEditEntryScreen(
                     Column(
                         modifier = Modifier.padding(paddingMedium)
                     ) {
+
                         // Date Picker
                         DatePickerItem(viewModel = viewModel, entryDate = entryDate)
                         Spacer(modifier = Modifier.height(paddingMedium))
@@ -129,16 +127,22 @@ fun AddEditEntryScreen(
                         Spacer(modifier = Modifier.height(paddingMedium))
                         // Content
                         ContentItem(viewModel = viewModel)
-                        FloatingActionButton(
+                        Button(
+                            modifier = Modifier
+                                .align(Alignment.End)
+                                .background(MaterialTheme.colorScheme.primary),
                             onClick = {
                                 viewModel.onEvent(AddEditEntryEvent.SaveEntry)
-                            },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                            }
                         ) {
-                            Icon(imageVector = Icons.Default.Check, contentDescription = "Save entry")
+                            Icon(
+                                imageVector = Icons.Default.Check,
+                                contentDescription = "Save entry"
+                            )
                         }
                     }
                 }
+                // Change to be part of top bar with animated visibility
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()

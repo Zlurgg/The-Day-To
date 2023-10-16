@@ -128,7 +128,7 @@ fun EntriesScreen(
                 )
             }
         },
-        floatingActionButton = {
+/*        floatingActionButton = {
             FloatingActionButton(
                 onClick = {
                     navController.navigate(Screen.AddEditMoodColorScreen.route)
@@ -137,7 +137,7 @@ fun EntriesScreen(
             ) {
                 Icon(imageVector = Icons.Default.Add, contentDescription = "Create new mood color")
             }
-        },
+        },*/
         snackbarHost = { SnackbarHost(snackbarHostState) },
         content = { padding ->
             Column(
