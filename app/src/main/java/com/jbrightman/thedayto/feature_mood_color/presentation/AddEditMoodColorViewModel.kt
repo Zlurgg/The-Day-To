@@ -9,6 +9,7 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.domain.util.OrderType
+import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor
 import com.jbrightman.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
@@ -49,9 +50,10 @@ class AddEditMoodColorViewModel @Inject constructor(
 
     private var getMoodColorsJob: Job? = null
 
+    private var recentlyDeletedMoodColor: MoodColor? = null
+
     init {
         getMoodColors(MoodColorOrder.Date(OrderType.Descending))
-
         savedStateHandle.get<Int>("moodColorId")?.let { moodColorId ->
             if (moodColorId != -1) {
                 viewModelScope.launch {
@@ -113,6 +115,12 @@ class AddEditMoodColorViewModel @Inject constructor(
                             )
                         )
                     }
+                }
+            }
+            is AddEditMoodColorEvent.DeleteMoodColor -> {
+                viewModelScope.launch {
+                    moodColorUseCases.deleteMoodColor(event.moodColor)
+                    recentlyDeletedMoodColor = event.moodColor
                 }
             }
         }
