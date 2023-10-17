@@ -7,14 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
@@ -28,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.presentation.util.datestampToFormattedDate
-import com.jbrightman.thedayto.presentation.util.getColorFromMood
 import com.jbrightman.thedayto.ui.theme.paddingLarge
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import com.jbrightman.thedayto.ui.theme.paddingSmall

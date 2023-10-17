@@ -89,13 +89,16 @@ fun AddEditEntryScreen(
             }
         },
         floatingActionButton = {
-            FloatingActionButton(
-                onClick = {
-                    viewModel.onEvent(AddEditEntryEvent.SaveEntry)
-                },
-                modifier = Modifier.background(MaterialTheme.colorScheme.primary)
-            ) {
-                Icon(imageVector = Icons.Default.Check, contentDescription = "Save entry")
+            /** if we are putting a new mood color in hide button **/
+            if (!viewModel.state.value.isMoodColorSectionVisible) {
+                FloatingActionButton(
+                    onClick = {
+                        viewModel.onEvent(AddEditEntryEvent.SaveEntry)
+                    },
+                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
+                ) {
+                    Icon(imageVector = Icons.Default.Check, contentDescription = "Save entry")
+                }
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },

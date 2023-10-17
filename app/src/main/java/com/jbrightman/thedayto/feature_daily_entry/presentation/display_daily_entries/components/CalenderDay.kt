@@ -16,7 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.presentation.util.datestampToDay
-import com.jbrightman.thedayto.presentation.util.getColorFromMood
+import com.jbrightman.thedayto.presentation.util.getColor
 
 @Composable
 fun CalenderDay(
@@ -24,7 +24,7 @@ fun CalenderDay(
     modifier: Modifier,
     cornerRadius: Dp = 10.dp,
 ) {
-    val color = getColorFromMood(entry.mood)
+    val color = getColor(entry.color)
     Box(
         modifier = modifier
     ) {
@@ -37,13 +37,11 @@ fun CalenderDay(
                 close()
             }
             clipPath(clipPath) {
-                if (color != null) {
-                    drawRoundRect(
-                        color = color,
-                        size = size,
-                        cornerRadius = CornerRadius(cornerRadius.toPx())
-                    )
-                }
+                drawRoundRect(
+                    color = color,
+                    size = size,
+                    cornerRadius = CornerRadius(cornerRadius.toPx())
+                )
             }
         }
         Box(
