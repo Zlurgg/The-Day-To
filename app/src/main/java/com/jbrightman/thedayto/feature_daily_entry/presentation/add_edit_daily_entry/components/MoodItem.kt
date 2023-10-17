@@ -119,7 +119,7 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            defaultMoods.forEach { mood ->
+            /*defaultMoods.forEach { mood ->
                 val color = getColorFromMoodForDefault(mood)
                 DropdownMenuItem(
                     onClick = {
@@ -160,7 +160,7 @@ fun MoodItem(
                         }
                     }
                 )
-            }
+            }*/
             mcViewModel.state.value.moodColors.forEach { moodColors ->
                 val color  = getColor(moodColors.color)
                 DropdownMenuItem(
