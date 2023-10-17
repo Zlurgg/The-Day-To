@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Cancel
@@ -12,6 +13,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
@@ -42,20 +44,37 @@ fun AddEditMoodColorScreen(
         Row(
             modifier = Modifier.fillMaxSize()
         ) {
-            IconButton(
-                onClick = {
-                    mcViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
-                    viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
-                }
+            Column(
+                modifier = Modifier.weight(0.2f)
             ) {
-                Icon(imageVector = Icons.Default.AddCircle, contentDescription = "Save entry")
+                IconButton(
+                    onClick = {
+                        mcViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
+                        viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(40.dp),
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = "Create new mood color"
+                    )
+                }
             }
-            IconButton(
-                onClick = {
-                    viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
-                }
+            Spacer(modifier = Modifier.weight(0.6f))
+            Column(
+                modifier = Modifier.weight(0.2f)
             ) {
-                Icon(imageVector = Icons.Default.Cancel, contentDescription = "Save entry")
+                IconButton(
+                    onClick = {
+                        viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.size(40.dp),
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = "Cancel mood color creation"
+                    )
+                }
             }
         }
     }

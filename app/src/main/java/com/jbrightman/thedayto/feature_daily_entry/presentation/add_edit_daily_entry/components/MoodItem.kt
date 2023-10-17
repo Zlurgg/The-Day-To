@@ -18,8 +18,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -29,7 +27,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.SwipeToDismiss
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -39,7 +36,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
@@ -50,15 +46,15 @@ import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesEvent
 import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor.Companion.defaultMoods
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
-import com.jbrightman.thedayto.presentation.util.getColorFromMood
+import com.jbrightman.thedayto.presentation.util.getColorFromMoodForDefault
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import java.time.LocalDate
 import java.time.ZoneOffset
+import com.jbrightman.thedayto.presentation.util.getColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
@@ -124,7 +120,7 @@ fun MoodItem(
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
             defaultMoods.forEach { mood ->
-                val color = getColorFromMood(mood)
+                val color = getColorFromMoodForDefault(mood)
                 DropdownMenuItem(
                     onClick = {
                         moodState.mood = mood
@@ -229,8 +225,4 @@ fun MoodItem(
         AddEditMoodColorScreen()
         Spacer(modifier = Modifier.height(paddingMedium))
     }
-}
-
-private fun getColor(colorString: String): Color {
-    return Color(android.graphics.Color.parseColor("#$colorString"))
 }
