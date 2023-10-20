@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.google.android.gms.auth.api.identity.Identity
+import com.jbrightman.thedayto.domain.repository.PrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
 import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient

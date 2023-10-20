@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,30 +22,25 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
-import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
+import com.jbrightman.thedayto.domain.repository.PrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
-import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
 import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInScreen
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInViewModel
 import com.jbrightman.thedayto.presentation.util.Screen
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
-    googleAuthUiClient: GoogleAuthUiClient,
-    entriesViewModel: EntriesViewModel = hiltViewModel()
+    googleAuthUiClient: GoogleAuthUiClient
 ) {
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
-    var alreadyMadeAnEntryToday = false
     val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current
     val scope = rememberCoroutineScope()
+    val prefRepository = PrefRepository(applicationContext)
 
     Surface(
         modifier = Modifier
@@ -62,20 +56,10 @@ fun TheDayToApp(
                 val signInViewModel: SignInViewModel = viewModel()
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
                 LaunchedEffect(key1 = Unit) {
-                    delay(50L)
-
-                    val entriesState by lazy {
-                        entriesViewModel.state
-                    }
-                    entriesState.value.entries.forEach { entry ->
-                        if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
-                            entriesState.value.dailyEntryMade = true
-                        }
-                    }
 
                     if(googleAuthUiClient.getSignedInUser() != null) {
 
-                        if (entriesState.value.dailyEntryMade) {
+                        if (prefRepository.getDailyEntryCreated()) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -104,15 +88,7 @@ fun TheDayToApp(
                             "Sign in successful",
                             Toast.LENGTH_LONG
                         ).show()
-                        val entriesState by lazy {
-                            entriesViewModel.state
-                        }
-                        entriesState.value.entries.forEach { entry ->
-                            if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
-                                entriesState.value.dailyEntryMade = true
-                            }
-                        }
-                        if (entriesState.value.dailyEntryMade) {
+                        if (prefRepository.getDailyEntryCreated()) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
