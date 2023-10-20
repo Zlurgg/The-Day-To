@@ -6,7 +6,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -30,10 +29,8 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Button
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -60,7 +57,6 @@ import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
-import com.jbrightman.thedayto.feature_login.presentation.GoogleAuthUiClient
 import com.jbrightman.thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.presentation.util.datestampToMonthValue
 import com.jbrightman.thedayto.presentation.util.datestampToYearValue

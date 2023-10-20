@@ -23,14 +23,16 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
+import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
-import com.jbrightman.thedayto.feature_login.presentation.GoogleAuthUiClient
-import com.jbrightman.thedayto.feature_login.presentation.LoginScreen
+import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
+import com.jbrightman.thedayto.feature_sign_in.presentation.SignInScreen
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
-import com.jbrightman.thedayto.feature_login.presentation.LoginViewModel
+import com.jbrightman.thedayto.feature_sign_in.presentation.SignInViewModel
 import com.jbrightman.thedayto.presentation.util.Screen
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -40,13 +42,11 @@ fun TheDayToApp(
     googleAuthUiClient: GoogleAuthUiClient,
     entriesViewModel: EntriesViewModel = hiltViewModel()
 ) {
-
-    var startDestination = Screen.LoginScreen.route
+    /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
+    var alreadyMadeAnEntryToday = false
+    val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current
     val scope = rememberCoroutineScope()
-
-    /** Check entries for today and see if there is already one, go to entries screen from login if so **/
-    var alreadyMadeAnEntryToday = false
 
     Surface(
         modifier = Modifier
@@ -54,23 +54,28 @@ fun TheDayToApp(
             .background(MaterialTheme.colorScheme.background)
     ) {
         val navController = rememberNavController()
-
         NavHost(
             navController = navController,
             startDestination = startDestination
         ) {
-            composable(route = Screen.LoginScreen.route) {
-                val viewModel = viewModel<LoginViewModel>()
-                val state by viewModel.state.collectAsStateWithLifecycle()
-
+            composable(route = Screen.SignInScreen.route) {
+                val signInViewModel: SignInViewModel = viewModel()
+                val state by signInViewModel.state.collectAsStateWithLifecycle()
                 LaunchedEffect(key1 = Unit) {
-                    entriesViewModel.state.value.entries.forEach { entry ->
+                    delay(50L)
+
+                    val entriesState by lazy {
+                        entriesViewModel.state
+                    }
+                    entriesState.value.entries.forEach { entry ->
                         if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
-                            alreadyMadeAnEntryToday = true
+                            entriesState.value.dailyEntryMade = true
                         }
                     }
+
                     if(googleAuthUiClient.getSignedInUser() != null) {
-                        if (alreadyMadeAnEntryToday) {
+
+                        if (entriesState.value.dailyEntryMade) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -86,7 +91,7 @@ fun TheDayToApp(
                                 val signInResult = googleAuthUiClient.signInWithIntent(
                                     intent = result.data ?: return@launch
                                 )
-                                viewModel.onSignInResult(signInResult)
+                                signInViewModel.onSignInResult(signInResult)
                             }
                         }
                     }
@@ -99,17 +104,24 @@ fun TheDayToApp(
                             "Sign in successful",
                             Toast.LENGTH_LONG
                         ).show()
-
-                        if (alreadyMadeAnEntryToday) {
+                        val entriesState by lazy {
+                            entriesViewModel.state
+                        }
+                        entriesState.value.entries.forEach { entry ->
+                            if (entry.dateStamp == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+                                entriesState.value.dailyEntryMade = true
+                            }
+                        }
+                        if (entriesState.value.dailyEntryMade) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
                         }
-                        viewModel.resetState()
+                        signInViewModel.resetState()
                     }
                 }
 
-                LoginScreen(
+                SignInScreen(
                     state = state,
                     onSignInClick = {
                         scope.launch {
@@ -165,7 +177,7 @@ fun TheDayToApp(
                                 "Signed out",
                                 Toast.LENGTH_LONG
                             ).show()
-                            navController.popBackStack()
+                            navController.navigate(route = startDestination)
                         }
                     }
                 )
