@@ -32,6 +32,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.List
+import androidx.compose.material3.Button
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -59,6 +60,7 @@ import androidx.navigation.NavController
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
+import com.jbrightman.thedayto.feature_login.presentation.GoogleAuthUiClient
 import com.jbrightman.thedayto.presentation.util.Screen
 import com.jbrightman.thedayto.presentation.util.datestampToMonthValue
 import com.jbrightman.thedayto.presentation.util.datestampToYearValue
@@ -76,6 +78,7 @@ import java.time.ZoneOffset
 fun EntriesScreen(
     navController: NavController,
     viewModel: EntriesViewModel = hiltViewModel(),
+    onSignOut: () -> Unit
 ) {
     val state = viewModel.state.value
     val snackbarHostState = remember { SnackbarHostState() }
@@ -129,6 +132,11 @@ fun EntriesScreen(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton =  {
+            Button(onClick = onSignOut) {
+                Text(text = "Sign out")
+            }
+        },
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -271,6 +279,7 @@ fun EntriesScreen(
                         Spacer(modifier = Modifier.height(paddingMedium))
                     }
                 }
+
             }
         }
     )

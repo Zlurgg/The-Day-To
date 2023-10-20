@@ -5,4 +5,7 @@
     <string name="calender">Calender\n</string>
     <string name="note">Note</string>
     <string name="home">Home</string>
+
+    <!--** FireBase **-->
+    <string name="web_client_id">425167987380-ubbk5gfe53c5702cgqgka9h25if9d85n.apps.googleusercontent.com</string>
 </resources>
