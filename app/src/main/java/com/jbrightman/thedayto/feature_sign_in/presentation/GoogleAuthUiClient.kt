@@ -1,4 +1,4 @@
-package com.jbrightman.thedayto.feature_login.presentation
+package com.jbrightman.thedayto.feature_sign_in.presentation
 
 import android.content.Context
 import android.content.Intent
@@ -31,13 +31,13 @@ class GoogleAuthUiClient(
         return result?.pendingIntent?.intentSender
     }
 
-    suspend fun signInWithIntent(intent: Intent): LoginResult {
+    suspend fun signInWithIntent(intent: Intent): SignInResult {
         val credential = oneTapClient.getSignInCredentialFromIntent(intent)
         val googleIdToken = credential.googleIdToken
         val googleCredentials = GoogleAuthProvider.getCredential(googleIdToken, null)
         return try {
             val user = auth.signInWithCredential(googleCredentials).await().user
-            LoginResult(
+            SignInResult(
                 data = user?.run {
                     UserData(
                         userId = uid,
@@ -50,7 +50,7 @@ class GoogleAuthUiClient(
         } catch(e: Exception) {
             e.printStackTrace()
             if(e is CancellationException) throw e
-            LoginResult(
+            SignInResult(
                 data = null,
                 errorMessage = e.message
             )

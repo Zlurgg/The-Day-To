@@ -7,5 +7,6 @@ import com.jbrightman.thedayto.domain.util.OrderType
 data class EntriesState(
     val entries: List<DailyEntry> = emptyList(),
     val dailyEntryOrder: DailyEntryOrder = DailyEntryOrder.Date(OrderType.Descending),
-    val isOrderSectionVisible: Boolean = false
+    val isOrderSectionVisible: Boolean = false,
+    var dailyEntryMade: Boolean = false
 )

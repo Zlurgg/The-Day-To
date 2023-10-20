@@ -1,6 +1,6 @@
-package com.jbrightman.thedayto.feature_login.presentation
+package com.jbrightman.thedayto.feature_sign_in.presentation
 
-data class LoginResult(
+data class SignInResult(
     val data: UserData?,
     val errorMessage: String?
 )

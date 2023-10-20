@@ -10,6 +10,7 @@ import com.jbrightman.thedayto.domain.util.DailyEntryOrder
 import com.jbrightman.thedayto.domain.util.OrderType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -72,7 +73,6 @@ class EntriesViewModel @Inject constructor(
 //            }
         }
     }
-
     private fun getEntries(dailyEntryOrder: DailyEntryOrder) {
         getEntriesJob?.cancel()
         getEntriesJob = entryUseCase.getEntries(dailyEntryOrder)
