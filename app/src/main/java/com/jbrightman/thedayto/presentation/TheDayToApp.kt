@@ -22,7 +22,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
-import com.jbrightman.thedayto.domain.repository.PrefRepository
+import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
@@ -31,6 +31,8 @@ import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorS
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInViewModel
 import com.jbrightman.thedayto.presentation.util.Screen
 import kotlinx.coroutines.launch
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
@@ -39,8 +41,9 @@ fun TheDayToApp(
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
     val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current
-    val scope = rememberCoroutineScope()
-    val prefRepository = PrefRepository(applicationContext)
+    val coroutineScope = rememberCoroutineScope()
+    /** shared preferences (entry made today, first time user **/
+    val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
     Surface(
         modifier = Modifier
@@ -56,10 +59,9 @@ fun TheDayToApp(
                 val signInViewModel: SignInViewModel = viewModel()
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
                 LaunchedEffect(key1 = Unit) {
-
                     if(googleAuthUiClient.getSignedInUser() != null) {
-
-                        if (prefRepository.getDailyEntryCreated()) {
+                        if (theDayToPrefRepository.getDailyEntryDate() ==
+                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -71,7 +73,7 @@ fun TheDayToApp(
                     contract = ActivityResultContracts.StartIntentSenderForResult(),
                     onResult = { result ->
                         if(result.resultCode == ComponentActivity.RESULT_OK) {
-                            scope.launch {
+                            coroutineScope.launch {
                                 val signInResult = googleAuthUiClient.signInWithIntent(
                                     intent = result.data ?: return@launch
                                 )
@@ -88,7 +90,8 @@ fun TheDayToApp(
                             "Sign in successful",
                             Toast.LENGTH_LONG
                         ).show()
-                        if (prefRepository.getDailyEntryCreated()) {
+                        if (theDayToPrefRepository.getDailyEntryDate() ==
+                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -100,7 +103,7 @@ fun TheDayToApp(
                 SignInScreen(
                     state = state,
                     onSignInClick = {
-                        scope.launch {
+                        coroutineScope.launch {
                             val signInIntentSender = googleAuthUiClient.signIn()
                             launcher.launch(
                                 IntentSenderRequest.Builder(
@@ -146,7 +149,7 @@ fun TheDayToApp(
                 EntriesScreen(
                     navController = navController,
                     onSignOut = {
-                        scope.launch {
+                        coroutineScope.launch {
                             googleAuthUiClient.signOut()
                             Toast.makeText(
                                 applicationContext,

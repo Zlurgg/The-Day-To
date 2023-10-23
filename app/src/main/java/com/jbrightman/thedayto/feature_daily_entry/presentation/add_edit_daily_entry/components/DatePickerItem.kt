@@ -21,6 +21,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.presentation.util.datestampToFormattedDate
 import com.vanpra.composematerialdialogs.MaterialDialog
@@ -103,7 +104,7 @@ fun DatePickerItem(
                 }
             ) {
                 viewModel.onEvent(
-                    com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent.EnteredDate(
+                    AddEditEntryEvent.EnteredDate(
                         it.atStartOfDay().toEpochSecond(
                             ZoneOffset.UTC
                         )
@@ -113,7 +114,7 @@ fun DatePickerItem(
         }
         if (dateState.date == 0L) {
             viewModel.onEvent(
-                com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent.EnteredDate(
+                AddEditEntryEvent.EnteredDate(
                     LocalDate.now().atStartOfDay().toEpochSecond(
                         ZoneOffset.UTC
                     )

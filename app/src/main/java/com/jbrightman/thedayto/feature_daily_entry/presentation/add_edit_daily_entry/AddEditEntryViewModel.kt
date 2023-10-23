@@ -1,15 +1,12 @@
 package com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry
 
 import android.content.Context
-import android.content.Context.MODE_PRIVATE
-import android.content.SharedPreferences
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jbrightman.thedayto.domain.repository.PrefRepository
+import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.feature_daily_entry.domain.model.InvalidDailyEntryException
 import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
@@ -63,7 +60,7 @@ class AddEditEntryViewModel @Inject constructor(
     private val _state = mutableStateOf(EntryMoodColorSectionState())
     val state: State<EntryMoodColorSectionState> = _state
 
-    val prefRepository = PrefRepository(context)
+    val theDayToPrefRepository = TheDayToPrefRepository(context)
 
 
     init {
@@ -142,7 +139,8 @@ class AddEditEntryViewModel @Inject constructor(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveEntry)
-                        prefRepository.setDailyEntryCreated(true)
+                        theDayToPrefRepository.setDailyEntryCreated(true)
+                        theDayToPrefRepository.setDailyEntryDate(entryDate.value.date)
                     } catch (e: InvalidDailyEntryException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(
