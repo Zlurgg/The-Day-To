@@ -140,4 +140,9 @@ dependencies {
     // Shared Preferences
     implementation("androidx.preference:preference-ktx:1.2.1")
 
+    // Notifications
+/*    implementation("androidx.core:core-ktx:2.2.0")
+    implementation("androidx.work:work-runtime-ktx:2.8.1")*/
+
+
 }
