@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">The Day To</string>
-    <string name="mood">Mood\n</string>
-    <string name="back_button">Back\n</string>
-    <string name="calender">Calender\n</string>
-    <string name="note">Note</string>
-    <string name="home">Home</string>
-
-    <!--** FireBase **-->
+    <!-- FireBase -->
     <string name="web_client_id">425167987380-ubbk5gfe53c5702cgqgka9h25if9d85n.apps.googleusercontent.com</string>
+
+    <!-- Notification -->
+    <string name="notification_channel_name">Entry Update</string>
+    <string name="notification_channel_description">Daily reminder for creating an entry</string>
+
+    <string name="notification_title">notification_title</string>
+    <string name="notification_content_text">notification_content_text</string>
+
 </resources>

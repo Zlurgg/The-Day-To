@@ -4,13 +4,12 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
-import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
 import com.jbrightman.thedayto.domain.util.DailyEntryOrder
 import com.jbrightman.thedayto.domain.util.OrderType
+import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
+import com.jbrightman.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch

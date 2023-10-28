@@ -1,15 +1,12 @@
 package com.jbrightman.thedayto.feature_mood_color.presentation
 
-import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.jbrightman.thedayto.domain.util.OrderType
-import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
 import com.jbrightman.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor
 import com.jbrightman.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases

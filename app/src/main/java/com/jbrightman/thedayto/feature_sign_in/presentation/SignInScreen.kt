@@ -12,11 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.jbrightman.thedayto.feature_daily_entry.domain.model.DailyEntry
-import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 @Composable
 fun SignInScreen(

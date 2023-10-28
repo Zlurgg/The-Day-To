@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -22,8 +23,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
+import com.jbrightman.thedayto.core.notifications.NotificationTestScreen
+import com.jbrightman.thedayto.core.notifications.NotificationsViewModel
 import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
+import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInScreen
@@ -36,12 +40,14 @@ import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
-    googleAuthUiClient: GoogleAuthUiClient
-) {
+    googleAuthUiClient: GoogleAuthUiClient,
+    viewModel: NotificationsViewModel = hiltViewModel(),
+    ) {
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
     val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current
     val coroutineScope = rememberCoroutineScope()
+
     /** shared preferences (entry made today, first time user **/
     val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
@@ -163,6 +169,9 @@ fun TheDayToApp(
             }
             composable(route = Screen.AddEditMoodColorScreen.route) {
                 AddEditMoodColorScreen()
+            }
+            composable(route = Screen.NotificationTestScreen.route) {
+                NotificationTestScreen()
             }
         }
     }
