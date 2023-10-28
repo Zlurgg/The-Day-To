@@ -2,7 +2,6 @@ package com.jbrightman.thedayto.domain.repository
 
 import android.content.Context
 import android.content.SharedPreferences
-import java.time.LocalDate
 
 class TheDayToPrefRepository(context: Context) {
     private val pref: SharedPreferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)

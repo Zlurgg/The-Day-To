@@ -46,15 +46,13 @@ import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import com.jbrightman.thedayto.feature_mood_color.domain.model.MoodColor.Companion.defaultMoods
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
-import com.jbrightman.thedayto.presentation.util.getColorFromMoodForDefault
+import com.jbrightman.thedayto.presentation.util.getColor
 import com.jbrightman.thedayto.ui.theme.paddingMedium
 import java.time.LocalDate
 import java.time.ZoneOffset
-import com.jbrightman.thedayto.presentation.util.getColor
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable

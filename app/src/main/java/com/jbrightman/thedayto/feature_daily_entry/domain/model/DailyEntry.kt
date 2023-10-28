@@ -2,7 +2,6 @@ package com.jbrightman.thedayto.feature_daily_entry.domain.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.jbrightman.thedayto.ui.theme.*
 
 @Entity
 data class DailyEntry(
