@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -23,6 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
+import androidx.navigation.navDeepLink
 import com.jbrightman.thedayto.core.notifications.NotificationTestScreen
 import com.jbrightman.thedayto.core.notifications.NotificationsViewModel
 import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
@@ -51,6 +53,8 @@ fun TheDayToApp(
     /** shared preferences (entry made today, first time user **/
     val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
+    val uri = "https://thedayto.co.uk/sign-in"
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -61,9 +65,13 @@ fun TheDayToApp(
             navController = navController,
             startDestination = startDestination
         ) {
-            composable(route = Screen.SignInScreen.route) {
+            composable(
+                route = Screen.SignInScreen.route,
+                deepLinks = listOf(navDeepLink { uriPattern = uri })
+            ) {
                 val signInViewModel: SignInViewModel = viewModel()
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
+
                 LaunchedEffect(key1 = Unit) {
                     if(googleAuthUiClient.getSignedInUser() != null) {
                         if (theDayToPrefRepository.getDailyEntryDate() ==

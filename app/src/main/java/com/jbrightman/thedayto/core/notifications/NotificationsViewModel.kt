@@ -3,20 +3,32 @@ package com.jbrightman.thedayto.core.notifications
 import android.Manifest
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.app.TaskStackBuilder
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
+import android.os.Bundle
+import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
+import androidx.navigation.NavDeepLinkBuilder
+import androidx.navigation.Navigation
 import androidx.work.Constraints
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
+import com.jbrightman.thedayto.MainActivity
 import com.jbrightman.thedayto.R
+import com.jbrightman.thedayto.presentation.util.Screen
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import okhttp3.internal.UTC
+import java.time.LocalTime
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -33,7 +45,7 @@ class NotificationsViewModel@Inject constructor(
         createNotification(context)
     }
 
-    private fun setNotification(
+    private fun setNotificationTimeViaWorkManager(
         context: Context
     ) {
         val workManager = WorkManager.getInstance(context)
@@ -49,14 +61,30 @@ class NotificationsViewModel@Inject constructor(
 //        workManager.enqueue(notificationWorker)
     }
 
+    private fun createPendingIntent(deepLink: String, context: Context): PendingIntent {
+        val startActivityIntent = Intent(Intent.ACTION_VIEW, deepLink.toUri(),
+            context,MainActivity::class.java)
+        val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
+            addNextIntentWithParentStack(startActivityIntent)
+            getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
+        }
+        return resultPendingIntent!!
+    }
+
     private fun createNotification(
         context: Context
     ) {
+        val pending = createPendingIntent(
+            deepLink = "https://thedayto.co.uk/sign-in",
+            context = context
+        )
+
         val notification = NotificationCompat.Builder(context, NOTIFICATION_CHANNEL_ID)
             .setContentTitle(context.getString(R.string.notification_title))
             .setContentText(context.getString(R.string.notification_content_text))
             .setSmallIcon(R.drawable.ic_notification_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pending)
             .build()
 
         val notificationManager = NotificationManagerCompat.from(context)
