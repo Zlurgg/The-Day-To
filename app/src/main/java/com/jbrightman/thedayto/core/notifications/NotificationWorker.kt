@@ -17,13 +17,18 @@ import androidx.work.WorkerParameters
 import com.jbrightman.thedayto.MainActivity
 import com.jbrightman.thedayto.R
 import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 class NotificationWorker(context: Context, params: WorkerParameters): Worker(context, params) {
     override fun doWork(): Result {
         val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
         val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
-        if (!theDayToPrefRepository.getDailyEntryCreated()) {
+        /** check an entry hasn't already been created today via date **/
+        if (theDayToPrefRepository.getDailyEntryDate() == LocalDate.now().atStartOfDay().toEpochSecond(
+                ZoneOffset.UTC)) {
             createNotification(id)
             return Result.success()
         }

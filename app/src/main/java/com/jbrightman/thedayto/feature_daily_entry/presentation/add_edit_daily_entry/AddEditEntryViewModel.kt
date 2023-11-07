@@ -60,7 +60,7 @@ class AddEditEntryViewModel @Inject constructor(
     private val _state = mutableStateOf(EntryMoodColorSectionState())
     val state: State<EntryMoodColorSectionState> = _state
 
-    val theDayToPrefRepository = TheDayToPrefRepository(context)
+    private val theDayToPrefRepository = TheDayToPrefRepository(context)
 
 
     init {
@@ -139,7 +139,6 @@ class AddEditEntryViewModel @Inject constructor(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveEntry)
-                        theDayToPrefRepository.setDailyEntryCreated(true)
                         theDayToPrefRepository.setDailyEntryDate(entryDate.value.date)
                     } catch (e: InvalidDailyEntryException) {
                         _eventFlow.emit(
