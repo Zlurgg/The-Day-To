@@ -15,25 +15,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.net.toUri
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import com.jbrightman.thedayto.core.notifications.NotificationTestScreen
-import com.jbrightman.thedayto.core.notifications.NotificationsViewModel
 import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
 import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
-import com.jbrightman.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import com.jbrightman.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
+import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInScreen
-import com.jbrightman.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import com.jbrightman.thedayto.feature_sign_in.presentation.SignInViewModel
 import com.jbrightman.thedayto.presentation.util.Screen
 import kotlinx.coroutines.launch
@@ -43,7 +38,6 @@ import java.time.ZoneOffset
 @Composable
 fun TheDayToApp(
     googleAuthUiClient: GoogleAuthUiClient,
-    viewModel: NotificationsViewModel = hiltViewModel(),
     ) {
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
     val startDestination = Screen.SignInScreen.route
@@ -177,9 +171,6 @@ fun TheDayToApp(
             }
             composable(route = Screen.AddEditMoodColorScreen.route) {
                 AddEditMoodColorScreen()
-            }
-            composable(route = Screen.NotificationTestScreen.route) {
-                NotificationTestScreen()
             }
         }
     }
