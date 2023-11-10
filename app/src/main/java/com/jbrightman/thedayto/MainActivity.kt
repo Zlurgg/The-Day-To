@@ -58,9 +58,8 @@ class MainActivity : ComponentActivity() {
         }
         checkPermission()
         if (isPermission) {
-            val data = Data.Builder().putInt(NOTIFICATION_ID, 0).build()
-            scheduleNotification(data)
-
+                val data = Data.Builder().putInt(NOTIFICATION_ID, 0).build()
+                scheduleNotification(data)
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                 checkNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
@@ -97,23 +96,26 @@ class MainActivity : ComponentActivity() {
     private fun scheduleNotification(data: Data) {
 
         val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
+        /** check we've not already made a notification **/
+        if (theDayToPrefRepository.getDailyEntryDate() != LocalDate.now().atStartOfDay().toEpochSecond(
+                ZoneOffset.UTC)) {
+            val userNotificationTime = theDayToPrefRepository.getDailyEntryDate()
+            val delay = (LocalDateTime.now().plusDays(1).toEpochSecond(ZoneOffset.UTC)) - userNotificationTime
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        var userNotificationTime = theDayToPrefRepository.getDailyEntryDate() ?: LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
-        val delay = (LocalDateTime.now().plusDays(1).toEpochSecond(ZoneOffset.UTC)) - userNotificationTime
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+            val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                .setInputData(data)
+                .setInitialDelay(delay, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .build()
 
-        val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-            .setInputData(data)
-            .setInitialDelay(delay, TimeUnit.SECONDS)
-            .setConstraints(constraints)
-            .build()
-
-        val instanceWorkManager = WorkManager.getInstance(this)
-        instanceWorkManager.beginUniqueWork(
-            NotificationWorker.NOTIFICATION_WORK,
-            ExistingWorkPolicy.REPLACE, notificationWorker).enqueue()
+            val instanceWorkManager = WorkManager.getInstance(this)
+            instanceWorkManager.beginUniqueWork(
+                NotificationWorker.NOTIFICATION_WORK,
+                ExistingWorkPolicy.REPLACE, notificationWorker).enqueue()
+        }
     }
 }
 
