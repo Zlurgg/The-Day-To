@@ -7,8 +7,6 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
