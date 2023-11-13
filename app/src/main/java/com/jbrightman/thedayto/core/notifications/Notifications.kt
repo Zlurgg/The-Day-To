@@ -7,6 +7,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -14,9 +15,9 @@ import java.util.concurrent.TimeUnit
 
 object Notifications {
     fun scheduleNotification(data: Data, context: Context) {
-        val userNotificationTime = LocalDate.now().plusDays(1).atTime(9,0).toEpochSecond(
+        val userNotificationTime = LocalDateTime.now().plusDays(1).toEpochSecond(
             ZoneOffset.UTC)
-        val delay = userNotificationTime - (LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC))
+        val delay = userNotificationTime - (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
         val constraints = Constraints.Builder()
             .setRequiredNetworkType(NetworkType.CONNECTED)
             .build()
