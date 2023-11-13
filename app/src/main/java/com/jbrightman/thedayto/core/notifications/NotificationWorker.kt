@@ -23,16 +23,8 @@ import java.time.ZoneOffset
 
 class NotificationWorker(context: Context, params: WorkerParameters): Worker(context, params) {
     override fun doWork(): Result {
-        val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
-
         val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
-        /** check an entry hasn't already been created today via date **/
-        if (theDayToPrefRepository.getDailyEntryDate() == LocalDate.now().atStartOfDay().toEpochSecond(
-                ZoneOffset.UTC)) {
-            createNotification(id)
-            return Result.success()
-        }
-        /** should log that we didn't send a notification as user has already made an entry **/
+        createNotification(id)
         return Result.success()
     }
 
@@ -68,23 +60,21 @@ class NotificationWorker(context: Context, params: WorkerParameters): Worker(con
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            notification.setChannelId(NOTIFICATION_CHANNEL)
+        notification.setChannelId(NOTIFICATION_CHANNEL)
 
-            val ringtoneManager = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-            val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        val ringtoneManager = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+        val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
 
-            val channel =
-                NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_HIGH)
+        val channel =
+            NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_HIGH)
 
-            channel.enableLights(true)
-            channel.lightColor = Color.GREEN
-            channel.enableVibration(true)
-            channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
-            channel.setSound(ringtoneManager, audioAttributes)
-            notificationManager.createNotificationChannel(channel)
-        }
+        channel.enableLights(true)
+        channel.lightColor = Color.GREEN
+        channel.enableVibration(true)
+        channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+        channel.setSound(ringtoneManager, audioAttributes)
+        notificationManager.createNotificationChannel(channel)
 
         notificationManager.notify(id, notification.build())
     }
