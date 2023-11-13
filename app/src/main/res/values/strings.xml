@@ -6,8 +6,6 @@
     <!-- Notification -->
     <string name="notification_channel_name">Entry Update</string>
     <string name="notification_channel_description">Daily reminder for creating an entry</string>
-
-    <string name="notification_title">notification_title</string>
-    <string name="notification_content_text">notification_content_text</string>
-
+    <string name="notification_title">The Day to</string>
+    <string name="notification_content_text">How are you feeling today?</string>
 </resources>

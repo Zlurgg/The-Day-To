@@ -220,6 +220,7 @@ fun MoodItem(
         enter = fadeIn() + slideInVertically(),
         exit = fadeOut() + slideOutVertically()
     ) {
+        Spacer(modifier = Modifier.height(paddingMedium))
         AddEditMoodColorScreen()
         Spacer(modifier = Modifier.height(paddingMedium))
     }

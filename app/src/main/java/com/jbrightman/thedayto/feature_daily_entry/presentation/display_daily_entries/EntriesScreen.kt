@@ -123,16 +123,17 @@ fun EntriesScreen(
                     dailyEntryOrder = state.dailyEntryOrder,
                     onOrderChange = {
                         viewModel.onEvent(EntriesEvent.Order(it))
-                    }
+                    },
+                    onSignOut = onSignOut
                 )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        floatingActionButton =  {
-            Button(onClick = onSignOut) {
-                Text(text = "Sign out")
-            }
-        },
+//        floatingActionButton =  {
+//            Button(onClick = onSignOut) {
+//                Text(text = "Sign out")
+//            }
+//        },
         content = { padding ->
             Column(
                 modifier = Modifier
