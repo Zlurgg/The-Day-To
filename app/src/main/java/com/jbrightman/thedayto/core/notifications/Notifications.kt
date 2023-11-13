@@ -7,29 +7,37 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
+import com.jbrightman.thedayto.domain.repository.TheDayToPrefRepository
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset
 import java.util.concurrent.TimeUnit
 
 object Notifications {
     fun scheduleNotification(data: Data, context: Context) {
-        val userNotificationTime = LocalDateTime.now().plusDays(1).toEpochSecond(
-            ZoneOffset.UTC)
-        val delay = userNotificationTime - (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
-        val constraints = Constraints.Builder()
-            .setRequiredNetworkType(NetworkType.CONNECTED)
-            .build()
+        val theDayToPrefRepository = TheDayToPrefRepository(context)
+        /** if the entry date is from yesterday then we create a notification (0 check to account for 1st time user **/
+        if (theDayToPrefRepository.getDailyEntryDate() == LocalDate.now().atStartOfDay().minusDays(1).toEpochSecond(ZoneOffset.UTC)
+            || theDayToPrefRepository.getDailyEntryDate() == 0L) {
+            val userNotificationTime = LocalDateTime.now().plusDays(1).toEpochSecond(
+                ZoneOffset.UTC)
+            val delay = userNotificationTime - (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
+            val constraints = Constraints.Builder()
+                .setRequiredNetworkType(NetworkType.CONNECTED)
+                .build()
 
-        val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
-            .setInputData(data)
-            .setInitialDelay(delay, TimeUnit.SECONDS)
-            .setConstraints(constraints)
-            .build()
+            val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+                .setInputData(data)
+                .setInitialDelay(delay, TimeUnit.SECONDS)
+                .setConstraints(constraints)
+                .build()
 
-        val instanceWorkManager = WorkManager.getInstance(context)
-        instanceWorkManager.beginUniqueWork(
-            NotificationWorker.NOTIFICATION_WORK,
-            ExistingWorkPolicy.REPLACE, notificationWorker).enqueue()
+            val instanceWorkManager = WorkManager.getInstance(context)
+            instanceWorkManager.beginUniqueWork(
+                NotificationWorker.NOTIFICATION_WORK,
+                ExistingWorkPolicy.REPLACE, notificationWorker).enqueue()
+        }
+
 
     }
 }
