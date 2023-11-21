@@ -129,11 +129,6 @@ fun EntriesScreen(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-//        floatingActionButton =  {
-//            Button(onClick = onSignOut) {
-//                Text(text = "Sign out")
-//            }
-//        },
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -146,7 +141,7 @@ fun EntriesScreen(
                         .fillMaxWidth()
                         .padding(paddingXXSmall)
                 ) {
-                    /** add drop down list to select year **/
+                    /** TODO add drop down list to select year **/
                     Row {
                         Text(text = date.month.toString())
                         Spacer(modifier = Modifier.padding(horizontal = paddingXXSmall))
@@ -230,7 +225,6 @@ fun EntriesScreen(
                                                     modifier = Modifier.alpha(0.5f),
                                                     text = "${it + 1}",
                                                     style = MaterialTheme.typography.headlineSmall,
-                                                    color = MaterialTheme.colorScheme.onSurface,
                                                     overflow = TextOverflow.Ellipsis
                                                 )
                                             }

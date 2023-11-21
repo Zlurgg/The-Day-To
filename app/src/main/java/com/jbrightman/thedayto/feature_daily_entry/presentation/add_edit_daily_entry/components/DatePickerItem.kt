@@ -74,12 +74,10 @@ fun DatePickerItem(
     ) {
         Text(
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.DarkGray,
             text = datestampToFormattedDate(dateState.date),
         )
         Icon(
             imageVector = icon,
-            tint = Color.DarkGray,
             contentDescription = "Date picker dropdown button",
         )
         MaterialDialog(
