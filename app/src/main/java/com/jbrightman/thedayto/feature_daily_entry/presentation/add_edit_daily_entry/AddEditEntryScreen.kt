@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -80,9 +81,8 @@ fun AddEditEntryScreen(
                     onClick = {
                         viewModel.onEvent(AddEditEntryEvent.SaveEntry)
                     },
-                    modifier = Modifier.background(MaterialTheme.colorScheme.primary)
                 ) {
-                    Icon(imageVector = Icons.Default.Check, contentDescription = "Save entry")
+                    Icon(imageVector = Icons.Default.Save, contentDescription = "Save entry")
                 }
             }
         },

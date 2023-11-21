@@ -79,7 +79,7 @@ fun MoodItem(
     ) {
         OutlinedTextField(
             value = moodState.mood,
-            onValueChange = { },
+            onValueChange = { viewModel.onEvent(AddEditEntryEvent.EnteredMood(it)) },
             textStyle = MaterialTheme.typography.headlineSmall,
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = MaterialTheme.colorScheme.primary,
@@ -117,11 +117,11 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            /*defaultMoods.forEach { mood ->
-                val color = getColorFromMoodForDefault(mood)
+            mcViewModel.state.value.moodColors.forEach { moodColors ->
+                val color  = getColor(moodColors.color)
                 DropdownMenuItem(
                     onClick = {
-                        moodState.mood = mood
+                        moodState.mood = moodColors.mood
                         viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
                         viewModel.onEvent(
                             AddEditEntryEvent.EnteredColor(
@@ -137,19 +137,19 @@ fun MoodItem(
                         ) {
                             Text(
                                 modifier = Modifier.weight(0.4f),
-                                text = mood
+                                text = moodColors.mood
                             )
                             Box(
                                 modifier = Modifier
                                     .background(color)
-                                    .height(height = 12.dp)
+                                    .size(12.dp)
                                     .weight(0.4f)
                             )
                             IconButton(
                                 modifier = Modifier.weight(0.2f),
                                 onClick = {
-
-                            }) {
+                                    mcViewModel.onEvent(AddEditMoodColorEvent.DeleteMoodColor(moodColors))
+                                }) {
                                 Icon(
                                     imageVector = Icons.Default.Cancel,
                                     contentDescription = "delete custom mood color"
@@ -158,48 +158,7 @@ fun MoodItem(
                         }
                     }
                 )
-            }*/
-            mcViewModel.state.value.moodColors.forEach { moodColors ->
-                val color  = getColor(moodColors.color)
-                DropdownMenuItem(
-                onClick = {
-                    moodState.mood = moodColors.mood
-                    viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
-                    viewModel.onEvent(
-                        AddEditEntryEvent.EnteredColor(
-                            color.toArgb().toHexString()
-                        )
-                    )
-                    mExpanded = false
-                },
-                text = {
-                    Row(
-                        modifier = Modifier.fillMaxSize(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            modifier = Modifier.weight(0.4f),
-                            text = moodColors.mood
-                        )
-                        Box(
-                            modifier = Modifier
-                                .background(color)
-                                .size(12.dp)
-                                .weight(0.4f)
-                        )
-                        IconButton(
-                            modifier = Modifier.weight(0.2f),
-                            onClick = {
-                                mcViewModel.onEvent(AddEditMoodColorEvent.DeleteMoodColor(moodColors))
-                            }) {
-                            Icon(
-                                imageVector = Icons.Default.Cancel,
-                                contentDescription = "delete custom mood color"
-                            )
-                        }
-                    }
-                }
-            )}
+            }
             // Button to add a new mood color
             IconButton(
                 modifier = Modifier.fillMaxSize(),
