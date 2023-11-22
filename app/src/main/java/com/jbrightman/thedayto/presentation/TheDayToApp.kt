@@ -47,6 +47,7 @@ fun TheDayToApp(
     /** shared preferences (entry made today, first time user **/
     val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
+    /** uri for direction of page from notifications **/
     val uri = "https://thedayto.co.uk/sign-in"
 
     Surface(
