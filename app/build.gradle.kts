@@ -11,7 +11,7 @@ android {
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.jbrightman.thedayto"
+        applicationId = "uk.co.zlurgg.thedayto"
         minSdk = 27
         targetSdk = 34
         versionCode = 1
@@ -51,7 +51,7 @@ android {
         }
     }
 
-    namespace = "com.jbrightman.thedayto"
+    namespace = "uk.co.zlurgg.thedayto"
 }
 
 dependencies {
