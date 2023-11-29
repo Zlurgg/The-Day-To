@@ -7,17 +7,17 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:425167987380:android:a1fcf74800e60ccb9bede1",
+        "mobilesdk_app_id": "1:425167987380:android:1618afb811008e899bede1",
         "android_client_info": {
-          "package_name": "com.jbrightman.thedayto"
+          "package_name": "uk.co.zlurgg.thedayto"
         }
       },
       "oauth_client": [
         {
-          "client_id": "425167987380-cb6o5go54acoa50413s3pks6pads4c7m.apps.googleusercontent.com",
+          "client_id": "425167987380-de72r7isata71eh4luejis1dvpfm562n.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.jbrightman.thedayto",
+            "package_name": "uk.co.zlurgg.thedayto",
             "certificate_hash": "968f12f5d3bcac2fd2604231ad1cefb84fefd252"
           }
         },
