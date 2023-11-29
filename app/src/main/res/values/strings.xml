@@ -8,4 +8,39 @@
     <string name="notification_channel_description">Daily reminder for creating an entry</string>
     <string name="notification_title">The Day to</string>
     <string name="notification_content_text">How are you feeling today?</string>
+
+    <!-- The Day to App -->
+    <string name="sign_in_successful">Sign in successful</string>
+    <string name="entryid">entryId</string>
+    <string name="entrydate">entryDate</string>
+    <string name="showbackbutton">showBackButton</string>
+    <string name="signed_out">Signed out</string>
+    <string name="uri">https://thedayto.co.uk/sign-in</string>
+
+    <!-- Sign In -->
+    <string name="sign_in">Sign in</string>
+    <string name="welcome">Welcome</string>
+
+    <!-- Color Mood -->
+    <string name="create_new_mood_color">Create new mood color</string>
+    <string name="cancel_mood_color_creation">Cancel mood color creation</string>
+
+    <!-- Add edit daily entry -->
+    <string name="back">Back</string>
+    <string name="save_entry">Save entry</string>
+    <string name="date_picker_dropdown_button">Date picker dropdown button</string>
+    <string name="ok">Ok</string>
+    <string name="cancel">Cancel</string>
+    <string name="pick_a_date">Pick a date</string>
+    <string name="delete_custom_mood_color">delete custom mood color</string>
+    <string name="add_custom_mood_color">add custom mood color</string>
+
+    <!-- Entries -->
+    <string name="your_month_in_colour">Your month in colour</string>
+    <string name="sort">Sort</string>
+    <string name="mood">Mood</string>
+    <string name="date">Date</string>
+    <string name="ascending">Ascending</string>
+    <string name="descending">Descending</string>
+    <string name="sign_out">Sign out</string>
 </resources>

@@ -15,6 +15,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
@@ -32,6 +33,7 @@ import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
 import uk.co.zlurgg.thedayto.presentation.util.Screen
 import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.R
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -48,7 +50,10 @@ fun TheDayToApp(
     val theDayToPrefRepository = TheDayToPrefRepository(applicationContext)
 
     /** uri for direction of page from notifications **/
-    val uri = "https://thedayto.co.uk/sign-in"
+    val uri = stringResource(R.string.uri)
+
+    /** context so we can get string resource **/
+    val context = LocalContext.current
 
     Surface(
         modifier = Modifier
@@ -96,7 +101,7 @@ fun TheDayToApp(
                     if(state.isSignInSuccessful) {
                         Toast.makeText(
                             applicationContext,
-                            "Sign in successful",
+                            context.resources.getString(R.string.sign_in_successful),
                             Toast.LENGTH_LONG
                         ).show()
                         if (theDayToPrefRepository.getDailyEntryDate() ==
@@ -123,31 +128,30 @@ fun TheDayToApp(
                     }
                 )
             }
-            composable(route = Screen.AddEditEntryScreen.route +
-                    "?entryId={entryId}&&entryDate={entryDate}&showBackButton={showBackButton}",
+            composable(route = "${Screen.AddEditEntryScreen.route}?entryId={entryId}&&entryDate={entryDate}&showBackButton={showBackButton}",
                 arguments = listOf(
                     navArgument(
-                        name = "entryId"
+                        name = context.resources.getString(R.string.entryid)
                     ) {
                         type = NavType.IntType
                         defaultValue = -1
                     },
                     navArgument(
-                        name = "entryDate"
+                        name = context.resources.getString(R.string.entrydate)
                     ) {
                         type = NavType.LongType
                         defaultValue = -1L
                     },
                     navArgument(
-                        name = "showBackButton"
+                        name = context.resources.getString(R.string.showbackbutton)
                     ) {
                         type = NavType.BoolType
                         defaultValue = false
                     }
                 )
             ) {
-                val date = it.arguments?.getLong("entryDate") ?: -1L
-                val backButton = it.arguments?.getBoolean("showBackButton") ?: false
+                val date = it.arguments?.getLong(stringResource(R.string.entrydate)) ?: -1L
+                val backButton = it.arguments?.getBoolean(stringResource(R.string.showbackbutton)) ?: false
                 AddEditEntryScreen(
                     navController = navController,
                     entryDate = date,
@@ -162,7 +166,7 @@ fun TheDayToApp(
                             googleAuthUiClient.signOut()
                             Toast.makeText(
                                 applicationContext,
-                                "Signed out",
+                                context.resources.getString(R.string.signed_out),
                                 Toast.LENGTH_LONG
                             ).show()
                             navController.navigate(route = startDestination)

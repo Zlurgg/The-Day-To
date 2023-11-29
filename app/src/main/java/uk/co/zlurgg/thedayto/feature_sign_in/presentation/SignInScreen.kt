@@ -16,8 +16,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 
@@ -53,15 +55,16 @@ fun SignInScreenDisplay(
         Column(
             modifier = Modifier
                 .padding(paddingMedium),
-            horizontalAlignment = Alignment.CenterHorizontally
+
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Welcome",
+                text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
             )
             Spacer(modifier = Modifier.padding(paddingSmall))
             Text(
-                text = "The Day To",
+                text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
             )
             Spacer(modifier = Modifier.padding(paddingMedium))
@@ -73,7 +76,7 @@ fun SignInScreenDisplay(
                 onClick = onSignInClick
             ) {
                 Text(
-                    text = "Sign in",
+                    text = stringResource(R.string.sign_in),
                     style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
                 )
             }

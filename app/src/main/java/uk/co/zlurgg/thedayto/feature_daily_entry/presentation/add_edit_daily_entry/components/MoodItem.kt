@@ -39,11 +39,13 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
@@ -152,7 +154,7 @@ fun MoodItem(
                                 }) {
                                 Icon(
                                     imageVector = Icons.Default.Cancel,
-                                    contentDescription = "delete custom mood color"
+                                    contentDescription = stringResource(R.string.delete_custom_mood_color)
                                 )
                             }
                         }
@@ -169,7 +171,7 @@ fun MoodItem(
             ) {
                 Icon(
                     imageVector = Icons.Default.AddCircle,
-                    contentDescription = "add custom mood color"
+                    contentDescription = stringResource(R.string.add_custom_mood_color)
                 )
             }
         }

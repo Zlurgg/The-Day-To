@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
@@ -27,6 +28,7 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import uk.co.zlurgg.thedayto.R
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -77,7 +79,7 @@ fun DatePickerItem(
         )
         Icon(
             imageVector = icon,
-            contentDescription = "Date picker dropdown button",
+            contentDescription = stringResource(R.string.date_picker_dropdown_button),
         )
         MaterialDialog(
             dialogState = dateDialogState,
@@ -88,13 +90,13 @@ fun DatePickerItem(
             elevation = 10.dp,
             onCloseRequest = { mExpanded = false },
             buttons = {
-                positiveButton(text = "Ok", onClick = { mExpanded = false })
-                negativeButton(text = "Cancel", onClick = { mExpanded = false })
+                positiveButton(text = stringResource(R.string.ok), onClick = { mExpanded = false })
+                negativeButton(text = stringResource(R.string.cancel), onClick = { mExpanded = false })
             }
         ) {
             datepicker(
                 initialDate = date,
-                title = "Pick a date",
+                title = stringResource(R.string.pick_a_date),
                 colors = DatePickerDefaults.colors(),
                 allowedDateValidator = {
                     !it.isAfter(LocalDate.now())

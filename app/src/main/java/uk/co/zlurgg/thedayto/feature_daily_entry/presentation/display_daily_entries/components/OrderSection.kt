@@ -12,6 +12,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.domain.util.DailyEntryOrder
 import uk.co.zlurgg.thedayto.domain.util.OrderType
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
@@ -31,13 +33,13 @@ fun OrderSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-             text = "Mood",
+             text = stringResource(R.string.mood),
              selected = dailyEntryOrder is DailyEntryOrder.Mood,
              onSelect = { onOrderChange(DailyEntryOrder.Mood(dailyEntryOrder.orderType)) }
             )
             Spacer(modifier = Modifier.width(paddingSmall))
             DefaultRadioButton(
-             text = "Date",
+             text = stringResource(R.string.date),
              selected = dailyEntryOrder is DailyEntryOrder.Date,
              onSelect = { onOrderChange(DailyEntryOrder.Date(dailyEntryOrder.orderType)) }
             )
@@ -47,7 +49,7 @@ fun OrderSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-                text = "Ascending",
+                text = stringResource(R.string.ascending),
                 selected = dailyEntryOrder.orderType is OrderType.Ascending,
                 onSelect = {
                     onOrderChange(dailyEntryOrder.copy(OrderType.Ascending))
@@ -55,7 +57,7 @@ fun OrderSection(
             )
             Spacer(modifier = Modifier.width(paddingSmall))
             DefaultRadioButton(
-                text = "Descending",
+                text = stringResource(R.string.descending),
                 selected = dailyEntryOrder.orderType is OrderType.Descending,
                 onSelect = {
                     onOrderChange(dailyEntryOrder.copy(OrderType.Descending))
@@ -64,11 +66,13 @@ fun OrderSection(
         }
         Spacer(modifier = Modifier.height(paddingMedium))
         Row(
-            modifier = Modifier.fillMaxWidth().padding(paddingMedium),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(paddingMedium),
             horizontalArrangement = Arrangement.End
         ) {
             Button(onClick = onSignOut) {
-                Text(text = "Sign out")
+                Text(text = stringResource(R.string.sign_out))
             }
         }
     }
