@@ -49,6 +49,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -65,6 +66,7 @@ import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.ui.theme.paddingVeryLarge
 import uk.co.zlurgg.thedayto.ui.theme.paddingXXSmall
 import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.R
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -96,7 +98,7 @@ fun EntriesScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Your month in colour",
+                    text = stringResource(R.string.your_month_in_colour),
                     style = MaterialTheme.typography.headlineMedium
                 )
                 IconButton(
@@ -106,7 +108,7 @@ fun EntriesScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.List,
-                        contentDescription = "Sort"
+                        contentDescription = stringResource(R.string.sort)
                     )
                 }
             }
@@ -208,8 +210,7 @@ fun EntriesScreen(
                                                 modifier = Modifier
                                                     .clickable {
                                                         navController.navigate(
-                                                            Screen.AddEditEntryScreen.route +
-                                                                    "?entryId=${entry.id}&showBackButton=${true}"
+                                                            "${Screen.AddEditEntryScreen.route}?entryId=${entry.id}&showBackButton=${true}"
                                                         )
                                                     }
                                             )
@@ -248,8 +249,7 @@ fun EntriesScreen(
                                     .fillMaxWidth()
                                     .clickable {
                                         navController.navigate(
-                                            Screen.AddEditEntryScreen.route +
-                                                    "?entryId=${entry.id}&showBackButton=${true}"
+                                            "${Screen.AddEditEntryScreen.route}?entryId=${entry.id}&showBackButton=${true}"
                                         )
                                     },
 /*                                onDeleteClick = {

@@ -13,8 +13,10 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.component.ColorPicker
@@ -56,7 +58,7 @@ fun AddEditMoodColorScreen(
                     Icon(
                         modifier = Modifier.size(40.dp),
                         imageVector = Icons.Default.AddCircle,
-                        contentDescription = "Create new mood color"
+                        contentDescription = stringResource(R.string.create_new_mood_color)
                     )
                 }
             }
@@ -72,7 +74,7 @@ fun AddEditMoodColorScreen(
                     Icon(
                         modifier = Modifier.size(40.dp),
                         imageVector = Icons.Default.Cancel,
-                        contentDescription = "Cancel mood color creation"
+                        contentDescription = stringResource(R.string.cancel_mood_color_creation)
                     )
                 }
             }

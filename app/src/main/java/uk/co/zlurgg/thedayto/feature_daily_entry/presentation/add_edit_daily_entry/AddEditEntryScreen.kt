@@ -21,6 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
@@ -29,6 +32,9 @@ import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_ent
 import uk.co.zlurgg.thedayto.presentation.util.Screen
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
+import uk.co.zlurgg.thedayto.R
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 @Composable
 fun AddEditEntryScreen(
@@ -61,7 +67,7 @@ fun AddEditEntryScreen(
                     Row {
                         Icon(
                             imageVector = Icons.Filled.ArrowBack,
-                            contentDescription = "Back",
+                            contentDescription = stringResource(R.string.back),
                             modifier = Modifier
                                 .padding(paddingMedium)
                                 .clickable {
@@ -80,7 +86,7 @@ fun AddEditEntryScreen(
                         viewModel.onEvent(AddEditEntryEvent.SaveEntry)
                     },
                 ) {
-                    Icon(imageVector = Icons.Default.Save, contentDescription = "Save entry")
+                    Icon(imageVector = Icons.Default.Save, contentDescription = stringResource(R.string.save_entry))
                 }
             }
         },
@@ -112,14 +118,3 @@ fun AddEditEntryScreenDisplay(padding: PaddingValues, entryDate: Long) {
         ContentItem()
     }
 }
-/*
-@Preview(showBackground = true)
-@Composable
-fun AddEditEntryScreenDisplayPreview() {
-    */
-/** create some temp variables to preview screen **//*
-
-    val  contentPadding = PaddingValues(top = 8.dp, bottom = 8.dp)
-    val date = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-    AddEditEntryScreenDisplay(contentPadding, date)
-}*/
