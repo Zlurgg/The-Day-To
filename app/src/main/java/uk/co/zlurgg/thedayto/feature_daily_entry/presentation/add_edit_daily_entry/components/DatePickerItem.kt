@@ -99,7 +99,8 @@ fun DatePickerItem(
                 title = stringResource(R.string.pick_a_date),
                 colors = DatePickerDefaults.colors(),
                 allowedDateValidator = {
-                    !it.isAfter(LocalDate.now())
+//                    !it.isAfter(LocalDate.now())
+                    it.isEqual(LocalDate.now())
                 }
             ) {
                 viewModel.onEvent(
