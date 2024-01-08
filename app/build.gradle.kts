@@ -96,9 +96,9 @@ dependencies {
     // Nav
     implementation("androidx.navigation:navigation-compose:2.7.4")
 
-    // Compose Nav
+/*    // Compose Nav
     implementation("io.github.raamcosta.compose-destinations:core:1.1.2-beta")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")
+    ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")*/
 
     // Dagger - Hilt (Upgrading to 2.48 seems to cause issues)
     implementation("com.google.dagger:hilt-android:2.47")
