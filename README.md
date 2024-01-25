@@ -32,6 +32,9 @@ Features/Ideas
 - Dagger Hilt  
 - Retrofit  
 - Room  
-- Offline Capability  
+- Offline Capability
+
+## Released  
+Internal testing on play store.
 
 
