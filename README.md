@@ -23,5 +23,15 @@ Use a github/gitlab/bitbucket repo, private initially
 
 General approach, think of using building with small/tetsable ‘modules/components’  
 
-Features/Ideas
+Features/Ideas  
+
+## Features: 
+- Jetpack Compose  
+- Kotlin  
+- MVVM  
+- Dagger Hilt  
+- Retrofit  
+- Room  
+- Offline Capability  
+
 
