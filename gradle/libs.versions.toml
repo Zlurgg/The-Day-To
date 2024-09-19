@@ -7,7 +7,7 @@ hiltNavigationCompose = "1.2.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.2"
+lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.0"
 composeBom = "2024.06.00"
 room = "2.6.0"
@@ -20,6 +20,7 @@ androidGradlePlugin = "8.6.1"
 kotlin = "2.0.10"
 kotlinKsp = "2.0.10-1.0.24"
 hiltAndroid = "2.51"
+google-services = "4.4.2"
 
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
@@ -60,3 +61,4 @@ jetbrains-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = 
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 jetbrainsKotlinKsp = { id = "com.google.devtools.ksp", version.ref = "kotlinKsp" }
 hiltPlugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
+google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }

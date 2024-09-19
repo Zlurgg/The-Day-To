@@ -4,9 +4,9 @@ buildscript {
         google()
         mavenCentral()
     }
-    dependencies {
-        classpath("com.google.gms:google-services:4.4.2")
-    }
+//    dependencies {
+//        classpath("com.google.gms:google-services:4.4.2")
+//    }
 }
 
 plugins {
@@ -15,4 +15,6 @@ plugins {
     alias(libs.plugins.compose.compiler) apply false
     alias(libs.plugins.jetbrainsKotlinKsp) apply false
     alias(libs.plugins.hiltPlugin) apply false
+    alias(libs.plugins.google.services) apply false
+
 }
