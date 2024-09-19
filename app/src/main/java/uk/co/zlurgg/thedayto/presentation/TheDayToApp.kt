@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.presentation
 
+import android.app.Activity.RESULT_OK
 import android.widget.Toast
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.IntentSenderRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -86,7 +86,7 @@ fun TheDayToApp(
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.StartIntentSenderForResult(),
                     onResult = { result ->
-                        if(result.resultCode == ComponentActivity.RESULT_OK) {
+                        if(result.resultCode == RESULT_OK) {
                             coroutineScope.launch {
                                 val signInResult = googleAuthUiClient.signInWithIntent(
                                     intent = result.data ?: return@launch
