@@ -4,7 +4,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinKsp)
     alias(libs.plugins.hiltPlugin)
-    id ("kotlin-parcelize")
+    alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.services)
 }
 
@@ -55,40 +55,35 @@ android {
     namespace = "uk.co.zlurgg.thedayto"
 }
 
-/*composeCompiler {
-    reportsDestination = layout.buildDirectory.dir("compose_compiler")
-    stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
-}*/
-
 dependencies {
     implementation(libs.androidx.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx)
-    implementation(libs.androidx.compose.bom.v20240902)
+    implementation(platform(libs.androidx.compose.bom))
 
     // Room
-    implementation("com.google.firebase:firebase-auth:23.0.0")
+    implementation(libs.firebase.auth)
     implementation(libs.androidx.room.runtime)
     ksp(libs.roomCompiler)
     implementation(libs.androidx.room.ktx)
 
     // Lifecycle
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
-    ksp("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-common-java8:2.8.6")
-    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
-    implementation("androidx.activity:activity-compose:1.9.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-compose:2.8.6")
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    ksp(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
+    implementation(libs.androidx.lifecycle.common.java8)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.androidx.activity.compose)
+    implementation (libs.androidx.lifecycle.runtime.compose)
 
     // UI
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-graphics")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material3:material3")
-    implementation("androidx.compose.runtime:runtime-livedata:1.7.2")
+    implementation(libs.ui)
+    implementation(libs.ui.graphics)
+    implementation(libs.ui.tooling.preview)
+    implementation(libs.material3)
+    implementation(libs.androidx.runtime.livedata)
 
     // Testing
     testImplementation(libs.junit)
@@ -109,43 +104,41 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Retrofit
-    implementation("com.squareup.retrofit2:retrofit:2.11.0")
-    implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
-    implementation("com.squareup.okhttp3:okhttp:5.0.0-alpha.3")
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation(libs.retrofit)
+    implementation(libs.converter.moshi)
+    implementation(libs.okhttp)
+    implementation(libs.converter.gson)
 
     // Location Services
-    implementation("com.google.android.gms:play-services-location:21.3.0")
+    implementation(libs.play.services.location)
 
     // Compose dependencies extended
-    implementation("androidx.paging:paging-compose:3.3.2")
-    implementation("com.google.accompanist:accompanist-swiperefresh:0.24.2-alpha")
-    implementation("androidx.compose.material:material-icons-extended:1.7.2")
-    implementation("com.google.accompanist:accompanist-flowlayout:0.17.0")
+    implementation(libs.androidx.paging.compose)
+    implementation(libs.accompanist.swiperefresh)
+    implementation(libs.androidx.material.icons.extended)
+    implementation(libs.accompanist.flowlayout)
 
     // OpenCSV
-    implementation ("com.opencsv:opencsv:5.5.2")
+    implementation (libs.opencsv)
 
     // Coil
-    implementation("io.coil-kt:coil-compose:2.6.0")
+    implementation(libs.coil.compose)
 
     // Date Picker
-    implementation("io.github.vanpra.compose-material-dialogs:datetime:0.9.0")
+    implementation(libs.datetime)
 
     // Color Picker
-    implementation("com.github.skydoves:colorpicker-compose:1.0.5")
+    implementation(libs.colorpicker.compose)
 
     // Firebase
-    implementation("com.google.firebase:firebase-auth:23.0.0")
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation(libs.firebase.auth)
+    implementation(libs.play.services.auth)
 
     // Shared Preferences
-    implementation("androidx.preference:preference-ktx:1.2.1")
+    implementation(libs.androidx.preference.ktx)
 
     // Work Manager (Notifications)
-    implementation("androidx.work:work-runtime:2.9.1")
-    implementation("androidx.work:work-runtime-ktx:2.9.1")
-    implementation("androidx.appcompat:appcompat:1.7.0")
-
-
+    implementation(libs.androidx.work.runtime)
+    implementation(libs.androidx.work.runtime.ktx)
+    implementation(libs.androidx.appcompat)
 }
