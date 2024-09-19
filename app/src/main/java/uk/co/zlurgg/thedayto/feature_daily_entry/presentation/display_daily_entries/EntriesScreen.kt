@@ -29,6 +29,7 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -107,7 +108,7 @@ fun EntriesScreen(
                     },
                 ) {
                     Icon(
-                        imageVector = Icons.Default.List,
+                        imageVector = Icons.AutoMirrored.Filled.List,
                         contentDescription = stringResource(R.string.sort)
                     )
                 }
@@ -176,11 +177,12 @@ fun EntriesScreen(
                         userScrollEnabled = true,
                         reverseLayout = false,
                         contentPadding = PaddingValues(0.dp),
-                        beyondBoundsPageCount = 0,
+                        beyondViewportPageCount = 0,
                         key = { it },
                         pageSize = PageSize.Fill,
                         flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
                         pageNestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
+                            pagerState,
                             Orientation.Horizontal
                         ),
                         pageContent = { _ ->
