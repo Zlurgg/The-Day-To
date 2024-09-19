@@ -10,10 +10,9 @@ buildscript {
 }
 
 plugins {
-    id("com.android.application") version "8.6.1" apply false
-    id("org.jetbrains.kotlin.android") version "2.0.10" apply false
-    id("com.google.devtools.ksp") version "2.0.10-1.0.24" apply false
-    id("com.google.dagger.hilt.android") version "2.47" apply false
-    id("org.jetbrains.kotlin.plugin.compose") version "2.0.10"
-
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.jetbrains.kotlin.android) apply false
+    alias(libs.plugins.compose.compiler) apply false
+    alias(libs.plugins.jetbrainsKotlinKsp) apply false
+    alias(libs.plugins.hiltPlugin) apply false
 }
