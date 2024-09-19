@@ -65,8 +65,8 @@ dependencies {
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation("androidx.fragment:fragment-ktx:1.8.3")
-    implementation(platform("androidx.compose:compose-bom:2024.09.02"))
+    implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.compose.bom.v20240902)
 
     // Room
     implementation("com.google.firebase:firebase-auth:23.0.0")
