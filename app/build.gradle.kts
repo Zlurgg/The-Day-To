@@ -62,17 +62,17 @@ android {
 
 dependencies {
     implementation(libs.androidx.ktx)
-    implementation("androidx.appcompat:appcompat:1.7.0")
-    implementation("androidx.activity:activity-ktx:1.9.2")
-    implementation("androidx.activity:activity-compose:1.9.2")
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.ktx)
+    implementation(libs.androidx.activity.compose)
     implementation("androidx.fragment:fragment-ktx:1.8.3")
     implementation(platform("androidx.compose:compose-bom:2024.09.02"))
 
     // Room
-    implementation("androidx.room:room-ktx:2.6.0")
     implementation("com.google.firebase:firebase-auth:23.0.0")
-    ksp("androidx.room:room-compiler:2.6.0")
-    implementation("androidx.room:room-testing:2.6.0")
+    implementation(libs.androidx.room.runtime)
+    ksp(libs.roomCompiler)
+    implementation(libs.androidx.room.ktx)
 
     // Lifecycle
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
@@ -91,26 +91,22 @@ dependencies {
     implementation("androidx.compose.runtime:runtime-livedata:1.7.2")
 
     // Testing
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.02"))
-    androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-    debugImplementation("androidx.compose.ui:ui-test-manifest")
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
 
     // Nav
-    implementation("androidx.navigation:navigation-compose:2.8.1")
+    implementation(libs.androidx.hilt.navigation.compose)
 
-/*    // Compose Nav
-    implementation("io.github.raamcosta.compose-destinations:core:1.1.2-beta")
-    ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")*/
-
-    // Dagger - Hilt (Upgrading to 2.48 seems to cause issues)
+    // Dagger - Hilt
     implementation (libs.hilt.android)
     ksp(libs.dagger.compiler)
     ksp(libs.hilt.compiler)
-    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation(libs.androidx.navigation.compose)
 
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
