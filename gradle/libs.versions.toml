@@ -1,6 +1,8 @@
 [versions]
 activityKtx = "1.9.2"
 appcompat = "1.7.0"
+fragmentKtx = "1.8.3"
+composeBomVersion = "2024.09.02"
 ktx = "1.13.1"
 navigationCompose = "2.8.1"
 hiltNavigationCompose = "1.2.0"
@@ -25,6 +27,8 @@ google-services = "4.4.2"
 [libraries]
 androidx-activity-ktx = { module = "androidx.activity:activity-ktx", version.ref = "activityKtx" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
+androidx-compose-bom-v20240902 = { module = "androidx.compose:compose-bom", version.ref = "composeBomVersion" }
+androidx-fragment-ktx = { module = "androidx.fragment:fragment-ktx", version.ref = "fragmentKtx" }
 androidx-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "ktx" }
 androidx-hilt-navigation-compose = { module = "androidx.hilt:hilt-navigation-compose", version.ref = "hiltNavigationCompose" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
