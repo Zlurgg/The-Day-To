@@ -51,14 +51,13 @@ fun AddEditMoodColorScreen(
             ) {
                 IconButton(
                     onClick = {
-                        mcViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                         viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
                     }
                 ) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        imageVector = Icons.Default.AddCircle,
-                        contentDescription = stringResource(R.string.create_new_mood_color)
+                        imageVector = Icons.Default.Cancel,
+                        contentDescription = stringResource(R.string.cancel_mood_color_creation)
                     )
                 }
             }
@@ -68,13 +67,14 @@ fun AddEditMoodColorScreen(
             ) {
                 IconButton(
                     onClick = {
+                        mcViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                         viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
                     }
                 ) {
                     Icon(
                         modifier = Modifier.size(40.dp),
-                        imageVector = Icons.Default.Cancel,
-                        contentDescription = stringResource(R.string.cancel_mood_color_creation)
+                        imageVector = Icons.Default.AddCircle,
+                        contentDescription = stringResource(R.string.create_new_mood_color)
                     )
                 }
             }

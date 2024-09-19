@@ -25,6 +25,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -65,13 +66,17 @@ fun MoodItem(
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
     val moodState = viewModel.entryMood.value
+    val mcMoodState = mcViewModel.state.value
 
-    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC))
+    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
         moodState.todayHint
-    else
+    } else {
         moodState.previousDayHint
+    }
 
     val moodColorState = viewModel.state.value
+
+//    var color by remember { mutableStateOf(Color.White) }
 
     ExposedDropdownMenuBox(
         expanded = mExpanded,
@@ -95,8 +100,9 @@ fun MoodItem(
             readOnly = true,
             singleLine = true,
             modifier = Modifier
+//                .background(moodState.color) would require some reworking
                 .fillMaxWidth()
-                .menuAnchor()
+                .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 .onGloballyPositioned { coordinates ->
                     mMoodFieldSize = coordinates.size.toSize()
                 },
@@ -119,7 +125,7 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            mcViewModel.state.value.moodColors.forEach { moodColors ->
+            mcMoodState.moodColors.forEach { moodColors ->
                 val color  = getColor(moodColors.color)
                 DropdownMenuItem(
                     onClick = {
