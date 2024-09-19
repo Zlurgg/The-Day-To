@@ -1,11 +1,11 @@
 plugins {
-    id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.kotlin.android)
+    alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.jetbrainsKotlinKsp)
+    alias(libs.plugins.hiltPlugin)
     id ("kotlin-parcelize")
-    id("com.google.devtools.ksp")
-    id ("dagger.hilt.android.plugin")
     id("com.google.gms.google-services")
-    id("org.jetbrains.kotlin.plugin.compose")
 }
 
 android {
@@ -61,9 +61,9 @@ android {
 }*/
 
 dependencies {
+    implementation(libs.androidx.ktx)
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("androidx.activity:activity-ktx:1.9.2")
-    implementation("androidx.core:core-ktx:1.13.1")
     implementation("androidx.activity:activity-compose:1.9.2")
     implementation("androidx.fragment:fragment-ktx:1.8.3")
     implementation(platform("androidx.compose:compose-bom:2024.09.02"))
@@ -107,9 +107,9 @@ dependencies {
     ksp("io.github.raamcosta.compose-destinations:ksp:1.1.2-beta")*/
 
     // Dagger - Hilt (Upgrading to 2.48 seems to cause issues)
-    implementation("com.google.dagger:hilt-android:2.47")
-    ksp("com.google.dagger:hilt-android-compiler:2.47")
-    ksp("androidx.hilt:hilt-compiler:1.2.0")
+    implementation (libs.hilt.android)
+    ksp(libs.dagger.compiler)
+    ksp(libs.hilt.compiler)
     implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
 
     // Retrofit
