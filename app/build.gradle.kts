@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.jetbrainsKotlinKsp)
     alias(libs.plugins.hiltPlugin)
     id ("kotlin-parcelize")
-    id("com.google.gms.google-services")
+    alias(libs.plugins.google.services)
 }
 
 android {
