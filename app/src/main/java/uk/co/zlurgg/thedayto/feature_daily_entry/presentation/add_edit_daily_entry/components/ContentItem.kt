@@ -24,7 +24,7 @@ fun ContentItem(
             viewModel.onEvent(AddEditEntryEvent.ChangeContentFocus(it))
         },
         isHintVisible = contentState.isHintVisible,
-        textStyle = MaterialTheme.typography.bodyLarge.copy(color = MaterialTheme.colorScheme.primary),
+        textStyle = MaterialTheme.typography.bodyLarge,
         modifier = Modifier.fillMaxHeight()
     )
 }
