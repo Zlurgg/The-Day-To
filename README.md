@@ -17,11 +17,24 @@ Some background research on existing apps. for example:
 Define a list of features for first version and possible features for later versions  
 
 Development Practice/Ideas/Approach  
-Aim to publish in Google Play store - available to invited test users not public initially  
+Aim to publish in Google Play store - available to invited test users not public initially (published to internal testing)  
 
-Use a github/gitlab/bitbucket repo, private initially  
+Use a github/gitlab/bitbucket repo, private initially  (now public)
 
 General approach, think of using building with small/tetsable ‘modules/components’  
 
-Features/Ideas
+Features/Ideas  
+
+## Features: 
+- Jetpack Compose  
+- Kotlin  
+- MVVM  
+- Dagger Hilt  
+- Retrofit  
+- Room  
+- Offline Capability
+
+## Released  
+Internal testing on play store.
+
 
