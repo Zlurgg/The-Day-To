@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_en
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.text.BasicTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -28,7 +29,7 @@ fun TransparentHintTextField(
             value = text,
             onValueChange = onValueChange,
             singleLine = singleLine,
-            textStyle = textStyle,
+            textStyle = textStyle.copy(MaterialTheme.colorScheme.onSurface),
             modifier = Modifier
                 .fillMaxWidth()
                 .onFocusChanged {
@@ -38,7 +39,8 @@ fun TransparentHintTextField(
         if (isHintVisible) {
             Text(
                 text = hint,
-                style = textStyle
+                style = textStyle,
+                color = MaterialTheme.colorScheme.primary
             )
         }
     }
