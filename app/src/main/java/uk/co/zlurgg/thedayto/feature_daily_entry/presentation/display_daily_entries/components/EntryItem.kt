@@ -81,21 +81,21 @@ fun EntryItem(
             Text(
                 text = datestampToFormattedDate(entry.dateStamp),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.Black,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.mood,
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.Black,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = Color.Black,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
