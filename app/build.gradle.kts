@@ -130,7 +130,8 @@ dependencies {
     implementation(libs.androidx.preference.ktx)
 
     // Work Manager (Notifications)
-    implementation(libs.androidx.work.runtime)
-    implementation(libs.androidx.work.runtime.ktx)
-    implementation(libs.androidx.appcompat)
+    implementation(libs.bundles.work.manager)
+
+    // Koin
+    implementation(libs.bundles.koin)
 }
