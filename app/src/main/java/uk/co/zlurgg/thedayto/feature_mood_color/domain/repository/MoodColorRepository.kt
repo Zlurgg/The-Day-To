@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.feature_mood_color.domain.repository
 
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 
 interface MoodColorRepository {
     suspend fun insertMoodColor(moodColor: MoodColor)

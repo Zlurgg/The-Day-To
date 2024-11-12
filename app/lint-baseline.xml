@@ -1,216 +1,126 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<issues format="6" by="lint 8.1.1" type="baseline" client="gradle" dependencies="false" name="AGP (8.1.1)" variant="all" version="8.1.1">
+<issues name="AGP (8.1.1)" by="lint 8.1.1" client="gradle" dependencies="false" format="6"
+    type="baseline" variant="all" version="8.1.1">
 
-    <issue
+    <issue errorLine1="        android:name=&quot;com.jbrightman.thedayto.TheDayToApplication&quot;"
+        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="MissingClass"
-        message="Class referenced in the manifest, `com.jbrightman.thedayto.TheDayToApplication`, was not found in the project or the libraries"
-        errorLine1="        android:name=&quot;com.jbrightman.thedayto.TheDayToApplication&quot;"
-        errorLine2="                      ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="10"
-            column="23"/>
+        message="Class referenced in the manifest, `com.jbrightman.thedayto.TheDayToApplication`, was not found in the project or the libraries">
+        <location column="23" file="src/main/AndroidManifest.xml" line="10" />
     </issue>
 
-    <issue
+    <issue errorLine1="            android:label=&quot;@string/app_name&quot;" errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~"
         id="RedundantLabel"
-        message="Redundant label can be removed"
-        errorLine1="            android:label=&quot;@string/app_name&quot;"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/AndroidManifest.xml"
-            line="23"
-            column="13"/>
+        message="Redundant label can be removed">
+        <location column="13" file="src/main/AndroidManifest.xml" line="23" />
     </issue>
 
-    <issue
-        id="ObsoleteSdkInt"
+    <issue id="ObsoleteSdkInt"
         message="This folder configuration (`v24`) is unnecessary; `minSdkVersion` is 27. Merge all the resources in this folder into `drawable`.">
-        <location
-            file="src/main/res/drawable-v24"/>
+        <location file="src/main/res/drawable-v24" />
     </issue>
 
-    <issue
-        id="ObsoleteSdkInt"
+    <issue id="ObsoleteSdkInt"
         message="This folder configuration (`v26`) is unnecessary; `minSdkVersion` is 27. Merge all the resources in this folder into `mipmap-anydpi`.">
-        <location
-            file="src/main/res/mipmap-anydpi-v26"/>
+        <location file="src/main/res/mipmap-anydpi-v26" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;purple_200&quot;>#FFBB86FC&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.purple_200` appears to be unused"
-        errorLine1="    &lt;color name=&quot;purple_200&quot;>#FFBB86FC&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="3"
-            column="12"/>
+        message="The resource `R.color.purple_200` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="3" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;purple_500&quot;>#FF6200EE&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.purple_500` appears to be unused"
-        errorLine1="    &lt;color name=&quot;purple_500&quot;>#FF6200EE&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="4"
-            column="12"/>
+        message="The resource `R.color.purple_500` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="4" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;purple_700&quot;>#FF3700B3&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.purple_700` appears to be unused"
-        errorLine1="    &lt;color name=&quot;purple_700&quot;>#FF3700B3&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="5"
-            column="12"/>
+        message="The resource `R.color.purple_700` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="5" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;teal_200&quot;>#FF03DAC5&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.teal_200` appears to be unused"
-        errorLine1="    &lt;color name=&quot;teal_200&quot;>#FF03DAC5&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="6"
-            column="12"/>
+        message="The resource `R.color.teal_200` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="6" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;teal_700&quot;>#FF018786&lt;/color>" errorLine2="           ~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.teal_700` appears to be unused"
-        errorLine1="    &lt;color name=&quot;teal_700&quot;>#FF018786&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="7"
-            column="12"/>
+        message="The resource `R.color.teal_700` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="7" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;black&quot;>#FF000000&lt;/color>" errorLine2="           ~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.black` appears to be unused"
-        errorLine1="    &lt;color name=&quot;black&quot;>#FF000000&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="8"
-            column="12"/>
+        message="The resource `R.color.black` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="8" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;color name=&quot;white&quot;>#FFFFFFFF&lt;/color>" errorLine2="           ~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.color.white` appears to be unused"
-        errorLine1="    &lt;color name=&quot;white&quot;>#FFFFFFFF&lt;/color>"
-        errorLine2="           ~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/colors.xml"
-            line="9"
-            column="12"/>
+        message="The resource `R.color.white` appears to be unused">
+        <location column="12" file="src/main/res/values/colors.xml" line="9" />
     </issue>
 
-    <issue
+    <issue errorLine1="&lt;vector android:height=&quot;120dp&quot; android:tint=&quot;#23C9C3&quot;" errorLine2="^"
         id="UnusedResources"
-        message="The resource `R.drawable.happy_face` appears to be unused"
-        errorLine1="&lt;vector android:height=&quot;120dp&quot; android:tint=&quot;#23C9C3&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/happy_face.xml"
-            line="1"
-            column="1"/>
+        message="The resource `R.drawable.happy_face` appears to be unused">
+        <location column="1" file="src/main/res/drawable/happy_face.xml" line="1" />
     </issue>
 
-    <issue
+    <issue errorLine1="&lt;vector android:height=&quot;120dp&quot; android:tint=&quot;#C96823&quot;" errorLine2="^"
         id="UnusedResources"
-        message="The resource `R.drawable.sad_face` appears to be unused"
-        errorLine1="&lt;vector android:height=&quot;120dp&quot; android:tint=&quot;#C96823&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/sad_face.xml"
-            line="1"
-            column="1"/>
+        message="The resource `R.drawable.sad_face` appears to be unused">
+        <location column="1" file="src/main/res/drawable/sad_face.xml" line="1" />
     </issue>
 
-    <issue
+    <issue errorLine1="&lt;vector android:height=&quot;24dp&quot; android:tint=&quot;#2EF1C9&quot;"
+        errorLine2="^"
         id="UnusedResources"
-        message="The resource `R.drawable.small_happy_face` appears to be unused"
-        errorLine1="&lt;vector android:height=&quot;24dp&quot; android:tint=&quot;#2EF1C9&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/small_happy_face.xml"
-            line="1"
-            column="1"/>
+        message="The resource `R.drawable.small_happy_face` appears to be unused">
+        <location column="1" file="src/main/res/drawable/small_happy_face.xml" line="1" />
     </issue>
 
-    <issue
+    <issue errorLine1="&lt;vector android:height=&quot;24dp&quot; android:tint=&quot;#C96823&quot;"
+        errorLine2="^"
         id="UnusedResources"
-        message="The resource `R.drawable.small_sad_face` appears to be unused"
-        errorLine1="&lt;vector android:height=&quot;24dp&quot; android:tint=&quot;#C96823&quot;"
-        errorLine2="^">
-        <location
-            file="src/main/res/drawable/small_sad_face.xml"
-            line="1"
-            column="1"/>
+        message="The resource `R.drawable.small_sad_face` appears to be unused">
+        <location column="1" file="src/main/res/drawable/small_sad_face.xml" line="1" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;mood&quot;>Mood\n&lt;/string>" errorLine2="            ~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.mood` appears to be unused"
-        errorLine1="    &lt;string name=&quot;mood&quot;>Mood\n&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="3"
-            column="13"/>
+        message="The resource `R.string.mood` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="3" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;back_button&quot;>Back\n&lt;/string>" errorLine2="            ~~~~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.back_button` appears to be unused"
-        errorLine1="    &lt;string name=&quot;back_button&quot;>Back\n&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="4"
-            column="13"/>
+        message="The resource `R.string.back_button` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="4" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;calender&quot;>Calender\n&lt;/string>" errorLine2="            ~~~~~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.calender` appears to be unused"
-        errorLine1="    &lt;string name=&quot;calender&quot;>Calender\n&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="5"
-            column="13"/>
+        message="The resource `R.string.calender` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="5" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;note&quot;>Note&lt;/string>" errorLine2="            ~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.note` appears to be unused"
-        errorLine1="    &lt;string name=&quot;note&quot;>Note&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="6"
-            column="13"/>
+        message="The resource `R.string.note` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="6" />
     </issue>
 
-    <issue
+    <issue errorLine1="    &lt;string name=&quot;home&quot;>Home&lt;/string>" errorLine2="            ~~~~~~~~~~~"
         id="UnusedResources"
-        message="The resource `R.string.home` appears to be unused"
-        errorLine1="    &lt;string name=&quot;home&quot;>Home&lt;/string>"
-        errorLine2="            ~~~~~~~~~~~">
-        <location
-            file="src/main/res/values/strings.xml"
-            line="7"
-            column="13"/>
+        message="The resource `R.string.home` appears to be unused">
+        <location column="13" file="src/main/res/values/strings.xml" line="7" />
     </issue>
 
 </issues>

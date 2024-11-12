@@ -79,7 +79,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.common.java8)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
-    implementation (libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Testing
     testImplementation(libs.junit)
@@ -94,7 +94,7 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
 
     // Dagger - Hilt
-    implementation (libs.hilt.android)
+    implementation(libs.hilt.android)
     ksp(libs.dagger.compiler)
     ksp(libs.hilt.compiler)
     implementation(libs.androidx.navigation.compose)
@@ -111,7 +111,7 @@ dependencies {
     implementation(libs.accompanist.flowlayout)
 
     // OpenCSV
-    implementation (libs.opencsv)
+    implementation(libs.opencsv)
 
     // Coil
     implementation(libs.coil.compose)

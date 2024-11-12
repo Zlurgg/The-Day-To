@@ -11,11 +11,11 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.work.Data
 import com.google.android.gms.auth.api.identity.Identity
-import uk.co.zlurgg.thedayto.core.notifications.Notifications.scheduleNotification
 import uk.co.zlurgg.thedayto.core.notifications.NotificationWorker.Companion.NOTIFICATION_ID
+import uk.co.zlurgg.thedayto.core.notifications.Notifications.scheduleNotification
+import uk.co.zlurgg.thedayto.core.presentation.TheDayToApp
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.ui.theme.TheDayToTheme
-import uk.co.zlurgg.thedayto.core.presentation.TheDayToApp
 
 class MainActivity : ComponentActivity() {
 

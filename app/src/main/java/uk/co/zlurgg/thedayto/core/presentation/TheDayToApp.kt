@@ -18,33 +18,31 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.rememberCurrentKoinScope
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
+import uk.co.zlurgg.thedayto.core.presentation.util.Screen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
-import uk.co.zlurgg.thedayto.core.presentation.util.Screen
-import kotlinx.coroutines.launch
-import org.koin.androidx.compose.defaultExtras
-import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.rememberCurrentKoinScope
-import uk.co.zlurgg.thedayto.R
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
     googleAuthUiClient: GoogleAuthUiClient,
-    ) {
+) {
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
     val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current
@@ -81,9 +79,10 @@ fun TheDayToApp(
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
 
                 LaunchedEffect(key1 = Unit) {
-                    if(googleAuthUiClient.getSignedInUser() != null) {
+                    if (googleAuthUiClient.getSignedInUser() != null) {
                         if (theDayToPrefRepository.getDailyEntryDate() ==
-                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+                        ) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -94,7 +93,7 @@ fun TheDayToApp(
                 val launcher = rememberLauncherForActivityResult(
                     contract = ActivityResultContracts.StartIntentSenderForResult(),
                     onResult = { result ->
-                        if(result.resultCode == RESULT_OK) {
+                        if (result.resultCode == RESULT_OK) {
                             coroutineScope.launch {
                                 val signInResult = googleAuthUiClient.signInWithIntent(
                                     intent = result.data ?: return@launch
@@ -106,14 +105,15 @@ fun TheDayToApp(
                 )
 
                 LaunchedEffect(key1 = state.isSignInSuccessful) {
-                    if(state.isSignInSuccessful) {
+                    if (state.isSignInSuccessful) {
                         Toast.makeText(
                             applicationContext,
                             context.resources.getString(R.string.sign_in_successful),
                             Toast.LENGTH_LONG
                         ).show()
                         if (theDayToPrefRepository.getDailyEntryDate() ==
-                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+                            LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+                        ) {
                             navController.navigate(Screen.EntriesScreen.route)
                         } else {
                             navController.navigate(Screen.AddEditEntryScreen.route)
@@ -159,7 +159,8 @@ fun TheDayToApp(
                 )
             ) {
                 val date = it.arguments?.getLong(stringResource(R.string.entrydate)) ?: -1L
-                val backButton = it.arguments?.getBoolean(stringResource(R.string.showbackbutton)) ?: false
+                val backButton =
+                    it.arguments?.getBoolean(stringResource(R.string.showbackbutton)) ?: false
                 AddEditEntryScreen(
                     navController = navController,
                     entryDate = date,

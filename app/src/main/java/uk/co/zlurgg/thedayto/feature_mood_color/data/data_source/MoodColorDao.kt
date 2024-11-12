@@ -6,17 +6,20 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 
 @Dao
 interface MoodColorDao {
     @Query("SELECT * FROM moodColor")
     fun getMoodColors(): Flow<List<MoodColor>>
+
     @Query("SELECT * FROM moodColor WHERE id = :id")
     suspend fun getMoodColorById(id: Int): MoodColor?
+
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMoodColor(moodColor: MoodColor)
+
     @Delete
     suspend fun deleteMoodColor(moodColor: MoodColor)
 

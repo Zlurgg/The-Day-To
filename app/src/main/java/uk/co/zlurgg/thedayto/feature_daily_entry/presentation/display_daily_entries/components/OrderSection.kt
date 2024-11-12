@@ -33,15 +33,15 @@ fun OrderSection(
             modifier = Modifier.fillMaxWidth()
         ) {
             DefaultRadioButton(
-             text = stringResource(R.string.mood),
-             selected = dailyEntryOrder is DailyEntryOrder.Mood,
-             onSelect = { onOrderChange(DailyEntryOrder.Mood(dailyEntryOrder.orderType)) }
+                text = stringResource(R.string.mood),
+                selected = dailyEntryOrder is DailyEntryOrder.Mood,
+                onSelect = { onOrderChange(DailyEntryOrder.Mood(dailyEntryOrder.orderType)) }
             )
             Spacer(modifier = Modifier.width(paddingSmall))
             DefaultRadioButton(
-             text = stringResource(R.string.date),
-             selected = dailyEntryOrder is DailyEntryOrder.Date,
-             onSelect = { onOrderChange(DailyEntryOrder.Date(dailyEntryOrder.orderType)) }
+                text = stringResource(R.string.date),
+                selected = dailyEntryOrder is DailyEntryOrder.Date,
+                onSelect = { onOrderChange(DailyEntryOrder.Date(dailyEntryOrder.orderType)) }
             )
         }
         Spacer(modifier = Modifier.width(paddingMedium))

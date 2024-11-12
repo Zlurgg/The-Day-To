@@ -3,7 +3,6 @@ package uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
-import kotlin.jvm.Throws
 
 class AddMoodColor(
     private val repository: MoodColorRepository

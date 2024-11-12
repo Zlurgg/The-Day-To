@@ -15,7 +15,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
@@ -30,7 +29,7 @@ import java.time.ZoneOffset
 fun AddEditMoodColorScreen(
     mcViewModel: AddEditMoodColorViewModel = koinViewModel(),
     viewModel: AddEditEntryViewModel = koinViewModel()
-    ) {
+) {
     Column(
         modifier = Modifier
     ) {

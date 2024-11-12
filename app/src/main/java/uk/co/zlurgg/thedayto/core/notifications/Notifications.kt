@@ -17,10 +17,13 @@ object Notifications {
     fun scheduleNotification(data: Data, context: Context) {
         val theDayToPrefRepository = TheDayToPrefRepository(context)
         /** if the entry date is from yesterday then we create a notification (0 check to account for 1st time user **/
-        if (theDayToPrefRepository.getDailyEntryDate() == LocalDate.now().atStartOfDay().minusDays(1).toEpochSecond(ZoneOffset.UTC)
-            || theDayToPrefRepository.getDailyEntryDate() == 0L) {
+        if (theDayToPrefRepository.getDailyEntryDate() == LocalDate.now().atStartOfDay()
+                .minusDays(1).toEpochSecond(ZoneOffset.UTC)
+            || theDayToPrefRepository.getDailyEntryDate() == 0L
+        ) {
             val userNotificationTime = LocalDateTime.now().plusDays(1).toEpochSecond(
-                ZoneOffset.UTC)
+                ZoneOffset.UTC
+            )
             val delay = userNotificationTime - (LocalDateTime.now().toEpochSecond(ZoneOffset.UTC))
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.CONNECTED)
@@ -35,7 +38,8 @@ object Notifications {
             val instanceWorkManager = WorkManager.getInstance(context)
             instanceWorkManager.beginUniqueWork(
                 NotificationWorker.NOTIFICATION_WORK,
-                ExistingWorkPolicy.REPLACE, notificationWorker).enqueue()
+                ExistingWorkPolicy.REPLACE, notificationWorker
+            ).enqueue()
         }
 
 

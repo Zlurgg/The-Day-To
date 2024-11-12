@@ -2,7 +2,6 @@ package uk.co.zlurgg.thedayto.feature_mood_color.presentation.component
 
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
-import androidx.hilt.navigation.compose.hiltViewModel
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
