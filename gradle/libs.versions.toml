@@ -40,6 +40,7 @@ google-services = "4.4.2"
 runtimeLivedata =  "1.7.5"
 workRuntime = "2.10.0"
 kotlinPlugin = "1.8.10"
+koin = "3.5.6"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
@@ -94,6 +95,10 @@ dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = 
 hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hiltAndroid" }
 hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hiltAndroid" }
 
+koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
+koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
+koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -125,4 +130,14 @@ retrofit = [
     "converter-moshi",
     "okhttp",
     "converter-gson",
+]
+koin = [
+    "koin-core",
+    "koin-android",
+    "koin-androidx-compose"
+]
+work-manager = [
+    "androidx-appcompat",
+    "androidx-work-runtime-ktx",
+    "androidx-work-runtime"
 ]
