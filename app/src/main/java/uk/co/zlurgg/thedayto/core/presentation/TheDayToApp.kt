@@ -35,7 +35,6 @@ import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
 import uk.co.zlurgg.thedayto.core.presentation.util.Screen
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.defaultExtras
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.rememberCurrentKoinScope
 import uk.co.zlurgg.thedayto.R
