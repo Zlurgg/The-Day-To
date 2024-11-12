@@ -7,7 +7,7 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
-import uk.co.zlurgg.thedayto.domain.repository.TheDayToPrefRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneOffset

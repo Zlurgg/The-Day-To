@@ -1,4 +1,4 @@
-//package uk.co.zlurgg.thedayto.feature_thedayto.presentation.entry.add_edit_entry.components
+package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components
 //
 //import androidx.compose.animation.core.Animatable
 //import androidx.compose.animation.core.AnimationVector4D
@@ -27,7 +27,7 @@
 //@Composable
 //fun ColorSelector(
 //    entryBackgroundAnimatatable: Animatable<Color, AnimationVector4D>,
-////    viewModel: AddEditMoodColorViewModel = hiltViewModel()
+////    viewModel: AddEditMoodColorViewModel = koinViewModel()
 //) {
 //    val scope = rememberCoroutineScope()
 //

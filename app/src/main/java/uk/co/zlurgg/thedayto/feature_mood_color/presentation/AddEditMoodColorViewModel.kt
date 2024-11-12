@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import uk.co.zlurgg.thedayto.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
@@ -22,8 +22,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@HiltViewModel
-class AddEditMoodColorViewModel @Inject constructor(
+class AddEditMoodColorViewModel(
     private val moodColorUseCases: MoodColorUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {

@@ -4,8 +4,8 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import uk.co.zlurgg.thedayto.domain.util.DailyEntryOrder
-import uk.co.zlurgg.thedayto.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.DailyEntryOrder
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,8 +15,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel
-class EntriesViewModel @Inject constructor(
+class EntriesViewModel(
     private val entryUseCase: DailyEntryUseCases
 ) : ViewModel() {
 

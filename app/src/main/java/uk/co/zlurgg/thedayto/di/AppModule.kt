@@ -1,77 +1,67 @@
 package uk.co.zlurgg.thedayto.di
 
-import android.app.Application
+import android.content.Context
+import androidx.lifecycle.SavedStateHandle
+import androidx.lifecycle.get
 import androidx.room.Room
-import uk.co.zlurgg.thedayto.data.data_source.TheDayToDatabase
-import uk.co.zlurgg.thedayto.feature_mood_color.data.repository.MoodColorRepositoryImpl
+import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.androidx.viewmodel.dsl.viewModelOf
+import org.koin.dsl.module
+import uk.co.zlurgg.thedayto.core.data.data_source.TheDayToDatabase
 import uk.co.zlurgg.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.AddDailyEntry
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DeleteDailyEntryUseCase
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DeleteDailyEntryUseCase
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntriesUseCase
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.UpdateDailyEntry
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
+import uk.co.zlurgg.thedayto.feature_mood_color.data.repository.MoodColorRepositoryImpl
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.AddMoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.GetMoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.GetMoodColorsUseCase
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.UpdateMoodColor
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
 
-@Module
-@InstallIn(SingletonComponent::class)
-object AppModule {
+val appModule = module {
 
-    @Provides
-    @Singleton
-    fun provideTheDayToDatabase(app: Application): TheDayToDatabase {
-        return Room.databaseBuilder(
-            app,
+    single {
+        Room.databaseBuilder(
+            androidApplication(),
             TheDayToDatabase::class.java,
             TheDayToDatabase.DATABASE_NAME
         ).build()
     }
 
-    @Provides
-    @Singleton
-    fun providesTheDayToRepository(db: TheDayToDatabase): DailyEntryRepository {
-        return DailyEntryRepositoryImpl(db.dailyEntryDao)
-    }
+//    viewModelOf(::AddEditEntryViewModel)
 
-    @Provides
-    @Singleton
-    fun provideTheDayToEntryUseCases(dailyEntryRepository: DailyEntryRepository): DailyEntryUseCases {
-        return DailyEntryUseCases(
-            getEntries = GetDailyEntriesUseCase(repository = dailyEntryRepository),
-            deleteEntry = DeleteDailyEntryUseCase(repository = dailyEntryRepository),
-            addDailyEntry = AddDailyEntry(repository = dailyEntryRepository),
-            getDailyEntry = GetDailyEntry(repository = dailyEntryRepository),
-            updateDailyEntry = UpdateDailyEntry(repository = dailyEntryRepository)
+
+    single<DailyEntryRepository> { DailyEntryRepositoryImpl(get<TheDayToDatabase>().dailyEntryDao) }
+
+    single {
+        DailyEntryUseCases(
+            getEntries = GetDailyEntriesUseCase(repository = get()),
+            deleteEntry = DeleteDailyEntryUseCase(repository = get()),
+            addDailyEntry = AddDailyEntry(repository = get()),
+            getDailyEntry = GetDailyEntry(repository = get()),
+            updateDailyEntry = UpdateDailyEntry(repository = get())
         )
     }
 
-    @Provides
-    @Singleton
-    fun providesMoodColorRepository(db: TheDayToDatabase): MoodColorRepository {
-        return MoodColorRepositoryImpl(db.moodColorDao)
-    }
+    single<MoodColorRepository> { MoodColorRepositoryImpl(get<TheDayToDatabase>().moodColorDao) }
 
-    @Provides
-    @Singleton
-    fun providesMoodColorUseCases(moodColorRepository: MoodColorRepository): MoodColorUseCases {
-        return MoodColorUseCases(
-            getMoodColors = GetMoodColorsUseCase(repository = moodColorRepository),
-            deleteMoodColor = DeleteMoodColorUseCase(repository = moodColorRepository),
-            addMoodColor = AddMoodColor(repository = moodColorRepository),
-            getMoodColor = GetMoodColor(repository = moodColorRepository),
-            updateMoodColor = UpdateMoodColor(repository = moodColorRepository)
+    single {
+        MoodColorUseCases(
+            getMoodColors = GetMoodColorsUseCase(repository = get()),
+            deleteMoodColor = DeleteMoodColorUseCase(repository = get()),
+            addMoodColor = AddMoodColor(repository = get()),
+            getMoodColor = GetMoodColor(repository = get()),
+            updateMoodColor = UpdateMoodColor(repository = get())
         )
     }
+
 }

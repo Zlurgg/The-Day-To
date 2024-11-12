@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.data.data_source
+package uk.co.zlurgg.thedayto.core.data.data_source
 
 import androidx.room.Database
 import androidx.room.RoomDatabase

@@ -21,15 +21,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.DatePickerItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.MoodItem
-import uk.co.zlurgg.thedayto.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.util.Screen
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import kotlinx.coroutines.flow.collectLatest
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.context.GlobalContext.get
+import org.koin.core.parameter.parametersOf
 import uk.co.zlurgg.thedayto.R
 
 @Composable
@@ -37,7 +41,7 @@ fun AddEditEntryScreen(
     navController: NavController,
     showBackButton: Boolean,
     entryDate: Long,
-    viewModel: AddEditEntryViewModel = hiltViewModel(),
+    viewModel: AddEditEntryViewModel = koinViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
     LaunchedEffect(key1 = true) {

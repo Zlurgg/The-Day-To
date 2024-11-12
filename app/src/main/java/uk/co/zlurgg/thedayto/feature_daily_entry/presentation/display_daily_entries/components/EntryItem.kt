@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
-import uk.co.zlurgg.thedayto.presentation.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.ui.theme.paddingLarge
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall

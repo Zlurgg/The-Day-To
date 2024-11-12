@@ -2,8 +2,8 @@ package uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case
 
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
-import uk.co.zlurgg.thedayto.domain.util.DailyEntryOrder
-import uk.co.zlurgg.thedayto.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.DailyEntryOrder
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

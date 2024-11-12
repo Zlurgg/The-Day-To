@@ -15,8 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
-import uk.co.zlurgg.thedayto.presentation.util.datestampToDay
-import uk.co.zlurgg.thedayto.presentation.util.getColor
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToDay
+import uk.co.zlurgg.thedayto.core.presentation.util.getColor
 
 @Composable
 fun CalenderDay(

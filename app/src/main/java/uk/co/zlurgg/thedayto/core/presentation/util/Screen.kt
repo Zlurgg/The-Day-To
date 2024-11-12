@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.presentation.util
+package uk.co.zlurgg.thedayto.core.presentation.util
 
 sealed class Screen(
     val route: String
