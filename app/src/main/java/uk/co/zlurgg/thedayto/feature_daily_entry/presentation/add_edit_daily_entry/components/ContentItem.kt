@@ -5,12 +5,13 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 
 @Composable
 fun ContentItem(
-    viewModel: AddEditEntryViewModel = hiltViewModel()
+    viewModel: AddEditEntryViewModel = koinViewModel()
 ) {
     val contentState = viewModel.entryContent.value
 

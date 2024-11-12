@@ -10,12 +10,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
+import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
 
 @Composable
 fun ColorPicker(
-        viewModel: AddEditMoodColorViewModel = hiltViewModel()
+        viewModel: AddEditMoodColorViewModel = koinViewModel()
 ) {
     val controller = rememberColorPickerController()
     HsvColorPicker(

@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.domain.repository
+package uk.co.zlurgg.thedayto.core.domain.repository
 
 const val PREFERENCE_NAME = "THE_DAY_TO_PREF"
 const val DAILY_ENTRY_CREATED = "DAILY_ENTRY_CREATED"

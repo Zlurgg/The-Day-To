@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.domain.repository
+package uk.co.zlurgg.thedayto.core.domain.repository
 
 import android.content.Context
 import android.content.SharedPreferences

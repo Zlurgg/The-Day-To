@@ -23,11 +23,12 @@ import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import uk.co.zlurgg.thedayto.presentation.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
+import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import java.time.Instant
 import java.time.LocalDate
@@ -37,7 +38,7 @@ import java.time.ZoneOffset
 
 @Composable
 fun DatePickerItem(
-    viewModel: AddEditEntryViewModel = hiltViewModel(),
+    viewModel: AddEditEntryViewModel = koinViewModel(),
     entryDate: Long
 ) {
     val dateDialogState = rememberMaterialDialogState()

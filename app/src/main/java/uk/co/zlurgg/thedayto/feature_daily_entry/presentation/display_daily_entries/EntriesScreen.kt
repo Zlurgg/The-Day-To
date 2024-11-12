@@ -51,13 +51,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
-import uk.co.zlurgg.thedayto.presentation.util.Screen
-import uk.co.zlurgg.thedayto.presentation.util.datestampToMonthValue
-import uk.co.zlurgg.thedayto.presentation.util.datestampToYearValue
-import uk.co.zlurgg.thedayto.presentation.util.dayToDatestampForCurrentMonthAndYear
+import uk.co.zlurgg.thedayto.core.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToMonthValue
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToYearValue
+import uk.co.zlurgg.thedayto.core.presentation.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.ui.theme.paddingVeryLarge
@@ -69,7 +71,7 @@ import java.time.ZoneOffset
 @Composable
 fun EntriesScreen(
     navController: NavController,
-    viewModel: EntriesViewModel = hiltViewModel(),
+    viewModel: EntriesViewModel = koinViewModel(),
     onSignOut: () -> Unit
 ) {
     val state = viewModel.state.value

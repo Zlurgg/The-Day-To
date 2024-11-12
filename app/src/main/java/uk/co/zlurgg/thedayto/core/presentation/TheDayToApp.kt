@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.presentation
+package uk.co.zlurgg.thedayto.core.presentation
 
 import android.app.Activity.RESULT_OK
 import android.widget.Toast
@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.LocalViewModelStoreOwner
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -24,15 +25,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
-import uk.co.zlurgg.thedayto.domain.repository.TheDayToPrefRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
-import uk.co.zlurgg.thedayto.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.util.Screen
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.defaultExtras
+import org.koin.androidx.compose.getViewModel
+import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.rememberCurrentKoinScope
 import uk.co.zlurgg.thedayto.R
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -69,7 +74,11 @@ fun TheDayToApp(
                 route = Screen.SignInScreen.route,
                 deepLinks = listOf(navDeepLink { uriPattern = uri })
             ) {
-                val signInViewModel: SignInViewModel = viewModel()
+                checkNotNull(LocalViewModelStoreOwner.current) {
+                    "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
+                }
+                rememberCurrentKoinScope()
+                val signInViewModel: SignInViewModel = koinViewModel()
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
 
                 LaunchedEffect(key1 = Unit) {

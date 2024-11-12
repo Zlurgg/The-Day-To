@@ -2,7 +2,7 @@ package uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case
 
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

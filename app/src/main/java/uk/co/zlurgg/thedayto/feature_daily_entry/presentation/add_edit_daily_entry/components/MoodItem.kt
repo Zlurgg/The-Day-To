@@ -46,13 +46,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
+import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
-import uk.co.zlurgg.thedayto.presentation.util.getColor
+import uk.co.zlurgg.thedayto.core.presentation.util.getColor
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -60,8 +61,8 @@ import java.time.ZoneOffset
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun MoodItem(
-    viewModel: AddEditEntryViewModel = hiltViewModel(),
-    mcViewModel: AddEditMoodColorViewModel = hiltViewModel()
+    viewModel: AddEditEntryViewModel = koinViewModel(),
+    mcViewModel: AddEditMoodColorViewModel = koinViewModel()
 ) {
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
