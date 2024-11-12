@@ -9,12 +9,12 @@ plugins {
 }
 
 android {
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "uk.co.zlurgg.thedayto"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -62,6 +62,9 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.fragment.ktx)
     implementation(platform(libs.androidx.compose.bom))
+    implementation(libs.bundles.compose)
+    debugImplementation(libs.bundles.compose.debug)
+    implementation(libs.androidx.runtime.livedata)
 
     // Room
     implementation(libs.firebase.auth)
@@ -77,13 +80,6 @@ dependencies {
     implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.activity.compose)
     implementation (libs.androidx.lifecycle.runtime.compose)
-
-    // UI
-    implementation(libs.ui)
-    implementation(libs.ui.graphics)
-    implementation(libs.ui.tooling.preview)
-    implementation(libs.material3)
-    implementation(libs.androidx.runtime.livedata)
 
     // Testing
     testImplementation(libs.junit)
@@ -104,10 +100,7 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
 
     // Retrofit
-    implementation(libs.retrofit)
-    implementation(libs.converter.moshi)
-    implementation(libs.okhttp)
-    implementation(libs.converter.gson)
+    implementation(libs.bundles.retrofit)
 
     // Location Services
     implementation(libs.play.services.location)
@@ -115,7 +108,6 @@ dependencies {
     // Compose dependencies extended
     implementation(libs.androidx.paging.compose)
     implementation(libs.accompanist.swiperefresh)
-    implementation(libs.androidx.material.icons.extended)
     implementation(libs.accompanist.flowlayout)
 
     // OpenCSV
