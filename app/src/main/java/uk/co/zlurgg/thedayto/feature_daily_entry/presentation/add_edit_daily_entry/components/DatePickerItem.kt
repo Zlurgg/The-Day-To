@@ -20,16 +20,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.navigation.compose.hiltViewModel
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
 import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
@@ -46,7 +45,7 @@ fun DatePickerItem(
 
     /** will change entry date to contain month and year going foward and pass around the long value **/
     val dateState = viewModel.entryDate.value
-    dateState.date =  if (entryDate != -1L ) {
+    dateState.date = if (entryDate != -1L) {
         entryDate
     } else {
         viewModel.entryDate.value.date
@@ -92,7 +91,9 @@ fun DatePickerItem(
             onCloseRequest = { mExpanded = false },
             buttons = {
                 positiveButton(text = stringResource(R.string.ok), onClick = { mExpanded = false })
-                negativeButton(text = stringResource(R.string.cancel), onClick = { mExpanded = false })
+                negativeButton(
+                    text = stringResource(R.string.cancel),
+                    onClick = { mExpanded = false })
             }
         ) {
             datepicker(

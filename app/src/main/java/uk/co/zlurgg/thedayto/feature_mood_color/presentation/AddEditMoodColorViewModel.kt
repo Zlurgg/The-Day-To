@@ -6,12 +6,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,7 +14,11 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
 
 class AddEditMoodColorViewModel(
     private val moodColorUseCases: MoodColorUseCases,
@@ -78,20 +76,24 @@ class AddEditMoodColorViewModel(
                     date = event.date
                 )
             }
+
             is AddEditMoodColorEvent.EnteredMood -> {
                 _moodColorMood.value = moodColorMood.value.copy(
                     mood = event.mood
                 )
             }
+
             is AddEditMoodColorEvent.ChangeMoodFocus -> {
                 _moodColorMood.value = moodColorMood.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
                             moodColorMood.value.mood.isBlank()
                 )
             }
+
             is AddEditMoodColorEvent.EnteredColor -> {
                 _moodColorColor.value = event.colorEnvelope.hexCode
             }
+
             is AddEditMoodColorEvent.SaveMoodColor -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {
@@ -113,6 +115,7 @@ class AddEditMoodColorViewModel(
                     }
                 }
             }
+
             is AddEditMoodColorEvent.DeleteMoodColor -> {
                 viewModelScope.launch {
                     moodColorUseCases.deleteMoodColor(event.moodColor)

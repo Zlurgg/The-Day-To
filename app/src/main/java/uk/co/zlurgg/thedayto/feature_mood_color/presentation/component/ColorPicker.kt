@@ -6,7 +6,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -16,7 +15,7 @@ import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorVie
 
 @Composable
 fun ColorPicker(
-        viewModel: AddEditMoodColorViewModel = koinViewModel()
+    viewModel: AddEditMoodColorViewModel = koinViewModel()
 ) {
     val controller = rememberColorPickerController()
     HsvColorPicker(

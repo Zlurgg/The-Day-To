@@ -49,21 +49,20 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.presentation.util.Screen
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.presentation.util.dayToDatestampForCurrentMonthAndYear
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.ui.theme.paddingVeryLarge
 import uk.co.zlurgg.thedayto.ui.theme.paddingXXSmall
-import uk.co.zlurgg.thedayto.R
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -157,10 +156,10 @@ fun EntriesScreen(
                     )
                     LaunchedEffect(pagerState) {
                         snapshotFlow { pagerState.currentPage }.collect { calenderPage ->
-                            if (calenderPage < (date.monthValue-1)) {
-                                    date = date.minusMonths(1)
-                            } else if (calenderPage > (date.monthValue-1)) {
-                                    date = date.plusMonths(1)
+                            if (calenderPage < (date.monthValue - 1)) {
+                                date = date.minusMonths(1)
+                            } else if (calenderPage > (date.monthValue - 1)) {
+                                date = date.plusMonths(1)
                             }
 
                         }
@@ -212,7 +211,8 @@ fun EntriesScreen(
                                                     }
                                             )
                                         } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay()
-                                                .toEpochSecond(ZoneOffset.UTC)) {
+                                                .toEpochSecond(ZoneOffset.UTC)
+                                        ) {
                                             addNumberToCalenderIfNoEntryForDateExists = false
                                             Box(
                                                 modifier = Modifier,
@@ -249,18 +249,18 @@ fun EntriesScreen(
                                             "${Screen.AddEditEntryScreen.route}?entryId=${entry.id}&showBackButton=${true}"
                                         )
                                     },
-/*                                onDeleteClick = {
-                                    viewModel.onEvent(EntriesEvent.DeleteEntry(entry))
-                                    scope.launch {
-                                        val result = snackbarHostState.showSnackbar(
-                                            message = "Entry deleted",
-                                            actionLabel = "Undo"
-                                        )
-                                        if (result == SnackbarResult.ActionPerformed) {
-                                            viewModel.onEvent(EntriesEvent.RestoreEntry)
-                                        }
-                                    }
-                                }*/
+                                /*                                onDeleteClick = {
+                                                                    viewModel.onEvent(EntriesEvent.DeleteEntry(entry))
+                                                                    scope.launch {
+                                                                        val result = snackbarHostState.showSnackbar(
+                                                                            message = "Entry deleted",
+                                                                            actionLabel = "Undo"
+                                                                        )
+                                                                        if (result == SnackbarResult.ActionPerformed) {
+                                                                            viewModel.onEvent(EntriesEvent.RestoreEntry)
+                                                                        }
+                                                                    }
+                                                                }*/
                             )
                         }
                         Spacer(modifier = Modifier.height(paddingMedium))

@@ -17,7 +17,7 @@ import androidx.work.WorkerParameters
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
 
-class NotificationWorker(context: Context, params: WorkerParameters): Worker(context, params) {
+class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {
         val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
         createNotification(id)
@@ -51,7 +51,8 @@ class NotificationWorker(context: Context, params: WorkerParameters): Worker(con
             .setSmallIcon(R.drawable.ic_notification_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setContentIntent(pending)
-            .setDefaults(NotificationCompat.DEFAULT_ALL).setContentIntent(pendingIntent).setAutoCancel(true)
+            .setDefaults(NotificationCompat.DEFAULT_ALL).setContentIntent(pendingIntent)
+            .setAutoCancel(true)
 
         val notificationManager =
             applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -59,11 +60,16 @@ class NotificationWorker(context: Context, params: WorkerParameters): Worker(con
         notification.setChannelId(NOTIFICATION_CHANNEL)
 
         val ringtoneManager = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
-        val audioAttributes = AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
-            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
+        val audioAttributes =
+            AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_NOTIFICATION_RINGTONE)
+                .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION).build()
 
         val channel =
-            NotificationChannel(NOTIFICATION_CHANNEL, NOTIFICATION_NAME, NotificationManager.IMPORTANCE_HIGH)
+            NotificationChannel(
+                NOTIFICATION_CHANNEL,
+                NOTIFICATION_NAME,
+                NotificationManager.IMPORTANCE_HIGH
+            )
 
         channel.enableLights(true)
         channel.lightColor = Color.GREEN
@@ -79,7 +85,8 @@ class NotificationWorker(context: Context, params: WorkerParameters): Worker(con
     private fun createPendingIntent(deepLink: String, context: Context): PendingIntent {
         val startActivityIntent = Intent(
             Intent.ACTION_VIEW, deepLink.toUri(),
-            context, MainActivity::class.java)
+            context, MainActivity::class.java
+        )
         val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(startActivityIntent)
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)

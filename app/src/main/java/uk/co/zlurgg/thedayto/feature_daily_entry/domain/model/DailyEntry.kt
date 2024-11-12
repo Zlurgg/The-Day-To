@@ -11,4 +11,5 @@ data class DailyEntry(
     val color: String,
     @PrimaryKey val id: Int? = null
 )
-class InvalidDailyEntryException(message: String): Exception(message)
+
+class InvalidDailyEntryException(message: String) : Exception(message)

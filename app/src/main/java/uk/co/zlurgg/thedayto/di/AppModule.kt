@@ -1,12 +1,7 @@
 package uk.co.zlurgg.thedayto.di
 
-import android.content.Context
-import androidx.lifecycle.SavedStateHandle
-import androidx.lifecycle.get
 import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
-import org.koin.androidx.viewmodel.dsl.viewModelOf
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.core.data.data_source.TheDayToDatabase
 import uk.co.zlurgg.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
@@ -17,7 +12,6 @@ import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DeleteDailyEntr
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntriesUseCase
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.UpdateDailyEntry
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.data.repository.MoodColorRepositoryImpl
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.AddMoodColor

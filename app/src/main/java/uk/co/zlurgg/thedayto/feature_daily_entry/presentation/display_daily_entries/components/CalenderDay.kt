@@ -14,9 +14,9 @@ import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToDay
 import uk.co.zlurgg.thedayto.core.presentation.util.getColor
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 
 @Composable
 fun CalenderDay(
@@ -31,9 +31,9 @@ fun CalenderDay(
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {
                 lineTo(size.width, 0f)
-                lineTo(size.width , size.width)
-                lineTo(size.width , size.height)
-                lineTo(0f , size.height)
+                lineTo(size.width, size.width)
+                lineTo(size.width, size.height)
+                lineTo(0f, size.height)
                 close()
             }
             clipPath(clipPath) {

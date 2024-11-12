@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 
 class TheDayToPrefRepository(context: Context) {
-    private val pref: SharedPreferences = context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
+    private val pref: SharedPreferences =
+        context.getSharedPreferences(PREFERENCE_NAME, Context.MODE_PRIVATE)
     private val editor = pref.edit()
 
     private fun String.put(boolean: Boolean) {

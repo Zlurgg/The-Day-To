@@ -45,15 +45,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import androidx.hilt.navigation.compose.hiltViewModel
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.presentation.util.getColor
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
-import uk.co.zlurgg.thedayto.core.presentation.util.getColor
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -69,7 +68,9 @@ fun MoodItem(
     val moodState = viewModel.entryMood.value
     val mcMoodState = mcViewModel.state.value
 
-    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)) {
+    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay()
+            .toEpochSecond(ZoneOffset.UTC)
+    ) {
         moodState.todayHint
     } else {
         moodState.previousDayHint
@@ -127,7 +128,7 @@ fun MoodItem(
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
             mcMoodState.moodColors.forEach { moodColors ->
-                val color  = getColor(moodColors.color)
+                val color = getColor(moodColors.color)
                 DropdownMenuItem(
                     onClick = {
                         moodState.mood = moodColors.mood
@@ -157,7 +158,11 @@ fun MoodItem(
                             IconButton(
                                 modifier = Modifier.weight(0.2f),
                                 onClick = {
-                                    mcViewModel.onEvent(AddEditMoodColorEvent.DeleteMoodColor(moodColors))
+                                    mcViewModel.onEvent(
+                                        AddEditMoodColorEvent.DeleteMoodColor(
+                                            moodColors
+                                        )
+                                    )
                                 }) {
                                 Icon(
                                     imageVector = Icons.Default.Cancel,

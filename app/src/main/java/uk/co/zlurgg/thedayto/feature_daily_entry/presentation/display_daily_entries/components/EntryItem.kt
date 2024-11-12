@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.ColorUtils
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.ui.theme.paddingLarge
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
@@ -42,9 +42,9 @@ fun EntryItem(
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {
                 lineTo(size.width - cutCornerSize.toPx(), 0f)
-                lineTo(size.width , cutCornerSize.toPx())
-                lineTo(size.width , size.height)
-                lineTo(0f , size.height)
+                lineTo(size.width, cutCornerSize.toPx())
+                lineTo(size.width, size.height)
+                lineTo(0f, size.height)
                 close()
             }
 
@@ -59,7 +59,9 @@ fun EntryItem(
             clipPath(clipPath) {
                 drawRoundRect(
                     color =
-                        Color(ColorUtils.blendARGB(color.hashCode(),
+                    Color(
+                        ColorUtils.blendARGB(
+                            color.hashCode(),
                             0x000000,
                             0.3f
                         )
@@ -101,15 +103,15 @@ fun EntryItem(
             )
         }
         /** Should we allow for deleting entries **/
-/*        IconButton(
-            onClick = onDeleteClick,
-            modifier = Modifier.align(Alignment.BottomEnd)
-        ) {
-            Icon(
-                imageVector = Icons.Default.Delete,
-                contentDescription = "Delete Entry"
-            )
-        }*/
+        /*        IconButton(
+                    onClick = onDeleteClick,
+                    modifier = Modifier.align(Alignment.BottomEnd)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = "Delete Entry"
+                    )
+                }*/
     }
 }
 

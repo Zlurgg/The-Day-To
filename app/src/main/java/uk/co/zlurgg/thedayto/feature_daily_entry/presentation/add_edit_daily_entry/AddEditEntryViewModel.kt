@@ -6,18 +6,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.InvalidDailyEntryException
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import javax.inject.Inject
+import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.InvalidDailyEntryException
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
 
 
 class AddEditEntryViewModel(
@@ -70,23 +67,23 @@ class AddEditEntryViewModel(
                         withContext(Dispatchers.Main) {
                             currentEntryId = entry.id
                             _entryDate.value = entryDate.value.copy(
-                                    date = entry.dateStamp,
-                                )
-                            }
-                            _entryMood.value = entryMood.value.copy(
-                                mood = entry.mood,
-                                isHintVisible = false
+                                date = entry.dateStamp,
                             )
-                            _entryContent.value = entryContent.value.copy(
-                                text = entry.content,
-                                isHintVisible = false
-                            )
-                             _entryColor.value = entry.color
                         }
+                        _entryMood.value = entryMood.value.copy(
+                            mood = entry.mood,
+                            isHintVisible = false
+                        )
+                        _entryContent.value = entryContent.value.copy(
+                            text = entry.content,
+                            isHintVisible = false
+                        )
+                        _entryColor.value = entry.color
                     }
                 }
             }
         }
+    }
 
     fun onEvent(event: AddEditEntryEvent) {
         when (event) {
@@ -95,36 +92,43 @@ class AddEditEntryViewModel(
                     date = event.date
                 )
             }
+
             is AddEditEntryEvent.EnteredMood -> {
                 _entryMood.value = entryMood.value.copy(
                     mood = event.mood
                 )
             }
+
             is AddEditEntryEvent.ChangeMoodFocus -> {
                 _entryMood.value = entryMood.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
                             entryMood.value.mood.isBlank()
                 )
             }
+
             is AddEditEntryEvent.EnteredContent -> {
                 _entryContent.value = _entryContent.value.copy(
                     text = event.value
                 )
             }
+
             is AddEditEntryEvent.ChangeContentFocus -> {
                 _entryContent.value = _entryContent.value.copy(
                     isHintVisible = !event.focusState.isFocused &&
                             _entryContent.value.text.isBlank()
                 )
             }
+
             is AddEditEntryEvent.EnteredColor -> {
                 _entryColor.value = event.color
             }
+
             is AddEditEntryEvent.ToggleMoodColorSection -> {
                 _state.value = state.value.copy(
                     isMoodColorSectionVisible = !state.value.isMoodColorSectionVisible
                 )
             }
+
             is AddEditEntryEvent.SaveEntry -> {
                 viewModelScope.launch(Dispatchers.IO) {
                     try {

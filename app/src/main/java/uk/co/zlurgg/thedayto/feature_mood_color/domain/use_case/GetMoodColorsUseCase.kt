@@ -1,13 +1,13 @@
 package uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case
 
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
 
-class GetMoodColorsUseCase (
+class GetMoodColorsUseCase(
     private val repository: MoodColorRepository
 ) {
     operator fun invoke(
@@ -21,6 +21,7 @@ class GetMoodColorsUseCase (
                         is MoodColorOrder.Date -> moodColors.sortedBy { it.dateStamp }
                     }
                 }
+
                 is OrderType.Descending -> {
                     when (moodColorOrder) {
                         is MoodColorOrder.Mood -> moodColors.sortedByDescending { it.mood.lowercase() }

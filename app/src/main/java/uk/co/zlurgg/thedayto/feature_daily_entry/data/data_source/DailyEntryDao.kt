@@ -6,8 +6,8 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 
 @Dao
 interface DailyEntryDao {

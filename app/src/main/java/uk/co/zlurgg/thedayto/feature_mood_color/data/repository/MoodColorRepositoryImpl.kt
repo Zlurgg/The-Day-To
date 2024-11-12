@@ -1,13 +1,13 @@
 package uk.co.zlurgg.thedayto.feature_mood_color.data.repository
 
+import kotlinx.coroutines.flow.Flow
 import uk.co.zlurgg.thedayto.feature_mood_color.data.data_source.MoodColorDao
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
-import kotlinx.coroutines.flow.Flow
 
-class MoodColorRepositoryImpl (
+class MoodColorRepositoryImpl(
     private val dao: MoodColorDao
-    ): MoodColorRepository {
+) : MoodColorRepository {
     override suspend fun insertMoodColor(moodColor: MoodColor) {
         return dao.insertMoodColor(moodColor)
     }
