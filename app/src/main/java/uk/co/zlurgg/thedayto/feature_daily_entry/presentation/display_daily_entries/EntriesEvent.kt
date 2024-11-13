@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries
 
-import uk.co.zlurgg.thedayto.core.domain.util.DailyEntryOrder
+import uk.co.zlurgg.thedayto.core.presentation.util.DailyEntryOrder
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 
 sealed class EntriesEvent {

@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.core.domain.util
+package uk.co.zlurgg.thedayto.core.presentation.util
 
 sealed class DailyEntryOrder(val orderType: OrderType) {
     class Date(orderType: OrderType) : DailyEntryOrder(orderType)

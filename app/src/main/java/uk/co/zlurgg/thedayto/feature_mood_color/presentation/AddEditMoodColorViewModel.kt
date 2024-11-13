@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.presentation.util.OrderType
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases

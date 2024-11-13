@@ -3,7 +3,6 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinKsp)
-    alias(libs.plugins.hiltPlugin)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.services)
 }
@@ -91,12 +90,6 @@ dependencies {
     debugImplementation(libs.androidx.ui.test.manifest)
 
     // Nav
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    // Dagger - Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.dagger.compiler)
-    ksp(libs.hilt.compiler)
     implementation(libs.androidx.navigation.compose)
 
     // Retrofit

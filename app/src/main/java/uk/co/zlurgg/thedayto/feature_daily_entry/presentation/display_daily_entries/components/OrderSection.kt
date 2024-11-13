@@ -14,8 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.domain.util.DailyEntryOrder
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.presentation.util.DailyEntryOrder
+import uk.co.zlurgg.thedayto.core.presentation.util.OrderType
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 
