@@ -10,11 +10,11 @@ import uk.co.zlurgg.thedayto.di.appModule
 import uk.co.zlurgg.thedayto.di.entriesModule
 import uk.co.zlurgg.thedayto.di.signInModule
 
-class TheDayToApplication : Application() {
+class TheDayToApp : Application() {
     override fun onCreate() {
         super.onCreate()
         startKoin {
-            androidContext(this@TheDayToApplication)
+            androidContext(this@TheDayToApp)
             androidLogger()
 
             modules(

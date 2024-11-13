@@ -27,31 +27,17 @@ class MainActivity : ComponentActivity() {
         )
     }
 
-    /** notification permissions **/
-    private lateinit var checkNotificationPermission: ActivityResultLauncher<String>
-    private var isPermission = false
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
-        checkNotificationPermission = registerForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted: Boolean ->
-            isPermission = isGranted
-        }
-
-        checkPermission()
-
-        if (isPermission) {
-            val data = Data.Builder().putInt(NOTIFICATION_ID, 0).build()
-            scheduleNotification(data, this)
-        } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                checkNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+        // Handle notification permission
+        handleNotificationPermission { isGranted ->
+            if (isGranted) {
+                val data = Data.Builder().putInt(NOTIFICATION_ID, 0).build()
+                scheduleNotification(data, this)
+            } else {
+                TODO()// Handle permission denial (e.g., show a message)
             }
         }
-
         setContent {
             TheDayToTheme {
                 TheDayToApp(
@@ -61,21 +47,23 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    private fun checkPermission() {
+    private fun handleNotificationPermission(onPermissionResult: (Boolean) -> Unit) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            if (ContextCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.POST_NOTIFICATIONS
-                ) == PackageManager.PERMISSION_GRANTED
-            ) {
-                isPermission = true
-            } else {
-                isPermission = false
+            val permissionStatus = ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
 
-                checkNotificationPermission.launch(Manifest.permission.POST_NOTIFICATIONS)
+            if (permissionStatus == PackageManager.PERMISSION_GRANTED) {
+                onPermissionResult(true) // Permission already granted
+            } else {
+                // Request permission
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+                    onPermissionResult(isGranted)
+                }.launch(Manifest.permission.POST_NOTIFICATIONS)
             }
         } else {
-            isPermission = true
+            onPermissionResult(true) // Permission not required on older versions
         }
     }
 }
