@@ -8,6 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Scaffold
+import androidx.compose.ui.Modifier
 import androidx.core.content.ContextCompat
 import androidx.work.Data
 import com.google.android.gms.auth.api.identity.Identity
@@ -18,14 +22,6 @@ import uk.co.zlurgg.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.ui.theme.TheDayToTheme
 
 class MainActivity : ComponentActivity() {
-
-    /** Firebase auth for google sign in **/
-    private val googleAuthUiClient by lazy {
-        GoogleAuthUiClient(
-            context = applicationContext,
-            oneTapClient = Identity.getSignInClient(applicationContext)
-        )
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,9 +36,11 @@ class MainActivity : ComponentActivity() {
         }
         setContent {
             TheDayToTheme {
-                TheDayToApp(
-                    googleAuthUiClient
-                )
+                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                    TheDayToApp(
+                        modifier = Modifier.padding(innerPadding)
+                    )
+                }
             }
         }
     }

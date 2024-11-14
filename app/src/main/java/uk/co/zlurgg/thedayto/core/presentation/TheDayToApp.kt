@@ -24,8 +24,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
+import com.google.android.gms.auth.api.identity.Identity
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.rememberCurrentKoinScope
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
@@ -41,8 +44,10 @@ import java.time.ZoneOffset
 
 @Composable
 fun TheDayToApp(
-    googleAuthUiClient: GoogleAuthUiClient,
+    modifier: Modifier = Modifier,
+    googleAuthUiClient: GoogleAuthUiClient = koinInject()
 ) {
+
     /** Check entries for today and see if there is already one, go to entries screen from sign in if so **/
     val startDestination = Screen.SignInScreen.route
     val applicationContext = LocalContext.current

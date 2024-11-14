@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.di
 import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
 import org.koin.dsl.module
+import uk.co.zlurgg.thedayto.TheDayToApp
 import uk.co.zlurgg.thedayto.core.data.data_source.TheDayToDatabase
 import uk.co.zlurgg.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
@@ -31,7 +32,7 @@ val appModule = module {
         ).build()
     }
 
-//    viewModelOf(::AddEditEntryViewModel)
+    single { (androidApplication() as TheDayToApp).googleAuthUiClient }
 
 
     single<DailyEntryRepository> { DailyEntryRepositoryImpl(get<TheDayToDatabase>().dailyEntryDao) }
