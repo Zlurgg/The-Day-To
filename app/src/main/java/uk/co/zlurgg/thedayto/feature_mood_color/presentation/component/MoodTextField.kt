@@ -1,8 +1,11 @@
 package uk.co.zlurgg.thedayto.feature_mood_color.presentation.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,6 +15,8 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.tooling.preview.PreviewLightDark
+import uk.co.zlurgg.thedayto.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 
 @Composable
@@ -25,6 +30,11 @@ fun MoodTextField(
     singleLine: Boolean = false,
     onFocusChange: (FocusState) -> Unit
 ) {
+    val contentColor = if(isSystemInDarkTheme()) {
+        Color.White
+    } else {
+        Color.Black
+    }
     Box(
         modifier = modifier
     ) {
@@ -46,8 +56,26 @@ fun MoodTextField(
                     .padding(horizontal = paddingSmall),
                 text = hint,
                 style = textStyle,
-                color = Color.DarkGray
+                color = contentColor
             )
         }
+    }
+}
+
+@PreviewLightDark
+@Composable
+private fun MoodTextFieldPreview() {
+    TheDayToTheme {
+        MoodTextField(
+            mood = "Good",
+            hint = "Enter Mood",
+            isHintVisible = false,
+            onValueChange = {},
+            textStyle = TextStyle(),
+            singleLine = false,
+            onFocusChange = {},
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.background),
+        )
     }
 }

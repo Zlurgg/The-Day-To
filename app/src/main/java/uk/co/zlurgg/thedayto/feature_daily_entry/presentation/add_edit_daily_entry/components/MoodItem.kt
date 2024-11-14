@@ -61,24 +61,23 @@ import java.time.ZoneOffset
 @Composable
 fun MoodItem(
     viewModel: AddEditEntryViewModel = koinViewModel(),
-    mcViewModel: AddEditMoodColorViewModel = koinViewModel()
+    moodColorViewModel: AddEditMoodColorViewModel = koinViewModel()
 ) {
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
-    val moodState = viewModel.entryMood.value
-    val mcMoodState = mcViewModel.state.value
 
+    val addEditEntryViewModelState = viewModel.state.value
+    val moodColorViewModelState = moodColorViewModel.state.value
+
+    val addEditEntryViewModelEntryMood = viewModel.entryMood.value
     val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay()
             .toEpochSecond(ZoneOffset.UTC)
     ) {
-        moodState.todayHint
+        addEditEntryViewModelEntryMood.todayHint
     } else {
-        moodState.previousDayHint
+        addEditEntryViewModelEntryMood.previousDayHint
     }
 
-    val moodColorState = viewModel.state.value
-
-//    var color by remember { mutableStateOf(Color.White) }
 
     ExposedDropdownMenuBox(
         expanded = mExpanded,
@@ -87,7 +86,7 @@ fun MoodItem(
         }
     ) {
         OutlinedTextField(
-            value = moodState.mood,
+            value = addEditEntryViewModelEntryMood.mood,
             onValueChange = { viewModel.onEvent(AddEditEntryEvent.EnteredMood(it)) },
             textStyle = MaterialTheme.typography.headlineSmall,
             colors = OutlinedTextFieldDefaults.colors(
@@ -102,7 +101,7 @@ fun MoodItem(
             readOnly = true,
             singleLine = true,
             modifier = Modifier
-//                .background(moodState.color) would require some reworking
+                .background(MaterialTheme.colorScheme.background)
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 .onGloballyPositioned { coordinates ->
@@ -127,12 +126,12 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            mcMoodState.moodColors.forEach { moodColors ->
+            moodColorViewModelState.moodColors.forEach { moodColors ->
                 val color = getColor(moodColors.color)
                 DropdownMenuItem(
                     onClick = {
-                        moodState.mood = moodColors.mood
-                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
+                        addEditEntryViewModelEntryMood.mood = moodColors.mood
+                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(addEditEntryViewModelEntryMood.mood))
                         viewModel.onEvent(
                             AddEditEntryEvent.EnteredColor(
                                 color.toArgb().toHexString()
@@ -158,7 +157,7 @@ fun MoodItem(
                             IconButton(
                                 modifier = Modifier.weight(0.2f),
                                 onClick = {
-                                    mcViewModel.onEvent(
+                                    moodColorViewModel.onEvent(
                                         AddEditMoodColorEvent.DeleteMoodColor(
                                             moodColors
                                         )
@@ -189,7 +188,7 @@ fun MoodItem(
         }
     }
     AnimatedVisibility(
-        visible = moodColorState.isMoodColorSectionVisible,
+        visible = addEditEntryViewModelState.isMoodColorSectionVisible,
         enter = fadeIn() + slideInVertically(),
         exit = fadeOut() + slideOutVertically()
     ) {

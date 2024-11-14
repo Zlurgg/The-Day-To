@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Cancel
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -27,16 +28,18 @@ import java.time.ZoneOffset
 
 @Composable
 fun AddEditMoodColorScreen(
-    mcViewModel: AddEditMoodColorViewModel = koinViewModel(),
+    moodColorViewModel: AddEditMoodColorViewModel = koinViewModel(),
     viewModel: AddEditEntryViewModel = koinViewModel()
 ) {
+    val state by moodColorViewModel.state
+
     Column(
         modifier = Modifier
     ) {
         MoodCreator()
         Spacer(modifier = Modifier.padding(paddingSmall))
         ColorPicker()
-        mcViewModel.onEvent(
+        moodColorViewModel.onEvent(
             AddEditMoodColorEvent.EnteredDate(
                 LocalDate.now().atStartOfDay().toEpochSecond(
                     ZoneOffset.UTC
@@ -67,7 +70,7 @@ fun AddEditMoodColorScreen(
             ) {
                 IconButton(
                     onClick = {
-                        mcViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
+                        moodColorViewModel.onEvent(AddEditMoodColorEvent.SaveMoodColor)
                         viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
                     }
                 ) {
