@@ -21,36 +21,35 @@ Aim to publish in Google Play store - available to invited test users not public
 
 Use a github/gitlab/bitbucket repo, private initially  (now public)
 
-General approach, think of using building with small/tetsable ‘modules/components’  
-
-Features/Ideas  
+General approach, think of using building with small/testsable ‘modules/components’  
 
 ## Features: 
 - Jetpack Compose  
 - Kotlin  
 - MVVM  
-- Dagger Hilt  
+- Dagger Hilt (Changed to Koin)
 - Retrofit  
 - Room  
 - Offline Capability
+- Modules  ( data -> domain <- presentation princple)
 
 ## Released  
 Internal testing on play store.
 
-## Screenshots
+## Screenshots showing use
 
 ### Daily Entry Screen
-![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://postimg.cc/8fQHy4RD][img]https://i.postimg.cc/8fQHy4RD/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg))
+[![Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/hvh5t3hJ/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/8fQHy4RD)  
 
-[url=https://postimg.cc/8fQHy4RD][img]https://i.postimg.cc/8fQHy4RD/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]  
-[url=https://postimg.cc/8Jr4B9rt][img]https://i.postimg.cc/8Jr4B9rt/Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]
-
+[![Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/hj2Ygq4W/Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/8Jr4B9rt)  
 
 ### Mood Color Screen
-[url=https://postimg.cc/zLv03VDm][img]https://i.postimg.cc/zLv03VDm/Screenshot-2024-12-02-15-49-19-53-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]  
-[url=https://postimg.cc/WDySZTtd][img]https://i.postimg.cc/WDySZTtd/Screenshot-2024-12-02-15-49-51-59-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]  
-[url=https://postimg.cc/K4BQKXbY][img]https://i.postimg.cc/K4BQKXbY/Screenshot-2024-12-02-16-05-41-20-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]
+[![Screenshot-2024-12-02-15-49-19-53-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/TPqS7DZP/Screenshot-2024-12-02-15-49-19-53-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/zLv03VDm)  
+
+[![Screenshot-2024-12-02-15-49-51-59-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/pTWSgdHJ/Screenshot-2024-12-02-15-49-51-59-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/WDySZTtd)  
+
+[![Screenshot-2024-12-02-16-05-41-20-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/h43Y5g3V/Screenshot-2024-12-02-16-05-41-20-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/K4BQKXbY)  
 
 
-### Google Sign In
-[url=https://postimg.cc/tn3z86k6][img]https://i.postimg.cc/tn3z86k6/Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg[/img][/url]
+### Google Sign In  
+[![Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg](https://i.postimg.cc/x87FJyb6/Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg)](https://postimg.cc/tn3z86k6)  
