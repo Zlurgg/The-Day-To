@@ -55,3 +55,8 @@ Following daily notification create a new entry for current day with a mood (wit
 Basic google sign in set up  
 
 [![Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg](https://i.postimg.cc/x87FJyb6/Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg)](https://postimg.cc/tn3z86k6)  
+
+### Notification
+Daily notification
+
+[![Screenshot-2024-12-02-164416.png](https://i.postimg.cc/qMsxFbyX/Screenshot-2024-12-02-164416.png)](https://postimg.cc/0bNSMCtb)  
