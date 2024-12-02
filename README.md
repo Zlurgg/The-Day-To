@@ -40,6 +40,8 @@ Internal testing on play store.
 ## Screenshots
 
 ### Daily Entry Screen
+![alt text]([https://github.com/[username]/[reponame]/blob/[branch]/image.jpg?raw=true](https://postimg.cc/8fQHy4RD][img]https://i.postimg.cc/8fQHy4RD/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg))
+
 [url=https://postimg.cc/8fQHy4RD][img]https://i.postimg.cc/8fQHy4RD/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]  
 [url=https://postimg.cc/8Jr4B9rt][img]https://i.postimg.cc/8Jr4B9rt/Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg[/img][/url]
 
