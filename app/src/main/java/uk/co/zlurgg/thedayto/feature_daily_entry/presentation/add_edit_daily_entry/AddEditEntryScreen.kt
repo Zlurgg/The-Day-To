@@ -40,6 +40,7 @@ fun AddEditEntryScreen(
     viewModel: AddEditEntryViewModel = koinViewModel(),
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
+    val state = viewModel.state.value
     LaunchedEffect(key1 = true) {
         viewModel.eventFlow.collectLatest { event ->
             when (event) {
@@ -77,7 +78,7 @@ fun AddEditEntryScreen(
         },
         floatingActionButton = {
             /** if we are putting a new mood color in hide button **/
-            if (!viewModel.state.value.isMoodColorSectionVisible) {
+            if (!state.isMoodColorSectionVisible) {
                 FloatingActionButton(
                     onClick = {
                         viewModel.onEvent(AddEditEntryEvent.SaveEntry)

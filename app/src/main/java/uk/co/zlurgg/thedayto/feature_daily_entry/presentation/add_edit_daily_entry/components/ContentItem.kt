@@ -15,7 +15,7 @@ fun ContentItem(
     val contentState = viewModel.entryContent.value
 
     TransparentHintTextField(
-        text = contentState.text,
+        text = contentState.text, 
         hint = contentState.hint,
         onValueChange = {
             viewModel.onEvent(AddEditEntryEvent.EnteredContent(it))
