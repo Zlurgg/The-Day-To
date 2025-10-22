@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.core
+package uk.co.zlurgg.thedayto.core.domain.resource
 
 sealed class Resource<T>(
     val data: T? = null, val message: String? = null

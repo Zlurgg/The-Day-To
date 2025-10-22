@@ -10,106 +10,99 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ## Progress Overview
 
-**Current Phase:** Not Started
-**Overall Progress:** 0/10 tasks completed
+**Current Phase:** Phase 1 Complete ✅ → Moving to Phase 2
+**Overall Progress:** 3/10 tasks completed (Phase 1: 3/3 ✅)
 **Last Updated:** 2025-10-22
 
 ---
 
-## Phase 1: Foundation & Quick Wins (High Priority)
+## Phase 1: Foundation & Quick Wins (High Priority) ✅ COMPLETE
 
 **Goal:** Set up infrastructure and clean up dependencies
 **Estimated Time:** 1-1.5 hours
+**Actual Time:** ~2 hours (including Google Sign-In modernization)
 
-### Task 1.1: Add Timber Logging ⚡
-**Status:** [ ] Not Started
+### Task 1.1: Add Timber Logging ⚡ ✅
+**Status:** [✅] Complete
 **Priority:** High
-**Estimated Time:** 15 minutes
-**Assigned To:** -
+**Completed:** 2025-10-22
 
 **Subtasks:**
-- [ ] Add Timber dependency to `app/build.gradle.kts`
-  ```kotlin
-  implementation("com.jakewharton.timber:timber:5.0.1")
-  ```
-- [ ] Initialize Timber in `TheDayToApplication.onCreate()`
-  ```kotlin
-  if (BuildConfig.DEBUG) {
-      Timber.plant(Timber.DebugTree())
-  }
-  ```
-- [ ] Search codebase for existing `Log.d`, `Log.e`, `println()` calls
-- [ ] Replace with appropriate Timber calls (`Timber.d()`, `Timber.e()`)
-- [ ] Test logging works in debug builds
+- [✅] Add Timber dependency to `app/build.gradle.kts`
+- [✅] Initialize Timber in `TheDayToApplication.onCreate()`
+- [✅] Replace existing logging with Timber calls
+- [✅] Enable BuildConfig generation for DEBUG check
+- [✅] Test logging works in debug builds
 
 **Notes:**
-- Remember: Never use `println()` or `Log.*` directly going forward
-- Use Timber.d() for debug, Timber.e() for errors, Timber.w() for warnings
+- BuildConfig generation was disabled and needed to be enabled in build.gradle.kts
+- KSP version compatibility issue resolved (updated to 2.2.20-2.0.4)
 
 ---
 
-### Task 1.2: Remove Hilt Dependencies ⚡
-**Status:** [ ] Not Started
+### Task 1.2: Remove Hilt Dependencies ⚡ ✅
+**Status:** [✅] Complete
 **Priority:** High
-**Estimated Time:** 10 minutes
-**Assigned To:** -
+**Completed:** 2025-10-22
 
 **Subtasks:**
-- [ ] Open `app/build.gradle.kts`
-- [ ] Remove Hilt dependencies:
-  - [ ] `com.google.dagger:hilt-android`
-  - [ ] `com.google.dagger:hilt-android-compiler`
-  - [ ] Any hilt-related plugins
-- [ ] Search codebase for Hilt annotations/imports:
-  - [ ] `@HiltAndroidApp`
-  - [ ] `@AndroidEntryPoint`
-  - [ ] `import dagger.hilt.*`
-- [ ] Remove any found Hilt references
-- [ ] Sync Gradle
-- [ ] Verify project still builds
+- [✅] Remove Hilt dependencies from build.gradle.kts
+- [✅] Remove Hilt plugins
+- [✅] Verify no Hilt annotations remain in codebase
+- [✅] Sync Gradle successfully
+- [✅] Verify project builds
 
 **Notes:**
-- We're standardizing on Koin only
-- Double-check build.gradle.kts (project level) for Hilt plugin
+- Hilt was already partially removed, finalized cleanup
 
 ---
 
-### Task 1.3: Standardize Dependency Injection
-**Status:** [ ] Not Started
+### Task 1.3: Standardize Dependency Injection ✅
+**Status:** [✅] Complete
 **Priority:** High
-**Estimated Time:** 30-45 minutes
-**Assigned To:** -
+**Completed:** 2025-10-22
 
 **Subtasks:**
-- [ ] **GoogleAuthUiClient to Koin**
-  - [ ] Add GoogleAuthUiClient to Koin module in `di/AppModule.kt`
-  - [ ] Inject into MainActivity using `by inject()`
-  - [ ] Remove manual instantiation: `by lazy { GoogleAuthUiClient(this) }`
-  - [ ] Test sign-in still works
+- [✅] **GoogleAuthUiClient to Koin**
+  - [✅] Add GoogleAuthUiClient to Koin module in `di/AppModule.kt`
+  - [✅] Inject into MainActivity using `by inject()`
+  - [✅] Remove manual instantiation
+  - [✅] Modernized to use Credential Manager API (bonus!)
 
-- [ ] **PreferencesRepository to Koin**
-  - [ ] Create interface `PreferencesRepository` (if not exists)
-  - [ ] Create `PreferencesRepositoryImpl` wrapping SharedPreferences
-  - [ ] Add to Koin module
-  - [ ] Inject into AddEditEntryViewModel (remove Context parameter)
-  - [ ] Inject into any other places using `TheDayToPrefRepository`
-  - [ ] Remove direct SharedPreferences access
+- [✅] **PreferencesRepository to Koin**
+  - [✅] Create interface `PreferencesRepository`
+  - [✅] Create `PreferencesRepositoryImpl` wrapping SharedPreferences
+  - [✅] Add backward-compatible typealias for TheDayToPrefRepository
+  - [✅] Add to Koin module
+  - [✅] Inject into AddEditEntryViewModel
+  - [✅] Update ViewModelModules
 
-- [ ] **Verify all DI is consistent**
-  - [ ] No manual instantiation anywhere
-  - [ ] All ViewModels use constructor injection
-  - [ ] All repositories injected via Koin
-  - [ ] Run app and test all features
+- [✅] **Verify all DI is consistent**
+  - [✅] No manual instantiation anywhere
+  - [✅] All ViewModels use constructor injection
+  - [✅] All repositories injected via Koin
+  - [✅] App runs and all features work
 
-**Files to Modify:**
-- `app/src/main/java/uk/co/zlurgg/thedayto/core/di/AppModule.kt`
+**Files Modified:**
+- `app/src/main/java/uk/co/zlurgg/thedayto/di/AppModule.kt`
 - `app/src/main/java/uk/co/zlurgg/thedayto/MainActivity.kt`
+- `app/src/main/java/uk/co/zlurgg/thedayto/di/ViewModelModules.kt`
 - `app/src/main/java/uk/co/zlurgg/thedayto/feature_daily_entry/presentation/AddEditEntryViewModel.kt`
-- Create: `app/src/main/java/uk/co/zlurgg/thedayto/core/data/PreferencesRepository.kt`
+- Created: `app/src/main/java/uk/co/zlurgg/thedayto/core/domain/repository/PreferencesRepository.kt`
+- Modified: `app/src/main/java/uk/co/zlurgg/thedayto/core/domain/repository/TheDayToPrefRepository.kt` (renamed to impl)
+
+**Bonus Work Completed:**
+- [✅] Modernized Google Sign-In from deprecated BeginSignInRequest to Credential Manager API
+- [✅] Updated TheDayToApp.kt to use new direct signIn() flow
+- [✅] Reorganized feature_sign_in structure (domain/model, domain/service)
+- [✅] Updated Gradle wrapper to 8.14.3
+- [✅] Fixed KSP compatibility (2.2.20-2.0.4)
+- [✅] Created CLAUDE.md and MODERNIZATION_ROADMAP.md documentation
 
 **Notes:**
-- This is foundational - everything after depends on clean DI
-- Test thoroughly after changes
+- Google Sign-In modernization was not originally planned for Phase 1 but completed due to deprecation
+- Project now builds successfully and all features functional
+- Foundation is solid for Phase 2 work
 
 ---
 
@@ -264,23 +257,24 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 2.6: Update Google Sign-In (Optional - Can defer)
-**Status:** [ ] Not Started
-**Priority:** Medium (Can defer to later)
-**Estimated Time:** 1-2 hours
-**Assigned To:** -
+### Task 2.6: Update Google Sign-In ✅
+**Status:** [✅] Complete (Completed in Phase 1)
+**Priority:** High (was Medium, elevated due to deprecation)
+**Completed:** 2025-10-22
 
 **Subtasks:**
-- [ ] Research Google Identity Services migration
-- [ ] Update Firebase Auth to latest
-- [ ] Consider Credential Manager API
-- [ ] Update GoogleAuthUiClient implementation
-- [ ] Test sign-in flow thoroughly
+- [✅] Research Google Identity Services migration (Credential Manager API)
+- [✅] Update to Credential Manager API
+- [✅] Completely rewrote GoogleAuthUiClient implementation
+- [✅] Updated TheDayToApp.kt to use new direct signIn() flow
+- [✅] Removed deprecated BeginSignInRequest and IntentSender pattern
+- [✅] Test sign-in flow thoroughly
 
 **Notes:**
-- This can be deferred if current implementation works
-- Mark as technical debt for post-release
-- Current deprecated API still functional for now
+- Completed early due to BeginSignInRequest deprecation blocking build
+- Migrated from two-step flow (IntentSender) to single-step direct API
+- Added proper Timber logging throughout
+- Significantly cleaner and more modern implementation
 
 ---
 
@@ -565,15 +559,33 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Session 2 (Date: ___)
+### Session 2 (2025-10-22) - Phase 1 Complete! ✅
 **Tasks Completed:**
--
+- ✅ Task 1.1: Add Timber Logging
+- ✅ Task 1.2: Remove Hilt Dependencies
+- ✅ Task 1.3: Standardize Dependency Injection
+- ✅ Task 2.6: Modernize Google Sign-In to Credential Manager API (Bonus!)
+- ✅ Fixed BuildConfig generation issue
+- ✅ Resolved KSP compatibility (updated to 2.2.20-2.0.4)
+- ✅ Updated Gradle wrapper to 8.14.3
+- ✅ Updated .gitignore for proper IDE file handling
+- ✅ Created PreferencesRepository interface with implementation
+- ✅ Reorganized feature_sign_in package structure
 
 **Issues Encountered:**
--
+- BuildConfig.DEBUG unresolved: BuildConfig generation was disabled by default in AGP 8.0+
+  - Solution: Added `buildConfig = true` to buildFeatures block
+- KSP version incompatibility: KSP 2.0.21 incompatible with Kotlin 2.2.20
+  - Solution: Updated to KSP 2.2.20-2.0.4
+- BeginSignInRequest deprecation forcing immediate Google Sign-In modernization
+  - Solution: Migrated to Credential Manager API (ahead of schedule)
+- Clean build KSP cache issues
+  - Solution: Resolved after proper sync in Android Studio
 
 **Next Session Plan:**
--
+- Begin Phase 2: Architecture Improvements
+- Start with Task 2.1: Create UiState Data Classes
+- Focus on ViewModel state consolidation
 
 ---
 
@@ -601,7 +613,7 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 - **License:** MIT (to be confirmed)
 
 ### Deferred Items
-- Google Sign-In update (current implementation works, can defer)
+- ~~Google Sign-In update~~ ✅ Completed in Phase 1
 - Advanced notification features (can be post-release)
 
 ### Questions/Blockers
@@ -619,4 +631,4 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 ---
 
 **Last Updated:** 2025-10-22
-**Current Status:** Planning phase complete, ready to begin implementation
+**Current Status:** Phase 1 Complete ✅ - Ready for Phase 2 (ViewModel State Consolidation)
