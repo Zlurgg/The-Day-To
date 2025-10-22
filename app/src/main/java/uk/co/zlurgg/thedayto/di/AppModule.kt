@@ -2,8 +2,12 @@ package uk.co.zlurgg.thedayto.di
 
 import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.core.data.data_source.TheDayToDatabase
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.feature_sign_in.domain.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.AddDailyEntry
@@ -29,6 +33,18 @@ val appModule = module {
             TheDayToDatabase::class.java,
             TheDayToDatabase.DATABASE_NAME
         ).build()
+    }
+
+    // Google Sign-In Client (Modern Credential Manager API)
+    single {
+        GoogleAuthUiClient(
+            context = androidContext()
+        )
+    }
+
+    // Preferences Repository
+    single<PreferencesRepository> {
+        PreferencesRepositoryImpl(androidContext())
     }
 
 //    viewModelOf(::AddEditEntryViewModel)
