@@ -396,7 +396,7 @@ Following [Android Room documentation](https://developer.android.com/training/da
        entities = [DailyEntry::class, MoodColor::class],
        version = 1,  // Increment when schema changes (no migration needed pre-release)
        exportSchema = false  // Can keep false until public release
-   )
+   ) {}
    ```
 
 2. **Migrations** (Post-Release Only)
