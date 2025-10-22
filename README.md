@@ -13,20 +13,20 @@ Some background research on existing apps:
 - https://friday.app/p/best-digital-journal-apps  
 
 Development Practice/Ideas/Approach  
-Aim to publish in Google Play store - available to invited test users not public initially (published to internal testing)  
+Aim to publish to Github as a release - using pages
 
-General approach, built using small/testsable ‘modules/components’  
+General approach, built using small/testable ‘modules/components’  
 
 ## Features: 
 - Jetpack Compose  
 - Kotlin  
 - MVVM  
-- Dagger Hilt (Changed to Koin)
+- DI Koin
 - Retrofit  
 - Room  
 - Offline Capability
 - Work Manager (notifications - daily prompt)
-- Google Sign in
+- Google Sign in (deprecated)
 - Modules  ( data -> domain <- presentation principle)
 
 ## Release
