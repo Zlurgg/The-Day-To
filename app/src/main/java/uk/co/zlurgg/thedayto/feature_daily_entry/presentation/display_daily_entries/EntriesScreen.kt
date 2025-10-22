@@ -52,7 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.Screen
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.presentation.util.dayToDatestampForCurrentMonthAndYear

@@ -12,7 +12,7 @@ import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
 val addEditEntryModule = module {
     viewModel { (savedStateHandle: SavedStateHandle) ->
         AddEditEntryViewModel(
-            context = androidContext(),
+            preferencesRepository = get(),
             dailyEntryUseCases = get(),
             savedStateHandle = savedStateHandle
         )
