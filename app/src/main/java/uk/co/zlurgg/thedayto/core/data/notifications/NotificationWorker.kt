@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.core.notifications
+package uk.co.zlurgg.thedayto.core.data.notifications
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
