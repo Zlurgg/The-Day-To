@@ -7,6 +7,10 @@
 /.idea/workspace.xml
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
+/.idea/deploymentTargetSelector.xml
+/.idea/inspectionProfiles/
+/.idea/misc.xml
+/.idea/AndroidProjectSystem.xml
 .DS_Store
 /build
 /captures
@@ -14,4 +18,3 @@
 .cxx
 local.properties
 /app/release/app-release.aab
-/.idea/deploymentTargetSelector.xml
