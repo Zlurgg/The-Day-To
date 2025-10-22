@@ -1,10 +1,6 @@
 package uk.co.zlurgg.thedayto.core.presentation
 
-import android.app.Activity.RESULT_OK
 import android.widget.Toast
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.IntentSenderRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -26,14 +22,14 @@ import androidx.navigation.navArgument
 import androidx.navigation.navDeepLink
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.rememberCurrentKoinScope
+import org.koin.compose.currentKoinScope
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
-import uk.co.zlurgg.thedayto.core.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.Screen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
-import uk.co.zlurgg.thedayto.feature_sign_in.presentation.GoogleAuthUiClient
+import uk.co.zlurgg.thedayto.feature_sign_in.domain.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
 import java.time.LocalDate
@@ -74,7 +70,7 @@ fun TheDayToApp(
                 checkNotNull(LocalViewModelStoreOwner.current) {
                     "No ViewModelStoreOwner was provided via LocalViewModelStoreOwner"
                 }
-                rememberCurrentKoinScope()
+                currentKoinScope()
                 val signInViewModel: SignInViewModel = koinViewModel()
                 val state by signInViewModel.state.collectAsStateWithLifecycle()
 
@@ -89,20 +85,6 @@ fun TheDayToApp(
                         }
                     }
                 }
-
-                val launcher = rememberLauncherForActivityResult(
-                    contract = ActivityResultContracts.StartIntentSenderForResult(),
-                    onResult = { result ->
-                        if (result.resultCode == RESULT_OK) {
-                            coroutineScope.launch {
-                                val signInResult = googleAuthUiClient.signInWithIntent(
-                                    intent = result.data ?: return@launch
-                                )
-                                signInViewModel.onSignInResult(signInResult)
-                            }
-                        }
-                    }
-                )
 
                 LaunchedEffect(key1 = state.isSignInSuccessful) {
                     if (state.isSignInSuccessful) {
@@ -126,12 +108,8 @@ fun TheDayToApp(
                     state = state,
                     onSignInClick = {
                         coroutineScope.launch {
-                            val signInIntentSender = googleAuthUiClient.signIn()
-                            launcher.launch(
-                                IntentSenderRequest.Builder(
-                                    signInIntentSender ?: return@launch
-                                ).build()
-                            )
+                            val signInResult = googleAuthUiClient.signIn(context)
+                            signInViewModel.onSignInResult(signInResult)
                         }
                     }
                 )

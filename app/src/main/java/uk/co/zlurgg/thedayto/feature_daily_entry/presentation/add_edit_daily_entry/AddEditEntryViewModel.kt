@@ -1,6 +1,5 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry
 
-import android.content.Context
 import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
@@ -11,14 +10,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.InvalidDailyEntryException
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
 
 
 class AddEditEntryViewModel(
-    context: Context,
+    private val preferencesRepository: PreferencesRepository,
     private val dailyEntryUseCases: DailyEntryUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
@@ -55,8 +54,6 @@ class AddEditEntryViewModel(
 
     private val _state = mutableStateOf(EntryMoodColorSectionState())
     val state: State<EntryMoodColorSectionState> = _state
-
-    private val theDayToPrefRepository = TheDayToPrefRepository(context)
 
 
     init {
@@ -142,7 +139,7 @@ class AddEditEntryViewModel(
                             )
                         )
                         _eventFlow.emit(UiEvent.SaveEntry)
-                        theDayToPrefRepository.setDailyEntryDate(entryDate.value.date)
+                        preferencesRepository.setDailyEntryDate(entryDate.value.date)
                     } catch (e: InvalidDailyEntryException) {
                         _eventFlow.emit(
                             UiEvent.ShowSnackbar(

@@ -26,7 +26,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.presentation.util.Screen
+import uk.co.zlurgg.thedayto.core.presentation.Screen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.DatePickerItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.MoodItem
