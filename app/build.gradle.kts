@@ -1,22 +1,24 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinKsp)
-    alias(libs.plugins.hiltPlugin)
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.google.services)
 }
 
 android {
-    compileSdk = 35
+    namespace = "uk.co.zlurgg.thedayto"
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "uk.co.zlurgg.thedayto"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 1
-        versionName = "1.0"
+        versionName = "1.0.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -34,25 +36,22 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
     }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        compilerOptions {
+            jvmTarget = JvmTarget.JVM_11
+        }
     }
     buildFeatures {
         compose = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
     }
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
-
-    namespace = "uk.co.zlurgg.thedayto"
 }
 
 dependencies {
@@ -90,13 +89,7 @@ dependencies {
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
 
-    // Nav
-    implementation(libs.androidx.hilt.navigation.compose)
-
-    // Dagger - Hilt
-    implementation(libs.hilt.android)
-    ksp(libs.dagger.compiler)
-    ksp(libs.hilt.compiler)
+    // Navigation
     implementation(libs.androidx.navigation.compose)
 
     // Retrofit
@@ -134,4 +127,12 @@ dependencies {
 
     // Koin
     implementation(libs.bundles.koin)
+
+    // Timber (Logging)
+    implementation(libs.timber)
+
+    // Credential Manager (Modern Auth)
+    implementation(libs.androidx.credentials)
+    implementation(libs.androidx.credentials.play.services)
+    implementation(libs.googleid)
 }

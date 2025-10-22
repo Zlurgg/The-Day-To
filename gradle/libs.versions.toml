@@ -1,46 +1,49 @@
 [versions]
-accompanistFlowlayout = "0.17.0"
-accompanistSwiperefresh = "0.24.2-alpha"
-activityKtx = "1.9.3"
-appcompat = "1.7.0"
+accompanistFlowlayout = "0.36.0"
+accompanistSwiperefresh = "0.36.0"
+activityKtx = "1.11.0"
+appcompat = "1.7.1"
 coilCompose = "2.7.0"
-colorpickerCompose = "1.0.5"
-converterGson = "2.9.0"
-converterMoshi = "2.11.0"
+colorpickerCompose = "1.1.2"
+converterGson = "3.0.0"
+converterMoshi = "3.0.0"
 datetime = "0.9.0"
-firebaseAuth = "23.1.0"
-fragmentKtx = "1.8.5"
-ktx = "1.15.0"
-navigationCompose = "2.8.4"
-hiltNavigationCompose = "1.2.0"
+firebaseAuth = "24.0.1"
+fragmentKtx = "1.8.9"
+ktx = "1.17.0"
+navigationCompose = "2.9.5"
+hiltNavigationCompose = "1.3.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.8.7"
-activityCompose = "1.9.3"
-composeBom = "2024.11.00"
-okhttp = "5.0.0-alpha.5"
-opencsv = "5.5.2"
-pagingCompose = "3.3.4"
-playServicesAuth = "21.3.0"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+lifecycleRuntimeKtx = "2.9.4"
+activityCompose = "1.11.0"
+composeBom = "2025.10.00"
+okhttp = "5.2.1"
+opencsv = "5.12.0"
+pagingCompose = "3.3.6"
+playServicesAuth = "21.4.0"
 playServicesLocation = "21.3.0"
 preferenceKtx = "1.2.1"
-retrofit = "2.11.0"
-room = "2.6.1"
-roomKtx = "2.6.1"
-roomRuntime = "2.6.1"
-compose-material-icons-extended = "1.7.5"
-material3-adaptive = "1.0.0"
+retrofit = "3.0.0"
+room = "2.8.2"
+roomKtx = "2.8.2"
+roomRuntime = "2.8.2"
+compose-material-icons-extended = "1.7.8"
+material3-adaptive = "1.1.0"
 
-androidGradlePlugin = "8.7.3"
-kotlin = "2.0.21"
+androidGradlePlugin = "8.13.0"
+kotlin = "2.2.20"
 kotlinKsp = "2.0.21-1.0.27"
-hiltAndroid = "2.51.1"
-google-services = "4.4.2"
-runtimeLivedata =  "1.7.5"
-workRuntime = "2.10.0"
-kotlinPlugin = "1.8.10"
-koin = "4.0.0"
+hiltAndroid = "2.57.2"
+google-services = "4.4.4"
+runtimeLivedata =  "1.9.3"
+workRuntime = "2.10.5"
+kotlinPlugin = "2.2.20"
+koin = "4.1.1"
+timber = "5.0.1"
+credentials = "1.5.0"
+googleid = "1.1.1"
 
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
@@ -98,6 +101,13 @@ hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hil
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-core = { group = "io.insert-koin", name = "koin-core", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
+
+# Credential Manager (modern auth)
+androidx-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
+androidx-credentials-play-services = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentials" }
+googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
 
 
 [plugins]
