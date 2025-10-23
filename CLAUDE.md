@@ -322,44 +322,106 @@ class MyViewModel : ViewModel() {
 
 Following [Jetpack Compose Best Practices](https://developer.android.com/jetpack/compose/architecture):
 
-1. **State Hoisting**
-   - Hoist state to the appropriate level (usually ViewModel)
-   - Pass state down, events up (unidirectional data flow)
-   - Keep Composables stateless when possible
+1. **Root/Presenter Pattern (Container-Presenter Separation)**
+
+   **IMPORTANT**: Use the Root/Presenter pattern for all screen-level composables (as seen in My-Bookshelf):
+
    ```kotlin
-   // ✅ CORRECT - State hoisting
+   // ✅ CORRECT - Root composable (container)
    @Composable
-   fun MyScreen(viewModel: MyViewModel = viewModel()) {
-       val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-       MyContent(
-           data = uiState.data,
-           onEvent = viewModel::onEvent
+   fun MyScreenRoot(
+       viewModel: MyViewModel = koinViewModel(),
+       onNavigateBack: () -> Unit
+   ) {
+       val state by viewModel.state.collectAsStateWithLifecycle()
+
+       // Handle navigation side effects
+       LaunchedEffect(key1 = true) {
+           viewModel.events.collect { event ->
+               when (event) {
+                   is MyUiEvent.NavigateBack -> onNavigateBack()
+               }
+           }
+       }
+
+       // Delegate to presenter
+       MyScreen(
+           state = state,
+           onAction = viewModel::onAction
        )
+   }
+
+   // ✅ CORRECT - Presenter composable (pure UI)
+   @Composable
+   private fun MyScreen(
+       state: MyUiState,
+       onAction: (MyAction) -> Unit,
+       modifier: Modifier = Modifier
+   ) {
+       Scaffold(
+           topBar = {
+               TopAppBar(
+                   title = { Text(state.title) },
+                   navigationIcon = {
+                       IconButton(onClick = { onAction(MyAction.NavigateBack) }) {
+                           Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                       }
+                   }
+               )
+           },
+           modifier = modifier
+       ) { innerPadding ->
+           // Main content
+           LazyColumn(
+               modifier = Modifier.padding(innerPadding)
+           ) {
+               // Content items
+           }
+       }
    }
    ```
 
-2. **Reusable Components**
+   **Benefits of Root/Presenter Pattern:**
+   - **Separation of concerns**: State management (Root) vs UI presentation (Presenter)
+   - **Testability**: Presenter is pure and easily testable with different states
+   - **Previewability**: Presenter can be previewed without ViewModel dependency
+   - **Reusability**: Presenter can be reused with different state sources
+   - **Clear contract**: State and callbacks are explicit parameters
+
+   **Key Points:**
+   - Root composable: `[Feature]ScreenRoot` - handles ViewModel, state collection, side effects
+   - Presenter composable: `[Feature]Screen` (private) - pure UI, takes state + callbacks
+   - Navigation callbacks handled in Root's `LaunchedEffect`
+   - Use `koinViewModel()` for ViewModel injection in Root
+   - Use `collectAsStateWithLifecycle()` for state collection
+
+2. **State Hoisting**
+   - Hoist state to the appropriate level (usually ViewModel)
+   - Pass state down, events up (unidirectional data flow)
+   - Keep Composables stateless when possible
+
+3. **Reusable Components**
    - Extract common UI patterns into separate Composables
    - Use modifier parameters for flexibility
    - Follow single responsibility principle
 
-3. **Side Effects**
+4. **Side Effects**
    - Use `LaunchedEffect` for one-time events
    - Use `DisposableEffect` for cleanup
    - Use `rememberCoroutineScope` for event-based coroutines
    - Never launch coroutines directly in Composable body
 
-4. **Performance**
+5. **Performance**
    - Use `remember` for expensive computations
    - Use `derivedStateOf` for computed state
    - Use `key` parameter in LazyColumn/LazyRow
    - Avoid unnecessary recompositions
 
-5. **Lifecycle Awareness**
+6. **Lifecycle Awareness**
    - Use `collectAsStateWithLifecycle()` instead of `collectAsState()`
    - Respects lifecycle, stops collection when app is backgrounded
 
-6. **Preview Annotations**
+7. **Preview Annotations**
    - Add `@Preview` for all major Composables
    - Include light and dark theme previews
    - Use `@PreviewParameter` for different states
@@ -374,7 +436,7 @@ Following [Jetpack Compose Best Practices](https://developer.android.com/jetpack
    }
    ```
 
-7. **Theming**
+8. **Theming**
    - Use Material 3 theming system
    - Access theme colors via `MaterialTheme.colorScheme`
    - Access typography via `MaterialTheme.typography`

@@ -10,9 +10,9 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ## Progress Overview
 
-**Current Phase:** Phase 1 Complete ✅ → Moving to Phase 2
-**Overall Progress:** 3/10 tasks completed (Phase 1: 3/3 ✅)
-**Last Updated:** 2025-10-22
+**Current Phase:** Phase 1 Complete ✅ → Moving to Phase 2 (Architecture Overhaul)
+**Overall Progress:** Phase 1: 3/3 ✅ | Phase 2: 0/9 | Overall: ~10% complete
+**Last Updated:** 2025-10-23
 
 ---
 
@@ -106,19 +106,503 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-## Phase 2: Architecture Improvements (High Priority)
+## Phase 2: Architecture Overhaul (CRITICAL Priority) 🏗️
 
-**Goal:** Modernize ViewModels to Google's recommended patterns
-**Estimated Time:** 2-3 hours
+**Goal:** Fix fundamental architecture issues and create all screens before ViewModel refactoring
+**Estimated Time:** 6-8 hours
+**Status:** [ ] Not Started
 
-### Task 2.1: Create UiState Data Classes
+**Deliverables:**
+- MoodColorPickerDialog component (reusable)
+- MoodColorManagerScreen (complete with Root/Presenter pattern)
+- Standardized naming across all features
+- Clean architecture with proper boundaries
+- All 4 screens ready for Phase 3 ViewModel work
+
+### 🚨 Critical Architectural Issues Identified
+
+During ViewModel audit (Session 4, 2025-10-23), we discovered that **jumping into ViewModel refactoring would be premature**. The following fundamental architecture issues must be addressed first:
+
+1. **MoodColorScreen should be a Dialog** - Currently a full screen, should be a modal dialog
+2. **Dual ViewModel Anti-Pattern** - AddEditMoodColorScreen injects TWO ViewModels (tight coupling)
+3. **Inconsistent Naming** - Mix of `*State`, `*Event` patterns across features
+4. **Missing Future Requirements** - Need to plan for standalone mood color management screen
+5. **Unclear Feature Boundaries** - MoodColor vs DailyEntry relationship unclear
+
+### 🎯 Target Architecture
+
+**Feature Structure (Best Practice):**
+```
+feature_mood_color/                    ← Separate bounded context
+├── data/
+│   ├── data_source/MoodColorDao.kt
+│   └── repository/MoodColorRepositoryImpl.kt
+├── domain/
+│   ├── model/MoodColor.kt
+│   ├── repository/MoodColorRepository.kt
+│   └── use_case/MoodColorUseCases.kt
+└── presentation/
+    ├── components/
+    │   ├── MoodColorPickerDialog.kt   ← NEW: Reusable dialog (not full screen)
+    │   ├── ColorPicker.kt
+    │   └── MoodTextField.kt
+    └── mood_color_manager/            ← FUTURE: Standalone management screen
+        ├── MoodColorManagerScreenRoot.kt
+        ├── MoodColorManagerScreen.kt
+        ├── MoodColorManagerViewModel.kt
+        └── state/
+            ├── MoodColorManagerUiState.kt
+            └── MoodColorManagerAction.kt
+
+feature_daily_entry/
+├── data/...
+├── domain/...
+└── presentation/
+    ├── add_edit_entry/
+    │   ├── AddEditEntryScreenRoot.kt  ← Root/Presenter pattern
+    │   ├── AddEditEntryScreen.kt      ← Pure presenter
+    │   ├── AddEditEntryViewModel.kt   ← NO mood color logic
+    │   └── state/
+    │       ├── AddEditEntryUiState.kt
+    │       ├── AddEditEntryAction.kt
+    │       └── AddEditEntryUiEvent.kt
+    └── entries/                       ← Renamed from display_daily_entries
+        ├── EntriesScreenRoot.kt
+        ├── EntriesScreen.kt
+        ├── EntriesViewModel.kt
+        └── state/
+            ├── EntriesUiState.kt
+            └── EntriesAction.kt
+
+feature_sign_in/
+└── presentation/
+    ├── SignInScreenRoot.kt
+    ├── SignInScreen.kt
+    ├── SignInViewModel.kt
+    └── state/
+        ├── SignInUiState.kt           ← Renamed from SignInState
+        └── (uses direct methods, no Action pattern)
+```
+
+**Key Architectural Principles:**
+- ✅ MoodColor as separate bounded context (can be managed independently)
+- ✅ Dialog component instead of full screen (reusable)
+- ✅ No ViewModel coupling (callback pattern)
+- ✅ Future-proof for standalone mood color management
+- ✅ Root/Presenter pattern for all screens
+- ✅ Consistent naming: `*UiState`, `*Action`, `*UiEvent`
+
+---
+
+### Task 2.1: Convert AddEditMoodColorScreen → Dialog Component
+**Status:** [ ] Not Started
+**Priority:** CRITICAL
+**Estimated Time:** 1.5 hours
+
+**Current Problem:**
+- `AddEditMoodColorScreen` is a full screen composable
+- Accessed when user clicks "add new mood color" in AddEditEntryScreen
+- Should be a **dialog/modal** instead
+- Currently injects `AddEditEntryViewModel` (tight coupling)
+
+**Target:**
+- Convert to `MoodColorPickerDialog` composable dialog
+- Use callback pattern instead of ViewModel injection
+- Can be reused in future MoodColorManagerScreen
+
+**Subtasks:**
+- [ ] Create `feature_mood_color/presentation/components/MoodColorPickerDialog.kt`:
+  ```kotlin
+  @Composable
+  fun MoodColorPickerDialog(
+      showDialog: Boolean,
+      moodColors: List<MoodColor>,
+      onDismiss: () -> Unit,
+      onSaveMoodColor: (mood: String, color: String) -> Unit,
+      onDeleteMoodColor: (MoodColor) -> Unit,
+      modifier: Modifier = Modifier
+  )
+  ```
+- [ ] Move ColorPicker, MoodCreator, MoodTextField to components/ directory
+- [ ] Remove AddEditMoodColorScreen.kt (full screen implementation)
+- [ ] Remove `isMoodColorSectionVisible` state from AddEditEntryViewModel
+- [ ] Update AddEditEntryScreen to use MoodColorPickerDialog with local state
+- [ ] Test mood color creation flow with dialog
+
+**Files to Create:**
+- `feature_mood_color/presentation/components/MoodColorPickerDialog.kt`
+
+**Files to Delete:**
+- `feature_mood_color/presentation/AddEditMoodColorScreen.kt`
+
+**Files to Modify:**
+- `feature_daily_entry/presentation/add_edit_daily_entry/AddEditEntryScreen.kt`
+- `feature_daily_entry/presentation/add_edit_daily_entry/AddEditEntryViewModel.kt`
+- Move component files to components/ directory
+
+**Notes:**
+- This solves the dual ViewModel anti-pattern
+- Dialog uses callback pattern (clean separation)
+- Future: Same dialog can be used in MoodColorManagerScreen
+
+---
+
+### Task 2.2: Standardize Naming - Event → Action Pattern
+**Status:** [ ] Not Started
+**Priority:** High
+**Estimated Time:** 45 minutes
+
+**Current State:**
+- Mixed naming: `AddEditEntryEvent`, `EntriesEvent`, `AddEditMoodColorEvent`
+- SignInViewModel uses direct methods (no event/action pattern)
+
+**Target:**
+- Rename all `*Event` → `*Action` (user interactions)
+- Keep `*UiEvent` for one-time UI events (navigation, snackbars)
+- Consistent with Google's Now in Android architecture
+
+**Subtasks:**
+- [ ] Rename `AddEditEntryEvent` → `AddEditEntryAction`
+- [ ] Rename `EntriesEvent` → `EntriesAction`
+- [ ] Rename `AddEditMoodColorEvent` → `AddEditMoodColorAction`
+- [ ] Update all usages and imports
+- [ ] Update `onEvent()` methods → `onAction()`
+
+**Files to Rename:**
+- `AddEditEntryEvent.kt` → `AddEditEntryAction.kt`
+- `EntriesEvent.kt` → `EntriesAction.kt`
+- `AddEditMoodColorEvent.kt` → `AddEditMoodColorAction.kt`
+
+**Files to Modify:**
+- All ViewModels (update method signatures)
+- All Screens (update event dispatch calls)
+
+**Pattern:**
+```kotlin
+// User interactions → Actions (imperative)
+sealed interface AddEditEntryAction {
+    data class EnterMood(val mood: String) : AddEditEntryAction
+    data class EnterContent(val value: String) : AddEditEntryAction
+    data object SaveEntry : AddEditEntryAction
+}
+
+// One-time UI events → UiEvent (these stay as "Event")
+sealed interface AddEditEntryUiEvent {
+    data class ShowSnackbar(val message: String) : AddEditEntryUiEvent
+    data object NavigateBack : AddEditEntryUiEvent
+}
+```
+
+---
+
+### Task 2.3: Standardize Naming - State → UiState Pattern
 **Status:** [ ] Not Started
 **Priority:** High
 **Estimated Time:** 30 minutes
-**Assigned To:** -
+
+**Current State:**
+- Mixed naming: `EntriesState`, `SignInState`, `MoodColorState`
+- Inconsistent with `UiState` convention
+
+**Target:**
+- All state classes named `*UiState`
+- Move to dedicated `state/` packages
 
 **Subtasks:**
-- [ ] Create `feature_daily_entry/presentation/state/AddEditEntryUiState.kt`
+- [ ] Rename `SignInState` → `SignInUiState`
+- [ ] Rename `EntriesState` → `EntriesUiState`
+- [ ] Rename `MoodColorState` → (will be merged into AddEditMoodColorUiState later)
+- [ ] Update all usages and imports
+
+**Files to Rename:**
+- `feature_sign_in/presentation/SignInState.kt` → `state/SignInUiState.kt`
+- `feature_daily_entry/presentation/display_daily_entries/EntriesState.kt` → `state/EntriesUiState.kt`
+
+**Files to Modify:**
+- SignInViewModel.kt
+- EntriesViewModel.kt
+- All screens using these states
+
+---
+
+### Task 2.4: Rename display_daily_entries → entries
+**Status:** [ ] Not Started
+**Priority:** Medium
+**Estimated Time:** 30 minutes
+
+**Current State:**
+- Package: `presentation/display_daily_entries/`
+- Verbose and inconsistent with other feature naming
+
+**Target:**
+- Package: `presentation/entries/`
+- Cleaner, more concise naming
+
+**Subtasks:**
+- [ ] Rename directory `display_daily_entries/` → `entries/`
+- [ ] Update all package declarations
+- [ ] Update all imports across codebase
+- [ ] Update navigation routes if needed
+
+**Files to Move:**
+- All files in `display_daily_entries/` → `entries/`
+
+---
+
+### Task 2.5: Create state/ Directory Structure
+**Status:** [ ] Not Started
+**Priority:** Medium
+**Estimated Time:** 15 minutes
+
+**Target Structure:**
+```
+presentation/
+├── add_edit_entry/
+│   ├── AddEditEntryScreen.kt
+│   ├── AddEditEntryViewModel.kt
+│   └── state/                     ← NEW
+│       ├── AddEditEntryUiState.kt
+│       ├── AddEditEntryAction.kt
+│       └── AddEditEntryUiEvent.kt
+├── entries/
+│   └── state/                     ← NEW
+│       ├── EntriesUiState.kt
+│       └── EntriesAction.kt
+└── mood_color_manager/ (future)
+    └── state/
+```
+
+**Subtasks:**
+- [ ] Create `state/` directories in each presentation package
+- [ ] Move/create state files into state/ directories
+- [ ] Update imports
+
+---
+
+### Task 2.6: Remove AddEditMoodColorViewModel
+**Status:** [ ] Not Started
+**Priority:** High
+**Estimated Time:** 30 minutes
+
+**Rationale:**
+- After converting to dialog, AddEditMoodColorViewModel is no longer needed
+- MoodColorPickerDialog uses callback pattern
+- Simplifies architecture
+
+**Subtasks:**
+- [ ] Remove `AddEditMoodColorViewModel.kt`
+- [ ] Remove from Koin DI modules
+- [ ] Verify AddEditEntryViewModel doesn't depend on it
+- [ ] Update any navigation that referenced it
+
+**Files to Delete:**
+- `feature_mood_color/presentation/AddEditMoodColorViewModel.kt`
+
+**Files to Modify:**
+- `di/ViewModelModules.kt`
+
+---
+
+### Task 2.7: Create MoodColorManagerScreen
+**Status:** [ ] Not Started
+**Priority:** High
+**Estimated Time:** 2 hours
+
+**Goal:** Create standalone mood color management screen
+
+**Requirements:**
+- Accessible from EntriesScreen (main page)
+- Allows users to create/edit/delete mood colors without creating entry
+- Reuses MoodColorPickerDialog for create/edit
+- Lists all existing mood colors with edit/delete actions
+- Follows Root/Presenter pattern from the start
+
+**Target Structure:**
+```
+feature_mood_color/presentation/mood_color_manager/
+├── MoodColorManagerScreenRoot.kt    ← State management + navigation
+├── MoodColorManagerScreen.kt        ← Pure UI (private)
+├── MoodColorManagerViewModel.kt     ← Single StateFlow
+└── state/
+    ├── MoodColorManagerUiState.kt   ← All state in one class
+    ├── MoodColorManagerAction.kt    ← User interactions
+    └── MoodColorManagerUiEvent.kt   ← One-time events
+```
+
+**Subtasks:**
+- [ ] Create `state/MoodColorManagerUiState.kt`:
+  ```kotlin
+  data class MoodColorManagerUiState(
+      val moodColors: List<MoodColor> = emptyList(),
+      val showDialog: Boolean = false,
+      val editingMoodColor: MoodColor? = null,
+      val isLoading: Boolean = false,
+      val error: String? = null
+  )
+  ```
+
+- [ ] Create `state/MoodColorManagerAction.kt`:
+  ```kotlin
+  sealed interface MoodColorManagerAction {
+      data object AddNewMoodColor : MoodColorManagerAction
+      data class EditMoodColor(val moodColor: MoodColor) : MoodColorManagerAction
+      data class DeleteMoodColor(val moodColor: MoodColor) : MoodColorManagerAction
+      data object DismissDialog : MoodColorManagerAction
+      data class SaveMoodColor(val mood: String, val color: String) : MoodColorManagerAction
+  }
+  ```
+
+- [ ] Create `state/MoodColorManagerUiEvent.kt`:
+  ```kotlin
+  sealed interface MoodColorManagerUiEvent {
+      data class ShowSnackbar(val message: String) : MoodColorManagerUiEvent
+      data object NavigateBack : MoodColorManagerUiEvent
+  }
+  ```
+
+- [ ] Create `MoodColorManagerViewModel.kt`:
+  - Inject `MoodColorUseCases`
+  - Single `MutableStateFlow<MoodColorManagerUiState>`
+  - Observe mood colors from repository
+  - Handle all actions (add, edit, delete)
+
+- [ ] Create `MoodColorManagerScreen.kt` (private Presenter):
+  - Display list of mood colors
+  - Each item shows mood name and color preview
+  - Edit/Delete buttons per item
+  - FAB to add new mood color
+  - Uses MoodColorPickerDialog when adding/editing
+
+- [ ] Create `MoodColorManagerScreenRoot.kt`:
+  - Inject ViewModel via Koin
+  - Collect state with `collectAsStateWithLifecycle()`
+  - Handle navigation events
+  - Pass state + callbacks to Presenter
+
+- [ ] Add navigation route to Screen.kt
+- [ ] Add button in EntriesScreen to navigate to MoodColorManagerScreen
+- [ ] Update navigation graph to include new screen
+- [ ] Test full flow: navigate, add, edit, delete mood colors
+
+**UI Design:**
+```
+┌─────────────────────────────┐
+│ ← Mood Colors               │  ← TopBar with back button
+├─────────────────────────────┤
+│                             │
+│ 😊 Happy      [🟢] [✏️][🗑️]│  ← Color preview, edit, delete
+│ 😢 Sad        [🔵] [✏️][🗑️]│
+│ 😠 Angry      [🔴] [✏️][🗑️]│
+│ 😌 Calm       [🟣] [✏️][🗑️]│
+│                             │
+│            [+]              │  ← FAB to add new
+└─────────────────────────────┘
+```
+
+**Files to Create:**
+- `feature_mood_color/presentation/mood_color_manager/MoodColorManagerScreenRoot.kt`
+- `feature_mood_color/presentation/mood_color_manager/MoodColorManagerScreen.kt`
+- `feature_mood_color/presentation/mood_color_manager/MoodColorManagerViewModel.kt`
+- `feature_mood_color/presentation/mood_color_manager/state/MoodColorManagerUiState.kt`
+- `feature_mood_color/presentation/mood_color_manager/state/MoodColorManagerAction.kt`
+- `feature_mood_color/presentation/mood_color_manager/state/MoodColorManagerUiEvent.kt`
+
+**Files to Modify:**
+- `core/presentation/Screen.kt` (add navigation route)
+- `feature_daily_entry/presentation/entries/EntriesScreen.kt` (add navigation button)
+- Navigation setup
+- `di/ViewModelModules.kt` (add ViewModel to DI)
+
+**Notes:**
+- This gives us 4 screens total for Phase 3 ViewModel work
+- All screens will follow same architectural patterns
+- MoodColorPickerDialog is reused (created in Task 2.1)
+- Sets the standard for Root/Presenter pattern
+
+---
+
+### Task 2.8: Update DI Modules for New Structure
+**Status:** [ ] Not Started
+**Priority:** Medium
+**Estimated Time:** 30 minutes
+
+**Subtasks:**
+- [ ] Remove AddEditMoodColorViewModel from ViewModelModules
+- [ ] Verify all remaining ViewModels properly injected
+- [ ] Update any module comments/documentation
+- [ ] Test DI graph builds correctly
+
+**Files to Modify:**
+- `di/ViewModelModules.kt`
+- `di/AppModule.kt` (if needed)
+
+---
+
+### Task 2.9: Update Navigation for Architecture Changes
+**Status:** [ ] Not Started
+**Priority:** Medium
+**Estimated Time:** 30 minutes
+
+**Current Issues:**
+- Navigation to AddEditMoodColorScreen needs to be removed
+- Routes may need updating after package renames
+
+**Subtasks:**
+- [ ] Remove AddEditMoodColorScreen navigation route
+- [ ] Update any routes referencing renamed packages
+- [ ] Verify navigation graph is correct
+- [ ] Test all navigation flows work
+
+**Files to Modify:**
+- Navigation setup files
+- Any composables that navigate to mood color screen
+
+---
+
+## Phase 3: ViewModel State Consolidation (High Priority)
+
+**Goal:** Modernize all ViewModels to Google's recommended patterns
+**Estimated Time:** 4-5 hours
+**Status:** [ ] Not Started
+
+**Prerequisites:** Phase 2 must be complete (architecture overhaul)
+
+**Scope:** Refactor 4 ViewModels:
+1. AddEditEntryViewModel (consolidate 6 → 1 state)
+2. EntriesViewModel (convert to StateFlow)
+3. SignInViewModel (rename state only)
+4. MoodColorManagerViewModel (already follows best practices from Phase 2)
+
+### 📊 ViewModel Audit Summary (Completed 2025-10-23)
+
+**Current State (After Phase 2):**
+- **Total ViewModels:** 3 (AddEditMoodColorViewModel removed in Phase 2)
+- **Following Best Practices:** 1 (SignInViewModel ✅)
+- **Needs Refactoring:** 2
+
+**Findings:**
+1. ✅ **SignInViewModel** - PERFECT (uses single StateFlow, follows MAD guidelines)
+2. 🔴 **AddEditEntryViewModel** - 6 separate state holders → needs consolidation
+3. 🟡 **EntriesViewModel** - Uses single mutableStateOf → convert to StateFlow
+4. ✅ **AddEditMoodColorViewModel** - REMOVED in Phase 2 (replaced with dialog)
+
+**Actions Pattern:**
+- All ViewModels now use `*Action` for user interactions (renamed in Phase 2)
+- All use `*UiEvent` for one-time UI events
+- SignInViewModel uses direct methods (acceptable for simple cases)
+
+**Priority Order:**
+1. Consolidate AddEditEntryViewModel (6 states → 1 StateFlow)
+2. Convert EntriesViewModel to StateFlow
+3. Create Root/Presenter pattern for all screens
+
+### Task 3.1: Create Unified UiState Data Classes
+**Status:** [ ] Not Started
+**Priority:** High
+**Estimated Time:** 30 minutes
+
+**Subtasks:**
+- [ ] Create `feature_daily_entry/presentation/add_edit_entry/state/AddEditEntryUiState.kt`
   ```kotlin
   data class AddEditEntryUiState(
       val entryDate: Long = System.currentTimeMillis(),
@@ -154,14 +638,19 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 2.2: Refactor AddEditEntryViewModel
+### Task 3.2: Refactor AddEditEntryViewModel (CRITICAL 🔴)
 **Status:** [ ] Not Started
-**Priority:** High
-**Estimated Time:** 45 minutes
-**Assigned To:** -
+**Priority:** CRITICAL
+**Estimated Time:** 1 hour
+
+**Current Issues:**
+- Has **6 separate state holders**: `_entryDate`, `_entryMood`, `_entryContent`, `_entryColor`, `_eventFlow`, `_state`
+- Violates single source of truth principle
+- State updates scattered across multiple properties
+- Makes testing difficult and error-prone
 
 **Subtasks:**
-- [ ] Replace 6 separate `mutableStateOf` properties with:
+- [ ] Replace 6 separate state holders with single StateFlow:
   ```kotlin
   private val _uiState = MutableStateFlow(AddEditEntryUiState())
   val uiState: StateFlow<AddEditEntryUiState> = _uiState.asStateFlow()
@@ -205,89 +694,107 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 2.3: Refactor EntriesViewModel
+### Task 3.3: Convert EntriesViewModel to StateFlow
 **Status:** [ ] Not Started
 **Priority:** High
 **Estimated Time:** 30 minutes
-**Assigned To:** -
+
+**Current State:**
+- Already uses single state holder: `_state = mutableStateOf(EntriesState())`
+- Works correctly but uses `mutableStateOf` instead of `StateFlow`
 
 **Subtasks:**
-- [ ] Replace separate state properties with single StateFlow
+- [ ] Convert `mutableStateOf` to `MutableStateFlow`
+- [ ] Add `recentlyDeletedEntry` to EntriesUiState
 - [ ] Update screen to use `collectAsStateWithLifecycle()`
-- [ ] Test entries display and filtering works
-- [ ] Test deletion and undo functionality
+- [ ] Test entries display still works
 
 **Files to Modify:**
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_daily_entry/presentation/EntriesViewModel.kt`
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_daily_entry/presentation/EntriesScreen.kt`
+- `feature_daily_entry/presentation/entries/EntriesViewModel.kt`
+- `feature_daily_entry/presentation/entries/EntriesScreen.kt`
 
 ---
 
-### Task 2.4: Refactor AddEditMoodColorViewModel
+### Task 3.4: Implement Root/Presenter Pattern for All Screens
 **Status:** [ ] Not Started
 **Priority:** High
-**Estimated Time:** 20 minutes
-**Assigned To:** -
+**Estimated Time:** 2 hours
+
+**Goal:** Split all screens into Root (state management) + Presenter (pure UI)
 
 **Subtasks:**
-- [ ] Replace state properties with single StateFlow
-- [ ] Update screen to collect state
-- [ ] Test mood color creation/editing
+- [ ] **AddEditEntryScreen**
+  - [ ] Create `AddEditEntryScreenRoot.kt` (handles ViewModel, state collection, navigation)
+  - [ ] Rename existing to `AddEditEntryScreen.kt` (private, pure UI)
+  - [ ] Pass state + callbacks as parameters
 
-**Files to Modify:**
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_mood_color/presentation/AddEditMoodColorViewModel.kt`
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_mood_color/presentation/AddEditMoodColorScreen.kt`
+- [ ] **EntriesScreen**
+  - [ ] Create `EntriesScreenRoot.kt`
+  - [ ] Rename existing to `EntriesScreen.kt` (private, pure UI)
+
+- [ ] **SignInScreen**
+  - [ ] Create `SignInScreenRoot.kt`
+  - [ ] Rename existing to `SignInScreen.kt` (private, pure UI)
+
+**Pattern:**
+```kotlin
+// Root - State management
+@Composable
+fun AddEditEntryScreenRoot(
+    viewModel: AddEditEntryViewModel = koinViewModel(),
+    onNavigateBack: () -> Unit
+) {
+    val state by viewModel.uiState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                is AddEditEntryUiEvent.NavigateBack -> onNavigateBack()
+            }
+        }
+    }
+
+    AddEditEntryScreen(
+        state = state,
+        onAction = viewModel::onAction
+    )
+}
+
+// Presenter - Pure UI
+@Composable
+private fun AddEditEntryScreen(
+    state: AddEditEntryUiState,
+    onAction: (AddEditEntryAction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    // Pure UI implementation
+}
+```
 
 ---
 
-### Task 2.5: Refactor SignInViewModel
+### Task 3.5: Update All Screens to Use collectAsStateWithLifecycle()
 **Status:** [ ] Not Started
 **Priority:** High
-**Estimated Time:** 15 minutes
-**Assigned To:** -
+**Estimated Time:** 30 minutes
 
 **Subtasks:**
-- [ ] Consolidate state into single StateFlow
-- [ ] Update sign-in screen
-- [ ] Test Google sign-in flow
-
-**Files to Modify:**
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_sign_in/presentation/SignInViewModel.kt`
-- `app/src/main/java/uk/co/zlurgg/thedayto/feature_sign_in/presentation/SignInScreen.kt`
+- [ ] AddEditEntryScreen (handled in Root/Presenter)
+- [ ] EntriesScreen (handled in Root/Presenter)
+- [ ] SignInScreen (handled in Root/Presenter)
+- [ ] Verify lifecycle-aware state collection works correctly
 
 ---
 
-### Task 2.6: Update Google Sign-In ✅
-**Status:** [✅] Complete (Completed in Phase 1)
-**Priority:** High (was Medium, elevated due to deprecation)
-**Completed:** 2025-10-22
-
-**Subtasks:**
-- [✅] Research Google Identity Services migration (Credential Manager API)
-- [✅] Update to Credential Manager API
-- [✅] Completely rewrote GoogleAuthUiClient implementation
-- [✅] Updated TheDayToApp.kt to use new direct signIn() flow
-- [✅] Removed deprecated BeginSignInRequest and IntentSender pattern
-- [✅] Test sign-in flow thoroughly
-
-**Notes:**
-- Completed early due to BeginSignInRequest deprecation blocking build
-- Migrated from two-step flow (IntentSender) to single-step direct API
-- Added proper Timber logging throughout
-- Significantly cleaner and more modern implementation
-
----
-
-## Phase 3: Quality & Polish (Medium Priority)
+## Phase 4: Quality & Polish (Medium Priority)
 
 **Goal:** Add error handling, clean up code, add tests
 **Estimated Time:** 3-4 hours
 
-### Task 3.1: Implement Error Handling
+### Task 4.1: Implement Error Handling
 **Status:** [ ] Not Started
 **Priority:** Medium
 **Estimated Time:** 1-2 hours
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] Create `core/util/Resource.kt` sealed class:
@@ -330,11 +837,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 3.2: Code Cleanup
+### Task 4.2: Code Cleanup
 **Status:** [ ] Not Started
 **Priority:** Medium
 **Estimated Time:** 1 hour
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] **Remove commented code:**
@@ -371,11 +877,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 3.3: Add Unit Tests
+### Task 4.3: Add Unit Tests
 **Status:** [ ] Not Started
 **Priority:** Medium
 **Estimated Time:** 2 hours
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] **Setup test dependencies:**
@@ -425,16 +930,15 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-## Phase 4: Release Preparation (Low Priority)
+## Phase 5: Release Preparation (Low Priority)
 
 **Goal:** Polish for public GitHub release
 **Estimated Time:** 2-3 hours
 
-### Task 4.1: Update README
+### Task 5.1: Update README
 **Status:** [ ] Not Started
 **Priority:** Low
 **Estimated Time:** 1 hour
-**Assigned To:** -
 
 **Reference:** [My-Bookshelf README](https://github.com/Zlurgg/My-Bookshelf/blob/main/README.md)
 
@@ -459,11 +963,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 4.2: Add LICENSE
+### Task 5.2: Add LICENSE
 **Status:** [ ] Not Started
 **Priority:** Low
 **Estimated Time:** 5 minutes
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] Choose license (MIT recommended like My-Bookshelf)
@@ -476,11 +979,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 4.3: Privacy & Documentation
+### Task 5.3: Privacy & Documentation
 **Status:** [ ] Not Started
 **Priority:** Low
 **Estimated Time:** 30 minutes
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] Add privacy policy statement (if collecting data)
@@ -496,11 +998,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 4.4: Notification Improvements
+### Task 5.4: Notification Improvements
 **Status:** [ ] Not Started
 **Priority:** Low
 **Estimated Time:** 1 hour
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] Remove network constraint from NotificationWorker
@@ -515,11 +1016,10 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Task 4.5: Final Polish
+### Task 5.5: Final Polish
 **Status:** [ ] Not Started
 **Priority:** Low
 **Estimated Time:** 1 hour
-**Assigned To:** -
 
 **Subtasks:**
 - [ ] Run code formatter on all files
@@ -589,15 +1089,95 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-### Session 3 (Date: ___)
+### Session 3 (2025-10-22) - ViewModel Audit Complete ✅
 **Tasks Completed:**
--
+- ✅ Conducted comprehensive ViewModel audit using Explore tool
+- ✅ Analyzed all 4 ViewModels for architecture patterns
+- ✅ Identified critical issues:
+  - AddEditEntryViewModel: 6 separate state holders (critical)
+  - AddEditMoodColorViewModel: 5 separate state holders (critical)
+  - AddEditMoodColorScreen: Uses TWO ViewModels (anti-pattern)
+  - EntriesViewModel: Uses mutableStateOf (optional improvement)
+  - SignInViewModel: Perfect implementation ✅
+- ✅ Updated MODERNIZATION_ROADMAP.md with detailed ViewModel Audit Summary
+- ✅ Updated Phase 2 tasks with specific findings and solutions
+- ✅ Added CLAUDE.md Root/Presenter pattern documentation (from My-Bookshelf)
+
+**Architectural Decisions:**
+- **Keep Actions Pattern:** 3/4 ViewModels use it - consistency over uniformity
+- **StateFlow over mutableStateOf:** Google's recommended pattern for ViewModels
+- **Single ViewModel per Screen:** Fix AddEditMoodColorScreen dual ViewModel issue
 
 **Issues Encountered:**
--
+- None - this was a planning/documentation session
 
 **Next Session Plan:**
--
+- Begin Phase 2 implementation
+- Start with Task 2.1: Create UiState Data Classes
+- Then tackle critical refactoring tasks (2.2, 2.3, 2.4)
+
+---
+
+### Session 4 (2025-10-23) - Architecture Overhaul Identified 🏗️
+**Critical Discovery:**
+- Realized jumping into ViewModel refactoring would be premature
+- Identified fundamental architecture issues requiring resolution first
+- User clarified MoodColor should be a **dialog**, not full screen
+- User confirmed future requirement: standalone mood color management screen
+
+**Major Architectural Insights:**
+1. **MoodColorScreen → Dialog**: Currently full screen, should be modal dialog
+2. **Dual ViewModel Anti-Pattern**: AddEditMoodColorScreen injects TWO ViewModels
+3. **Naming Inconsistency**: Mix of `*State`, `*Event` patterns across features
+4. **Feature Boundaries**: MoodColor should stay separate (bounded context) but use dialog pattern
+5. **Future-Proofing**: Architecture must support standalone mood color management
+
+**Tasks Completed:**
+- ✅ Comprehensive architecture review with user
+- ✅ Clarified MoodColor usage patterns (dialog now, standalone screen later)
+- ✅ Defined target architecture following Google MAD best practices
+- ✅ Created new **Phase 2: Architecture Overhaul** (9 tasks)
+- ✅ Reorganized roadmap phases:
+  - Phase 1: Foundation ✅ (Complete)
+  - Phase 2: Architecture Overhaul (NEW - 9 tasks)
+  - Phase 3: ViewModel State Consolidation (reorganized, 5 tasks)
+  - Phase 4: Quality & Polish (3 tasks)
+  - Phase 5: Release Preparation (5 tasks)
+- ✅ Updated MODERNIZATION_ROADMAP.md with comprehensive architecture plan
+
+**Key Architectural Decisions:**
+1. **MoodColor as Separate Feature** - Keep as bounded context (has its own data layer)
+2. **Dialog Pattern** - Convert AddEditMoodColorScreen → MoodColorPickerDialog component
+3. **Callback Pattern** - Dialog uses callbacks, no ViewModel injection
+4. **Naming Standardization**:
+   - All state: `*UiState`
+   - User interactions: `*Action`
+   - One-time UI events: `*UiEvent`
+5. **Root/Presenter Pattern** - All screens split into Root (state) + Presenter (UI)
+6. **Future MoodColorManagerScreen** - Plan documented, defer to post-Phase 3
+
+**Roadmap Summary:**
+- **Phase 2** (Architecture): 9 tasks, 4-6 hours estimated
+  - Convert screen → dialog
+  - Standardize naming (Event→Action, State→UiState)
+  - Rename display_daily_entries → entries
+  - Create state/ directories
+  - Remove AddEditMoodColorViewModel
+  - Update DI and navigation
+
+- **Phase 3** (ViewModels): 5 tasks, 3-4 hours estimated
+  - Create unified UiState classes
+  - Refactor AddEditEntryViewModel (6→1 state)
+  - Convert EntriesViewModel to StateFlow
+  - Implement Root/Presenter pattern for all screens
+
+**Issues Encountered:**
+- None - pure planning and architecture design session
+
+**Next Session Plan:**
+- Begin Phase 2: Architecture Overhaul
+- Start with Task 2.1: Convert AddEditMoodColorScreen → MoodColorPickerDialog
+- This solves dual ViewModel anti-pattern immediately
 
 ---
 
@@ -630,5 +1210,5 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ---
 
-**Last Updated:** 2025-10-22
-**Current Status:** Phase 1 Complete ✅ - Ready for Phase 2 (ViewModel State Consolidation)
+**Last Updated:** 2025-10-23
+**Current Status:** Phase 1 Complete ✅ → Phase 2 Ready (Architecture Overhaul)
