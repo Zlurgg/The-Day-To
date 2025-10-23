@@ -628,7 +628,7 @@ sealed class Screen(val route: String) {
     data object EntriesScreen : Screen("entries_screen")
 }
 
-composable(route = Screen.AddEditEntryScreen.route + "?entryId={entryId}") { ... }
+composable(route = Screen.AddEditEntryScreen.route + "?entryId={entryId}") {  }
 navController.navigate("${Screen.AddEditEntryScreen.route}?entryId=$id")
 
 // ✅ NEW (Type-Safe)
