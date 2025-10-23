@@ -14,11 +14,17 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.InvalidDailyEntryException
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 
 class AddEditEntryViewModel(
     private val preferencesRepository: PreferencesRepository,
     private val dailyEntryUseCases: DailyEntryUseCases,
+    private val moodColorUseCases: MoodColorUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -124,6 +130,44 @@ class AddEditEntryViewModel(
                 _state.value = state.value.copy(
                     isMoodColorSectionVisible = !state.value.isMoodColorSectionVisible
                 )
+            }
+
+            is AddEditEntryEvent.SaveMoodColor -> {
+                viewModelScope.launch(Dispatchers.IO) {
+                    // Validate input
+                    if (event.mood.isBlank()) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                message = "Mood cannot be empty"
+                            )
+                        )
+                        return@launch
+                    }
+
+                    try {
+                        moodColorUseCases.addMoodColor(
+                            MoodColor(
+                                mood = event.mood.trim(),
+                                color = event.colorHex,
+                                dateStamp = LocalDate.now().atStartOfDay()
+                                    .toEpochSecond(ZoneOffset.UTC),
+                                id = null
+                            )
+                        )
+                        // Close dialog after successful save
+                        withContext(Dispatchers.Main) {
+                            _state.value = state.value.copy(
+                                isMoodColorSectionVisible = false
+                            )
+                        }
+                    } catch (e: InvalidMoodColorException) {
+                        _eventFlow.emit(
+                            UiEvent.ShowSnackbar(
+                                message = e.message ?: "Couldn't save mood color"
+                            )
+                        )
+                    }
+                }
             }
 
             is AddEditEntryEvent.SaveEntry -> {
