@@ -108,14 +108,15 @@ See [CLAUDE.md](./CLAUDE.md) for detailed coding standards and architectural gui
 
 ## Phase 2: Architecture Overhaul (CRITICAL Priority) 🏗️
 
-**Goal:** Fix fundamental architecture issues and create all screens before ViewModel refactoring
-**Estimated Time:** 6-8 hours
+**Goal:** Fix fundamental architecture issues, modernize navigation, and create all screens before ViewModel refactoring
+**Estimated Time:** 8-11 hours (includes type-safe navigation migration)
 **Status:** [ ] Not Started
 
 **Deliverables:**
 - MoodColorPickerDialog component (reusable)
 - MoodColorManagerScreen (complete with Root/Presenter pattern)
-- Standardized naming across all features
+- Type-safe navigation with Kotlin Serialization (modern MAD standard)
+- Standardized naming across all features (`*UiState`, `*Action`, `*UiEvent`)
 - Clean architecture with proper boundaries
 - All 4 screens ready for Phase 3 ViewModel work
 
@@ -538,24 +539,128 @@ feature_mood_color/presentation/mood_color_manager/
 
 ---
 
-### Task 2.9: Update Navigation for Architecture Changes
+### Task 2.9: Migrate to Type-Safe Navigation (Modern Pattern)
 **Status:** [ ] Not Started
-**Priority:** Medium
-**Estimated Time:** 30 minutes
+**Priority:** High
+**Estimated Time:** 2-3 hours
 
-**Current Issues:**
-- Navigation to AddEditMoodColorScreen needs to be removed
-- Routes may need updating after package renames
+**Current State:**
+- Using string-based navigation with sealed class routes (older pattern)
+- Manual argument parsing from route strings
+- No compile-time safety for navigation
+
+**Target:**
+- Migrate to **type-safe navigation** with Kotlin Serialization
+- Follows Google's Modern Android Development (MAD) standard (Navigation Compose 2.8+)
+- Remove AddEditMoodColorScreen route (now a dialog)
 
 **Subtasks:**
-- [ ] Remove AddEditMoodColorScreen navigation route
-- [ ] Update any routes referencing renamed packages
+
+**Part A: Add Dependencies**
+- [ ] Add Kotlin Serialization plugin to `build.gradle.kts` (project level):
+  ```kotlin
+  plugins {
+      id("org.jetbrains.kotlin.plugin.serialization") version "2.2.20"
+  }
+  ```
+- [ ] Add kotlinx-serialization dependency to `build.gradle.kts` (app level):
+  ```kotlin
+  implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
+  ```
+
+**Part B: Create Type-Safe Routes**
+- [ ] Create `core/presentation/navigation/NavigationRoutes.kt`:
+  ```kotlin
+  @Serializable
+  object SignInRoute
+
+  @Serializable
+  object EntriesRoute
+
+  @Serializable
+  data class AddEditEntryRoute(
+      val entryId: Int = -1,
+      val showBackButton: Boolean = false
+  )
+
+  @Serializable
+  object MoodColorManagerRoute  // For Task 2.7
+
+  @Serializable
+  object NotificationTestRoute
+  ```
+
+**Part C: Update Navigation Graph**
+- [ ] Update `TheDayToApp.kt` to use type-safe composable routes
+- [ ] Remove string-based route parsing
+- [ ] Use `backStackEntry.toRoute<T>()` for argument retrieval
+- [ ] Remove AddEditMoodColorScreen composable (now a dialog)
+
+**Part D: Update Navigation Calls**
+- [ ] Update all `navController.navigate(Screen.*.route)` calls to use route objects
+- [ ] Update in EntriesScreen, AddEditEntryScreen, SignInScreen
+- [ ] Update back navigation to use type-safe routes
+
+**Part E: Clean Up**
+- [ ] Delete `core/presentation/Screen.kt` (replaced by NavigationRoutes)
+- [ ] Remove all `Screen.*` references
+- [ ] Test all navigation flows work correctly
 - [ ] Verify navigation graph is correct
-- [ ] Test all navigation flows work
+
+**Files to Create:**
+- `core/presentation/navigation/NavigationRoutes.kt`
+
+**Files to Delete:**
+- `core/presentation/Screen.kt`
 
 **Files to Modify:**
-- Navigation setup files
-- Any composables that navigate to mood color screen
+- `build.gradle.kts` (project level - add serialization plugin)
+- `build.gradle.kts` (app level - add kotlinx-serialization dependency)
+- `core/presentation/TheDayToApp.kt` (update NavHost)
+- `feature_daily_entry/presentation/entries/EntriesScreen.kt` (navigation calls)
+- `feature_daily_entry/presentation/add_edit_daily_entry/AddEditEntryScreen.kt` (navigation calls)
+- `feature_sign_in/presentation/SignInScreen.kt` (navigation calls)
+
+**Example Migration:**
+```kotlin
+// ❌ OLD (String-Based)
+sealed class Screen(val route: String) {
+    data object EntriesScreen : Screen("entries_screen")
+}
+
+composable(route = Screen.AddEditEntryScreen.route + "?entryId={entryId}") { ... }
+navController.navigate("${Screen.AddEditEntryScreen.route}?entryId=$id")
+
+// ✅ NEW (Type-Safe)
+@Serializable
+object EntriesRoute
+
+@Serializable
+data class AddEditEntryRoute(val entryId: Int = -1, val showBackButton: Boolean = false)
+
+composable<AddEditEntryRoute> { backStackEntry ->
+    val args = backStackEntry.toRoute<AddEditEntryRoute>()
+    AddEditEntryScreen(entryId = args.entryId, showBackButton = args.showBackButton)
+}
+
+navController.navigate(AddEditEntryRoute(entryId = id, showBackButton = true))
+```
+
+**Benefits:**
+- Type-safe: No string manipulation, compile-time checks
+- Refactor-friendly: Rename detection works
+- Cleaner: No manual argument parsing
+- Modern: Follows Google's current best practices (2024+)
+
+**References:**
+- [Google Docs: Type Safety in Navigation Compose](https://developer.android.com/guide/navigation/design/type-safety)
+- [Google Codelabs: Navigation Compose Type Safety](https://developer.android.com/codelabs/basic-android-kotlin-compose-navigation)
+
+**Notes:**
+- This is a significant upgrade to navigation architecture
+- Aligns with Google's Modern Android Development standards
+- Makes codebase more maintainable and less error-prone
+- Required dependency: kotlinx-serialization-json 1.6.3+
 
 ---
 

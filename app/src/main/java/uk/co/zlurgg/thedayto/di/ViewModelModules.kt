@@ -14,6 +14,7 @@ val addEditEntryModule = module {
         AddEditEntryViewModel(
             preferencesRepository = get(),
             dailyEntryUseCases = get(),
+            moodColorUseCases = get(),
             savedStateHandle = savedStateHandle
         )
     }

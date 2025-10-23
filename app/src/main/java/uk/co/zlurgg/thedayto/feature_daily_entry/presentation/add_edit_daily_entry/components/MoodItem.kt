@@ -1,10 +1,5 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -51,7 +46,6 @@ import uk.co.zlurgg.thedayto.core.presentation.util.getColor
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
-import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import java.time.LocalDate
@@ -188,13 +182,14 @@ fun MoodItem(
             }
         }
     }
-    AnimatedVisibility(
-        visible = moodColorState.isMoodColorSectionVisible,
-        enter = fadeIn() + slideInVertically(),
-        exit = fadeOut() + slideOutVertically()
-    ) {
-        Spacer(modifier = Modifier.height(paddingMedium))
-        AddEditMoodColorScreen()
-        Spacer(modifier = Modifier.height(paddingMedium))
-    }
+    // Mood color picker dialog
+    MoodColorPickerDialog(
+        showDialog = moodColorState.isMoodColorSectionVisible,
+        onDismiss = {
+            viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
+        },
+        onSave = { mood, colorHex ->
+            viewModel.onEvent(AddEditEntryEvent.SaveMoodColor(mood, colorHex))
+        }
+    )
 }

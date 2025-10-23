@@ -28,7 +28,6 @@ import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
 import uk.co.zlurgg.thedayto.core.presentation.Screen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
-import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.domain.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
@@ -160,9 +159,6 @@ fun TheDayToApp(
                         }
                     }
                 )
-            }
-            composable(route = Screen.AddEditMoodColorScreen.route) {
-                AddEditMoodColorScreen()
             }
         }
     }
