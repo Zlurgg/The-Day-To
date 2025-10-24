@@ -41,15 +41,18 @@ class AddEditEntryViewModel(
     init {
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
             if (entryId != -1) {
-                viewModelScope.launch(Dispatchers.IO) {
-                    dailyEntryUseCases.getDailyEntry(entryId)?.also { entry ->
-                        _uiState.update {
-                            it.copy(
-                                currentEntryId = entry.id,
-                                entryDate = entry.dateStamp,
-                                entryMood = entry.mood,
-                                entryContent = entry.content,
-                                entryColor = entry.color,
+                viewModelScope.launch {
+                    val entry = withContext(Dispatchers.IO) {
+                        dailyEntryUseCases.getDailyEntry(entryId)
+                    }
+                    entry?.let {
+                        _uiState.update { state ->
+                            state.copy(
+                                currentEntryId = it.id,
+                                entryDate = it.dateStamp,
+                                entryMood = it.mood,
+                                entryContent = it.content,
+                                entryColor = it.color,
                                 isMoodHintVisible = false,
                                 isContentHintVisible = false
                             )
@@ -103,7 +106,7 @@ class AddEditEntryViewModel(
             }
 
             is AddEditEntryAction.SaveMoodColor -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     // Validate input
                     if (action.mood.isBlank()) {
                         _uiEvents.emit(
@@ -115,15 +118,17 @@ class AddEditEntryViewModel(
                     }
 
                     try {
-                        moodColorUseCases.addMoodColor(
-                            MoodColor(
-                                mood = action.mood.trim(),
-                                color = action.colorHex,
-                                dateStamp = LocalDate.now().atStartOfDay()
-                                    .toEpochSecond(ZoneOffset.UTC),
-                                id = null
+                        withContext(Dispatchers.IO) {
+                            moodColorUseCases.addMoodColor(
+                                MoodColor(
+                                    mood = action.mood.trim(),
+                                    color = action.colorHex,
+                                    dateStamp = LocalDate.now().atStartOfDay()
+                                        .toEpochSecond(ZoneOffset.UTC),
+                                    id = null
+                                )
                             )
-                        )
+                        }
                         // Close dialog after successful save
                         _uiState.update { it.copy(isMoodColorSectionVisible = false) }
                     } catch (e: InvalidMoodColorException) {
@@ -137,20 +142,22 @@ class AddEditEntryViewModel(
             }
 
             is AddEditEntryAction.SaveEntry -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     val state = _uiState.value
                     try {
-                        dailyEntryUseCases.addDailyEntry(
-                            DailyEntry(
-                                content = state.entryContent,
-                                dateStamp = state.entryDate,
-                                mood = state.entryMood,
-                                color = state.entryColor,
-                                id = state.currentEntryId
+                        withContext(Dispatchers.IO) {
+                            dailyEntryUseCases.addDailyEntry(
+                                DailyEntry(
+                                    content = state.entryContent,
+                                    dateStamp = state.entryDate,
+                                    mood = state.entryMood,
+                                    color = state.entryColor,
+                                    id = state.currentEntryId
+                                )
                             )
-                        )
+                            preferencesRepository.setDailyEntryDate(state.entryDate)
+                        }
                         _uiEvents.emit(AddEditEntryUiEvent.SaveEntry)
-                        preferencesRepository.setDailyEntryDate(state.entryDate)
                     } catch (e: InvalidDailyEntryException) {
                         _uiEvents.emit(
                             AddEditEntryUiEvent.ShowSnackbar(
