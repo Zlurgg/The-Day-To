@@ -84,7 +84,7 @@ fun EntriesScreenRoot(
     EntriesScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onNavigateToEntry: { entryId ->
+        onNavigateToEntry = { entryId ->
             navController.navigate(
                 "${Screen.AddEditEntryScreen.route}?entryId=${entryId}&showBackButton=${true}"
             )
@@ -115,6 +115,7 @@ private fun EntriesScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .systemBarsPadding()
                     .padding(paddingSmall),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
@@ -210,40 +211,36 @@ private fun EntriesScreen(
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                var addNumberToCalenderIfNoEntryForDateExists = true
-                                items(dates) {
+                                items(dates) { dayIndex ->
                                     val entryDate = dayToDatestampForCurrentMonthAndYear(
-                                        it + 1,
+                                        dayIndex + 1,
                                         date.monthValue,
                                         date.year
                                     )
-                                    uiState.entries.forEach { entry ->
-                                        if (entryDate == entry.dateStamp) {
-                                            CalenderDay(
-                                                entry = entry,
-                                                modifier = Modifier.clickable {
-                                                    onNavigateToEntry(entry.id)
-                                                }
-                                            )
-                                        } else if (addNumberToCalenderIfNoEntryForDateExists &&
-                                            entryDate != currentDate.atStartOfDay()
-                                                .toEpochSecond(ZoneOffset.UTC)
-                                        ) {
-                                            addNumberToCalenderIfNoEntryForDateExists = false
-                                            Box(
-                                                modifier = Modifier,
-                                                contentAlignment = Alignment.Center
-                                            ) {
-                                                Text(
-                                                    modifier = Modifier.alpha(0.5f),
-                                                    text = "${it + 1}",
-                                                    style = MaterialTheme.typography.headlineSmall,
-                                                    overflow = TextOverflow.Ellipsis
-                                                )
+                                    val entry = uiState.entries.find { it.dateStamp == entryDate }
+
+                                    if (entry != null) {
+                                        CalenderDay(
+                                            entry = entry,
+                                            modifier = Modifier.clickable {
+                                                onNavigateToEntry(entry.id)
                                             }
+                                        )
+                                    } else if (entryDate != currentDate.atStartOfDay()
+                                            .toEpochSecond(ZoneOffset.UTC)
+                                    ) {
+                                        Box(
+                                            modifier = Modifier,
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                modifier = Modifier.alpha(0.5f),
+                                                text = "${dayIndex + 1}",
+                                                style = MaterialTheme.typography.headlineSmall,
+                                                overflow = TextOverflow.Ellipsis
+                                            )
                                         }
                                     }
-                                    addNumberToCalenderIfNoEntryForDateExists = true
                                 }
                             }
                         }
@@ -251,20 +248,23 @@ private fun EntriesScreen(
                 }
 
                 Spacer(modifier = Modifier.height(paddingMedium))
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(uiState.entries) { entry ->
-                        if (date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
+
+                // Filter entries for current month/year
+                val filteredEntries = uiState.entries.filter { entry ->
+                    date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
                             date.year.toString() == datestampToYearValue(entry.dateStamp)
-                        ) {
-                            EntryItem(
-                                entry = entry,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .clickable {
-                                        onNavigateToEntry(entry.id)
-                                    }
-                            )
-                        }
+                }
+
+                LazyColumn(modifier = Modifier.fillMaxSize()) {
+                    items(filteredEntries) { entry ->
+                        EntryItem(
+                            entry = entry,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    onNavigateToEntry(entry.id)
+                                }
+                        )
                         Spacer(modifier = Modifier.height(paddingMedium))
                     }
                 }

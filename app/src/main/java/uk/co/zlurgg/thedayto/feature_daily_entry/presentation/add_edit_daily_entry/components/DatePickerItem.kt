@@ -24,37 +24,33 @@ import com.vanpra.composematerialdialogs.MaterialDialog
 import com.vanpra.composematerialdialogs.datetime.date.DatePickerDefaults
 import com.vanpra.composematerialdialogs.datetime.date.datepicker
 import com.vanpra.composematerialdialogs.rememberMaterialDialogState
-import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.presentation.util.datestampToFormattedDate
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.ZoneOffset
 
-
+/**
+ * Pure presenter component for date selection.
+ * No ViewModel dependency - receives state and callbacks as parameters.
+ *
+ * @param selectedDate The currently selected date (Unix timestamp in seconds)
+ * @param onDateSelected Callback when a new date is selected
+ * @param modifier Optional modifier
+ */
 @Composable
 fun DatePickerItem(
-    viewModel: AddEditEntryViewModel = koinViewModel(),
-    entryDate: Long
+    selectedDate: Long,
+    onDateSelected: (Long) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val dateDialogState = rememberMaterialDialogState()
     var mExpanded by remember { mutableStateOf(false) }
 
-    /** will change entry date to contain month and year going foward and pass around the long value **/
-    val dateState = viewModel.entryDate.value
-    dateState.date = if (entryDate != -1L) {
-        entryDate
-    } else {
-        viewModel.entryDate.value.date
-    }
-
-    val date = Instant.ofEpochSecond(dateState.date)
+    val date = Instant.ofEpochSecond(selectedDate)
         .atZone(ZoneId.systemDefault())
         .toLocalDate()
-
 
     val icon = if (mExpanded)
         Icons.Filled.KeyboardArrowUp
@@ -63,7 +59,7 @@ fun DatePickerItem(
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clickable(
                 onClick = {
@@ -75,7 +71,7 @@ fun DatePickerItem(
     ) {
         Text(
             style = MaterialTheme.typography.headlineSmall,
-            text = datestampToFormattedDate(dateState.date),
+            text = datestampToFormattedDate(selectedDate),
         )
         Icon(
             imageVector = icon,
@@ -101,28 +97,13 @@ fun DatePickerItem(
                 title = stringResource(R.string.pick_a_date),
                 colors = DatePickerDefaults.colors(),
                 allowedDateValidator = {
-//                    !it.isAfter(LocalDate.now())
                     it.isEqual(LocalDate.now())
                 }
             ) {
-                viewModel.onEvent(
-                    AddEditEntryEvent.EnteredDate(
-                        it.atStartOfDay().toEpochSecond(
-                            ZoneOffset.UTC
-                        )
-                    )
+                onDateSelected(
+                    it.atStartOfDay().toEpochSecond(ZoneOffset.UTC)
                 )
             }
         }
-        if (dateState.date == 0L) {
-            viewModel.onEvent(
-                AddEditEntryEvent.EnteredDate(
-                    LocalDate.now().atStartOfDay().toEpochSecond(
-                        ZoneOffset.UTC
-                    )
-                )
-            )
-        }
     }
 }
-

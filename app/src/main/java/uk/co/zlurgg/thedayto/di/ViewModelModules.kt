@@ -6,7 +6,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
-import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
 
 val addEditEntryModule = module {
@@ -14,15 +13,6 @@ val addEditEntryModule = module {
         AddEditEntryViewModel(
             preferencesRepository = get(),
             dailyEntryUseCases = get(),
-            moodColorUseCases = get(),
-            savedStateHandle = savedStateHandle
-        )
-    }
-}
-
-val addEditMoodColorModule = module {
-    viewModel { (savedStateHandle: SavedStateHandle) ->
-        AddEditMoodColorViewModel(
             moodColorUseCases = get(),
             savedStateHandle = savedStateHandle
         )

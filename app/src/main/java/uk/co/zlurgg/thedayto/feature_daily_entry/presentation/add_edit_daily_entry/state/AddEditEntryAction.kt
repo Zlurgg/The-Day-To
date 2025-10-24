@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.state
 
 import androidx.compose.ui.focus.FocusState
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 
 sealed interface AddEditEntryAction {
     data class EnteredDate(val date: Long) : AddEditEntryAction
@@ -11,5 +12,6 @@ sealed interface AddEditEntryAction {
     data class EnteredColor(val color: String) : AddEditEntryAction
     data object ToggleMoodColorSection : AddEditEntryAction
     data class SaveMoodColor(val mood: String, val colorHex: String) : AddEditEntryAction
+    data class DeleteMoodColor(val moodColor: MoodColor) : AddEditEntryAction
     data object SaveEntry : AddEditEntryAction
 }

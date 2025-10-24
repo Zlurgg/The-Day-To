@@ -1,12 +1,19 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.state
 
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
+import java.time.LocalDate
+import java.time.ZoneOffset
+
 data class AddEditEntryUiState(
     // Entry data
-    val entryDate: Long = System.currentTimeMillis(),
+    val entryDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
     val entryMood: String = "",
     val entryContent: String = "",
     val entryColor: String = "#000000",
     val currentEntryId: Int? = null,
+
+    // Mood colors list (for dropdown)
+    val moodColors: List<MoodColor> = emptyList(),
 
     // UI state
     val isMoodHintVisible: Boolean = true,

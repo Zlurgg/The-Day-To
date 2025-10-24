@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
@@ -89,7 +90,9 @@ private fun AddEditEntryScreen(
     Scaffold(
         topBar = {
             Row(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .systemBarsPadding()
             ) {
                 if (showBackButton) {
                     Icon(
@@ -125,13 +128,48 @@ private fun AddEditEntryScreen(
                 .padding(paddingMedium)
         ) {
             // Date Picker
-            DatePickerItem(entryDate = entryDate)
+            DatePickerItem(
+                selectedDate = uiState.entryDate,
+                onDateSelected = { date -> onAction(AddEditEntryAction.EnteredDate(date)) }
+            )
             Spacer(modifier = Modifier.height(paddingMedium))
-            // Mood
-            MoodItem()
+
+            // Mood Selection
+            MoodItem(
+                selectedMood = uiState.entryMood,
+                moodColors = uiState.moodColors,
+                hint = if (uiState.entryDate == java.time.LocalDate.now().atStartOfDay()
+                        .toEpochSecond(java.time.ZoneOffset.UTC)
+                ) uiState.todayHint else uiState.previousDayHint,
+                showMoodColorDialog = uiState.isMoodColorSectionVisible,
+                onMoodSelected = { mood, colorHex ->
+                    onAction(AddEditEntryAction.EnteredMood(mood))
+                    onAction(AddEditEntryAction.EnteredColor(colorHex))
+                },
+                onDeleteMoodColor = { moodColor ->
+                    onAction(AddEditEntryAction.DeleteMoodColor(moodColor))
+                },
+                onToggleMoodColorDialog = {
+                    onAction(AddEditEntryAction.ToggleMoodColorSection)
+                },
+                onSaveMoodColor = { mood, colorHex ->
+                    onAction(AddEditEntryAction.SaveMoodColor(mood, colorHex))
+                }
+            )
             Spacer(modifier = Modifier.height(paddingMedium))
+
             // Content
-            ContentItem()
+            ContentItem(
+                content = uiState.entryContent,
+                hint = uiState.contentHint,
+                isHintVisible = uiState.isContentHintVisible,
+                onContentChange = { content ->
+                    onAction(AddEditEntryAction.EnteredContent(content))
+                },
+                onFocusChange = { focusState ->
+                    onAction(AddEditEntryAction.ChangeContentFocus(focusState))
+                }
+            )
         }
     }
 }
