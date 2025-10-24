@@ -32,9 +32,9 @@ class EntriesViewModel(
     fun onAction(action: EntriesAction) {
         when (action) {
             is EntriesAction.Order -> {
-                val currentState = _uiState.value
-                if (currentState.dailyEntryOrder::class == action.dailyEntryOrder::class &&
-                    currentState.dailyEntryOrder.orderType == action.dailyEntryOrder.orderType
+                // Check if order actually changed to avoid unnecessary fetches
+                if (_uiState.value.dailyEntryOrder::class == action.dailyEntryOrder::class &&
+                    _uiState.value.dailyEntryOrder.orderType == action.dailyEntryOrder.orderType
                 ) {
                     return
                 }

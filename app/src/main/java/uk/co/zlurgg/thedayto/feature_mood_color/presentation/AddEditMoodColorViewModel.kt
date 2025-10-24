@@ -42,13 +42,16 @@ class AddEditMoodColorViewModel(
         savedStateHandle.get<Int>("moodColorId")?.let { moodColorId ->
             if (moodColorId != -1) {
                 viewModelScope.launch {
-                    moodColorUseCases.getMoodColor(moodColorId)?.also { moodColor ->
-                        _uiState.update {
-                            it.copy(
-                                currentMoodColorId = moodColor.id,
-                                date = moodColor.dateStamp,
-                                mood = moodColor.mood,
-                                color = moodColor.color,
+                    val moodColor = withContext(Dispatchers.IO) {
+                        moodColorUseCases.getMoodColor(moodColorId)
+                    }
+                    moodColor?.let {
+                        _uiState.update { state ->
+                            state.copy(
+                                currentMoodColorId = it.id,
+                                date = it.dateStamp,
+                                mood = it.mood,
+                                color = it.color,
                                 isMoodHintVisible = false
                             )
                         }
@@ -82,17 +85,19 @@ class AddEditMoodColorViewModel(
             }
 
             is AddEditMoodColorAction.SaveMoodColor -> {
-                viewModelScope.launch(Dispatchers.IO) {
+                viewModelScope.launch {
                     val state = _uiState.value
                     try {
-                        moodColorUseCases.addMoodColor(
-                            MoodColor(
-                                dateStamp = state.date,
-                                mood = state.mood,
-                                color = state.color,
-                                id = state.currentMoodColorId
+                        withContext(Dispatchers.IO) {
+                            moodColorUseCases.addMoodColor(
+                                MoodColor(
+                                    dateStamp = state.date,
+                                    mood = state.mood,
+                                    color = state.color,
+                                    id = state.currentMoodColorId
+                                )
                             )
-                        )
+                        }
                         _uiEvents.emit(AddEditMoodColorUiEvent.SaveMoodColor)
                     } catch (e: InvalidMoodColorException) {
                         _uiEvents.emit(
