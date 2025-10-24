@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.feature_mood_color.presentation.component
+package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth

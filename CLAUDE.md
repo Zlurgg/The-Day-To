@@ -34,25 +34,33 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 Following [Android's Guide to App Architecture](https://developer.android.com/topic/architecture):
 
 ```
-UI Layer (presentation/)          <- Compose UI + ViewModels (State Holders)
-    ├── [Feature]Screen.kt        <- Composable UI
-    ├── [Feature]ViewModel.kt     <- UI state holder
-    ├── state/
-    │   └── [Feature]UiState.kt   <- UI state data class
-    └── components/               <- Reusable composables
+UI Layer (ui/)                   <- Compose UI + ViewModels (State Holders)
+    ├── [feature]/               <- Feature-specific UI
+    │   ├── [Feature]Screen.kt   <- Composable UI
+    │   ├── [Feature]ViewModel.kt <- UI state holder
+    │   ├── state/
+    │   │   ├── [Feature]UiState.kt <- UI state data class
+    │   │   └── [Feature]Action.kt  <- User actions/events
+    │   └── components/          <- Feature-specific composables
+    └── ...
 
-Domain Layer (domain/)            <- Optional business logic layer
-    ├── model/                    <- Business models
-    ├── repository/               <- Repository interfaces
-    └── use_case/                 <- Single-responsibility use cases
+Domain Layer (domain/)           <- Pure business logic layer
+    ├── model/                   <- Domain models (pure Kotlin, no @Entity)
+    ├── repository/              <- Repository interfaces only
+    └── usecases/                <- Single-responsibility use cases
+        └── [entity]/            <- Grouped by entity
 
 Data Layer (data/)               <- Data sources and repositories
+    ├── model/                   <- Data entities (DTOs with @Entity)
+    │   ├── [Entity]Entity.kt    <- Room entities
+    │   └── ...
+    ├── mapper/                  <- Entity ↔ Domain mappers
+    │   ├── [Entity]Mapper.kt    <- Extension functions for conversion
+    │   └── ...
     ├── repository/              <- Repository implementations
     │   └── [Entity]RepositoryImpl.kt
-    └── data_source/             <- Local/remote data sources
-        ├── local/
-        │   └── [Entity]Dao.kt   <- Room DAOs
-        └── remote/              <- API services (if needed)
+    └── dao/                     <- Room DAOs
+        └── [Entity]Dao.kt
 ```
 
 **Key Principles:**
@@ -444,6 +452,153 @@ Following [Jetpack Compose Best Practices](https://developer.android.com/jetpack
 
 ---
 
+## Data/Domain Separation Pattern
+
+### Clean Architecture Layering
+
+**IMPORTANT**: Domain layer must be pure Kotlin with NO framework dependencies.
+
+Following [Clean Architecture principles](https://developer.android.com/topic/architecture):
+
+### 1. Domain Models (Pure Kotlin)
+
+```kotlin
+// ✅ domain/model/Entry.kt - Pure Kotlin, no @Entity
+package uk.co.zlurgg.thedayto.journal.domain.model
+
+data class Entry(
+    val mood: String,
+    val content: String,
+    val dateStamp: Long,
+    val color: String,
+    val id: Int? = null
+)
+
+class InvalidEntryException(message: String) : Exception(message)
+```
+
+### 2. Data Entities (Room)
+
+```kotlin
+// ✅ data/model/EntryEntity.kt - Room @Entity
+package uk.co.zlurgg.thedayto.journal.data.model
+
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
+@Entity(tableName = "entry")
+data class EntryEntity(
+    val mood: String,
+    val content: String,
+    val dateStamp: Long,
+    val color: String,
+    @PrimaryKey val id: Int? = null
+)
+```
+
+### 3. Mappers (Conversion Layer)
+
+```kotlin
+// ✅ data/mapper/EntryMapper.kt - Extension functions
+package uk.co.zlurgg.thedayto.journal.data.mapper
+
+import uk.co.zlurgg.thedayto.journal.data.model.EntryEntity
+import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+
+fun EntryEntity.toDomain(): Entry {
+    return Entry(
+        mood = mood,
+        content = content,
+        dateStamp = dateStamp,
+        color = color,
+        id = id
+    )
+}
+
+fun Entry.toEntity(): EntryEntity {
+    return EntryEntity(
+        mood = mood,
+        content = content,
+        dateStamp = dateStamp,
+        color = color,
+        id = id
+    )
+}
+```
+
+### 4. DAOs (Data Layer)
+
+```kotlin
+// ✅ data/dao/EntryDao.kt - Works with entities
+package uk.co.zlurgg.thedayto.journal.data.dao
+
+import androidx.room.*
+import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.journal.data.model.EntryEntity
+
+@Dao
+interface EntryDao {
+    @Query("SELECT * FROM entry")
+    fun getEntries(): Flow<List<EntryEntity>>
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertEntry(entry: EntryEntity)
+}
+```
+
+### 5. Repository Interface (Domain Layer)
+
+```kotlin
+// ✅ domain/repository/EntryRepository.kt - Returns domain models
+package uk.co.zlurgg.thedayto.journal.domain.repository
+
+import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+
+interface EntryRepository {
+    fun getEntries(): Flow<List<Entry>>
+    suspend fun insertEntry(entry: Entry)
+}
+```
+
+### 6. Repository Implementation (Data Layer)
+
+```kotlin
+// ✅ data/repository/EntryRepositoryImpl.kt - Uses mappers
+package uk.co.zlurgg.thedayto.journal.data.repository
+
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
+import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
+import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
+import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
+import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+
+class EntryRepositoryImpl(
+    private val dao: EntryDao
+) : EntryRepository {
+    override fun getEntries(): Flow<List<Entry>> {
+        return dao.getEntries().map { entities ->
+            entities.map { it.toDomain() }
+        }
+    }
+
+    override suspend fun insertEntry(entry: Entry) {
+        dao.insertEntry(entry.toEntity())
+    }
+}
+```
+
+### Benefits
+
+✅ **Domain is framework-agnostic** - Can use in any Kotlin project
+✅ **Testability** - Easy to mock/fake repositories with domain models
+✅ **Flexibility** - Swap Room for other data sources without touching domain
+✅ **Clear boundaries** - Data layer owns persistence, domain owns business logic
+
+---
+
 ## Database Guidelines
 
 ### Room Best Practices
@@ -455,10 +610,14 @@ Following [Android Room documentation](https://developer.android.com/training/da
    - **Note**: No migrations needed for pre-release - clean deployment
    ```kotlin
    @Database(
-       entities = [DailyEntry::class, MoodColor::class],
+       entities = [EntryEntity::class, MoodColorEntity::class],
        version = 1,  // Increment when schema changes (no migration needed pre-release)
        exportSchema = false  // Can keep false until public release
-   ) {}
+   )
+   abstract class TheDayToDatabase : RoomDatabase() {
+       abstract val entryDao: EntryDao
+       abstract val moodColorDao: MoodColorDao
+   }
    ```
 
 2. **Migrations** (Post-Release Only)
@@ -475,15 +634,16 @@ Following [Android Room documentation](https://developer.android.com/training/da
    - Use `Flow<List<T>>` for observable queries (Google's recommendation)
    - Use `suspend fun` for one-shot operations
    - Avoid `LiveData` - prefer Flow for modern architecture
+   - **DAOs work with data entities, NOT domain models**
    ```kotlin
    // ✅ CORRECT - Google's recommended pattern
    @Dao
-   interface DailyEntryDao {
-       @Query("SELECT * FROM daily_entry ORDER BY dateStamp DESC")
-       fun getAll(): Flow<List<DailyEntry>>  // Observable
+   interface EntryDao {
+       @Query("SELECT * FROM entry ORDER BY dateStamp DESC")
+       fun getEntries(): Flow<List<EntryEntity>>  // Observable, returns entities
 
        @Insert(onConflict = OnConflictStrategy.REPLACE)
-       suspend fun insert(entry: DailyEntry)  // One-shot
+       suspend fun insertEntry(entry: EntryEntity)  // One-shot, accepts entity
    }
    ```
 
@@ -498,60 +658,81 @@ Following [Android Room documentation](https://developer.android.com/training/da
 
 ---
 
-## Known Issues to Fix
+## Implementation Status
+
+### ✅ Completed (Phase 2 Refactoring)
+
+1. **Clean Architecture Separation** ✅
+   - Implemented proper data/domain separation
+   - Created entity/mapper pattern for Room
+   - Domain models are now pure Kotlin (no @Entity)
+   - Repository implementations use mappers
+
+2. **Package Structure Modernization** ✅
+   - Renamed `feature_*` → `journal`, `auth`
+   - Renamed `use_case` → `usecases`
+   - Renamed `presentation` → `ui`
+   - Renamed UI screens: `add_edit` → `editor`, `entries` → `overview`
+   - Fixed package naming: removed `snake_case`, used lowercase
+
+3. **Fixed Architectural Violations** ✅
+   - Moved `PreferencesRepositoryImpl` to `core.data.repository`
+   - Moved `GoogleAuthUiClient` to `auth.data.service`
+   - Moved `theme` to `core.ui.theme`
+   - Reorganized `notifications` to `core.service.notifications`
+   - Fixed duplicate `core.data.data` → `core.data`
+
+4. **Standardized DI** ✅
+   - All dependencies injected via Koin
+   - No manual instantiation
+   - Proper constructor injection throughout
+
+### 🔄 In Progress
+
+5. **ViewModel State Management**
+   - Partially complete - some ViewModels use StateFlow pattern
+   - Need to verify all ViewModels follow single StateFlow<UiState> pattern
+   - Ensure proper Root/Presenter composable separation
+
+### 📋 Remaining Tasks
 
 ### High Priority
 
-1. **Add Timber Logging**
+6. **Add Timber Logging**
    - Add Timber dependency to build.gradle.kts
    - Initialize in Application class
    - Replace any Log.d/Log.e calls with Timber
 
-2. **Remove Hilt Dependencies**
-   - Clean up build.gradle.kts
-   - Remove unused Hilt annotations/imports
-   - Standardize on Koin only
-
-3. **Update Google Sign-In**
+7. **Update Google Sign-In**
    - Replace deprecated Firebase auth flow
    - Use Google Identity Services
    - Update to Credential Manager API
 
-4. **Standardize DI**
-   - Inject GoogleAuthUiClient
-   - Inject PreferencesRepository everywhere
-   - Remove manual instantiation in MainActivity
-
-5. **Consolidate ViewModel State**
-   - Replace multiple `mutableStateOf` with single `StateFlow<UiState>`
-   - Create proper UiState data classes
-   - Implement in all ViewModels
-
 ### Medium Priority
 
-6. **Error Handling**
+8. **Error Handling**
    - Create Resource/Result sealed class
    - Add error handling in repositories
    - Display errors in UI
 
-7. **Code Cleanup**
+9. **Code Cleanup**
    - Remove all commented code
    - Extract magic numbers to constants
    - Improve naming consistency
 
-8. **Testing**
-   - Add ViewModel unit tests
-   - Add Use Case tests
-   - Add Repository tests (with fakes)
+10. **Testing**
+    - Add ViewModel unit tests
+    - Add Use Case tests
+    - Add Repository tests (with fakes)
 
 ### Low Priority
 
-9. **Documentation**
-   - Update README to match My-Bookshelf quality
-   - Add KDoc comments for public APIs
-   - Create architecture diagram
+11. **Documentation**
+    - Update README to match My-Bookshelf quality
+    - Add KDoc comments for public APIs
+    - Create architecture diagram
 
-10. **Notification Improvements**
+12. **Notification Improvements**
     - Remove network constraint from WorkManager
     - Add user-configurable notification time
     - Improve notification content
@@ -561,50 +742,91 @@ Following [Android Room documentation](https://developer.android.com/training/da
 ## File Organization
 
 ### Feature Module Structure
-Each feature should follow this structure:
+Each feature follows Clean Architecture with proper data/domain separation:
 
 ```
-feature_[name]/
+[feature]/                        (e.g., journal/, auth/)
 ├── data/
-│   ├── data_source/
-│   │   └── [Entity]Dao.kt
-│   └── repository/
-│       └── [Entity]RepositoryImpl.kt
+│   ├── model/                    <- Data layer entities
+│   │   ├── [Entity]Entity.kt     <- Room @Entity (e.g., EntryEntity)
+│   │   └── ...
+│   ├── mapper/                   <- Data ↔ Domain conversion
+│   │   ├── [Entity]Mapper.kt     <- Extension functions (toEntity/toDomain)
+│   │   └── ...
+│   ├── dao/                      <- Room DAOs
+│   │   ├── [Entity]Dao.kt        <- Returns/accepts entities
+│   │   └── ...
+│   ├── repository/               <- Repository implementations
+│   │   ├── [Entity]RepositoryImpl.kt <- Uses mappers, returns domain models
+│   │   └── ...
+│   └── service/                  <- Platform services (optional)
+│       └── [Service]Client.kt    <- e.g., GoogleAuthUiClient
 ├── domain/
-│   ├── model/
-│   │   └── [Entity].kt
-│   ├── repository/
-│   │   └── [Entity]Repository.kt
-│   └── use_case/
-│       ├── Get[Entity]UseCase.kt
-│       ├── Add[Entity]UseCase.kt
-│       ├── Update[Entity]UseCase.kt
-│       ├── Delete[Entity]UseCase.kt
-│       └── [Entity]UseCases.kt (aggregator)
-└── presentation/
-    ├── [Feature]Screen.kt
-    ├── [Feature]ViewModel.kt
-    ├── state/
-    │   └── [Feature]UiState.kt
-    └── components/
-        └── [Reusable]Component.kt
+│   ├── model/                    <- Pure domain models
+│   │   ├── [Entity].kt           <- No @Entity, pure Kotlin
+│   │   └── [Exception].kt        <- Domain exceptions
+│   ├── repository/               <- Repository interfaces only
+│   │   └── [Entity]Repository.kt <- Returns/accepts domain models
+│   ├── usecases/                 <- Business logic
+│   │   ├── [entity]/             <- Grouped by entity (lowercase)
+│   │   │   ├── Get[Entity]UseCase.kt
+│   │   │   ├── Add[Entity]UseCase.kt
+│   │   │   ├── Update[Entity]UseCase.kt
+│   │   │   ├── Delete[Entity]UseCase.kt
+│   │   │   └── [Entity]UseCases.kt (aggregator)
+│   │   └── ...
+│   └── util/                     <- Domain-specific utilities (optional)
+│       └── [Entity]Order.kt      <- Business logic helpers
+└── ui/
+    ├── [screen]/                 <- Screen-specific UI (lowercase)
+    │   ├── [Screen]Screen.kt     <- Root composable (handles ViewModel)
+    │   ├── [Screen]ViewModel.kt  <- State management
+    │   ├── state/
+    │   │   ├── [Screen]UiState.kt  <- Immutable UI state
+    │   │   ├── [Screen]Action.kt   <- User actions
+    │   │   └── [Screen]UiEvent.kt  <- One-time events (optional)
+    │   └── components/           <- Screen-specific composables
+    │       └── [Component].kt
+    └── ...
+
+Example: journal feature
+journal/
+├── data/model/EntryEntity.kt, MoodColorEntity.kt
+├── data/mapper/EntryMapper.kt, MoodColorMapper.kt
+├── data/dao/EntryDao.kt, MoodColorDao.kt
+├── data/repository/EntryRepositoryImpl.kt, MoodColorRepositoryImpl.kt
+├── domain/model/Entry.kt, MoodColor.kt
+├── domain/repository/EntryRepository.kt, MoodColorRepository.kt
+├── domain/usecases/entry/, moodcolor/
+└── ui/overview/, editor/
 ```
 
 ### Core Module
 ```
 core/
 ├── data/
-│   └── TheDayToDatabase.kt
+│   ├── database/
+│   │   └── TheDayToDatabase.kt   <- Room database configuration
+│   └── repository/
+│       └── PreferencesRepositoryImpl.kt <- Shared preferences impl
+├── domain/
+│   ├── repository/
+│   │   └── PreferencesRepository.kt <- Interface
+│   └── util/
+│       ├── OrderType.kt          <- Shared domain utilities
+│       └── ...
 ├── di/
-│   ├── AppModule.kt
-│   └── ViewModelModules.kt
-├── notification/
-│   ├── NotificationWorker.kt
-│   └── Notifications.kt
-└── util/
-    ├── Constants.kt
-    ├── Extensions.kt
-    └── Resource.kt
+│   ├── AppModule.kt              <- App-level DI
+│   └── ViewModelModules.kt       <- ViewModel injection
+├── service/
+│   └── notifications/
+│       ├── NotificationWorker.kt <- WorkManager background tasks
+│       └── NotificationHelper.kt
+└── ui/
+    └── theme/                    <- App-wide theming
+        ├── Color.kt
+        ├── Theme.kt
+        └── Type.kt
 ```
 
 ---
