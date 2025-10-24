@@ -3,10 +3,8 @@ package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_en
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardOptions
@@ -32,7 +30,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
@@ -40,49 +37,50 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
-import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.presentation.util.getColor
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryEvent
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorEvent
-import uk.co.zlurgg.thedayto.feature_mood_color.presentation.AddEditMoodColorViewModel
-import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
-import java.time.LocalDate
-import java.time.ZoneOffset
+import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 
+/**
+ * Pure presenter component for mood selection with color picker.
+ * No ViewModel dependency - receives all state and callbacks as parameters.
+ *
+ * @param selectedMood The currently selected mood text
+ * @param moodColors List of available mood-color combinations
+ * @param hint Hint text to display
+ * @param showMoodColorDialog Whether to show the mood color picker dialog
+ * @param onMoodSelected Callback when a mood is selected (mood, colorHex)
+ * @param onDeleteMoodColor Callback to delete a mood color
+ * @param onToggleMoodColorDialog Callback to toggle the mood color picker dialog
+ * @param onSaveMoodColor Callback to save a new mood color (mood, colorHex)
+ * @param modifier Optional modifier
+ */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun MoodItem(
-    viewModel: AddEditEntryViewModel = koinViewModel(),
-    mcViewModel: AddEditMoodColorViewModel = koinViewModel()
+    selectedMood: String,
+    moodColors: List<MoodColor>,
+    hint: String,
+    showMoodColorDialog: Boolean,
+    onMoodSelected: (mood: String, colorHex: String) -> Unit,
+    onDeleteMoodColor: (MoodColor) -> Unit,
+    onToggleMoodColorDialog: () -> Unit,
+    onSaveMoodColor: (mood: String, colorHex: String) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
-    val moodState = viewModel.entryMood.value
-    val mcMoodState = mcViewModel.state.value
-
-    val hint = if (viewModel.entryDate.value.date == LocalDate.now().atStartOfDay()
-            .toEpochSecond(ZoneOffset.UTC)
-    ) {
-        moodState.todayHint
-    } else {
-        moodState.previousDayHint
-    }
-
-    val moodColorState = viewModel.state.value
-
-//    var color by remember { mutableStateOf(Color.White) }
 
     ExposedDropdownMenuBox(
         expanded = mExpanded,
         onExpandedChange = {
             mExpanded = !mExpanded
-        }
+        },
+        modifier = modifier
     ) {
         OutlinedTextField(
-            value = moodState.mood,
-            onValueChange = { viewModel.onEvent(AddEditEntryEvent.EnteredMood(it)) },
+            value = selectedMood,
+            onValueChange = { /* Read-only, changes via dropdown */ },
             textStyle = MaterialTheme.typography.headlineSmall,
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = MaterialTheme.colorScheme.primary,
@@ -96,7 +94,6 @@ fun MoodItem(
             readOnly = true,
             singleLine = true,
             modifier = Modifier
-//                .background(moodState.color) would require some reworking
                 .fillMaxWidth()
                 .menuAnchor(MenuAnchorType.PrimaryEditable, true)
                 .onGloballyPositioned { coordinates ->
@@ -121,17 +118,11 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
-            mcMoodState.moodColors.forEach { moodColors ->
-                val color = getColor(moodColors.color)
+            moodColors.forEach { moodColor ->
+                val color = getColor(moodColor.color)
                 DropdownMenuItem(
                     onClick = {
-                        moodState.mood = moodColors.mood
-                        viewModel.onEvent(AddEditEntryEvent.EnteredMood(moodState.mood))
-                        viewModel.onEvent(
-                            AddEditEntryEvent.EnteredColor(
-                                color.toArgb().toHexString()
-                            )
-                        )
+                        onMoodSelected(moodColor.mood, moodColor.color)
                         mExpanded = false
                     },
                     text = {
@@ -141,7 +132,7 @@ fun MoodItem(
                         ) {
                             Text(
                                 modifier = Modifier.weight(0.4f),
-                                text = moodColors.mood
+                                text = moodColor.mood
                             )
                             Box(
                                 modifier = Modifier
@@ -152,11 +143,7 @@ fun MoodItem(
                             IconButton(
                                 modifier = Modifier.weight(0.2f),
                                 onClick = {
-                                    mcViewModel.onEvent(
-                                        AddEditMoodColorEvent.DeleteMoodColor(
-                                            moodColors
-                                        )
-                                    )
+                                    onDeleteMoodColor(moodColor)
                                 }) {
                                 Icon(
                                     imageVector = Icons.Default.Cancel,
@@ -171,7 +158,7 @@ fun MoodItem(
             IconButton(
                 modifier = Modifier.fillMaxSize(),
                 onClick = {
-                    viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
+                    onToggleMoodColorDialog()
                     mExpanded = false
                 },
             ) {
@@ -182,14 +169,11 @@ fun MoodItem(
             }
         }
     }
+
     // Mood color picker dialog
     MoodColorPickerDialog(
-        showDialog = moodColorState.isMoodColorSectionVisible,
-        onDismiss = {
-            viewModel.onEvent(AddEditEntryEvent.ToggleMoodColorSection)
-        },
-        onSave = { mood, colorHex ->
-            viewModel.onEvent(AddEditEntryEvent.SaveMoodColor(mood, colorHex))
-        }
+        showDialog = showMoodColorDialog,
+        onDismiss = onToggleMoodColorDialog,
+        onSave = onSaveMoodColor
     )
 }

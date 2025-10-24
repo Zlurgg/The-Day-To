@@ -4,10 +4,13 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -39,7 +42,20 @@ class AddEditEntryViewModel(
     private val _uiEvents = MutableSharedFlow<AddEditEntryUiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    private var getMoodColorsJob: Job? = null
+
     init {
+        // Load mood colors
+        loadMoodColors()
+
+        // Set entry date from navigation parameter if provided
+        savedStateHandle.get<Long>("entryDate")?.let { entryDate ->
+            if (entryDate != -1L) {
+                _uiState.update { it.copy(entryDate = entryDate) }
+            }
+        }
+
+        // Load existing entry if editing
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
             if (entryId != -1) {
                 viewModelScope.launch {
@@ -142,6 +158,14 @@ class AddEditEntryViewModel(
                 }
             }
 
+            is AddEditEntryAction.DeleteMoodColor -> {
+                viewModelScope.launch {
+                    withContext(Dispatchers.IO) {
+                        moodColorUseCases.deleteMoodColor(action.moodColor)
+                    }
+                }
+            }
+
             is AddEditEntryAction.SaveEntry -> {
                 viewModelScope.launch {
                     val state = _uiState.value
@@ -169,5 +193,18 @@ class AddEditEntryViewModel(
                 }
             }
         }
+    }
+
+    private fun loadMoodColors() {
+        getMoodColorsJob?.cancel()
+        getMoodColorsJob = moodColorUseCases.getMoodColors(
+            uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder.Date(
+                uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending
+            )
+        )
+            .onEach { moodColors ->
+                _uiState.update { it.copy(moodColors = moodColors) }
+            }
+            .launchIn(viewModelScope)
     }
 }
