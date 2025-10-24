@@ -4,26 +4,26 @@ import androidx.room.Room
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import uk.co.zlurgg.thedayto.core.data.data_source.TheDayToDatabase
+import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepositoryImpl
-import uk.co.zlurgg.thedayto.feature_sign_in.domain.service.GoogleAuthUiClient
-import uk.co.zlurgg.thedayto.feature_daily_entry.data.repository.DailyEntryRepositoryImpl
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.repository.DailyEntryRepository
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.AddDailyEntry
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DeleteDailyEntryUseCase
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntriesUseCase
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.GetDailyEntry
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.UpdateDailyEntry
-import uk.co.zlurgg.thedayto.feature_mood_color.data.repository.MoodColorRepositoryImpl
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.AddMoodColor
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.DeleteMoodColorUseCase
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.GetMoodColor
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.GetMoodColorsUseCase
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
-import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.UpdateMoodColor
+import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
+import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
+import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.AddEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.DeleteEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.UpdateEntryUseCase
+import uk.co.zlurgg.thedayto.journal.data.repository.MoodColorRepositoryImpl
+import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.AddMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.DeleteMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.GetMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.MoodColorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.UpdateMoodColorUseCase
 
 val appModule = module {
 
@@ -50,15 +50,15 @@ val appModule = module {
 //    viewModelOf(::AddEditEntryViewModel)
 
 
-    single<DailyEntryRepository> { DailyEntryRepositoryImpl(get<TheDayToDatabase>().dailyEntryDao) }
+    single<EntryRepository> { EntryRepositoryImpl(get<TheDayToDatabase>().entryDao) }
 
     single {
-        DailyEntryUseCases(
-            getEntries = GetDailyEntriesUseCase(repository = get()),
-            deleteEntry = DeleteDailyEntryUseCase(repository = get()),
-            addDailyEntry = AddDailyEntry(repository = get()),
-            getDailyEntry = GetDailyEntry(repository = get()),
-            updateDailyEntry = UpdateDailyEntry(repository = get())
+        EntryUseCases(
+            getEntries = GetEntriesUseCase(repository = get()),
+            deleteEntry = DeleteEntryUseCase(repository = get()),
+            addEntryUseCase = AddEntryUseCase(repository = get()),
+            getEntryUseCase = GetEntryUseCase(repository = get()),
+            updateEntryUseCase = UpdateEntryUseCase(repository = get())
         )
     }
 
@@ -68,9 +68,9 @@ val appModule = module {
         MoodColorUseCases(
             getMoodColors = GetMoodColorsUseCase(repository = get()),
             deleteMoodColor = DeleteMoodColorUseCase(repository = get()),
-            addMoodColor = AddMoodColor(repository = get()),
-            getMoodColor = GetMoodColor(repository = get()),
-            updateMoodColor = UpdateMoodColor(repository = get())
+            addMoodColorUseCase = AddMoodColorUseCase(repository = get()),
+            getMoodColorUseCase = GetMoodColorUseCase(repository = get()),
+            updateMoodColorUseCase = UpdateMoodColorUseCase(repository = get())
         )
     }
 
