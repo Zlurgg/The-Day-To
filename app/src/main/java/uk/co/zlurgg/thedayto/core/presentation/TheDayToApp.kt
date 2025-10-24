@@ -26,8 +26,8 @@ import org.koin.compose.currentKoinScope
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.repository.TheDayToPrefRepository
 import uk.co.zlurgg.thedayto.core.presentation.Screen
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreen
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreen
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryScreenRoot
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesScreenRoot
 import uk.co.zlurgg.thedayto.feature_sign_in.domain.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInScreen
 import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
@@ -138,14 +138,14 @@ fun TheDayToApp(
                 val date = it.arguments?.getLong(stringResource(R.string.entrydate)) ?: -1L
                 val backButton =
                     it.arguments?.getBoolean(stringResource(R.string.showbackbutton)) ?: false
-                AddEditEntryScreen(
+                AddEditEntryScreenRoot(
                     navController = navController,
                     entryDate = date,
                     showBackButton = backButton
                 )
             }
             composable(route = Screen.EntriesScreen.route) {
-                EntriesScreen(
+                EntriesScreenRoot(
                     navController = navController,
                     onSignOut = {
                         coroutineScope.launch {
