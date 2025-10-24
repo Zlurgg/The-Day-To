@@ -1,27 +1,26 @@
 package uk.co.zlurgg.thedayto.di
 
 import androidx.lifecycle.SavedStateHandle
-import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.AddEditEntryViewModel
-import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.EntriesViewModel
-import uk.co.zlurgg.thedayto.feature_sign_in.presentation.SignInViewModel
+import uk.co.zlurgg.thedayto.journal.ui.editor.EditorViewModel
+import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewViewModel
+import uk.co.zlurgg.thedayto.auth.ui.SignInViewModel
 
-val addEditEntryModule = module {
+val editorModule = module {
     viewModel { (savedStateHandle: SavedStateHandle) ->
-        AddEditEntryViewModel(
+        EditorViewModel(
             preferencesRepository = get(),
-            dailyEntryUseCases = get(),
+            entryUseCases = get(),
             moodColorUseCases = get(),
             savedStateHandle = savedStateHandle
         )
     }
 }
 
-val entriesModule = module {
+val overviewModule = module {
     viewModel {
-        EntriesViewModel(
+        OverviewViewModel(
             entryUseCase = get()
         )
     }

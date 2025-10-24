@@ -1,0 +1,7 @@
+package uk.co.zlurgg.thedayto.core.data.util
+
+const val PREFERENCE_NAME = "THE_DAY_TO_PREF"
+const val ENTRY_CREATED = "DAILY_ENTRY_CREATED"
+const val FIRST_TIME_USER = "FIRST_TIME_USER"
+const val ENTRY_DATE = "DAILY_ENTRY_DATE"
+const val NOTIFICATIONS_ALLOWED = "NOTIFICATIONS_ALLOWED"
