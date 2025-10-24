@@ -2,7 +2,6 @@ package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_en
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -19,9 +18,11 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
@@ -30,58 +31,82 @@ import uk.co.zlurgg.thedayto.core.presentation.Screen
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.ContentItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.DatePickerItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.components.MoodItem
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.state.AddEditEntryAction
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.state.AddEditEntryUiEvent
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.add_edit_daily_entry.state.AddEditEntryUiState
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 
+/**
+ * Root composable - handles ViewModel, state collection, and side effects
+ */
 @Composable
-fun AddEditEntryScreen(
+fun AddEditEntryScreenRoot(
     navController: NavController,
     showBackButton: Boolean,
     entryDate: Long,
-    viewModel: AddEditEntryViewModel = koinViewModel(),
+    viewModel: AddEditEntryViewModel = koinViewModel()
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
-    LaunchedEffect(key1 = true) {
-        viewModel.eventFlow.collectLatest { event ->
-            when (event) {
-                is AddEditEntryViewModel.UiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(
-                        message = event.message
-                    )
-                }
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-                is AddEditEntryViewModel.UiEvent.SaveEntry -> {
+    // Handle one-time UI events
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvents.collectLatest { event ->
+            when (event) {
+                is AddEditEntryUiEvent.ShowSnackbar -> {
+                    // Handle snackbar via callback
+                }
+                is AddEditEntryUiEvent.SaveEntry -> {
                     navController.navigate(Screen.EntriesScreen.route)
                 }
             }
         }
     }
+
+    // Delegate to presenter
+    AddEditEntryScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
+        onNavigateBack = { navController.navigate(Screen.EntriesScreen.route) },
+        showBackButton = showBackButton,
+        entryDate = entryDate
+    )
+}
+
+/**
+ * Presenter composable - pure UI, no ViewModel dependency
+ */
+@Composable
+private fun AddEditEntryScreen(
+    uiState: AddEditEntryUiState,
+    onAction: (AddEditEntryAction) -> Unit,
+    onNavigateBack: () -> Unit,
+    showBackButton: Boolean,
+    entryDate: Long,
+    modifier: Modifier = Modifier
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
+
     Scaffold(
         topBar = {
             Row(
                 modifier = Modifier.fillMaxWidth()
             ) {
                 if (showBackButton) {
-                    Row {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                            modifier = Modifier
-                                .padding(paddingMedium)
-                                .clickable {
-                                    navController.navigate(Screen.EntriesScreen.route)
-                                }
-                        )
-                    }
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.back),
+                        modifier = Modifier
+                            .padding(paddingMedium)
+                            .clickable { onNavigateBack() }
+                    )
                 }
             }
         },
         floatingActionButton = {
-            /** if we are putting a new mood color in hide button **/
-            if (!viewModel.state.value.isMoodColorSectionVisible) {
+            // Hide FAB when mood color picker is visible
+            if (!uiState.isMoodColorSectionVisible) {
                 FloatingActionButton(
-                    onClick = {
-                        viewModel.onEvent(AddEditEntryEvent.SaveEntry)
-                    },
+                    onClick = { onAction(AddEditEntryAction.SaveEntry) }
                 ) {
                     Icon(
                         imageVector = Icons.Default.Save,
@@ -91,30 +116,22 @@ fun AddEditEntryScreen(
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        content = { padding ->
-            AddEditEntryScreenDisplay(
-                padding,
-                entryDate
-            )
+        modifier = modifier
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(paddingMedium)
+        ) {
+            // Date Picker
+            DatePickerItem(entryDate = entryDate)
+            Spacer(modifier = Modifier.height(paddingMedium))
+            // Mood
+            MoodItem()
+            Spacer(modifier = Modifier.height(paddingMedium))
+            // Content
+            ContentItem()
         }
-    )
-}
-
-@Composable
-fun AddEditEntryScreenDisplay(padding: PaddingValues, entryDate: Long) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(padding)
-            .padding(paddingMedium)
-    ) {
-        // Date Picker
-        DatePickerItem(entryDate = entryDate)
-        Spacer(modifier = Modifier.height(paddingMedium))
-        // Mood
-        MoodItem()
-        Spacer(modifier = Modifier.height(paddingMedium))
-        // Content
-        ContentItem()
     }
 }

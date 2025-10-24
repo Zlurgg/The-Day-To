@@ -49,6 +49,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
@@ -59,6 +60,8 @@ import uk.co.zlurgg.thedayto.core.presentation.util.dayToDatestampForCurrentMont
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.CalenderDay
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.EntryItem
 import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.components.OrderSection
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.state.EntriesAction
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.state.EntriesUiState
 import uk.co.zlurgg.thedayto.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.ui.theme.paddingVeryLarge
@@ -66,20 +69,44 @@ import uk.co.zlurgg.thedayto.ui.theme.paddingXXSmall
 import java.time.LocalDate
 import java.time.ZoneOffset
 
+/**
+ * Root composable - handles ViewModel, state collection, and side effects
+ */
 @Composable
-fun EntriesScreen(
+fun EntriesScreenRoot(
     navController: NavController,
     viewModel: EntriesViewModel = koinViewModel(),
     onSignOut: () -> Unit
 ) {
-    val state = viewModel.state.value
-    val snackbarHostState = remember { SnackbarHostState() }
-//    val scope = rememberCoroutineScope()
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+    // Delegate to presenter
+    EntriesScreen(
+        uiState = uiState,
+        onAction = viewModel::onAction,
+        onNavigateToEntry: { entryId ->
+            navController.navigate(
+                "${Screen.AddEditEntryScreen.route}?entryId=${entryId}&showBackButton=${true}"
+            )
+        },
+        onSignOut = onSignOut
+    )
+}
+
+/**
+ * Presenter composable - pure UI, no ViewModel dependency
+ */
+@Composable
+private fun EntriesScreen(
+    uiState: EntriesUiState,
+    onAction: (EntriesAction) -> Unit,
+    onNavigateToEntry: (Int?) -> Unit,
+    onSignOut: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val snackbarHostState = remember { SnackbarHostState() }
     val currentDate = LocalDate.now()
-    var date by remember {
-        mutableStateOf(currentDate)
-    }
+    var date by remember { mutableStateOf(currentDate) }
     val daysInMonth = date.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
 
@@ -97,9 +124,7 @@ fun EntriesScreen(
                     style = MaterialTheme.typography.headlineMedium
                 )
                 IconButton(
-                    onClick = {
-                        viewModel.onEvent(EntriesEvent.ToggleOrderSection)
-                    },
+                    onClick = { onAction(EntriesAction.ToggleOrderSection) }
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.List,
@@ -108,7 +133,7 @@ fun EntriesScreen(
                 }
             }
             AnimatedVisibility(
-                visible = state.isOrderSectionVisible,
+                visible = uiState.isOrderSectionVisible,
                 enter = fadeIn() + slideInVertically(),
                 exit = fadeOut() + slideOutVertically()
             ) {
@@ -116,15 +141,14 @@ fun EntriesScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = paddingVeryLarge),
-                    dailyEntryOrder = state.dailyEntryOrder,
-                    onOrderChange = {
-                        viewModel.onEvent(EntriesEvent.Order(it))
-                    },
+                    dailyEntryOrder = uiState.dailyEntryOrder,
+                    onOrderChange = { onAction(EntriesAction.Order(it)) },
                     onSignOut = onSignOut
                 )
             }
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = modifier,
         content = { padding ->
             Column(
                 modifier = Modifier
@@ -137,7 +161,6 @@ fun EntriesScreen(
                         .fillMaxWidth()
                         .padding(paddingXXSmall)
                 ) {
-                    /** TODO add drop down list to select year **/
                     Row {
                         Text(text = date.month.toString())
                         Spacer(modifier = Modifier.padding(horizontal = paddingXXSmall))
@@ -147,8 +170,6 @@ fun EntriesScreen(
                 Box(
                     modifier = Modifier.padding(paddingXXSmall)
                 ) {
-                    /** pages are indexed so 12 months as 0-12 but month
-                     * value isn't so -1 from month value for initial **/
                     val pagerState = rememberPagerState(
                         initialPage = date.monthValue - 1,
                         initialPageOffsetFraction = 0f,
@@ -161,7 +182,6 @@ fun EntriesScreen(
                             } else if (calenderPage > (date.monthValue - 1)) {
                                 date = date.plusMonths(1)
                             }
-
                         }
                     }
                     HorizontalPager(
@@ -181,8 +201,7 @@ fun EntriesScreen(
                         ),
                         pageContent = { _ ->
                             LazyVerticalGrid(
-                                modifier = Modifier
-                                    .systemBarsPadding(),
+                                modifier = Modifier.systemBarsPadding(),
                                 columns = GridCells.Fixed(7),
                                 contentPadding = PaddingValues(
                                     horizontal = 16.dp,
@@ -193,24 +212,21 @@ fun EntriesScreen(
                             ) {
                                 var addNumberToCalenderIfNoEntryForDateExists = true
                                 items(dates) {
-                                    val entryDate =
-                                        dayToDatestampForCurrentMonthAndYear(
-                                            it + 1,
-                                            date.monthValue,
-                                            date.year
-                                        )
-                                    state.entries.forEach { entry ->
+                                    val entryDate = dayToDatestampForCurrentMonthAndYear(
+                                        it + 1,
+                                        date.monthValue,
+                                        date.year
+                                    )
+                                    uiState.entries.forEach { entry ->
                                         if (entryDate == entry.dateStamp) {
                                             CalenderDay(
                                                 entry = entry,
-                                                modifier = Modifier
-                                                    .clickable {
-                                                        navController.navigate(
-                                                            "${Screen.AddEditEntryScreen.route}?entryId=${entry.id}&showBackButton=${true}"
-                                                        )
-                                                    }
+                                                modifier = Modifier.clickable {
+                                                    onNavigateToEntry(entry.id)
+                                                }
                                             )
-                                        } else if (addNumberToCalenderIfNoEntryForDateExists && entryDate != currentDate.atStartOfDay()
+                                        } else if (addNumberToCalenderIfNoEntryForDateExists &&
+                                            entryDate != currentDate.atStartOfDay()
                                                 .toEpochSecond(ZoneOffset.UTC)
                                         ) {
                                             addNumberToCalenderIfNoEntryForDateExists = false
@@ -236,37 +252,22 @@ fun EntriesScreen(
 
                 Spacer(modifier = Modifier.height(paddingMedium))
                 LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(state.entries) { entry ->
-                        if (date.monthValue.toString() == datestampToMonthValue(entry.dateStamp)
-                            && date.year.toString() == datestampToYearValue(entry.dateStamp)
+                    items(uiState.entries) { entry ->
+                        if (date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
+                            date.year.toString() == datestampToYearValue(entry.dateStamp)
                         ) {
                             EntryItem(
                                 entry = entry,
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .clickable {
-                                        navController.navigate(
-                                            "${Screen.AddEditEntryScreen.route}?entryId=${entry.id}&showBackButton=${true}"
-                                        )
-                                    },
-                                /*                                onDeleteClick = {
-                                                                    viewModel.onEvent(EntriesEvent.DeleteEntry(entry))
-                                                                    scope.launch {
-                                                                        val result = snackbarHostState.showSnackbar(
-                                                                            message = "Entry deleted",
-                                                                            actionLabel = "Undo"
-                                                                        )
-                                                                        if (result == SnackbarResult.ActionPerformed) {
-                                                                            viewModel.onEvent(EntriesEvent.RestoreEntry)
-                                                                        }
-                                                                    }
-                                                                }*/
+                                        onNavigateToEntry(entry.id)
+                                    }
                             )
                         }
                         Spacer(modifier = Modifier.height(paddingMedium))
                     }
                 }
-
             }
         }
     )
