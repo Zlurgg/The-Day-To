@@ -1,75 +1,66 @@
 package uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries
 
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.core.domain.util.DailyEntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.feature_daily_entry.domain.model.DailyEntry
 import uk.co.zlurgg.thedayto.feature_daily_entry.domain.use_case.DailyEntryUseCases
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.state.EntriesAction
+import uk.co.zlurgg.thedayto.feature_daily_entry.presentation.display_daily_entries.state.EntriesUiState
 
 class EntriesViewModel(
     private val entryUseCase: DailyEntryUseCases
 ) : ViewModel() {
 
-    private val _state = mutableStateOf(EntriesState())
-    val state: State<EntriesState> = _state
-
-    private var recentlyDeletedEntry: DailyEntry? = null
+    // Single source of truth for UI state
+    private val _uiState = MutableStateFlow(EntriesUiState())
+    val uiState = _uiState.asStateFlow()
 
     private var getEntriesJob: Job? = null
-
-    /*    private val _entriesYear = mutableStateOf(
-            EntriesYearFieldState(
-                year = LocalDate.now().year
-            )
-        )
-        private val entriesYear: State<EntriesYearFieldState> = _entriesYear*/
 
     init {
         getEntries(DailyEntryOrder.Date(OrderType.Descending))
     }
 
-    fun onEvent(event: EntriesEvent) {
-        when (event) {
-            is EntriesEvent.Order -> {
-                if (state.value.dailyEntryOrder::class == event.dailyEntryOrder::class &&
-                    state.value.dailyEntryOrder.orderType == event.dailyEntryOrder.orderType
+    fun onAction(action: EntriesAction) {
+        when (action) {
+            is EntriesAction.Order -> {
+                val currentState = _uiState.value
+                if (currentState.dailyEntryOrder::class == action.dailyEntryOrder::class &&
+                    currentState.dailyEntryOrder.orderType == action.dailyEntryOrder.orderType
                 ) {
                     return
                 }
-                getEntries(dailyEntryOrder = event.dailyEntryOrder)
+                getEntries(dailyEntryOrder = action.dailyEntryOrder)
             }
 
-            is EntriesEvent.DeleteEntry -> {
+            is EntriesAction.DeleteEntry -> {
                 viewModelScope.launch {
-                    entryUseCase.deleteEntry(event.entry)
-                    recentlyDeletedEntry = event.entry
+                    entryUseCase.deleteEntry(action.entry)
+                    _uiState.update { it.copy(recentlyDeletedEntry = action.entry) }
                 }
             }
 
-            is EntriesEvent.RestoreEntry -> {
+            is EntriesAction.RestoreEntry -> {
                 viewModelScope.launch {
-                    entryUseCase.addDailyEntry(recentlyDeletedEntry ?: return@launch)
-                    recentlyDeletedEntry = null
+                    val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
+                    entryUseCase.addDailyEntry(deletedEntry)
+                    _uiState.update { it.copy(recentlyDeletedEntry = null) }
                 }
             }
 
-            is EntriesEvent.ToggleOrderSection -> {
-                _state.value = state.value.copy(
-                    isOrderSectionVisible = !state.value.isOrderSectionVisible
-                )
+            is EntriesAction.ToggleOrderSection -> {
+                _uiState.update {
+                    it.copy(isOrderSectionVisible = !it.isOrderSectionVisible)
+                }
             }
-//            is EntriesEvent.ChangeYear -> {
-//                _entriesYear.value = entriesYear.value.copy(
-//                    year = event.year
-//                )
-//            }
         }
     }
 
@@ -77,10 +68,12 @@ class EntriesViewModel(
         getEntriesJob?.cancel()
         getEntriesJob = entryUseCase.getEntries(dailyEntryOrder)
             .onEach { entries ->
-                _state.value = state.value.copy(
-                    entries = entries,
-                    dailyEntryOrder = dailyEntryOrder
-                )
+                _uiState.update {
+                    it.copy(
+                        entries = entries,
+                        dailyEntryOrder = dailyEntryOrder
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }

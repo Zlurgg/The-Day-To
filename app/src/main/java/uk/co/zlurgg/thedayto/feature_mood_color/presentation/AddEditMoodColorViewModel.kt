@@ -1,50 +1,41 @@
 package uk.co.zlurgg.thedayto.feature_mood_color.presentation
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.State
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.use_case.MoodColorUseCases
 import uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder
+import uk.co.zlurgg.thedayto.feature_mood_color.presentation.state.AddEditMoodColorAction
+import uk.co.zlurgg.thedayto.feature_mood_color.presentation.state.AddEditMoodColorUiEvent
+import uk.co.zlurgg.thedayto.feature_mood_color.presentation.state.AddEditMoodColorUiState
 
 class AddEditMoodColorViewModel(
     private val moodColorUseCases: MoodColorUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val _moodColorDate = mutableStateOf(MoodColorDateFieldState(date = 0L))
-    val moodColorDate: State<MoodColorDateFieldState> = _moodColorDate
+    // Single source of truth for UI state
+    private val _uiState = MutableStateFlow(AddEditMoodColorUiState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _moodColorMood = mutableStateOf(MoodTextFieldState(hint = "Enter a new mood"))
-    val moodColorMood: State<MoodTextFieldState> = _moodColorMood
-
-    private val _moodColorColor = mutableStateOf("#000000")
-    val moodColorColor: MutableState<String> = _moodColorColor
-
-    private val _eventFlow = MutableSharedFlow<UiEvent>()
-    val eventFlow = _eventFlow.asSharedFlow()
-
-    private var currentMoodColorId: Int? = null
-
-    private val _state = mutableStateOf(MoodColorState())
-    val state: State<MoodColorState> = _state
+    // One-time UI events
+    private val _uiEvents = MutableSharedFlow<AddEditMoodColorUiEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private var getMoodColorsJob: Job? = null
-
-    private var recentlyDeletedMoodColor: MoodColor? = null
 
     init {
         getMoodColors(MoodColorOrder.Date(OrderType.Descending))
@@ -52,63 +43,60 @@ class AddEditMoodColorViewModel(
             if (moodColorId != -1) {
                 viewModelScope.launch {
                     moodColorUseCases.getMoodColor(moodColorId)?.also { moodColor ->
-                        withContext(Dispatchers.Main) {
-                            currentMoodColorId = moodColor.id
-                            _moodColorDate.value = moodColorDate.value.copy(
+                        _uiState.update {
+                            it.copy(
+                                currentMoodColorId = moodColor.id,
                                 date = moodColor.dateStamp,
+                                mood = moodColor.mood,
+                                color = moodColor.color,
+                                isMoodHintVisible = false
                             )
                         }
-                        _moodColorMood.value = moodColorMood.value.copy(
-                            mood = moodColor.mood,
-                            isHintVisible = false
-                        )
-                        _moodColorColor.value = moodColor.color
                     }
                 }
             }
         }
     }
 
-    fun onEvent(event: AddEditMoodColorEvent) {
-        when (event) {
-            is AddEditMoodColorEvent.EnteredDate -> {
-                _moodColorDate.value = moodColorDate.value.copy(
-                    date = event.date
-                )
+    fun onAction(action: AddEditMoodColorAction) {
+        when (action) {
+            is AddEditMoodColorAction.EnteredDate -> {
+                _uiState.update { it.copy(date = action.date) }
             }
 
-            is AddEditMoodColorEvent.EnteredMood -> {
-                _moodColorMood.value = moodColorMood.value.copy(
-                    mood = event.mood
-                )
+            is AddEditMoodColorAction.EnteredMood -> {
+                _uiState.update { it.copy(mood = action.mood) }
             }
 
-            is AddEditMoodColorEvent.ChangeMoodFocus -> {
-                _moodColorMood.value = moodColorMood.value.copy(
-                    isHintVisible = !event.focusState.isFocused &&
-                            moodColorMood.value.mood.isBlank()
-                )
+            is AddEditMoodColorAction.ChangeMoodFocus -> {
+                _uiState.update {
+                    it.copy(
+                        isMoodHintVisible = !action.focusState.isFocused &&
+                                it.mood.isBlank()
+                    )
+                }
             }
 
-            is AddEditMoodColorEvent.EnteredColor -> {
-                _moodColorColor.value = event.colorEnvelope.hexCode
+            is AddEditMoodColorAction.EnteredColor -> {
+                _uiState.update { it.copy(color = action.colorEnvelope.hexCode) }
             }
 
-            is AddEditMoodColorEvent.SaveMoodColor -> {
+            is AddEditMoodColorAction.SaveMoodColor -> {
                 viewModelScope.launch(Dispatchers.IO) {
+                    val state = _uiState.value
                     try {
                         moodColorUseCases.addMoodColor(
                             MoodColor(
-                                dateStamp = moodColorDate.value.date,
-                                mood = moodColorMood.value.mood,
-                                color = moodColorColor.value,
-                                id = currentMoodColorId
+                                dateStamp = state.date,
+                                mood = state.mood,
+                                color = state.color,
+                                id = state.currentMoodColorId
                             )
                         )
-                        _eventFlow.emit(UiEvent.SaveMoodColor)
+                        _uiEvents.emit(AddEditMoodColorUiEvent.SaveMoodColor)
                     } catch (e: InvalidMoodColorException) {
-                        _eventFlow.emit(
-                            UiEvent.ShowSnackbar(
+                        _uiEvents.emit(
+                            AddEditMoodColorUiEvent.ShowSnackbar(
                                 message = e.message ?: "Couldn't save new mood color"
                             )
                         )
@@ -116,10 +104,10 @@ class AddEditMoodColorViewModel(
                 }
             }
 
-            is AddEditMoodColorEvent.DeleteMoodColor -> {
+            is AddEditMoodColorAction.DeleteMoodColor -> {
                 viewModelScope.launch {
-                    moodColorUseCases.deleteMoodColor(event.moodColor)
-                    recentlyDeletedMoodColor = event.moodColor
+                    moodColorUseCases.deleteMoodColor(action.moodColor)
+                    _uiState.update { it.copy(recentlyDeletedMoodColor = action.moodColor) }
                 }
             }
         }
@@ -129,16 +117,13 @@ class AddEditMoodColorViewModel(
         getMoodColorsJob?.cancel()
         getMoodColorsJob = moodColorUseCases.getMoodColors(moodColorOrder)
             .onEach { moodColors ->
-                _state.value = state.value.copy(
-                    moodColors = moodColors,
-                    moodColorOrder = moodColorOrder
-                )
+                _uiState.update {
+                    it.copy(
+                        moodColors = moodColors,
+                        moodColorOrder = moodColorOrder
+                    )
+                }
             }
             .launchIn(viewModelScope)
-    }
-
-    sealed class UiEvent {
-        data class ShowSnackbar(val message: String) : UiEvent()
-        object SaveMoodColor : UiEvent()
     }
 }
