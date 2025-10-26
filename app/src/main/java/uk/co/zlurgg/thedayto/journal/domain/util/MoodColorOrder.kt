@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.feature_mood_color.domain.util
+package uk.co.zlurgg.thedayto.journal.domain.util
 
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 

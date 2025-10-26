@@ -8,12 +8,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
@@ -23,6 +26,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
@@ -44,17 +48,17 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 fun EditorScreenRoot(
     navController: NavController,
     showBackButton: Boolean,
-    entryDate: Long,
     viewModel: EditorViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { event ->
             when (event) {
                 is EditorUiEvent.ShowSnackbar -> {
-                    // Handle snackbar via callback
+                    snackbarHostState.showSnackbar(event.message)
                 }
                 is EditorUiEvent.SaveEntry -> {
                     navController.navigate(Screen.OverviewScreen.route)
@@ -69,7 +73,7 @@ fun EditorScreenRoot(
         onAction = viewModel::onAction,
         onNavigateBack = { navController.navigate(Screen.OverviewScreen.route) },
         showBackButton = showBackButton,
-        entryDate = entryDate
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -82,10 +86,9 @@ private fun EditorScreen(
     onAction: (EditorAction) -> Unit,
     onNavigateBack: () -> Unit,
     showBackButton: Boolean,
-    entryDate: Long,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
 
     Scaffold(
         topBar = {
@@ -109,12 +112,24 @@ private fun EditorScreen(
             // Hide FAB when mood color picker is visible
             if (!uiState.isMoodColorSectionVisible) {
                 FloatingActionButton(
-                    onClick = { onAction(EditorAction.SaveEntry) }
+                    onClick = { onAction(EditorAction.SaveEntry) },
+                    containerColor = if (uiState.isLoading)
+                        MaterialTheme.colorScheme.secondary
+                    else
+                        MaterialTheme.colorScheme.primaryContainer
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Save,
-                        contentDescription = stringResource(R.string.save_entry)
-                    )
+                    if (uiState.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = MaterialTheme.colorScheme.onSecondary,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Icon(
+                            imageVector = Icons.Default.Save,
+                            contentDescription = stringResource(R.string.save_entry)
+                        )
+                    }
                 }
             }
         },

@@ -25,7 +25,6 @@ data class EditorUiState(
     val previousDayHint: String = "How're were you feeling that day?",
     val contentHint: String = "Any additional info?",
 
-    // Loading & error states
-    val isLoading: Boolean = false,
-    val error: String? = null
+    // Loading state
+    val isLoading: Boolean = false
 )
