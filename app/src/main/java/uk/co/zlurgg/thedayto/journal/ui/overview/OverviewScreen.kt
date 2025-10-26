@@ -53,7 +53,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.Screen
+import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
@@ -76,7 +76,7 @@ import java.time.ZoneOffset
 fun OverviewScreenRoot(
     navController: NavController,
     viewModel: OverviewViewModel = koinViewModel(),
-    onSignOut: () -> Unit
+    onNavigateToSignIn: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -88,6 +88,9 @@ fun OverviewScreenRoot(
                 is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
+                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToSignIn -> {
+                    onNavigateToSignIn()
+                }
             }
         }
     }
@@ -98,10 +101,9 @@ fun OverviewScreenRoot(
         onAction = viewModel::onAction,
         onNavigateToEntry = { entryId ->
             navController.navigate(
-                "${Screen.EditorScreen.route}?entryId=${entryId}&showBackButton=${true}"
+                EditorRoute(entryId = entryId, showBackButton = true)
             )
         },
-        onSignOut = onSignOut,
         snackbarHostState = snackbarHostState
     )
 }
@@ -114,7 +116,6 @@ private fun OverviewScreen(
     uiState: OverviewUiState,
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (Int?) -> Unit,
-    onSignOut: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -159,7 +160,7 @@ private fun OverviewScreen(
                         .padding(vertical = paddingVeryLarge),
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
-                    onSignOut = onSignOut
+                    onSignOut = { onAction(OverviewAction.SignOut) }
                 )
             }
         },

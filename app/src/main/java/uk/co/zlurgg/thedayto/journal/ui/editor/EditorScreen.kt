@@ -32,7 +32,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.Screen
+import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.DatePickerItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
@@ -61,7 +61,10 @@ fun EditorScreenRoot(
                     snackbarHostState.showSnackbar(event.message)
                 }
                 is EditorUiEvent.SaveEntry -> {
-                    navController.navigate(Screen.OverviewScreen.route)
+                    navController.navigate(OverviewRoute) {
+                        // Remove editor from back stack
+                        popUpTo(OverviewRoute) { inclusive = false }
+                    }
                 }
             }
         }
@@ -71,7 +74,12 @@ fun EditorScreenRoot(
     EditorScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onNavigateBack = { navController.navigate(Screen.OverviewScreen.route) },
+        onNavigateBack = {
+            navController.navigate(OverviewRoute) {
+                // Remove editor from back stack
+                popUpTo(OverviewRoute) { inclusive = false }
+            }
+        },
         showBackButton = showBackButton,
         snackbarHostState = snackbarHostState
     )

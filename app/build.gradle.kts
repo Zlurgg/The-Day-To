@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.jetbrainsKotlinKsp)
     alias(libs.plugins.kotlin.parcelize)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
 }
 
@@ -136,4 +137,7 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
     implementation(libs.googleid)
+
+    // Kotlin Serialization (Type-safe Navigation)
+    implementation(libs.kotlinx.serialization.json)
 }

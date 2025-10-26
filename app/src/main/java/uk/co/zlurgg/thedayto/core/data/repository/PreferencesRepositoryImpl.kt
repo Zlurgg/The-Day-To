@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import uk.co.zlurgg.thedayto.core.data.util.ENTRY_CREATED
 import uk.co.zlurgg.thedayto.core.data.util.ENTRY_DATE
 import uk.co.zlurgg.thedayto.core.data.util.PREFERENCE_NAME
+import uk.co.zlurgg.thedayto.core.data.util.SIGNED_IN_STATE
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 
 class PreferencesRepositoryImpl(context: Context) : PreferencesRepository {
@@ -37,6 +38,12 @@ class PreferencesRepositoryImpl(context: Context) : PreferencesRepository {
     }
 
     override fun getEntryDate() = ENTRY_DATE.getDatestamp()
+
+    override fun setSignedInState(isSignedIn: Boolean) {
+        SIGNED_IN_STATE.put(isSignedIn)
+    }
+
+    override fun getSignedInState() = SIGNED_IN_STATE.getBoolean()
 
 }
 

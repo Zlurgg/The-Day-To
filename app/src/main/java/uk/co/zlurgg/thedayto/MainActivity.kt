@@ -10,17 +10,12 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.work.Data
-import org.koin.android.ext.android.inject
 import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.core.service.notifications.Notifications.scheduleNotification
 import uk.co.zlurgg.thedayto.core.ui.TheDayToApp
-import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 class MainActivity : ComponentActivity() {
-
-    /** Firebase auth for google sign in - injected via Koin **/
-    private val googleAuthUiClient: GoogleAuthUiClient by inject()
 
     /** notification permissions **/
     private lateinit var checkNotificationPermission: ActivityResultLauncher<String>
@@ -49,9 +44,7 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             TheDayToTheme {
-                TheDayToApp(
-                    googleAuthUiClient
-                )
+                TheDayToApp()
             }
         }
     }
