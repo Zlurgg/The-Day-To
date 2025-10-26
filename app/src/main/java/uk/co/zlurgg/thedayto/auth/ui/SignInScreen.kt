@@ -1,6 +1,5 @@
 package uk.co.zlurgg.thedayto.auth.ui
 
-import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
