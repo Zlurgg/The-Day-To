@@ -5,4 +5,6 @@ interface PreferencesRepository {
     fun getEntryCreated(): Boolean
     fun setEntryDate(datestamp: Long)
     fun getEntryDate(): Long
+    fun setSignedInState(isSignedIn: Boolean)
+    fun getSignedInState(): Boolean
 }

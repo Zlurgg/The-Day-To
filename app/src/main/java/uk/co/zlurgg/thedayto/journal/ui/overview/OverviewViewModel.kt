@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
@@ -20,7 +22,9 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 
 class OverviewViewModel(
-    private val entryUseCase: EntryUseCases
+    private val entryUseCase: EntryUseCases,
+    private val googleAuthUiClient: GoogleAuthUiClient,
+    private val preferencesRepository: PreferencesRepository
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -112,6 +116,38 @@ class OverviewViewModel(
             is OverviewAction.ToggleOrderSection -> {
                 _uiState.update {
                     it.copy(isOrderSectionVisible = !it.isOrderSectionVisible)
+                }
+            }
+
+            is OverviewAction.SignOut -> {
+                viewModelScope.launch {
+                    // Debounced loading: only show if operation takes > 150ms
+                    val loadingJob = launch {
+                        delay(150)
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
+                    try {
+                        // Sign out from Google Auth
+                        googleAuthUiClient.signOut()
+
+                        // Clear sign-in state
+                        preferencesRepository.setSignedInState(false)
+
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
+
+                        // Navigate to sign-in screen
+                        _uiEvents.emit(OverviewUiEvent.NavigateToSignIn)
+                    } catch (e: Exception) {
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
+                        _uiEvents.emit(
+                            OverviewUiEvent.ShowSnackbar(
+                                message = "Failed to sign out: ${e.message}"
+                            )
+                        )
+                    }
                 }
             }
         }

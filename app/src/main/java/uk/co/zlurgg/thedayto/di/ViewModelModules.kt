@@ -21,13 +21,18 @@ val editorModule = module {
 val overviewModule = module {
     viewModel {
         OverviewViewModel(
-            entryUseCase = get()
+            entryUseCase = get(),
+            googleAuthUiClient = get(),
+            preferencesRepository = get()
         )
     }
 }
 
 val signInModule = module {
     viewModel {
-        SignInViewModel()
+        SignInViewModel(
+            googleAuthUiClient = get(),
+            preferencesRepository = get()
+        )
     }
 }
