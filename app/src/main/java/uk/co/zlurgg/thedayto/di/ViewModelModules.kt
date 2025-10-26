@@ -1,8 +1,8 @@
 package uk.co.zlurgg.thedayto.di
 
 import androidx.lifecycle.SavedStateHandle
-import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import org.koin.core.module.dsl.viewModel
 import uk.co.zlurgg.thedayto.journal.ui.editor.EditorViewModel
 import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewViewModel
 import uk.co.zlurgg.thedayto.auth.ui.SignInViewModel
