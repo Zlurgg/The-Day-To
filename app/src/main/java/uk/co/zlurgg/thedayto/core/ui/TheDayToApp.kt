@@ -139,7 +139,6 @@ fun TheDayToApp(
                     it.arguments?.getBoolean(stringResource(R.string.showbackbutton)) ?: false
                 EditorScreenRoot(
                     navController = navController,
-                    entryDate = date,
                     showBackButton = backButton
                 )
             }

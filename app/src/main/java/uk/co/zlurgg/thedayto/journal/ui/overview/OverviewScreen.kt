@@ -79,6 +79,18 @@ fun OverviewScreenRoot(
     onSignOut: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+
+    // Handle one-time UI events
+    LaunchedEffect(key1 = true) {
+        viewModel.uiEvents.collect { event ->
+            when (event) {
+                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar -> {
+                    snackbarHostState.showSnackbar(event.message)
+                }
+            }
+        }
+    }
 
     // Delegate to presenter
     OverviewScreen(
@@ -89,7 +101,8 @@ fun OverviewScreenRoot(
                 "${Screen.EditorScreen.route}?entryId=${entryId}&showBackButton=${true}"
             )
         },
-        onSignOut = onSignOut
+        onSignOut = onSignOut,
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -102,15 +115,16 @@ private fun OverviewScreen(
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (Int?) -> Unit,
     onSignOut: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
-    val snackbarHostState = remember { SnackbarHostState() }
     val currentDate = LocalDate.now()
     var date by remember { mutableStateOf(currentDate) }
     val daysInMonth = date.lengthOfMonth()
     val dates = MutableList(daysInMonth) { it }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             Row(
                 modifier = Modifier

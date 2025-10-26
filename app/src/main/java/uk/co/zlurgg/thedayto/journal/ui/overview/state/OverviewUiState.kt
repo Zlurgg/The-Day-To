@@ -9,5 +9,6 @@ data class OverviewUiState(
     val entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     val isOrderSectionVisible: Boolean = false,
     val entryMade: Boolean = false,
-    val recentlyDeletedEntry: Entry? = null
+    val recentlyDeletedEntry: Entry? = null,
+    val isLoading: Boolean = false
 )

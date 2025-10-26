@@ -3,7 +3,10 @@ package uk.co.zlurgg.thedayto.journal.ui.overview
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -13,6 +16,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 
 class OverviewViewModel(
@@ -22,6 +26,10 @@ class OverviewViewModel(
     // Single source of truth for UI state
     private val _uiState = MutableStateFlow(OverviewUiState())
     val uiState = _uiState.asStateFlow()
+
+    // One-time UI events
+    private val _uiEvents = MutableSharedFlow<OverviewUiEvent>()
+    val uiEvents = _uiEvents.asSharedFlow()
 
     private var getEntriesJob: Job? = null
 
@@ -43,16 +51,61 @@ class OverviewViewModel(
 
             is OverviewAction.DeleteEntry -> {
                 viewModelScope.launch {
-                    entryUseCase.deleteEntry(action.entry)
-                    _uiState.update { it.copy(recentlyDeletedEntry = action.entry) }
+                    // Debounced loading: only show if operation takes > 150ms
+                    val loadingJob = launch {
+                        delay(150)
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
+                    try {
+                        entryUseCase.deleteEntry(action.entry)
+                        loadingJob.cancel()
+                        _uiState.update {
+                            it.copy(
+                                recentlyDeletedEntry = action.entry,
+                                isLoading = false
+                            )
+                        }
+                    } catch (e: Exception) {
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
+                        _uiEvents.emit(
+                            OverviewUiEvent.ShowSnackbar(
+                                message = "Failed to delete entry: ${e.message}"
+                            )
+                        )
+                    }
                 }
             }
 
             is OverviewAction.RestoreEntry -> {
                 viewModelScope.launch {
                     val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
-                    entryUseCase.addEntryUseCase(deletedEntry)
-                    _uiState.update { it.copy(recentlyDeletedEntry = null) }
+
+                    // Debounced loading: only show if operation takes > 150ms
+                    val loadingJob = launch {
+                        delay(150)
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
+                    try {
+                        entryUseCase.addEntryUseCase(deletedEntry)
+                        loadingJob.cancel()
+                        _uiState.update {
+                            it.copy(
+                                recentlyDeletedEntry = null,
+                                isLoading = false
+                            )
+                        }
+                    } catch (e: Exception) {
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
+                        _uiEvents.emit(
+                            OverviewUiEvent.ShowSnackbar(
+                                message = "Failed to restore entry: ${e.message}"
+                            )
+                        )
+                    }
                 }
             }
 

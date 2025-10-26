@@ -1,3 +1,9 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+---
+
 # The Day To - Modernization Guide
 
 ## Project Overview
@@ -23,6 +29,132 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 - [Jetpack Compose Best Practices](https://developer.android.com/jetpack/compose/architecture)
 - [Material Design 3 Guidelines](https://m3.material.io/)
 - [Guide to App Architecture](https://developer.android.com/topic/architecture/recommendations)
+
+---
+
+## Development Commands
+
+### Building the App
+
+```bash
+# Build debug APK
+./gradlew assembleDebug
+
+# Build release APK
+./gradlew assembleRelease
+
+# Build all variants
+./gradlew build
+
+# Clean build
+./gradlew clean
+```
+
+### Running on Device/Emulator
+
+```bash
+# Install debug build on connected device
+./gradlew installDebug
+
+# Install and launch (manual launch required after install)
+./gradlew installDebug
+# Then launch manually from device or use: adb shell am start -n uk.co.zlurgg.thedayto/.MainActivity
+
+# Uninstall debug build
+./gradlew uninstallDebug
+```
+
+### Running Tests
+
+```bash
+# Run all unit tests
+./gradlew test
+
+# Run unit tests for debug variant only
+./gradlew testDebugUnitTest
+
+# Run instrumented tests (requires connected device/emulator)
+./gradlew connectedAndroidTest
+
+# Run instrumented tests for debug only
+./gradlew connectedDebugAndroidTest
+
+# Run all checks (lint + tests)
+./gradlew check
+```
+
+**Note**: Currently there are no test files in the project. Tests need to be added as part of the modernization effort (see Implementation Status section).
+
+### Code Quality & Linting
+
+```bash
+# Run lint checks
+./gradlew lint
+
+# Run lint and auto-fix issues where possible
+./gradlew lintFix
+
+# Run lint on debug variant
+./gradlew lintDebug
+
+# Run lint on release variant
+./gradlew lintRelease
+```
+
+### Dependency Management
+
+```bash
+# Show all project dependencies
+./gradlew app:dependencies
+
+# Check for outdated dependencies (if plugin configured)
+./gradlew dependencyUpdates
+
+# Show buildscript dependencies
+./gradlew buildEnvironment
+```
+
+### KSP (Kotlin Symbol Processing)
+
+This project uses KSP for Room and other annotation processors:
+
+```bash
+# KSP is automatically run during compilation
+# To clean KSP generated files:
+./gradlew clean
+
+# KSP output location: app/build/generated/ksp/
+```
+
+### Gradle Sync Issues
+
+If you encounter Gradle sync issues:
+
+```bash
+# Clean and rebuild
+./gradlew clean build
+
+# Clear Gradle cache (nuclear option)
+rm -rf .gradle
+./gradlew clean build
+
+# Invalidate caches in Android Studio:
+# File → Invalidate Caches → Invalidate and Restart
+```
+
+### Running with Android Studio
+
+1. Open project in Android Studio
+2. Sync Gradle files (File → Sync Project with Gradle Files)
+3. Select a device/emulator from the dropdown
+4. Click Run (green play button) or Shift+F10
+
+### Working with Koin DI
+
+All dependencies are managed via Koin:
+- Module definitions: `app/src/main/java/uk/co/zlurgg/thedayto/di/`
+- ViewModels use `koinViewModel()` in composables
+- Repositories and DAOs use constructor injection
 
 ---
 
@@ -940,4 +1072,4 @@ Before publishing to GitHub:
 
 This is a living document. Update as the project evolves and new patterns emerge.
 
-Last Updated: 2025-10-22
+Last Updated: 2025-10-26

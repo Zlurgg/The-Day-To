@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -24,6 +25,7 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.MoodColorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -59,21 +61,48 @@ class EditorViewModel(
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
             if (entryId != -1) {
                 viewModelScope.launch {
-                    val entry = withContext(Dispatchers.IO) {
-                        entryUseCases.getEntryUseCase(entryId)
+                    // Debounced loading: only show if operation takes > 150ms
+                    val loadingJob = launch {
+                        delay(150)
+                        _uiState.update { it.copy(isLoading = true) }
                     }
-                    entry?.let {
-                        _uiState.update { state ->
-                            state.copy(
-                                currentEntryId = it.id,
-                                entryDate = it.dateStamp,
-                                entryMood = it.mood,
-                                entryContent = it.content,
-                                entryColor = it.color,
-                                isMoodHintVisible = false,
-                                isContentHintVisible = false
+
+                    try {
+                        val entry = withContext(Dispatchers.IO) {
+                            entryUseCases.getEntryUseCase(entryId)
+                        }
+                        entry?.let {
+                            loadingJob.cancel() // Cancel if finished quickly
+                            _uiState.update { state ->
+                                state.copy(
+                                    currentEntryId = it.id,
+                                    entryDate = it.dateStamp,
+                                    entryMood = it.mood,
+                                    entryContent = it.content,
+                                    entryColor = it.color,
+                                    isMoodHintVisible = false,
+                                    isContentHintVisible = false,
+                                    isLoading = false
+                                )
+                            }
+                        } ?: run {
+                            // Entry not found
+                            loadingJob.cancel()
+                            _uiState.update { it.copy(isLoading = false) }
+                            _uiEvents.emit(
+                                EditorUiEvent.ShowSnackbar(
+                                    message = "Entry not found"
+                                )
                             )
                         }
+                    } catch (e: Exception) {
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar(
+                                message = "Failed to load entry: ${e.message}"
+                            )
+                        )
                     }
                 }
             }
@@ -169,6 +198,13 @@ class EditorViewModel(
             is EditorAction.SaveEntry -> {
                 viewModelScope.launch {
                     val state = _uiState.value
+
+                    // Debounced loading: only show if operation takes > 150ms
+                    val loadingJob = launch {
+                        delay(150)
+                        _uiState.update { it.copy(isLoading = true) }
+                    }
+
                     try {
                         withContext(Dispatchers.IO) {
                             entryUseCases.addEntryUseCase(
@@ -182,8 +218,12 @@ class EditorViewModel(
                             )
                             preferencesRepository.setEntryDate(state.entryDate)
                         }
+                        loadingJob.cancel() // Cancel if finished quickly
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(EditorUiEvent.SaveEntry)
                     } catch (e: InvalidEntryException) {
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
                                 message = e.message ?: "Couldn't save entry"
@@ -198,7 +238,7 @@ class EditorViewModel(
     private fun loadMoodColors() {
         getMoodColorsJob?.cancel()
         getMoodColorsJob = moodColorUseCases.getMoodColors(
-            uk.co.zlurgg.thedayto.feature_mood_color.domain.util.MoodColorOrder.Date(
+            MoodColorOrder.Date(
                 uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending
             )
         )
