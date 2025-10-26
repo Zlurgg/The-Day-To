@@ -46,7 +46,3 @@ class PreferencesRepositoryImpl(context: Context) : PreferencesRepository {
     override fun getSignedInState() = SIGNED_IN_STATE.getBoolean()
 
 }
-
-// Keeping old class name for backward compatibility - can be removed after all usages are updated
-@Deprecated("Use PreferencesRepository interface and PreferencesRepositoryImpl instead", ReplaceWith("PreferencesRepositoryImpl"))
-typealias TheDayToPrefRepository = PreferencesRepositoryImpl
