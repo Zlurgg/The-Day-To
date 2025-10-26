@@ -125,6 +125,7 @@ private fun OverviewScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        modifier = modifier,
         topBar = {
             Row(
                 modifier = Modifier
@@ -162,8 +163,6 @@ private fun OverviewScreen(
                 )
             }
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier,
         content = { padding ->
             Column(
                 modifier = Modifier
