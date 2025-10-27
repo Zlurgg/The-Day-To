@@ -7,6 +7,8 @@ import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
@@ -45,6 +47,14 @@ val appModule = module {
     // Preferences Repository
     single<PreferencesRepository> {
         PreferencesRepositoryImpl(androidContext())
+    }
+
+    // Notification Repository
+    single<NotificationRepository> {
+        NotificationRepositoryImpl(
+            context = androidContext(),
+            preferencesRepository = get()
+        )
     }
 
 //    viewModelOf(::AddEditEntryViewModel)
