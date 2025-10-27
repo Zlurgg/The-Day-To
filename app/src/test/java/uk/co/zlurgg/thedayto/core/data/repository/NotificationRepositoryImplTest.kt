@@ -4,6 +4,8 @@ import android.content.Context
 import androidx.work.WorkManager
 import androidx.work.testing.WorkManagerTestInitHelper
 import org.junit.After
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,8 +14,6 @@ import org.robolectric.RuntimeEnvironment
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import java.time.LocalDate
 import java.time.ZoneOffset
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 
 /**
  * Unit tests for NotificationRepositoryImpl.
@@ -82,8 +82,8 @@ class NotificationRepositoryImplTest {
             "thedayto_notification_work"
         ).get()
 
-        assertEquals(1, workInfos.size, "Should have one scheduled work")
-        assertNotNull(workInfos.firstOrNull(), "Work should be scheduled")
+        assertEquals("Should have one scheduled work", 1, workInfos.size)
+        assertNotNull("Work should be scheduled", workInfos.firstOrNull())
     }
 
     /**
@@ -104,7 +104,7 @@ class NotificationRepositoryImplTest {
             "thedayto_notification_work"
         ).get()
 
-        assertEquals(1, workInfos.size, "Should schedule notification for first-time user")
+        assertEquals("Should schedule notification for first-time user", 1, workInfos.size)
     }
 
     /**
@@ -128,7 +128,7 @@ class NotificationRepositoryImplTest {
             "thedayto_notification_work"
         ).get()
 
-        assertEquals(0, workInfos.size, "Should NOT schedule when entry already made today")
+        assertEquals("Should NOT schedule when entry already made today", 0, workInfos.size)
     }
 
     /**
@@ -153,7 +153,7 @@ class NotificationRepositoryImplTest {
             "thedayto_notification_work"
         ).get()
 
-        assertEquals(0, workInfos.size, "Should NOT schedule when entry is in the future")
+        assertEquals("Should NOT schedule when entry is in the future", 0, workInfos.size)
     }
 
     /**
@@ -171,7 +171,7 @@ class NotificationRepositoryImplTest {
         var workInfos = workManager.getWorkInfosForUniqueWork(
             "thedayto_notification_work"
         ).get()
-        assertEquals(1, workInfos.size, "Notification should be scheduled initially")
+        assertEquals("Notification should be scheduled initially", 1, workInfos.size)
 
         // When: Cancel notifications
         notificationRepository.cancelNotifications()
@@ -180,7 +180,7 @@ class NotificationRepositoryImplTest {
         workInfos = workManager.getWorkInfosForUniqueWork(
             "thedayto_notification_work"
         ).get()
-        assertEquals(0, workInfos.size, "All notifications should be cancelled")
+        assertEquals("All notifications should be cancelled", 0, workInfos.size)
     }
 
     /**
@@ -202,7 +202,7 @@ class NotificationRepositoryImplTest {
             "thedayto_notification_work"
         ).get()
 
-        assertEquals(1, workInfos.size, "Should replace existing work, not create duplicate")
+        assertEquals("Should replace existing work, not create duplicate", 1, workInfos.size)
     }
 
     // Note: hasNotificationPermission() tests are commented out because they depend on
