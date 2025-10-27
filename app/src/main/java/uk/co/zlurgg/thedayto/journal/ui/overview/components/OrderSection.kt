@@ -24,7 +24,9 @@ fun OrderSection(
     modifier: Modifier = Modifier,
     entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     onOrderChange: (EntryOrder) -> Unit,
-    onSignOut: () -> Unit
+    onSignOut: () -> Unit,
+    hasNotificationPermission: Boolean = false,
+    onRequestNotificationPermission: () -> Unit = {}
 ) {
     Column(
         modifier = modifier
@@ -69,8 +71,23 @@ fun OrderSection(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingMedium),
-            horizontalArrangement = Arrangement.End
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
+            // Notification button
+            Button(
+                onClick = onRequestNotificationPermission,
+                enabled = !hasNotificationPermission
+            ) {
+                Text(
+                    text = if (hasNotificationPermission) {
+                        stringResource(R.string.notifications_enabled)
+                    } else {
+                        stringResource(R.string.enable_notifications)
+                    }
+                )
+            }
+
+            // Sign out button
             Button(onClick = onSignOut) {
                 Text(text = stringResource(R.string.sign_out))
             }
