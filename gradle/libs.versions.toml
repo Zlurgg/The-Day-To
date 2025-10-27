@@ -45,6 +45,13 @@ credentials = "1.5.0"
 googleid = "1.1.1"
 kotlinxSerialization = "1.7.3"
 
+# Testing
+mockk = "1.13.13"
+turbine = "1.2.0"
+coroutinesTest = "1.9.0"
+workTesting = "2.10.5"
+robolectric = "4.13"
+
 [libraries]
 accompanist-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanistFlowlayout" }
 accompanist-swiperefresh = { module = "com.google.accompanist:accompanist-swiperefresh", version.ref = "accompanistSwiperefresh" }
@@ -106,6 +113,14 @@ googleid = { group = "com.google.android.libraries.identity.googleid", name = "g
 
 # Kotlin Serialization (type-safe navigation)
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
+
+# Testing libraries
+mockk = { group = "io.mockk", name = "mockk", version.ref = "mockk" }
+mockk-android = { group = "io.mockk", name = "mockk-android", version.ref = "mockk" }
+turbine = { group = "app.cash.turbine", name = "turbine", version.ref = "turbine" }
+kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "coroutinesTest" }
+androidx-work-testing = { group = "androidx.work", name = "work-testing", version.ref = "workTesting" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 
 [plugins]
