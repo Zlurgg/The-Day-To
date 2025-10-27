@@ -24,7 +24,6 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
@@ -45,14 +44,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
@@ -66,9 +66,6 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialo
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
 import java.time.LocalDate
 import java.time.ZoneOffset
 
