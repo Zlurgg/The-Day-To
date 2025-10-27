@@ -43,6 +43,6 @@
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
     <string name="enable_notifications">Enable Notifications</string>
-    <string name="notifications_enabled">Notifications Enabled</string>
+    <string name="disable_notifications">Disable Notifications</string>
     <string name="sign_out">Sign out</string>
 </resources>

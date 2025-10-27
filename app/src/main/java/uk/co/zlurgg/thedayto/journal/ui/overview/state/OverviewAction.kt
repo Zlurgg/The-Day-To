@@ -7,7 +7,6 @@ sealed interface OverviewAction {
     data class Order(val entryOrder: EntryOrder) : OverviewAction
     data class DeleteEntry(val entry: Entry) : OverviewAction
     data object RestoreEntry : OverviewAction
-    data object ToggleOrderSection : OverviewAction
     data object RequestNotificationPermission : OverviewAction
     data object SignOut : OverviewAction
 }
