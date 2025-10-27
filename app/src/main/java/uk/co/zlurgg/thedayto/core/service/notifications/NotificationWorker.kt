@@ -11,6 +11,7 @@ import android.media.AudioAttributes
 import android.media.RingtoneManager
 import android.os.Build
 import androidx.core.app.NotificationCompat
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
@@ -20,9 +21,27 @@ import uk.co.zlurgg.thedayto.R
 
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
     override fun doWork(): Result {
+        // Check if notification permission is granted (Android 13+)
+        if (!hasNotificationPermission()) {
+            Timber.w("Notification permission not granted - skipping notification")
+            return Result.success()  // Not a failure, just can't show notification
+        }
+
         val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
         createNotification(id)
         return Result.success()
+    }
+
+    /**
+     * Check if app has notification permission.
+     * On API < 33, always returns true (no runtime permission required).
+     */
+    private fun hasNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()
+        } else {
+            true  // Pre-Android 13: no runtime permission needed
+        }
     }
 
     private fun createNotification(id: Int) {

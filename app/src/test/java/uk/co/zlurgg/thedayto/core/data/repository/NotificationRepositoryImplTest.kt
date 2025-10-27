@@ -176,11 +176,20 @@ class NotificationRepositoryImplTest {
         // When: Cancel notifications
         notificationRepository.cancelNotifications()
 
-        // Then: Work should be cancelled
+        // Then: Work should be cancelled (check state instead of count)
         workInfos = workManager.getWorkInfosForUniqueWork(
             "thedayto_notification_work"
         ).get()
-        assertEquals("All notifications should be cancelled", 0, workInfos.size)
+
+        // WorkManager keeps record but marks as CANCELLED
+        if (workInfos.isNotEmpty()) {
+            assertEquals(
+                "Work should be in CANCELLED state",
+                androidx.work.WorkInfo.State.CANCELLED,
+                workInfos.first().state
+            )
+        }
+        // OR it might be removed entirely (both are valid)
     }
 
     /**
