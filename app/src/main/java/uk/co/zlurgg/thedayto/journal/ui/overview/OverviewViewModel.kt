@@ -115,12 +115,6 @@ class OverviewViewModel(
                 }
             }
 
-            is OverviewAction.ToggleOrderSection -> {
-                _uiState.update {
-                    it.copy(isOrderSectionVisible = !it.isOrderSectionVisible)
-                }
-            }
-
             is OverviewAction.RequestNotificationPermission -> {
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.RequestNotificationPermission)

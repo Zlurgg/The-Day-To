@@ -1,10 +1,5 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -32,10 +27,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.List
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -64,12 +55,12 @@ import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalenderDay
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntryItem
-import uk.co.zlurgg.thedayto.journal.ui.overview.components.OrderSection
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingVeryLarge
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -85,9 +76,7 @@ fun OverviewScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val hasNotificationPermission = remember(viewModel) {
-        viewModel.hasNotificationPermission()
-    }
+    var hasNotificationPermission by remember { mutableStateOf(viewModel.hasNotificationPermission()) }
 
     // Permission launcher for Android 13+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -95,6 +84,7 @@ fun OverviewScreenRoot(
     ) { isGranted ->
         if (isGranted) {
             viewModel.onNotificationPermissionGranted()
+            hasNotificationPermission = true // Update state to trigger recomposition
         }
     }
 
@@ -167,29 +157,10 @@ private fun OverviewScreen(
                     text = stringResource(R.string.your_month_in_colour),
                     style = MaterialTheme.typography.headlineMedium
                 )
-                IconButton(
-                    onClick = { onAction(OverviewAction.ToggleOrderSection) }
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.List,
-                        contentDescription = stringResource(R.string.sort)
-                    )
-                }
-            }
-            AnimatedVisibility(
-                visible = uiState.isOrderSectionVisible,
-                enter = fadeIn() + slideInVertically(),
-                exit = fadeOut() + slideOutVertically()
-            ) {
-                OrderSection(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = paddingVeryLarge),
-                    entryOrder = uiState.entryOrder,
-                    onOrderChange = { onAction(OverviewAction.Order(it)) },
-                    onSignOut = { onAction(OverviewAction.SignOut) },
+                SettingsMenu(
                     hasNotificationPermission = hasNotificationPermission,
-                    onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) }
+                    onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) },
+                    onSignOut = { onAction(OverviewAction.SignOut) }
                 )
             }
         },
@@ -306,6 +277,15 @@ private fun OverviewScreen(
                 }
 
                 Spacer(modifier = Modifier.height(paddingMedium))
+
+                // Entry sorting controls
+                EntrySortSection(
+                    modifier = Modifier.padding(vertical = paddingSmall),
+                    entryOrder = uiState.entryOrder,
+                    onOrderChange = { onAction(OverviewAction.Order(it)) }
+                )
+
+                Spacer(modifier = Modifier.height(paddingSmall))
 
                 // Filter entries for current month/year
                 val filteredEntries = uiState.entries.filter { entry ->
