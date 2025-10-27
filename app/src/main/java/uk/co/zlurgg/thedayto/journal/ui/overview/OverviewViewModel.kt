@@ -21,6 +21,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import java.time.LocalTime
 
 class OverviewViewModel(
     private val entryUseCase: EntryUseCases,
@@ -41,6 +42,22 @@ class OverviewViewModel(
 
     init {
         getEntries(EntryOrder.Date(OrderType.Descending))
+        updateGreeting()
+    }
+
+    /**
+     * Update greeting based on current time of day
+     */
+    private fun updateGreeting() {
+        val hour = LocalTime.now().hour
+        val greeting = when (hour) {
+            in 0..4 -> "Good night"
+            in 5..11 -> "Good morning"
+            in 12..16 -> "Good afternoon"
+            in 17..20 -> "Good evening"
+            else -> "Good night"
+        }
+        _uiState.update { it.copy(greeting = greeting) }
     }
 
     fun onAction(action: OverviewAction) {

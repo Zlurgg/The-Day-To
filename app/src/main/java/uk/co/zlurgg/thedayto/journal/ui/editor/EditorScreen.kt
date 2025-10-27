@@ -20,6 +20,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -33,8 +34,8 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
+import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
-import uk.co.zlurgg.thedayto.journal.ui.editor.components.DatePickerItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -150,10 +151,11 @@ private fun EditorScreen(
                 .padding(padding)
                 .padding(paddingMedium)
         ) {
-            // Date Picker
-            DatePickerItem(
-                selectedDate = uiState.entryDate,
-                onDateSelected = { date -> onAction(EditorAction.EnteredDate(date)) }
+            // Date display (read-only)
+            Text(
+                text = datestampToFormattedDate(uiState.entryDate),
+                style = MaterialTheme.typography.titleLarge,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Spacer(modifier = Modifier.height(paddingMedium))
 
@@ -161,9 +163,7 @@ private fun EditorScreen(
             MoodItem(
                 selectedMood = uiState.entryMood,
                 moodColors = uiState.moodColors,
-                hint = if (uiState.entryDate == java.time.LocalDate.now().atStartOfDay()
-                        .toEpochSecond(java.time.ZoneOffset.UTC)
-                ) uiState.todayHint else uiState.previousDayHint,
+                hint = uiState.moodHint,
                 showMoodColorDialog = uiState.isMoodColorSectionVisible,
                 onMoodSelected = { mood, colorHex ->
                     onAction(EditorAction.EnteredMood(mood))
