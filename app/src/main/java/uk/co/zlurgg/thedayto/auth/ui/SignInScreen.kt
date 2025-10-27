@@ -37,7 +37,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 @Composable
 fun SignInScreenRoot(
     viewModel: SignInViewModel = koinViewModel(),
-    onNavigateToOverview: () -> Unit
+    onNavigateToOverview: () -> Unit,
+    onNavigateToEditor: (Long) -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -52,6 +53,9 @@ fun SignInScreenRoot(
                 }
                 is SignInUiEvent.NavigateToOverview -> {
                     onNavigateToOverview()
+                }
+                is SignInUiEvent.NavigateToEditor -> {
+                    onNavigateToEditor(event.entryDate)
                 }
             }
         }

@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
@@ -30,7 +29,6 @@ import java.time.LocalDate
 import java.time.ZoneOffset
 
 class EditorViewModel(
-    private val preferencesRepository: PreferencesRepository,
     private val entryUseCases: EntryUseCases,
     private val moodColorUseCases: MoodColorUseCases,
     savedStateHandle: SavedStateHandle
@@ -216,7 +214,6 @@ class EditorViewModel(
                                     id = state.currentEntryId
                                 )
                             )
-                            preferencesRepository.setEntryDate(state.entryDate)
                         }
                         loadingJob.cancel() // Cancel if finished quickly
                         _uiState.update { it.copy(isLoading = false) }

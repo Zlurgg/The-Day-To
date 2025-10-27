@@ -13,7 +13,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
@@ -24,7 +24,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 class OverviewViewModel(
     private val entryUseCase: EntryUseCases,
     private val googleAuthUiClient: GoogleAuthUiClient,
-    private val preferencesRepository: PreferencesRepository
+    private val authStateRepository: AuthStateRepository
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -132,7 +132,7 @@ class OverviewViewModel(
                         googleAuthUiClient.signOut()
 
                         // Clear sign-in state
-                        preferencesRepository.setSignedInState(false)
+                        authStateRepository.setSignedInState(false)
 
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }

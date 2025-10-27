@@ -5,8 +5,8 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
+import uk.co.zlurgg.thedayto.auth.data.repository.AuthStateRepositoryImpl
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.DeleteEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.UpdateEntryUseCase
 import uk.co.zlurgg.thedayto.journal.data.repository.MoodColorRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
@@ -44,16 +45,16 @@ val appModule = module {
         )
     }
 
-    // Preferences Repository
-    single<PreferencesRepository> {
-        PreferencesRepositoryImpl(androidContext())
+    // Auth State Repository
+    single<AuthStateRepository> {
+        AuthStateRepositoryImpl(androidContext())
     }
 
     // Notification Repository
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             context = androidContext(),
-            preferencesRepository = get()
+            getEntryByDateUseCase = GetEntryByDateUseCase(repository = get())
         )
     }
 
@@ -68,6 +69,7 @@ val appModule = module {
             deleteEntry = DeleteEntryUseCase(repository = get()),
             addEntryUseCase = AddEntryUseCase(repository = get()),
             getEntryUseCase = GetEntryUseCase(repository = get()),
+            getEntryByDate = GetEntryByDateUseCase(repository = get()),
             updateEntryUseCase = UpdateEntryUseCase(repository = get())
         )
     }
