@@ -20,11 +20,13 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
+import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 
 class OverviewViewModel(
     private val entryUseCase: EntryUseCases,
     private val googleAuthUiClient: GoogleAuthUiClient,
-    private val authStateRepository: AuthStateRepository
+    private val authStateRepository: AuthStateRepository,
+    private val notificationRepository: NotificationRepository
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -119,6 +121,12 @@ class OverviewViewModel(
                 }
             }
 
+            is OverviewAction.RequestNotificationPermission -> {
+                viewModelScope.launch {
+                    _uiEvents.emit(OverviewUiEvent.RequestNotificationPermission)
+                }
+            }
+
             is OverviewAction.SignOut -> {
                 viewModelScope.launch {
                     // Debounced loading: only show if operation takes > 150ms
@@ -151,6 +159,21 @@ class OverviewViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * Called after notification permission is granted.
+     * Sets up daily notification scheduling.
+     */
+    fun onNotificationPermissionGranted() {
+        notificationRepository.setupDailyNotificationIfNeeded()
+    }
+
+    /**
+     * Check if notification permission is granted
+     */
+    fun hasNotificationPermission(): Boolean {
+        return notificationRepository.hasNotificationPermission()
     }
 
     private fun getEntries(entryOrder: EntryOrder) {

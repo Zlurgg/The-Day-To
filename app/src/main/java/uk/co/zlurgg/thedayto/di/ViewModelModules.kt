@@ -22,7 +22,8 @@ val overviewModule = module {
         OverviewViewModel(
             entryUseCase = get(),
             googleAuthUiClient = get(),
-            authStateRepository = get()
+            authStateRepository = get(),
+            notificationRepository = get()
         )
     }
 }

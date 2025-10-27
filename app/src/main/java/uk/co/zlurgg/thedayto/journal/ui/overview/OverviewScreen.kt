@@ -5,6 +5,10 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import android.Manifest
+import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -81,6 +85,18 @@ fun OverviewScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val hasNotificationPermission = remember(viewModel) {
+        viewModel.hasNotificationPermission()
+    }
+
+    // Permission launcher for Android 13+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            viewModel.onNotificationPermissionGranted()
+        }
+    }
 
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {
@@ -91,6 +107,14 @@ fun OverviewScreenRoot(
                 }
                 is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToSignIn -> {
                     onNavigateToSignIn()
+                }
+                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.RequestNotificationPermission -> {
+                    // Request permission on Android 13+, otherwise just setup notifications
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        viewModel.onNotificationPermissionGranted()
+                    }
                 }
             }
         }
@@ -105,7 +129,8 @@ fun OverviewScreenRoot(
                 EditorRoute(entryId = entryId, showBackButton = true)
             )
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        hasNotificationPermission = hasNotificationPermission
     )
 }
 
@@ -118,6 +143,7 @@ private fun OverviewScreen(
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (Int?) -> Unit,
     snackbarHostState: SnackbarHostState,
+    hasNotificationPermission: Boolean,
     modifier: Modifier = Modifier
 ) {
     val currentDate = LocalDate.now()
@@ -161,7 +187,9 @@ private fun OverviewScreen(
                         .padding(vertical = paddingVeryLarge),
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
-                    onSignOut = { onAction(OverviewAction.SignOut) }
+                    onSignOut = { onAction(OverviewAction.SignOut) },
+                    hasNotificationPermission = hasNotificationPermission,
+                    onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) }
                 )
             }
         },
