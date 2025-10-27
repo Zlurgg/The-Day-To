@@ -14,6 +14,7 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
 
@@ -25,11 +26,6 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     }
 
     private fun createNotification(id: Int) {
-        val pending = createPendingIntent(
-            deepLink = "https://thedayto.co.uk/sign-in",
-            context = applicationContext
-        )
-
         val intent = Intent(applicationContext, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         intent.putExtra(NOTIFICATION_ID, id)
@@ -45,13 +41,19 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             )
         }
 
+        // Use pendingIntent for content intent (fallback if deep link fails)
+        val deepLinkPendingIntent = createPendingIntent(
+            deepLink = "https://thedayto.co.uk/sign-in",
+            context = applicationContext
+        )
+
         val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
             .setContentTitle(applicationContext.getString(R.string.notification_title))
             .setContentText(applicationContext.getString(R.string.notification_content_text))
             .setSmallIcon(R.drawable.ic_notification_foreground)
             .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pending)
-            .setDefaults(NotificationCompat.DEFAULT_ALL).setContentIntent(pendingIntent)
+            .setContentIntent(deepLinkPendingIntent ?: pendingIntent) // Use deep link or fallback
+            .setDefaults(NotificationCompat.DEFAULT_ALL)
             .setAutoCancel(true)
 
         val notificationManager =
@@ -82,7 +84,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     }
 
     /** allows for deep linking to go from notification to screen in app **/
-    private fun createPendingIntent(deepLink: String, context: Context): PendingIntent {
+    private fun createPendingIntent(deepLink: String, context: Context): PendingIntent? {
         val startActivityIntent = Intent(
             Intent.ACTION_VIEW, deepLink.toUri(),
             context, MainActivity::class.java
@@ -91,7 +93,12 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             addNextIntentWithParentStack(startActivityIntent)
             getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE)
         }
-        return resultPendingIntent!!
+
+        if (resultPendingIntent == null) {
+            Timber.e("Failed to create PendingIntent for deep link: $deepLink")
+        }
+
+        return resultPendingIntent
     }
 
     companion object {
