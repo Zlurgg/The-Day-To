@@ -12,11 +12,15 @@ import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 class SignInViewModel(
     private val googleAuthUiClient: GoogleAuthUiClient,
-    private val preferencesRepository: PreferencesRepository
+    private val authStateRepository: AuthStateRepository,
+    private val entryUseCases: EntryUseCases
 ) : ViewModel() {
 
     // UI State
@@ -42,10 +46,18 @@ class SignInViewModel(
                 _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
 
                 // Save sign-in state
-                preferencesRepository.setSignedInState(true)
+                authStateRepository.setSignedInState(true)
 
-                // Navigate to overview
-                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                // Check if entry exists for today
+                val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+                val todayEntry = entryUseCases.getEntryByDate(todayStart)
+
+                // Navigate based on entry existence
+                if (todayEntry != null) {
+                    _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                } else {
+                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
+                }
             } else {
                 // Sign-in failed
                 val errorMessage = result.errorMessage ?: "Unknown sign-in error"
@@ -61,12 +73,20 @@ class SignInViewModel(
      */
     fun checkSignInStatus() {
         viewModelScope.launch {
-            val isSignedIn = preferencesRepository.getSignedInState()
+            val isSignedIn = authStateRepository.getSignedInState()
             val currentUser = googleAuthUiClient.getSignedInUser()
 
             if (isSignedIn && currentUser != null) {
-                // User is signed in, navigate to overview
-                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                // Check if entry exists for today
+                val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+                val todayEntry = entryUseCases.getEntryByDate(todayStart)
+
+                // Navigate based on entry existence
+                if (todayEntry != null) {
+                    _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                } else {
+                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
+                }
             }
         }
     }

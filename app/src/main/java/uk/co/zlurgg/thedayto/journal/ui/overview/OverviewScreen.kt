@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.layout.Arrangement
@@ -240,17 +241,32 @@ private fun OverviewScreen(
                                                 onNavigateToEntry(entry.id)
                                             }
                                         )
-                                    } else if (entryDate != currentDate.atStartOfDay()
+                                    } else {
+                                        val isToday = entryDate == currentDate.atStartOfDay()
                                             .toEpochSecond(ZoneOffset.UTC)
-                                    ) {
+
                                         Box(
-                                            modifier = Modifier,
+                                            modifier = Modifier
+                                                .then(
+                                                    if (isToday) {
+                                                        Modifier
+                                                            .border(
+                                                                2.dp,
+                                                                MaterialTheme.colorScheme.primary,
+                                                                androidx.compose.foundation.shape.CircleShape
+                                                            )
+                                                            .clickable { onNavigateToEntry(null) }
+                                                    } else {
+                                                        Modifier
+                                                    }
+                                                ),
                                             contentAlignment = Alignment.Center
                                         ) {
                                             Text(
-                                                modifier = Modifier.alpha(0.5f),
+                                                modifier = Modifier.alpha(if (isToday) 1f else 0.5f),
                                                 text = "${dayIndex + 1}",
                                                 style = MaterialTheme.typography.headlineSmall,
+                                                color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
                                                 overflow = TextOverflow.Ellipsis
                                             )
                                         }

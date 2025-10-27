@@ -13,7 +13,8 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryByDateUseCase
+import kotlinx.coroutines.runBlocking
 import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker
 import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import java.time.LocalDate
@@ -25,37 +26,41 @@ import java.util.concurrent.TimeUnit
  * Implementation of NotificationRepository.
  *
  * Handles notification scheduling using WorkManager and checks user's
- * entry status via PreferencesRepository.
+ * entry status by querying the database directly.
  *
  * Follows Clean Architecture:
- * - Uses dependency injection (Context + PreferencesRepository via Koin)
- * - No direct SharedPreferences access
+ * - Uses dependency injection (Context + GetEntryByDateUseCase via Koin)
+ * - Single source of truth: Database
  * - Implements domain layer interface
  *
  * @param context Application context for WorkManager and permission checks
- * @param preferencesRepository Repository for accessing user preferences
+ * @param getEntryByDateUseCase Use case for checking if entry exists for a date
  */
 class NotificationRepositoryImpl(
     private val context: Context,
-    private val preferencesRepository: PreferencesRepository
+    private val getEntryByDateUseCase: GetEntryByDateUseCase
 ) : NotificationRepository {
 
     override fun setupDailyNotificationIfNeeded() {
         try {
-            val entryDate = preferencesRepository.getEntryDate()
             val yesterday = LocalDate.now()
                 .atStartOfDay()
                 .minusDays(1)
                 .toEpochSecond(ZoneOffset.UTC)
 
+            // Check if entry exists for yesterday using database
+            val yesterdayEntry = runBlocking {
+                getEntryByDateUseCase(yesterday)
+            }
+
             // Schedule notification if:
             // 1. User made entry yesterday (needs reminder for today)
-            // 2. First-time user (entryDate == 0)
-            if (entryDate == yesterday || entryDate == 0L) {
+            // 2. First-time user (no entry for yesterday - fresh install)
+            if (yesterdayEntry != null) {
                 scheduleNotification()
-                Timber.d("Notification scheduled - Entry date: $entryDate")
+                Timber.d("Notification scheduled - User created entry yesterday")
             } else {
-                Timber.d("Notification NOT needed - Entry date: $entryDate, Yesterday: $yesterday")
+                Timber.d("Notification NOT needed - No entry yesterday")
             }
         } catch (e: Exception) {
             Timber.e(e, "Failed to setup daily notification")
