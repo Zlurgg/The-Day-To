@@ -1,10 +1,12 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
+import androidx.compose.ui.unit.dp
 
 /**
  * Pure presenter component for content entry field.
@@ -33,6 +35,8 @@ fun ContentItem(
         onFocusChange = onFocusChange,
         isHintVisible = isHintVisible,
         textStyle = MaterialTheme.typography.bodyLarge,
-        modifier = modifier.fillMaxHeight()
+        modifier = modifier
+            .fillMaxWidth()
+            .height(200.dp)  // Fixed height to avoid FAB overlap
     )
 }

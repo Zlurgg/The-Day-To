@@ -1,12 +1,16 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
@@ -127,27 +131,38 @@ fun MoodItem(
                     },
                     text = {
                         Row(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalAlignment = Alignment.CenterVertically
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                modifier = Modifier.weight(0.4f),
-                                text = moodColor.mood
-                            )
+                            // Color indicator - prominent circle
                             Box(
                                 modifier = Modifier
-                                    .background(color)
-                                    .size(12.dp)
-                                    .weight(0.4f)
+                                    .size(24.dp)
+                                    .background(color, CircleShape)
                             )
+
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            // Mood text - takes remaining space
+                            Text(
+                                text = moodColor.mood,
+                                style = MaterialTheme.typography.bodyLarge,
+                                modifier = Modifier.weight(1f)
+                            )
+
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            // Delete button
                             IconButton(
-                                modifier = Modifier.weight(0.2f),
                                 onClick = {
                                     onDeleteMoodColor(moodColor)
-                                }) {
+                                }
+                            ) {
                                 Icon(
                                     imageVector = Icons.Default.Cancel,
-                                    contentDescription = stringResource(R.string.delete_custom_mood_color)
+                                    contentDescription = stringResource(R.string.delete_custom_mood_color),
+                                    tint = MaterialTheme.colorScheme.error
                                 )
                             }
                         }
@@ -155,18 +170,31 @@ fun MoodItem(
                 )
             }
             // Button to add a new mood color
-            IconButton(
-                modifier = Modifier.fillMaxSize(),
+            DropdownMenuItem(
                 onClick = {
                     onToggleMoodColorDialog()
                     mExpanded = false
                 },
-            ) {
-                Icon(
-                    imageVector = Icons.Default.AddCircle,
-                    contentDescription = stringResource(R.string.add_custom_mood_color)
-                )
-            }
+                text = {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AddCircle,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Text(
+                            text = stringResource(R.string.add_custom_mood_color),
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                }
+            )
         }
     }
 
@@ -174,6 +202,10 @@ fun MoodItem(
     MoodColorPickerDialog(
         showDialog = showMoodColorDialog,
         onDismiss = onToggleMoodColorDialog,
-        onSave = onSaveMoodColor
+        onSave = { mood, colorHex ->
+            onSaveMoodColor(mood, colorHex)
+            // Auto-select the newly created mood color
+            onMoodSelected(mood, colorHex)
+        }
     )
 }

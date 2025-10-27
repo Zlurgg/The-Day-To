@@ -52,8 +52,12 @@ class EditorViewModel(
         savedStateHandle.get<Long>("entryDate")?.let { entryDate ->
             if (entryDate != -1L) {
                 _uiState.update { it.copy(entryDate = entryDate) }
+                updateMoodHint()
             }
         }
+
+        // Update hint for initial state
+        updateMoodHint()
 
         // Load existing entry if editing
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
@@ -230,6 +234,22 @@ class EditorViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * Update mood hint based on whether the entry is for today or a previous day
+     */
+    private fun updateMoodHint() {
+        val isToday = _uiState.value.entryDate == LocalDate.now().atStartOfDay()
+            .toEpochSecond(ZoneOffset.UTC)
+
+        val hint = if (isToday) {
+            "How're you feeling today?"
+        } else {
+            "How're were you feeling that day?"
+        }
+
+        _uiState.update { it.copy(moodHint = hint) }
     }
 
     private fun loadMoodColors() {

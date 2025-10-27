@@ -4,6 +4,9 @@ import android.Manifest
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -54,8 +57,12 @@ import uk.co.zlurgg.thedayto.core.ui.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalenderDay
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.DayOfWeekHeader
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.EmptyState
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntryItem
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -138,8 +145,14 @@ private fun OverviewScreen(
 ) {
     val currentDate = LocalDate.now()
     var date by remember { mutableStateOf(currentDate) }
+    var showMonthYearPicker by remember { mutableStateOf(false) }
     val daysInMonth = date.lengthOfMonth()
-    val dates = MutableList(daysInMonth) { it }
+
+    // Calculate the day of week for the first day of the month (Monday = 1, Sunday = 7)
+    val firstDayOfWeek = date.withDayOfMonth(1).dayOfWeek.value
+    // Create empty cells for days before the 1st (Monday=1 needs 0 empty, Tuesday=2 needs 1, etc.)
+    val emptyCellsAtStart = firstDayOfWeek - 1
+    val totalCells = emptyCellsAtStart + daysInMonth
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -154,8 +167,9 @@ private fun OverviewScreen(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.your_month_in_colour),
-                    style = MaterialTheme.typography.headlineMedium
+                    text = uiState.greeting,
+                    style = MaterialTheme.typography.headlineMedium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 SettingsMenu(
                     hasNotificationPermission = hasNotificationPermission,
@@ -169,21 +183,67 @@ private fun OverviewScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
-                    .padding(paddingMedium)
+                    .padding(paddingXXSmall)
             ) {
+                // Filter entries for current month/year
+                val filteredEntries = uiState.entries.filter { entry ->
+                    date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
+                            date.year.toString() == datestampToYearValue(entry.dateStamp)
+                }
+
+                // Month statistics summary
+                MonthStatistics(
+                    entries = filteredEntries,
+                    daysInMonth = daysInMonth,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = paddingMedium)
+                )
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(paddingXXSmall)
+                        .padding(paddingSmall)
+                        .clickable { showMonthYearPicker = true },
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     Row {
-                        Text(text = date.month.toString())
-                        Spacer(modifier = Modifier.padding(horizontal = paddingXXSmall))
-                        Text(text = date.year.toString())
+                        Text(
+                            text = date.month.toString(),
+                            style = MaterialTheme.typography.titleLarge
+                        )
+                        Spacer(modifier = Modifier.padding(horizontal = paddingSmall))
+                        Text(
+                            text = date.year.toString(),
+                            style = MaterialTheme.typography.titleLarge
+                        )
                     }
+                    Text(
+                        text = "▼",
+                        style = MaterialTheme.typography.labelSmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
+
+                // Month/Year picker dialog
+                if (showMonthYearPicker) {
+                    MonthYearPickerDialog(
+                        currentDate = date,
+                        onDismiss = { showMonthYearPicker = false },
+                        onDateSelected = { newDate ->
+                            date = newDate
+                        }
+                    )
+                }
+
+                // Day-of-week labels
+                DayOfWeekHeader(
+                    modifier = Modifier.fillMaxWidth()
+                )
+
                 Box(
-                    modifier = Modifier.padding(paddingXXSmall)
+                    modifier = Modifier
                 ) {
                     val pagerState = rememberPagerState(
                         initialPage = date.monthValue - 1,
@@ -219,55 +279,65 @@ private fun OverviewScreen(
                                 modifier = Modifier.systemBarsPadding(),
                                 columns = GridCells.Fixed(7),
                                 contentPadding = PaddingValues(
-                                    horizontal = 16.dp,
-                                    vertical = 16.dp
+                                    start = 16.dp,
+                                    end = 16.dp,
+                                    top = 0.dp,
+                                    bottom = 16.dp
                                 ),
                                 verticalArrangement = Arrangement.spacedBy(8.dp),
                                 horizontalArrangement = Arrangement.spacedBy(8.dp)
                             ) {
-                                items(dates) { dayIndex ->
-                                    val entryDate = dayToDatestampForCurrentMonthAndYear(
-                                        dayIndex + 1,
-                                        date.monthValue,
-                                        date.year
-                                    )
-                                    val entry = uiState.entries.find { it.dateStamp == entryDate }
-
-                                    if (entry != null) {
-                                        CalenderDay(
-                                            entry = entry,
-                                            modifier = Modifier.clickable {
-                                                onNavigateToEntry(entry.id)
-                                            }
-                                        )
+                                items(totalCells) { index ->
+                                    // Check if this is an empty cell before the first day
+                                    if (index < emptyCellsAtStart) {
+                                        // Empty cell - just a spacer
+                                        Box(modifier = Modifier)
                                     } else {
-                                        val isToday = entryDate == currentDate.atStartOfDay()
-                                            .toEpochSecond(ZoneOffset.UTC)
+                                        // Calculate the actual day number (1-based)
+                                        val dayNumber = index - emptyCellsAtStart + 1
+                                        val entryDate = dayToDatestampForCurrentMonthAndYear(
+                                            dayNumber,
+                                            date.monthValue,
+                                            date.year
+                                        )
+                                        val entry = uiState.entries.find { it.dateStamp == entryDate }
 
-                                        Box(
-                                            modifier = Modifier
-                                                .then(
-                                                    if (isToday) {
-                                                        Modifier
-                                                            .border(
-                                                                2.dp,
-                                                                MaterialTheme.colorScheme.primary,
-                                                                androidx.compose.foundation.shape.CircleShape
-                                                            )
-                                                            .clickable { onNavigateToEntry(null) }
-                                                    } else {
-                                                        Modifier
-                                                    }
-                                                ),
-                                            contentAlignment = Alignment.Center
-                                        ) {
-                                            Text(
-                                                modifier = Modifier.alpha(if (isToday) 1f else 0.5f),
-                                                text = "${dayIndex + 1}",
-                                                style = MaterialTheme.typography.headlineSmall,
-                                                color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
-                                                overflow = TextOverflow.Ellipsis
+                                        if (entry != null) {
+                                            CalenderDay(
+                                                entry = entry,
+                                                modifier = Modifier.clickable {
+                                                    onNavigateToEntry(entry.id)
+                                                }
                                             )
+                                        } else {
+                                            val isToday = entryDate == currentDate.atStartOfDay()
+                                                .toEpochSecond(ZoneOffset.UTC)
+
+                                            Box(
+                                                modifier = Modifier
+                                                    .then(
+                                                        if (isToday) {
+                                                            Modifier
+                                                                .border(
+                                                                    2.dp,
+                                                                    MaterialTheme.colorScheme.primary,
+                                                                    androidx.compose.foundation.shape.CircleShape
+                                                                )
+                                                                .clickable { onNavigateToEntry(null) }
+                                                        } else {
+                                                            Modifier
+                                                        }
+                                                    ),
+                                                contentAlignment = Alignment.Center
+                                            ) {
+                                                Text(
+                                                    modifier = Modifier.alpha(if (isToday) 1f else 0.5f),
+                                                    text = "$dayNumber",
+                                                    style = MaterialTheme.typography.headlineSmall,
+                                                    color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                                    overflow = TextOverflow.Ellipsis
+                                                )
+                                            }
                                         }
                                     }
                                 }
@@ -287,23 +357,34 @@ private fun OverviewScreen(
 
                 Spacer(modifier = Modifier.height(paddingSmall))
 
-                // Filter entries for current month/year
-                val filteredEntries = uiState.entries.filter { entry ->
-                    date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
-                            date.year.toString() == datestampToYearValue(entry.dateStamp)
-                }
-
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    items(filteredEntries) { entry ->
-                        EntryItem(
-                            entry = entry,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    onNavigateToEntry(entry.id)
+                // Show empty state if no entries, otherwise show list
+                if (filteredEntries.isEmpty()) {
+                    EmptyState()
+                } else {
+                    LazyColumn(modifier = Modifier.fillMaxSize()) {
+                        items(
+                            items = filteredEntries,
+                            key = { it.id ?: 0 }
+                        ) { entry ->
+                            AnimatedVisibility(
+                                visible = true,
+                                enter = fadeIn() + slideInVertically(
+                                    initialOffsetY = { it / 4 }
+                                )
+                            ) {
+                                Column {
+                                    EntryItem(
+                                        entry = entry,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                onNavigateToEntry(entry.id)
+                                            }
+                                    )
+                                    Spacer(modifier = Modifier.height(paddingMedium))
                                 }
-                        )
-                        Spacer(modifier = Modifier.height(paddingMedium))
+                            }
+                        }
                     }
                 }
             }

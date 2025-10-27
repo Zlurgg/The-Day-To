@@ -2,67 +2,70 @@ package uk.co.zlurgg.thedayto.core.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-val md_theme_light_primary = Color(0xFF006781)
+// Warm, calming theme for mood tracking - inspired by soft pastels and nature
+// Light Theme - Warm & Inviting
+val md_theme_light_primary = Color(0xFF7B6FA1)  // Soft purple - calm and reflective
 val md_theme_light_onPrimary = Color(0xFFFFFFFF)
-val md_theme_light_primaryContainer = Color(0xFFBAEAFF)
-val md_theme_light_onPrimaryContainer = Color(0xFF001F29)
-val md_theme_light_secondary = Color(0xFF4C626B)
+val md_theme_light_primaryContainer = Color(0xFFEBDEFF)  // Very light lavender
+val md_theme_light_onPrimaryContainer = Color(0xFF2A1A40)
+val md_theme_light_secondary = Color(0xFF8B7355)  // Warm earth tone
 val md_theme_light_onSecondary = Color(0xFFFFFFFF)
-val md_theme_light_secondaryContainer = Color(0xFFCFE6F1)
-val md_theme_light_onSecondaryContainer = Color(0xFF071E26)
-val md_theme_light_tertiary = Color(0xFF5B5B7E)
+val md_theme_light_secondaryContainer = Color(0xFFFFDDB6)  // Soft peach
+val md_theme_light_onSecondaryContainer = Color(0xFF2E1500)
+val md_theme_light_tertiary = Color(0xFF6B9080)  // Sage green - natural and calming
 val md_theme_light_onTertiary = Color(0xFFFFFFFF)
-val md_theme_light_tertiaryContainer = Color(0xFFE2DFFF)
-val md_theme_light_onTertiaryContainer = Color(0xFF181837)
+val md_theme_light_tertiaryContainer = Color(0xFFD4F1E8)  // Mint
+val md_theme_light_onTertiaryContainer = Color(0xFF00201A)
 val md_theme_light_error = Color(0xFFBA1A1A)
 val md_theme_light_errorContainer = Color(0xFFFFDAD6)
 val md_theme_light_onError = Color(0xFFFFFFFF)
 val md_theme_light_onErrorContainer = Color(0xFF410002)
-val md_theme_light_background = Color(0xFFFBFCFE)
-val md_theme_light_onBackground = Color(0xFF191C1D)
-val md_theme_light_surface = Color(0xFFFBFCFE)
-val md_theme_light_onSurface = Color(0xFF191C1D)
-val md_theme_light_surfaceVariant = Color(0xFFDCE4E8)
-val md_theme_light_onSurfaceVariant = Color(0xFF40484C)
-val md_theme_light_outline = Color(0xFF70787D)
-val md_theme_light_inverseOnSurface = Color(0xFFEFF1F3)
-val md_theme_light_inverseSurface = Color(0xFF2E3132)
-val md_theme_light_inversePrimary = Color(0xFF5FD4FE)
+val md_theme_light_background = Color(0xFFFFFBF7)  // Warm off-white
+val md_theme_light_onBackground = Color(0xFF1F1B16)
+val md_theme_light_surface = Color(0xFFFFFBF7)  // Warm off-white
+val md_theme_light_onSurface = Color(0xFF1F1B16)
+val md_theme_light_surfaceVariant = Color(0xFFE8E0D8)  // Warm beige
+val md_theme_light_onSurfaceVariant = Color(0xFF4A4540)
+val md_theme_light_outline = Color(0xFF7C7570)
+val md_theme_light_inverseOnSurface = Color(0xFFF8EFE7)
+val md_theme_light_inverseSurface = Color(0xFF34302A)
+val md_theme_light_inversePrimary = Color(0xFFD5BAFF)
 val md_theme_light_shadow = Color(0xFF000000)
-val md_theme_light_surfaceTint = Color(0xFF006781)
-val md_theme_light_outlineVariant = Color(0xFFC0C8CC)
+val md_theme_light_surfaceTint = Color(0xFF7B6FA1)
+val md_theme_light_outlineVariant = Color(0xFFCCC4BD)
 val md_theme_light_scrim = Color(0xFF000000)
 
-val md_theme_dark_primary = Color(0xFF5FD4FE)
-val md_theme_dark_onPrimary = Color(0xFF003544)
-val md_theme_dark_primaryContainer = Color(0xFF004D62)
-val md_theme_dark_onPrimaryContainer = Color(0xFFBAEAFF)
-val md_theme_dark_secondary = Color(0xFFB3CAD5)
-val md_theme_dark_onSecondary = Color(0xFF1E333C)
-val md_theme_dark_secondaryContainer = Color(0xFF354A53)
-val md_theme_dark_onSecondaryContainer = Color(0xFFCFE6F1)
-val md_theme_dark_tertiary = Color(0xFFC4C3EB)
-val md_theme_dark_onTertiary = Color(0xFF2D2D4D)
-val md_theme_dark_tertiaryContainer = Color(0xFF444465)
-val md_theme_dark_onTertiaryContainer = Color(0xFFE2DFFF)
+// Dark Theme - Soothing & Comfortable
+val md_theme_dark_primary = Color(0xFFD5BAFF)  // Light lavender for dark mode
+val md_theme_dark_onPrimary = Color(0xFF402D5A)
+val md_theme_dark_primaryContainer = Color(0xFF5A4D7A)
+val md_theme_dark_onPrimaryContainer = Color(0xFFEBDEFF)
+val md_theme_dark_secondary = Color(0xFFFFCE93)  // Warm golden
+val md_theme_dark_onSecondary = Color(0xFF4A2800)
+val md_theme_dark_secondaryContainer = Color(0xFF6A4F3C)
+val md_theme_dark_onSecondaryContainer = Color(0xFFFFDDB6)
+val md_theme_dark_tertiary = Color(0xFFB8D5CB)  // Soft mint
+val md_theme_dark_onTertiary = Color(0xFF24382F)
+val md_theme_dark_tertiaryContainer = Color(0xFF52756A)
+val md_theme_dark_onTertiaryContainer = Color(0xFFD4F1E8)
 val md_theme_dark_error = Color(0xFFFFB4AB)
 val md_theme_dark_errorContainer = Color(0xFF93000A)
 val md_theme_dark_onError = Color(0xFF690005)
 val md_theme_dark_onErrorContainer = Color(0xFFFFDAD6)
-val md_theme_dark_background = Color(0xFF191C1D)
-val md_theme_dark_onBackground = Color(0xFFE1E3E4)
-val md_theme_dark_surface = Color(0xFF191C1D)
-val md_theme_dark_onSurface = Color(0xFFE1E3E4)
-val md_theme_dark_surfaceVariant = Color(0xFF40484C)
-val md_theme_dark_onSurfaceVariant = Color(0xFFC0C8CC)
-val md_theme_dark_outline = Color(0xFF8A9296)
-val md_theme_dark_inverseOnSurface = Color(0xFF191C1D)
-val md_theme_dark_inverseSurface = Color(0xFFE1E3E4)
-val md_theme_dark_inversePrimary = Color(0xFF006781)
+val md_theme_dark_background = Color(0xFF1A1614)  // Warm dark brown
+val md_theme_dark_onBackground = Color(0xFFE8E0D8)
+val md_theme_dark_surface = Color(0xFF1A1614)  // Warm dark brown
+val md_theme_dark_onSurface = Color(0xFFE8E0D8)
+val md_theme_dark_surfaceVariant = Color(0xFF4A4540)
+val md_theme_dark_onSurfaceVariant = Color(0xFFCCC4BD)
+val md_theme_dark_outline = Color(0xFF958F8A)
+val md_theme_dark_inverseOnSurface = Color(0xFF1A1614)
+val md_theme_dark_inverseSurface = Color(0xFFE8E0D8)
+val md_theme_dark_inversePrimary = Color(0xFF7B6FA1)
 val md_theme_dark_shadow = Color(0xFF000000)
-val md_theme_dark_surfaceTint = Color(0xFF5FD4FE)
-val md_theme_dark_outlineVariant = Color(0xFF40484C)
+val md_theme_dark_surfaceTint = Color(0xFFD5BAFF)
+val md_theme_dark_outlineVariant = Color(0xFF4A4540)
 val md_theme_dark_scrim = Color(0xFF000000)
 
-
-val seed = Color(0xFF87CEEB)
+// Seed color for theme generation
+val seed = Color(0xFF7B6FA1)  // Soft purple
