@@ -8,5 +8,5 @@ sealed interface OverviewAction {
     data class DeleteEntry(val entry: Entry) : OverviewAction
     data object RestoreEntry : OverviewAction
     data object RequestNotificationPermission : OverviewAction
-    data object SignOut : OverviewAction
+    data object RequestSignOut : OverviewAction
 }

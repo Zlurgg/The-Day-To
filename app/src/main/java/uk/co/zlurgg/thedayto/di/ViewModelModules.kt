@@ -19,8 +19,7 @@ val editorModule = module {
 val overviewModule = module {
     viewModel {
         OverviewViewModel(
-            overviewUseCases = get(),
-            signOutUseCase = get()
+            overviewUseCases = get()
         )
     }
 }
