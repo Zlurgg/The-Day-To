@@ -1557,5 +1557,137 @@ Completed comprehensive modernization following Google's 2025 Android best pract
 
 ---
 
-**Last Updated:** 2025-10-26
-**Current Status:** Phase 2 COMPLETE ✅ (Type-Safe Navigation) → Phase 3 Ready (ViewModel Consolidation) → Code Quality Focus
+---
+
+### Session 7 (2025-10-27) - Material Design 3 Enhancements ✨
+
+**Focus:** UI/UX improvements with Material Design 3, architectural cleanup, and proper separation of concerns
+
+**Tasks Completed:**
+
+**1. Material Design 3 Theme Implementation ✅**
+- ✅ Disabled dynamic colors (Material You) by default in `Theme.kt`
+  - Added `useDynamicColor` parameter defaulting to `false`
+  - Ensures custom warm color scheme is applied
+- ✅ Created custom warm color palette for mood tracking app
+  - Light theme: Soft purple primary (#7B6FA1), warm off-white background (#FFFBF7)
+  - Dark theme: Light lavender (#D5BAFF), warm dark brown (#1A1614)
+  - Calming, nature-inspired colors appropriate for mood journaling
+- ✅ Implemented complete Material 3 typography scale in `Type.kt`
+  - Display, Headline, Title, Body, Label styles
+  - All 15 typography variants defined with proper sizing and spacing
+
+**2. Calendar View Improvements ✅**
+- ✅ Fixed day-of-week alignment (lines 146-155 in OverviewScreen.kt)
+  - Calculated `firstDayOfWeek` using `date.withDayOfMonth(1).dayOfWeek.value`
+  - Added empty cells before 1st day: `emptyCellsAtStart = firstDayOfWeek - 1`
+  - Grid now properly aligns days with M T W T F S S headers
+- ✅ Reduced spacing between calendar components
+  - Removed Box padding around calendar pager
+  - Reduced calendar grid top padding from 4.dp to 0.dp
+  - Reduced DayOfWeekHeader vertical padding to top=0.dp, bottom=4.dp
+  - Tighter, more cohesive calendar layout
+
+**3. Dynamic Greeting Feature ✅**
+- ✅ Added time-based greeting to OverviewScreen
+  - "Good morning" (5-11), "Good afternoon" (12-16), "Good evening" (17-20), "Good night" (21-4)
+  - Added `greeting: String` to `OverviewUiState`
+  - Implemented `updateGreeting()` in `OverviewViewModel`
+  - Proper MVVM - business logic in ViewModel, not UI
+
+**4. Month/Year Picker Dialog Refinements ✅**
+- ✅ Optimized text sizing and spacing
+  - Reduced year text to `labelMedium` typography
+  - Reduced year grid height from 120.dp to 100.dp
+  - Reduced month grid height to 220.dp (user-adjusted)
+  - Reduced component spacing from 16.dp to 12.dp, and 8.dp to 6.dp
+  - Dialog now fits better without excessive scrolling
+
+**5. Editor Screen UX Improvements ✅**
+- ✅ Removed date picker component
+  - Replaced with simple read-only date display
+  - Aligns with app's daily tracking pattern (one entry per day)
+  - Cleaner, less cluttered UI
+- ✅ Fixed content box height
+  - Changed from `.fillMaxHeight()` to fixed `.height(200.dp)`
+  - Prevents FAB (save button) from overlapping content
+
+**6. Mood Color Dropdown Enhancements ✅**
+- ✅ Fixed auto-population of newly created mood colors
+  - Added `onMoodSelected(mood, colorHex)` call after `onSaveMoodColor`
+  - Users no longer need to reopen dropdown to select new mood
+- ✅ Improved dropdown UI (MoodItem.kt)
+  - Color indicators: 12.dp squares → 24.dp circles with `CircleShape`
+  - Better layout with `Arrangement.SpaceBetween`
+  - Proper spacing with `Spacer` components (12.dp, 8.dp)
+  - Delete icon uses `MaterialTheme.colorScheme.error` tint
+  - Enhanced "Add new mood color" button:
+    - Changed from `IconButton` to full `DropdownMenuItem`
+    - Added text label with icon
+    - Centered layout with primary color theming
+
+**7. Business Logic Architectural Cleanup ✅**
+- ✅ Identified and fixed business logic in UI layer (EditorScreen.kt line 166-168)
+  - **Violation:** UI was comparing `entryDate` with `LocalDate.now()` to choose hint
+  - **Fix:** Moved hint selection to `EditorViewModel.updateMoodHint()`
+  - **Result:** Clean separation - ViewModel computes hint, UI just displays it
+- ✅ Updated `EditorUiState` structure
+  - Removed separate `todayHint` and `previousDayHint` fields
+  - Added single dynamic `moodHint` field computed in ViewModel
+  - Simplified state management
+- ✅ Audited all UI components for business logic violations
+  - MoodItem.kt: ✅ Pure presenter
+  - DayOfWeekHeader.kt: ✅ Pure presenter
+  - ContentItem.kt: ✅ Pure presenter
+  - MonthYearPicker.kt: ✅ Acceptable UI state (form state, not business logic)
+  - OverviewScreen.kt: ✅ Acceptable (calendar layout calculations are view logic)
+
+**Architectural Principles Applied:**
+1. **MVVM Compliance** - Business logic in ViewModels, UI is pure presentation
+2. **Single Source of Truth** - Computed state lives in ViewModel, not UI
+3. **Material Design 3** - Proper theming, typography, and color usage
+4. **Performance** - State computed once in ViewModel, not on every recomposition
+5. **UX Best Practices** - Auto-population, proper spacing, clear visual hierarchy
+
+**Files Modified:**
+- `core/ui/theme/Theme.kt` (dynamic color control)
+- `core/ui/theme/Color.kt` (complete warm color scheme)
+- `core/ui/theme/Type.kt` (Material 3 typography scale)
+- `journal/ui/overview/OverviewScreen.kt` (calendar alignment, spacing, greeting)
+- `journal/ui/overview/OverviewViewModel.kt` (greeting logic)
+- `journal/ui/overview/state/OverviewUiState.kt` (greeting field)
+- `journal/ui/overview/components/DayOfWeekHeader.kt` (spacing)
+- `journal/ui/overview/components/MonthYearPicker.kt` (sizing)
+- `journal/ui/editor/EditorScreen.kt` (date display, business logic fix)
+- `journal/ui/editor/EditorViewModel.kt` (hint logic)
+- `journal/ui/editor/state/EditorUiState.kt` (hint field)
+- `journal/ui/editor/components/MoodItem.kt` (auto-population, UI improvements)
+- `journal/ui/editor/components/ContentItem.kt` (fixed height)
+
+**Issues Encountered & Fixed:**
+- Custom theme colors not applying → disabled dynamic colors
+- Calendar days misaligned with headers → added empty cell calculation
+- Business logic in UI layer → moved to ViewModel
+- Mood color not auto-selecting → added callback chaining
+- All issues resolved successfully
+
+**Result:**
+- ✅ App has cohesive, calming Material Design 3 theme
+- ✅ Calendar properly aligned and spaced
+- ✅ Improved UX with auto-population and dynamic greeting
+- ✅ All business logic violations fixed
+- ✅ Clean architecture maintained throughout
+- ✅ App builds and runs successfully
+
+**Next Session Plan:**
+- Continue with code quality improvements:
+  - Add error handling to viewModelScope.launch blocks
+  - Remove `!!` operators
+  - Clean up commented code
+- Consider Phase 3 ViewModel consolidation tasks
+- Plan for unit testing implementation
+
+---
+
+**Last Updated:** 2025-10-27
+**Current Status:** Phase 2 COMPLETE ✅ → Material Design 3 Enhancements COMPLETE ✅ → Code Quality Focus

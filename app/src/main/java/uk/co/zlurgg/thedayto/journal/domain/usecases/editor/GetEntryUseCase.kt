@@ -1,12 +1,12 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.entry
+package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 
-class UpdateEntryUseCase(
+class GetEntryUseCase(
     private val repository: EntryRepository
 ) {
-    suspend operator fun invoke(entry: Entry) {
-        return repository.updateEntry(entry)
+    suspend operator fun invoke(id: Int): Entry? {
+        return repository.getEntryById(id)
     }
 }

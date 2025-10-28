@@ -16,7 +16,7 @@ import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -24,7 +24,7 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import java.time.LocalTime
 
 class OverviewViewModel(
-    private val entryUseCase: EntryUseCases,
+    private val entryUseCase: OverviewUseCases,
     private val googleAuthUiClient: GoogleAuthUiClient,
     private val authStateRepository: AuthStateRepository,
     private val notificationRepository: NotificationRepository
@@ -112,7 +112,7 @@ class OverviewViewModel(
                     }
 
                     try {
-                        entryUseCase.addEntryUseCase(deletedEntry)
+                        entryUseCase.restoreEntry(deletedEntry)
                         loadingJob.cancel()
                         _uiState.update {
                             it.copy(

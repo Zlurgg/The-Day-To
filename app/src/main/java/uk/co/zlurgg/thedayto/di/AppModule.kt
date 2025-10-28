@@ -12,21 +12,24 @@ import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.AddEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.DeleteEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntriesUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryByDateUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.UpdateEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.data.repository.MoodColorRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.AddMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.DeleteMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.GetMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.GetMoodColorsUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.MoodColorUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.DeleteMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 
 val appModule = module {
 
@@ -64,11 +67,10 @@ val appModule = module {
     single<EntryRepository> { EntryRepositoryImpl(get<TheDayToDatabase>().entryDao) }
 
     single {
-        EntryUseCases(
+        OverviewUseCases(
             getEntries = GetEntriesUseCase(repository = get()),
             deleteEntry = DeleteEntryUseCase(repository = get()),
-            addEntryUseCase = AddEntryUseCase(repository = get()),
-            getEntryUseCase = GetEntryUseCase(repository = get()),
+            restoreEntry = RestoreEntryUseCase(repository = get()),
             getEntryByDate = GetEntryByDateUseCase(repository = get()),
             updateEntryUseCase = UpdateEntryUseCase(repository = get())
         )
@@ -77,12 +79,21 @@ val appModule = module {
     single<MoodColorRepository> { MoodColorRepositoryImpl(get<TheDayToDatabase>().moodColorDao) }
 
     single {
-        MoodColorUseCases(
+        EditorUseCases(
+            getEntryUseCase = GetEntryUseCase(repository = get()),
+            addEntryUseCase = AddEntryUseCase(repository = get()),
             getMoodColors = GetMoodColorsUseCase(repository = get()),
             deleteMoodColor = DeleteMoodColorUseCase(repository = get()),
             addMoodColorUseCase = AddMoodColorUseCase(repository = get()),
             getMoodColorUseCase = GetMoodColorUseCase(repository = get()),
             updateMoodColorUseCase = UpdateMoodColorUseCase(repository = get())
+        )
+    }
+
+    // Auth UseCases
+    single {
+        SignInUseCases(
+            checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get())
         )
     }
 

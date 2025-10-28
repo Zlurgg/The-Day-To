@@ -10,8 +10,7 @@ import uk.co.zlurgg.thedayto.auth.ui.SignInViewModel
 val editorModule = module {
     viewModel { (savedStateHandle: SavedStateHandle) ->
         EditorViewModel(
-            entryUseCases = get(),
-            moodColorUseCases = get(),
+            editorUseCases = get(),
             savedStateHandle = savedStateHandle
         )
     }
@@ -33,7 +32,7 @@ val signInModule = module {
         SignInViewModel(
             googleAuthUiClient = get(),
             authStateRepository = get(),
-            entryUseCases = get()
+            signInUseCases = get()
         )
     }
 }
