@@ -58,11 +58,23 @@ class GoogleAuthUiClient(
             // Handle the credential response
             handleSignInResult(result)
         } catch (e: Exception) {
-            Timber.Forest.e(e, "Error during Google sign-in")
+            Timber.e(e, "Error during Google sign-in")
             if (e is CancellationException) throw e
+
+            // Provide more helpful error messages for common issues
+            val errorMessage = when {
+                e.message?.contains("No credentials available", ignoreCase = true) == true ->
+                    "No Google account found. Please add a Google account in Settings → Accounts."
+                e.message?.contains("16", ignoreCase = true) == true ->
+                    "Configuration error. Please contact support."
+                e.message?.contains("network", ignoreCase = true) == true ->
+                    "Network error. Please check your connection and try again."
+                else -> e.message ?: "Sign-in failed. Please try again."
+            }
+
             SignInResult(
                 data = null,
-                errorMessage = e.message ?: "Sign-in failed"
+                errorMessage = errorMessage
             )
         }
     }
@@ -98,27 +110,27 @@ class GoogleAuthUiClient(
                             errorMessage = null
                         )
                     } else {
-                        Timber.Forest.e("Unexpected credential type: ${credential.type}")
+                        Timber.e("Unexpected credential type: ${credential.type}")
                         SignInResult(
                             data = null,
-                            errorMessage = "Unexpected credential type"
+                            errorMessage = "Sign-in error. Please try again."
                         )
                     }
                 }
                 else -> {
-                    Timber.Forest.e("Unexpected credential class: ${credential::class.java.name}")
+                    Timber.e("Unexpected credential class: ${credential::class.java.name}")
                     SignInResult(
                         data = null,
-                        errorMessage = "Unexpected credential type"
+                        errorMessage = "Sign-in error. Please try again."
                     )
                 }
             }
         } catch (e: Exception) {
-            Timber.Forest.e(e, "Error handling sign-in result")
+            Timber.e(e, "Error handling sign-in result")
             if (e is CancellationException) throw e
             SignInResult(
                 data = null,
-                errorMessage = e.message ?: "Failed to process sign-in"
+                errorMessage = e.message ?: "Failed to process sign-in. Please try again."
             )
         }
     }
@@ -134,9 +146,9 @@ class GoogleAuthUiClient(
             )
             // Sign out from Firebase
             auth.signOut()
-            Timber.Forest.d("User signed out successfully")
+            Timber.d("User signed out successfully")
         } catch (e: Exception) {
-            Timber.Forest.e(e, "Error signing out")
+            Timber.e(e, "Error signing out")
             if (e is CancellationException) throw e
         }
     }
