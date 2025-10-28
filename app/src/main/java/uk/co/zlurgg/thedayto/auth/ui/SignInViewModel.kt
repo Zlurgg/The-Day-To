@@ -79,8 +79,4 @@ class SignInViewModel(
             }
         }
     }
-
-    fun resetState() {
-        _state.update { SignInState() }
-    }
 }
