@@ -15,7 +15,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToDay
-import uk.co.zlurgg.thedayto.journal.domain.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 
 @Composable
@@ -51,7 +52,7 @@ fun CalenderDay(
             Text(
                 text = datestampToDay(entry.dateStamp).toString(),
                 style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = color.getContrastingTextColor(),
                 overflow = TextOverflow.Ellipsis,
             )
         }
