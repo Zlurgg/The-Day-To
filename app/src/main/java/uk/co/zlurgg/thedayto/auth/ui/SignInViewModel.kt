@@ -9,15 +9,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
-import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 
 class SignInViewModel(
-    private val googleAuthUiClient: GoogleAuthUiClient,
-    private val authStateRepository: AuthStateRepository,
     private val signInUseCases: SignInUseCases
 ) : ViewModel() {
 
@@ -37,14 +34,12 @@ class SignInViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
-            val result = googleAuthUiClient.signIn(activityContext)
+            // Sign in via UseCase
+            val result = signInUseCases.signIn(activityContext)
 
             if (result.data != null) {
                 // Sign-in successful
                 _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
-
-                // Save sign-in state
-                authStateRepository.setSignedInState(true)
 
                 // Check if entry exists for today
                 val todayEntryDate = signInUseCases.checkTodayEntry()
@@ -53,9 +48,7 @@ class SignInViewModel(
                 if (todayEntryDate != null) {
                     _uiEvents.emit(SignInUiEvent.NavigateToOverview)
                 } else {
-                    val todayStart = java.time.LocalDate.now().atStartOfDay()
-                        .toEpochSecond(java.time.ZoneOffset.UTC)
-                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
+                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = DateUtils.getTodayStartEpoch()))
                 }
             } else {
                 // Sign-in failed
@@ -72,10 +65,8 @@ class SignInViewModel(
      */
     fun checkSignInStatus() {
         viewModelScope.launch {
-            val isSignedIn = authStateRepository.getSignedInState()
-            val currentUser = googleAuthUiClient.getSignedInUser()
-
-            if (isSignedIn && currentUser != null) {
+            // Check sign-in status via UseCase
+            if (signInUseCases.checkSignInStatus()) {
                 // Check if entry exists for today
                 val todayEntryDate = signInUseCases.checkTodayEntry()
 
@@ -83,9 +74,7 @@ class SignInViewModel(
                 if (todayEntryDate != null) {
                     _uiEvents.emit(SignInUiEvent.NavigateToOverview)
                 } else {
-                    val todayStart = java.time.LocalDate.now().atStartOfDay()
-                        .toEpochSecond(java.time.ZoneOffset.UTC)
-                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
+                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = DateUtils.getTodayStartEpoch()))
                 }
             }
         }

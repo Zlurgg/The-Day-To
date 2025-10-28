@@ -24,6 +24,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
+import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -153,24 +154,13 @@ class EditorViewModel(
 
             is EditorAction.SaveMoodColor -> {
                 viewModelScope.launch {
-                    // Validate input
-                    if (action.mood.isBlank()) {
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = "Mood cannot be empty"
-                            )
-                        )
-                        return@launch
-                    }
-
                     try {
                         withContext(Dispatchers.IO) {
                             editorUseCases.addMoodColorUseCase(
                                 MoodColor(
                                     mood = action.mood.trim(),
                                     color = action.colorHex,
-                                    dateStamp = LocalDate.now().atStartOfDay()
-                                        .toEpochSecond(ZoneOffset.UTC),
+                                    dateStamp = DateUtils.getTodayStartEpoch(),
                                     id = null
                                 )
                             )

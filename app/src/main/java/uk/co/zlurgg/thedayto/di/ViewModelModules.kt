@@ -19,10 +19,8 @@ val editorModule = module {
 val overviewModule = module {
     viewModel {
         OverviewViewModel(
-            entryUseCase = get(),
-            googleAuthUiClient = get(),
-            authStateRepository = get(),
-            notificationRepository = get()
+            overviewUseCases = get(),
+            signOutUseCase = get()
         )
     }
 }
@@ -30,8 +28,6 @@ val overviewModule = module {
 val signInModule = module {
     viewModel {
         SignInViewModel(
-            googleAuthUiClient = get(),
-            authStateRepository = get(),
             signInUseCases = get()
         )
     }

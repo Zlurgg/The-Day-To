@@ -28,8 +28,13 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.SetupNotificationUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckNotificationPermissionUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
 
 val appModule = module {
 
@@ -72,7 +77,9 @@ val appModule = module {
             deleteEntry = DeleteEntryUseCase(repository = get()),
             restoreEntry = RestoreEntryUseCase(repository = get()),
             getEntryByDate = GetEntryByDateUseCase(repository = get()),
-            updateEntryUseCase = UpdateEntryUseCase(repository = get())
+            updateEntryUseCase = UpdateEntryUseCase(repository = get()),
+            setupNotification = SetupNotificationUseCase(notificationRepository = get()),
+            checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get())
         )
     }
 
@@ -93,7 +100,23 @@ val appModule = module {
     // Auth UseCases
     single {
         SignInUseCases(
+            signIn = SignInUseCase(
+                googleAuthUiClient = get(),
+                authStateRepository = get()
+            ),
+            checkSignInStatus = CheckSignInStatusUseCase(
+                googleAuthUiClient = get(),
+                authStateRepository = get()
+            ),
             checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get())
+        )
+    }
+
+    // Standalone SignOutUseCase - injected separately into OverviewViewModel
+    single {
+        SignOutUseCase(
+            googleAuthUiClient = get(),
+            authStateRepository = get()
         )
     }
 
