@@ -11,15 +11,14 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
-import uk.co.zlurgg.thedayto.journal.ui.util.getColor
-import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
 fun EntryItem(
