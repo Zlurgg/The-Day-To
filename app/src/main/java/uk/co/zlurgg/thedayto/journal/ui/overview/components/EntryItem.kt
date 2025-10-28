@@ -15,6 +15,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -25,6 +27,7 @@ fun EntryItem(
     modifier: Modifier
 ) {
     val moodColor = getColor(entry.color)
+    val textColor = moodColor.getContrastingTextColor()
 
     Card(
         modifier = modifier,
@@ -44,30 +47,24 @@ fun EntryItem(
             Text(
                 text = datestampToFormattedDate(entry.dateStamp),
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = textColor,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.mood,
                 style = MaterialTheme.typography.titleMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = textColor,
                 overflow = TextOverflow.Ellipsis
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = entry.content,
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = textColor,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis
             )
         }
     }
-}
-
-
-// Conversion method for getting color from Colour env
-private fun getColor(colorString: String): Color {
-    return Color(android.graphics.Color.parseColor("#$colorString"))
 }

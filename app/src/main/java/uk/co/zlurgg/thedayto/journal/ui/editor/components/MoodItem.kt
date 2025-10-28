@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.journal.domain.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 
 /**
  * Pure presenter component for mood selection with color picker.

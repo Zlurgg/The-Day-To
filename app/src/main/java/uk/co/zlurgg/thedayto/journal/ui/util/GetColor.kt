@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.domain.util
+package uk.co.zlurgg.thedayto.journal.ui.util
 
 import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt

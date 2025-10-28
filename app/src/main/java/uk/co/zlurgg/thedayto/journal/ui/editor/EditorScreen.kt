@@ -211,9 +211,9 @@ private fun EditorScreenNewEntryPreview() {
         EditorScreen(
             uiState = EditorUiState(
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1),
-                    MoodColor("Peaceful", "2196F3", System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "FF9800", System.currentTimeMillis(), 3)
+                    MoodColor("Cheerful", "FFF59D", System.currentTimeMillis(), 1),
+                    MoodColor("Calm", "4A148C", System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "4CAF50", System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
