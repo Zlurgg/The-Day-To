@@ -211,9 +211,9 @@ private fun EditorScreenNewEntryPreview() {
         EditorScreen(
             uiState = EditorUiState(
                 moodColors = listOf(
-                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1),
-                    MoodColor("Peaceful", "#2196F3", System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "#FF9800", System.currentTimeMillis(), 3)
+                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "2196F3", System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "FF9800", System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
@@ -234,14 +234,14 @@ private fun EditorScreenEditEntryPreview() {
                 entryDate = LocalDate.now().minusDays(2).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
                 entryMood = "Happy",
                 entryContent = "Had a great day at work! Finished the new feature and got positive feedback from the team.",
-                entryColor = "#4CAF50",
+                entryColor = "4CAF50",
                 isMoodHintVisible = false,
                 isContentHintVisible = false,
                 currentEntryId = 1,
                 moodColors = listOf(
-                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1),
-                    MoodColor("Peaceful", "#2196F3", System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "#FF9800", System.currentTimeMillis(), 3)
+                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "2196F3", System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "FF9800", System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
@@ -263,7 +263,7 @@ private fun EditorScreenLoadingPreview() {
                 entryContent = "Sample content",
                 isLoading = true,
                 moodColors = listOf(
-                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1)
+                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1)
                 )
             ),
             onAction = {},
