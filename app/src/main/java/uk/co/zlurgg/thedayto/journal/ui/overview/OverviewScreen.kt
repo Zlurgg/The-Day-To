@@ -65,6 +65,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -76,7 +77,8 @@ import java.time.ZoneOffset
 fun OverviewScreenRoot(
     navController: NavController,
     viewModel: OverviewViewModel = koinViewModel(),
-    onNavigateToSignIn: () -> Unit
+    onNavigateToSignIn: () -> Unit,
+    onShowSignOutDialog: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,19 +98,22 @@ fun OverviewScreenRoot(
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
-                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar -> {
+                is OverviewUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
-                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToSignIn -> {
+                is OverviewUiEvent.NavigateToSignIn -> {
                     onNavigateToSignIn()
                 }
-                is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.RequestNotificationPermission -> {
+                is OverviewUiEvent.RequestNotificationPermission -> {
                     // Request permission on Android 13+, otherwise just setup notifications
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                         notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     } else {
                         viewModel.onNotificationPermissionGranted()
                     }
+                }
+                is OverviewUiEvent.ShowSignOutDialog -> {
+                    onShowSignOutDialog()
                 }
             }
         }
@@ -171,7 +176,7 @@ private fun OverviewScreen(
                 SettingsMenu(
                     hasNotificationPermission = hasNotificationPermission,
                     onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) },
-                    onSignOut = { onAction(OverviewAction.SignOut) }
+                    onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
             }
         },

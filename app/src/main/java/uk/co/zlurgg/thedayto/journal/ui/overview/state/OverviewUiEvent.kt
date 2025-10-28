@@ -4,4 +4,5 @@ sealed interface OverviewUiEvent {
     data class ShowSnackbar(val message: String) : OverviewUiEvent
     data object NavigateToSignIn : OverviewUiEvent
     data object RequestNotificationPermission : OverviewUiEvent
+    data object ShowSignOutDialog : OverviewUiEvent
 }

@@ -15,15 +15,13 @@ import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
-import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import java.time.LocalTime
 
 class OverviewViewModel(
-    private val overviewUseCases: OverviewUseCases,
-    private val signOutUseCase: SignOutUseCase
+    private val overviewUseCases: OverviewUseCases
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -134,32 +132,9 @@ class OverviewViewModel(
                 }
             }
 
-            is OverviewAction.SignOut -> {
+            is OverviewAction.RequestSignOut -> {
                 viewModelScope.launch {
-                    // Debounced loading: only show if operation takes > 150ms
-                    val loadingJob = launch {
-                        delay(150)
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
-
-                    try {
-                        // Sign out via UseCase
-                        signOutUseCase()
-
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-
-                        // Navigate to sign-in screen
-                        _uiEvents.emit(OverviewUiEvent.NavigateToSignIn)
-                    } catch (e: Exception) {
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to sign out: ${e.message}"
-                            )
-                        )
-                    }
+                    _uiEvents.emit(OverviewUiEvent.ShowSignOutDialog)
                 }
             }
         }

@@ -5,15 +5,24 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.auth.ui.SignInScreenRoot
+import uk.co.zlurgg.thedayto.auth.ui.components.SignOutDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.SignInRoute
@@ -74,6 +83,10 @@ fun TheDayToApp() {
 
             // Overview Screen (Calendar + Entry List)
             composable<OverviewRoute> {
+                val signOutUseCase: SignOutUseCase = koinInject()
+                val scope = rememberCoroutineScope()
+                var showSignOutDialog by remember { mutableStateOf(false) }
+
                 OverviewScreenRoot(
                     navController = navController,
                     onNavigateToSignIn = {
@@ -81,8 +94,28 @@ fun TheDayToApp() {
                             // Clear entire back stack on sign-out
                             popUpTo(0) { inclusive = true }
                         }
+                    },
+                    onShowSignOutDialog = {
+                        showSignOutDialog = true
                     }
                 )
+
+                // Sign Out Dialog (stateless)
+                if (showSignOutDialog) {
+                    SignOutDialog(
+                        onDismiss = { showSignOutDialog = false },
+                        onConfirm = {
+                            scope.launch {
+                                signOutUseCase()
+                                showSignOutDialog = false
+                                navController.navigate(SignInRoute) {
+                                    // Clear entire back stack on sign-out
+                                    popUpTo(0) { inclusive = true }
+                                }
+                            }
+                        }
+                    )
+                }
             }
         }
     }
