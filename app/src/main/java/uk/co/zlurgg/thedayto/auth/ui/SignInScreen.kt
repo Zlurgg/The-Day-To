@@ -1,35 +1,34 @@
 package uk.co.zlurgg.thedayto.auth.ui
 
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
+import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
+import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
+import uk.co.zlurgg.thedayto.auth.ui.components.WelcomeHeader
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -40,7 +39,6 @@ fun SignInScreenRoot(
     onNavigateToOverview: () -> Unit,
     onNavigateToEditor: (Long) -> Unit
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
@@ -68,7 +66,6 @@ fun SignInScreenRoot(
 
     // Delegate to presenter
     SignInScreen(
-        state = state,
         onSignInClick = { viewModel.signIn(context) },
         snackbarHostState = snackbarHostState
     )
@@ -79,7 +76,6 @@ fun SignInScreenRoot(
  */
 @Composable
 private fun SignInScreen(
-    state: SignInState,
     onSignInClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
@@ -88,59 +84,93 @@ private fun SignInScreen(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier
     ) { innerPadding ->
-        SignInScreenDisplay(
+        SignInScreenContent(
             onSignInClick = onSignInClick,
-            modifier = Modifier.padding(innerPadding)
+            modifier = Modifier
+                .padding(innerPadding)
+                .fillMaxSize()
         )
     }
 }
 
 @Composable
-private fun SignInScreenDisplay(
+private fun SignInScreenContent(
     onSignInClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
-        modifier = modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
-    ) {
-        Column(
-            modifier = Modifier
-                .padding(paddingMedium),
+    // Animation states for staggered entrance
+    var showWelcome by remember { mutableStateOf(false) }
+    var showAppName by remember { mutableStateOf(false) }
+    var showSubtitle by remember { mutableStateOf(false) }
+    var showButton by remember { mutableStateOf(false) }
 
-            horizontalAlignment = Alignment.CenterHorizontally,
+    // Staggered animation entrance
+    LaunchedEffect(Unit) {
+        showWelcome = true
+        delay(200)
+        showAppName = true
+        delay(200)
+        showSubtitle = true
+        delay(300)
+        showButton = true
+    }
+
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.background
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .systemBarsPadding()
+                .padding(paddingLarge),
+            contentAlignment = Alignment.Center
         ) {
-            Text(
-                text = stringResource(R.string.welcome),
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
-            )
-            Spacer(modifier = Modifier.padding(paddingSmall))
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.ExtraBold)
-            )
-            Spacer(modifier = Modifier.padding(paddingMedium))
-            Button(
-                shape = MaterialTheme.shapes.medium,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
-                ),
-                onClick = onSignInClick
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxWidth()
             ) {
-                Text(
-                    text = stringResource(R.string.sign_in),
-                    style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Normal)
+                WelcomeHeader(
+                    showWelcome = showWelcome,
+                    showAppName = showAppName,
+                    showSubtitle = showSubtitle
+                )
+
+                SignInButton(
+                    onClick = onSignInClick,
+                    showButton = showButton
+                )
+
+                SignInFooter(
+                    showButton = showButton
                 )
             }
         }
     }
 }
 
-@Preview(showBackground = true, widthDp = 320, heightDp = 320)
+@Preview(name = "Light Mode", showBackground = true, widthDp = 360, heightDp = 640)
 @Composable
-fun SignInScreenPreview() {
-    SignInScreenDisplay(
-        onSignInClick = { }
-    )
+private fun SignInScreenContentPreview() {
+    TheDayToTheme {
+        SignInScreenContent(
+            onSignInClick = { }
+        )
+    }
+}
+
+@Preview(
+    name = "Dark Mode",
+    showBackground = true,
+    widthDp = 360,
+    heightDp = 640,
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+)
+@Composable
+private fun SignInScreenContentDarkPreview() {
+    TheDayToTheme(useDarkTheme = true) {
+        SignInScreenContent(
+            onSignInClick = { }
+        )
+    }
 }
