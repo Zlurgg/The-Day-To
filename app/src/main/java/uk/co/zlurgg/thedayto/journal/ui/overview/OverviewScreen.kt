@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview
 
 import android.Manifest
+import android.content.res.Configuration
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -45,10 +46,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -67,6 +70,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -392,4 +396,40 @@ private fun OverviewScreen(
             }
         }
     )
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun OverviewScreenPreview() {
+    TheDayToTheme {
+        OverviewScreen(
+            uiState = OverviewUiState(
+                entries = SampleEntries.allSamples,
+                greeting = "Good morning"
+            ),
+            onAction = {},
+            onNavigateToEntry = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            hasNotificationPermission = true
+        )
+    }
+}
+
+@Preview(name = "Empty State - Light", showBackground = true)
+@Preview(name = "Empty State - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun OverviewScreenEmptyPreview() {
+    TheDayToTheme {
+        OverviewScreen(
+            uiState = OverviewUiState(
+                entries = emptyList(),
+                greeting = "Good evening"
+            ),
+            onAction = {},
+            onNavigateToEntry = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            hasNotificationPermission = false
+        )
+    }
 }

@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -35,12 +37,16 @@ import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -194,5 +200,76 @@ private fun EditorScreen(
                 }
             )
         }
+    }
+}
+
+@Preview(name = "New Entry - Light", showBackground = true)
+@Preview(name = "New Entry - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EditorScreenNewEntryPreview() {
+    TheDayToTheme {
+        EditorScreen(
+            uiState = EditorUiState(
+                moodColors = listOf(
+                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "#2196F3", System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "#FF9800", System.currentTimeMillis(), 3)
+                )
+            ),
+            onAction = {},
+            onNavigateBack = {},
+            showBackButton = false,
+            snackbarHostState = remember { SnackbarHostState() }
+        )
+    }
+}
+
+@Preview(name = "Edit Entry - Light", showBackground = true)
+@Preview(name = "Edit Entry - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EditorScreenEditEntryPreview() {
+    TheDayToTheme {
+        EditorScreen(
+            uiState = EditorUiState(
+                entryDate = LocalDate.now().minusDays(2).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
+                entryMood = "Happy",
+                entryContent = "Had a great day at work! Finished the new feature and got positive feedback from the team.",
+                entryColor = "#4CAF50",
+                isMoodHintVisible = false,
+                isContentHintVisible = false,
+                currentEntryId = 1,
+                moodColors = listOf(
+                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "#2196F3", System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "#FF9800", System.currentTimeMillis(), 3)
+                )
+            ),
+            onAction = {},
+            onNavigateBack = {},
+            showBackButton = true,
+            snackbarHostState = remember { SnackbarHostState() }
+        )
+    }
+}
+
+@Preview(name = "Loading State - Light", showBackground = true)
+@Preview(name = "Loading State - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EditorScreenLoadingPreview() {
+    TheDayToTheme {
+        EditorScreen(
+            uiState = EditorUiState(
+                entryMood = "Happy",
+                entryContent = "Sample content",
+                isLoading = true,
+                moodColors = listOf(
+                    MoodColor("Happy", "#4CAF50", System.currentTimeMillis(), 1)
+                )
+            ),
+            onAction = {},
+            onNavigateBack = {},
+            showBackButton = true,
+            snackbarHostState = remember { SnackbarHostState() }
+        )
     }
 }
