@@ -13,14 +13,12 @@ import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
-import java.time.LocalDate
-import java.time.ZoneOffset
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 
 class SignInViewModel(
     private val googleAuthUiClient: GoogleAuthUiClient,
     private val authStateRepository: AuthStateRepository,
-    private val entryUseCases: EntryUseCases
+    private val signInUseCases: SignInUseCases
 ) : ViewModel() {
 
     // UI State
@@ -49,13 +47,14 @@ class SignInViewModel(
                 authStateRepository.setSignedInState(true)
 
                 // Check if entry exists for today
-                val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-                val todayEntry = entryUseCases.getEntryByDate(todayStart)
+                val todayEntryDate = signInUseCases.checkTodayEntry()
 
                 // Navigate based on entry existence
-                if (todayEntry != null) {
+                if (todayEntryDate != null) {
                     _uiEvents.emit(SignInUiEvent.NavigateToOverview)
                 } else {
+                    val todayStart = java.time.LocalDate.now().atStartOfDay()
+                        .toEpochSecond(java.time.ZoneOffset.UTC)
                     _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
                 }
             } else {
@@ -78,13 +77,14 @@ class SignInViewModel(
 
             if (isSignedIn && currentUser != null) {
                 // Check if entry exists for today
-                val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-                val todayEntry = entryUseCases.getEntryByDate(todayStart)
+                val todayEntryDate = signInUseCases.checkTodayEntry()
 
                 // Navigate based on entry existence
-                if (todayEntry != null) {
+                if (todayEntryDate != null) {
                     _uiEvents.emit(SignInUiEvent.NavigateToOverview)
                 } else {
+                    val todayStart = java.time.LocalDate.now().atStartOfDay()
+                        .toEpochSecond(java.time.ZoneOffset.UTC)
                     _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = todayStart))
                 }
             }

@@ -17,20 +17,18 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.EntryUseCases
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor.MoodColorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 class EditorViewModel(
-    private val entryUseCases: EntryUseCases,
-    private val moodColorUseCases: MoodColorUseCases,
+    private val editorUseCases: EditorUseCases,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -71,7 +69,7 @@ class EditorViewModel(
 
                     try {
                         val entry = withContext(Dispatchers.IO) {
-                            entryUseCases.getEntryUseCase(entryId)
+                            editorUseCases.getEntryUseCase(entryId)
                         }
                         entry?.let {
                             loadingJob.cancel() // Cancel if finished quickly
@@ -167,7 +165,7 @@ class EditorViewModel(
 
                     try {
                         withContext(Dispatchers.IO) {
-                            moodColorUseCases.addMoodColorUseCase(
+                            editorUseCases.addMoodColorUseCase(
                                 MoodColor(
                                     mood = action.mood.trim(),
                                     color = action.colorHex,
@@ -192,7 +190,7 @@ class EditorViewModel(
             is EditorAction.DeleteMoodColor -> {
                 viewModelScope.launch {
                     withContext(Dispatchers.IO) {
-                        moodColorUseCases.deleteMoodColor(action.moodColor)
+                        editorUseCases.deleteMoodColor(action.moodColor)
                     }
                 }
             }
@@ -209,7 +207,7 @@ class EditorViewModel(
 
                     try {
                         withContext(Dispatchers.IO) {
-                            entryUseCases.addEntryUseCase(
+                            editorUseCases.addEntryUseCase(
                                 Entry(
                                     content = state.entryContent,
                                     dateStamp = state.entryDate,
@@ -246,7 +244,7 @@ class EditorViewModel(
         val hint = if (isToday) {
             "How're you feeling today?"
         } else {
-            "How're were you feeling that day?"
+            "How were you feeling that day?"
         }
 
         _uiState.update { it.copy(moodHint = hint) }
@@ -254,7 +252,7 @@ class EditorViewModel(
 
     private fun loadMoodColors() {
         getMoodColorsJob?.cancel()
-        getMoodColorsJob = moodColorUseCases.getMoodColors(
+        getMoodColorsJob = editorUseCases.getMoodColors(
             MoodColorOrder.Date(
                 uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending
             )

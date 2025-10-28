@@ -1,0 +1,12 @@
+package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
+
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
+
+class UpdateMoodColorUseCase(
+    private val repository: MoodColorRepository
+) {
+    suspend operator fun invoke(moodColor: MoodColor) {
+        return repository.updateMoodColor(moodColor)
+    }
+}

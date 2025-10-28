@@ -1,10 +1,9 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.entry
+package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
-data class EntryUseCases(
+data class OverviewUseCases(
     val getEntries: GetEntriesUseCase,
     val deleteEntry: DeleteEntryUseCase,
-    val addEntryUseCase: AddEntryUseCase,
-    val getEntryUseCase: GetEntryUseCase,
+    val restoreEntry: RestoreEntryUseCase,
     val getEntryByDate: GetEntryByDateUseCase,
     val updateEntryUseCase: UpdateEntryUseCase
 )

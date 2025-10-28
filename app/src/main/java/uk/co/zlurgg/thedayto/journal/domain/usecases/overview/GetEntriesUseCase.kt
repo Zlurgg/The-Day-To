@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.entry
+package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

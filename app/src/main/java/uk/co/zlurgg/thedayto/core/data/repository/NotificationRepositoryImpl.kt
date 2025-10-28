@@ -13,7 +13,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.entry.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
 import kotlinx.coroutines.runBlocking
 import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker
 import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID

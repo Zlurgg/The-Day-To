@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolor
+package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
