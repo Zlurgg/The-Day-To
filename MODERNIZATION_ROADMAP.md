@@ -1689,5 +1689,245 @@ Completed comprehensive modernization following Google's 2025 Android best pract
 
 ---
 
-**Last Updated:** 2025-10-27
-**Current Status:** Phase 2 COMPLETE ✅ → Material Design 3 Enhancements COMPLETE ✅ → Code Quality Focus
+### Session 8 (2025-10-28) - UseCase Architecture & Sign-Out Dialog Refactoring ✅
+
+**Focus:** Business logic extraction into UseCases, bounded context violation fixes, and proper Unidirectional Data Flow
+
+**Tasks Completed:**
+
+**1. UseCase Architecture Refactoring ✅**
+- ✅ Renamed UseCase packages to mirror UI structure
+  - `journal/domain/usecases/entry` → `journal/domain/usecases/overview`
+  - `journal/domain/usecases/moodcolor` → `journal/domain/usecases/editor`
+  - Aligns UseCases with the ViewModels that use them
+  - Cleaner one-to-one mapping
+
+- ✅ Eliminated UseCase crossover between ViewModels
+  - **Issue:** Both OverviewViewModel and EditorViewModel used `EntryUseCases`
+  - **Fix:**
+    - Moved `GetEntryUseCase` and `AddEntryUseCase` to `EditorUseCases`
+    - Created `RestoreEntryUseCase` for overview's undo functionality
+    - Result: Clean separation - no shared UseCases between ViewModels
+
+**2. Business Logic Extraction (7 New UseCases Created) ✅**
+- ✅ **SignOutUseCase** (auth/domain/usecases)
+  - Encapsulates sign-out logic (GoogleAuthUiClient + AuthStateRepository)
+  - Removes auth dependency from OverviewViewModel
+
+- ✅ **SignInUseCase** (auth/domain/usecases)
+  - Handles sign-in flow + saves auth state
+  - Returns SignInResult with error handling
+
+- ✅ **CheckSignInStatusUseCase** (auth/domain/usecases)
+  - Checks if user is signed in (local state + Google)
+  - Combines both data sources
+
+- ✅ **CheckTodayEntryUseCase** (auth/domain/usecases)
+  - Determines post-login navigation (Overview vs Editor)
+  - Returns today's entry timestamp if exists
+
+- ✅ **SetupNotificationUseCase** (journal/domain/usecases/overview)
+  - Wraps notification setup logic
+
+- ✅ **CheckNotificationPermissionUseCase** (journal/domain/usecases/overview)
+  - Checks notification permission status
+
+- ✅ **RestoreEntryUseCase** (journal/domain/usecases/overview)
+  - Dedicated UseCase for undo functionality
+
+- ✅ **DateUtils** (core/domain/util)
+  - Created centralized date logic
+  - `getTodayStartEpoch()` - removes duplication across ViewModels
+
+**3. ViewModel Cleanup - Repository Dependencies Removed ✅**
+- ✅ **OverviewViewModel**
+  - Removed: GoogleAuthUiClient, AuthStateRepository, NotificationRepository
+  - Now depends only on: OverviewUseCases + standalone SignOutUseCase
+
+- ✅ **EditorViewModel**
+  - Removed: OverviewUseCases dependency (was crossover)
+  - Now depends only on: EditorUseCases
+  - Uses DateUtils instead of inline date calculation
+
+- ✅ **SignInViewModel**
+  - Removed: GoogleAuthUiClient, AuthStateRepository
+  - Now depends only on: SignInUseCases
+  - All business logic encapsulated in UseCases
+
+**4. Sign-Out Dialog with Unidirectional Data Flow ✅**
+- ✅ **Bounded Context Violation Fix**
+  - **Issue:** OverviewViewModel (journal) depending on SignOutUseCase (auth)
+  - **User's Solution:** Create SignOutDialog in auth package with confirmation (standard UX)
+  - **Result:** Journal domain no longer depends on auth domain
+
+- ✅ **Created SignOutDialog Component** (auth/ui/components)
+  - Stateless confirmation dialog
+  - No business logic, pure UI component
+  - Material 3 themed with error-colored confirm button
+
+- ✅ **Updated OverviewAction**
+  - Renamed `SignOut` → `RequestSignOut`
+  - Clear intent: request to show dialog
+
+- ✅ **Updated OverviewUiEvent**
+  - Added `ShowSignOutDialog` event
+
+- ✅ **Updated OverviewViewModel**
+  - Removed SignOutUseCase dependency
+  - Emits `ShowSignOutDialog` event instead of performing sign-out
+  - Clean architecture: journal domain doesn't know about auth operations
+
+- ✅ **Updated OverviewScreenRoot**
+  - Handles `ShowSignOutDialog` event
+  - Calls `onShowSignOutDialog()` callback
+  - Passes event up to navigation layer
+
+- ✅ **Updated Navigation Layer (TheDayToApp.kt)**
+  - Injects `SignOutUseCase` via Koin
+  - Manages dialog state (`showSignOutDialog`)
+  - Shows `SignOutDialog` when triggered
+  - Handles sign-out business logic and navigation
+  - Proper Unidirectional Data Flow pattern
+
+- ✅ **Updated DI (ViewModelModules.kt)**
+  - Removed `signOutUseCase` from `overviewModule`
+
+**5. SignInScreen UI/UX Improvements ✅**
+- ✅ **Component Separation**
+  - Created `WelcomeHeader.kt` - Welcome text with animations
+  - Created `SignInButton.kt` - Material 3 elevated card button
+  - Created `SignInFooter.kt` - "Continue with Google" text
+
+- ✅ **Material 3 Styling**
+  - Elevated card button with proper color scheme
+  - Staggered entrance animations (fade + slide)
+  - Typography: `displaySmall`, `displayLarge`, `titleMedium`
+  - Matches app's overall aesthetic
+
+- ✅ **Removed Unused State**
+  - `SignInState` was not being used anywhere
+  - Removed parameter from SignInScreen
+
+- ✅ **Better Error Messages** (GoogleAuthUiClient.kt)
+  - "No Google account found. Please add a Google account in Settings → Accounts."
+  - "Configuration error. Please contact support."
+  - "Network error. Please check your connection and try again."
+  - Fixed Timber usage: `Timber.e()` instead of `Timber.Forest.e()`
+
+**6. Compose Previews Added ✅**
+- ✅ **Created SampleEntries.kt** (journal/ui/overview/util)
+  - 3 realistic sample entries with different moods/colors/dates
+  - Reusable for both previews and testing
+
+- ✅ **OverviewScreen Previews**
+  - `OverviewScreenPreview` (Light + Dark) - with 3 sample entries
+  - `OverviewScreenEmptyPreview` (Light + Dark) - empty state
+
+- ✅ **EditorScreen Previews**
+  - `EditorScreenNewEntryPreview` (Light + Dark) - new entry creation
+  - `EditorScreenEditEntryPreview` (Light + Dark) - editing existing entry
+  - `EditorScreenLoadingPreview` (Light + Dark) - loading state during save
+
+**Architectural Improvements:**
+
+**Unidirectional Data Flow Pattern:**
+```
+User clicks "Sign Out" button
+    ↓
+OverviewAction.RequestSignOut
+    ↓
+OverviewViewModel emits OverviewUiEvent.ShowSignOutDialog
+    ↓
+OverviewScreenRoot receives event → onShowSignOutDialog()
+    ↓
+Navigation layer (TheDayToApp) manages dialog state
+    ↓
+SignOutDialog displays (stateless, no ViewModel)
+    ↓
+User confirms → Navigation layer calls SignOutUseCase → Navigate to SignIn
+```
+
+**Before This Session:**
+- ❌ ViewModels directly depended on repositories and data services
+- ❌ Bounded context violation (journal → auth)
+- ❌ UseCase crossover between ViewModels
+- ❌ Business logic in navigation layer
+- ❌ No sign-out confirmation dialog
+
+**After This Session:**
+- ✅ ViewModels depend ONLY on UseCases (Clean Architecture)
+- ✅ No bounded context violations
+- ✅ Clean UseCase separation (one set per ViewModel)
+- ✅ Business logic in ViewModels and UseCases only
+- ✅ Proper UDF with confirmation dialog
+- ✅ Comprehensive Compose previews
+
+**Key Patterns Applied:**
+1. **UseCase Pattern** - Single responsibility, encapsulated business logic
+2. **Bounded Context Separation** - Auth and journal features independent
+3. **Unidirectional Data Flow** - Events up, data down
+4. **Stateless Dialog** - No ViewModel needed, pure UI component
+5. **Repository Pattern** - Date utils centralized, no duplication
+6. **Preview Patterns** - Light/dark modes, multiple states
+
+**Files Created:**
+- `auth/domain/usecases/SignOutUseCase.kt`
+- `auth/domain/usecases/SignInUseCase.kt`
+- `auth/domain/usecases/CheckSignInStatusUseCase.kt`
+- `auth/domain/usecases/CheckTodayEntryUseCase.kt`
+- `auth/domain/usecases/SignInUseCases.kt` (aggregator)
+- `journal/domain/usecases/overview/SetupNotificationUseCase.kt`
+- `journal/domain/usecases/overview/CheckNotificationPermissionUseCase.kt`
+- `journal/domain/usecases/overview/RestoreEntryUseCase.kt`
+- `core/domain/util/DateUtils.kt`
+- `auth/ui/components/SignOutDialog.kt`
+- `auth/ui/components/WelcomeHeader.kt`
+- `auth/ui/components/SignInButton.kt`
+- `auth/ui/components/SignInFooter.kt`
+- `journal/ui/overview/util/SampleEntries.kt`
+
+**Files Modified:**
+- `journal/ui/overview/OverviewViewModel.kt` (removed repo dependencies)
+- `journal/ui/overview/OverviewScreen.kt` (UDF pattern, preview)
+- `journal/ui/overview/state/OverviewAction.kt` (RequestSignOut)
+- `journal/ui/overview/state/OverviewUiEvent.kt` (ShowSignOutDialog)
+- `journal/ui/editor/EditorViewModel.kt` (removed crossover)
+- `journal/ui/editor/EditorScreen.kt` (preview)
+- `auth/ui/SignInViewModel.kt` (uses SignInUseCases)
+- `auth/ui/SignInScreen.kt` (components, removed unused state)
+- `auth/data/service/GoogleAuthUiClient.kt` (better error messages)
+- `core/ui/TheDayToApp.kt` (dialog management)
+- `di/AppModule.kt` (new UseCases)
+- `di/ViewModelModules.kt` (updated dependencies)
+
+**Issues Encountered & Fixed:**
+- None - All changes applied cleanly and built successfully
+
+**Phase 4 Tasks Completed:**
+- ✅ Extracted business logic into UseCases
+- ✅ Fixed bounded context violations
+- ✅ Proper Unidirectional Data Flow
+- ✅ Material 3 component improvements
+- ✅ Comprehensive preview coverage
+
+**Result:**
+- ✅ App builds successfully
+- ✅ Clean Architecture properly enforced
+- ✅ No bounded context violations
+- ✅ ViewModels depend only on domain layer
+- ✅ Proper separation of concerns throughout
+- ✅ Preview system in place for rapid UI development
+
+**Next Session Plan:**
+- Continue with Phase 4 code quality:
+  - Add error handling to viewModelScope.launch blocks
+  - Remove `!!` operators (NotificationWorker)
+  - Change `commit()` to `apply()` in PreferencesRepositoryImpl
+  - Remove commented code throughout codebase
+- Consider Phase 4.3: Add Unit Tests
+- Plan for Phase 5: Release Preparation
+
+---
+
+**Last Updated:** 2025-10-28
+**Current Status:** Phase 2 COMPLETE ✅ → Material Design 3 Enhancements COMPLETE ✅ → Code Quality Focus (UseCases ✅, Previews ✅)

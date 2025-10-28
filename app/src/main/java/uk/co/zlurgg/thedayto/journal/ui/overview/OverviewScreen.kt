@@ -416,6 +416,24 @@ private fun OverviewScreenPreview() {
     }
 }
 
+@Preview(name = "Single Entry - Light", showBackground = true)
+@Preview(name = "Single Entry - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun OverviewScreenSingleEntryPreview() {
+    TheDayToTheme {
+        OverviewScreen(
+            uiState = OverviewUiState(
+                entries = listOf(SampleEntries.sampleEntry1),
+                greeting = "Good afternoon"
+            ),
+            onAction = {},
+            onNavigateToEntry = {},
+            snackbarHostState = remember { SnackbarHostState() },
+            hasNotificationPermission = true
+        )
+    }
+}
+
 @Preview(name = "Empty State - Light", showBackground = true)
 @Preview(name = "Empty State - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
