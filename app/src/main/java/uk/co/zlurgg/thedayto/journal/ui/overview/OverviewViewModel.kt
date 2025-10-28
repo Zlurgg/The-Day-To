@@ -12,22 +12,18 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
-import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import java.time.LocalTime
 
 class OverviewViewModel(
-    private val entryUseCase: OverviewUseCases,
-    private val googleAuthUiClient: GoogleAuthUiClient,
-    private val authStateRepository: AuthStateRepository,
-    private val notificationRepository: NotificationRepository
+    private val overviewUseCases: OverviewUseCases,
+    private val signOutUseCase: SignOutUseCase
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -81,7 +77,7 @@ class OverviewViewModel(
                     }
 
                     try {
-                        entryUseCase.deleteEntry(action.entry)
+                        overviewUseCases.deleteEntry(action.entry)
                         loadingJob.cancel()
                         _uiState.update {
                             it.copy(
@@ -112,7 +108,7 @@ class OverviewViewModel(
                     }
 
                     try {
-                        entryUseCase.restoreEntry(deletedEntry)
+                        overviewUseCases.restoreEntry(deletedEntry)
                         loadingJob.cancel()
                         _uiState.update {
                             it.copy(
@@ -147,11 +143,8 @@ class OverviewViewModel(
                     }
 
                     try {
-                        // Sign out from Google Auth
-                        googleAuthUiClient.signOut()
-
-                        // Clear sign-in state
-                        authStateRepository.setSignedInState(false)
+                        // Sign out via UseCase
+                        signOutUseCase()
 
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
@@ -177,19 +170,19 @@ class OverviewViewModel(
      * Sets up daily notification scheduling.
      */
     fun onNotificationPermissionGranted() {
-        notificationRepository.setupDailyNotificationIfNeeded()
+        overviewUseCases.setupNotification()
     }
 
     /**
      * Check if notification permission is granted
      */
     fun hasNotificationPermission(): Boolean {
-        return notificationRepository.hasNotificationPermission()
+        return overviewUseCases.checkNotificationPermission()
     }
 
     private fun getEntries(entryOrder: EntryOrder) {
         getEntriesJob?.cancel()
-        getEntriesJob = entryUseCase.getEntries(entryOrder)
+        getEntriesJob = overviewUseCases.getEntries(entryOrder)
             .onEach { entries ->
                 _uiState.update {
                     it.copy(

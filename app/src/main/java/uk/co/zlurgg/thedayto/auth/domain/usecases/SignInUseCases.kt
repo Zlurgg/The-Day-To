@@ -5,5 +5,7 @@ package uk.co.zlurgg.thedayto.auth.domain.usecases
  * Injected into SignInViewModel.
  */
 data class SignInUseCases(
+    val signIn: SignInUseCase,
+    val checkSignInStatus: CheckSignInStatusUseCase,
     val checkTodayEntry: CheckTodayEntryUseCase
 )
