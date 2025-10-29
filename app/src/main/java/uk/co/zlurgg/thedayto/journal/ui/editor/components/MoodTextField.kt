@@ -14,8 +14,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 @Composable
 fun MoodTextField(
@@ -26,14 +28,20 @@ fun MoodTextField(
     onValueChange: (String) -> Unit,
     textStyle: TextStyle = TextStyle(),
     singleLine: Boolean = false,
-    onFocusChange: (FocusState) -> Unit
+    onFocusChange: (FocusState) -> Unit,
+    maxLength: Int = InputValidation.MAX_MOOD_LENGTH
 ) {
     Box(
         modifier = modifier
     ) {
         OutlinedTextField(
             value = mood,
-            onValueChange = onValueChange,
+            onValueChange = { newValue ->
+                // Enforce max length at UI level
+                if (newValue.length <= maxLength) {
+                    onValueChange(newValue)
+                }
+            },
             singleLine = singleLine,
             textStyle = textStyle,
             shape = RoundedCornerShape(12.dp),

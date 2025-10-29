@@ -7,10 +7,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 /**
  * Pure presenter component for content entry field.
  * No ViewModel dependency - receives all state and callbacks as parameters.
+ *
+ * Enforces input validation:
+ * - Maximum length limit to prevent DoS/memory issues
+ * - Character counter to guide users
+ * - Visual feedback when approaching limit
  *
  * @param content The current content text
  * @param hint Hint text to display when field is empty
@@ -35,6 +41,8 @@ fun ContentItem(
         onFocusChange = onFocusChange,
         isHintVisible = isHintVisible,
         textStyle = MaterialTheme.typography.bodyLarge,
+        maxLength = InputValidation.MAX_CONTENT_LENGTH,
+        showCharacterCount = true,
         modifier = modifier
             .fillMaxWidth()
             .height(200.dp)  // Fixed height to avoid FAB overlap

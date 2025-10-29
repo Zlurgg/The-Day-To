@@ -3,21 +3,48 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import uk.co.zlurgg.thedayto.journal.domain.util.ValidationResult
 
+/**
+ * Use Case: Add a custom mood-color mapping with comprehensive validation
+ *
+ * Security measures:
+ * - Input length limits for mood names
+ * - Input sanitization to remove control characters
+ * - Hex color format validation
+ * - User-friendly error messages
+ *
+ * @param repository MoodColor repository for persistence
+ */
 class AddMoodColorUseCase(
     private val repository: MoodColorRepository
 ) {
     @Throws(InvalidMoodColorException::class)
     suspend operator fun invoke(moodColor: MoodColor) {
-        if (moodColor.dateStamp == 0L) {
-            throw InvalidMoodColorException("The date of the new mood color selection can't be empty.")
+        // Validate timestamp
+        when (val result = InputValidation.validateTimestamp(moodColor.dateStamp)) {
+            is ValidationResult.Invalid -> throw InvalidMoodColorException(result.message)
+            is ValidationResult.Valid -> {} // Continue
         }
-        if (moodColor.mood.isBlank()) {
-            throw InvalidMoodColorException("The mood of the new mood color selection can't be empty.")
+
+        // Validate and sanitize mood
+        val sanitizedMood = when (val result = InputValidation.validateMood(moodColor.mood)) {
+            is ValidationResult.Invalid -> throw InvalidMoodColorException(result.message)
+            is ValidationResult.Valid -> result.value
         }
-        if (moodColor.color == "") {
-            throw InvalidMoodColorException("The color of the new mood color selection can't be empty.")
+
+        // Validate color format
+        when (val result = InputValidation.validateColor(moodColor.color)) {
+            is ValidationResult.Invalid -> throw InvalidMoodColorException(result.message)
+            is ValidationResult.Valid -> {} // Continue
         }
-        repository.insertMoodColor(moodColor)
+
+        // Create sanitized mood color
+        val sanitizedMoodColor = moodColor.copy(
+            mood = sanitizedMood
+        )
+
+        repository.insertMoodColor(sanitizedMoodColor)
     }
 }
