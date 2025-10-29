@@ -62,7 +62,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
         // Use pendingIntent for content intent (fallback if deep link fails)
         val deepLinkPendingIntent = createPendingIntent(
-            deepLink = "https://thedayto.co.uk/sign-in",
+            deepLink = "https://thedayto.co.uk/editor?entryId=null&showBackButton=true",
             context = applicationContext
         )
 

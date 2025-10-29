@@ -62,12 +62,6 @@ fun TheDayToApp() {
                             // Clear back stack so back button doesn't return to sign-in
                             popUpTo<SignInRoute> { inclusive = true }
                         }
-                    },
-                    onNavigateToEditor = { entryDate ->
-                        navController.navigate(EditorRoute(entryId = null, showBackButton = false)) {
-                            // Clear back stack so back button doesn't return to sign-in
-                            popUpTo<SignInRoute> { inclusive = true }
-                        }
                     }
                 )
             }

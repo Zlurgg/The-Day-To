@@ -30,6 +30,10 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -45,6 +49,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -60,6 +65,7 @@ import uk.co.zlurgg.thedayto.core.ui.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalenderDay
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.DayOfWeekHeader
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EmptyState
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntryItem
@@ -107,6 +113,11 @@ fun OverviewScreenRoot(
                 }
                 is OverviewUiEvent.NavigateToSignIn -> {
                     onNavigateToSignIn()
+                }
+                is OverviewUiEvent.NavigateToEditor -> {
+                    navController.navigate(
+                        EditorRoute(entryId = event.entryId, showBackButton = true)
+                    )
                 }
                 is OverviewUiEvent.RequestNotificationPermission -> {
                     // Request permission on Android 13+, otherwise just setup notifications
@@ -162,6 +173,20 @@ private fun OverviewScreen(
 
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            // Only show FAB when today's entry is missing
+            if (!uiState.hasTodayEntry) {
+                FloatingActionButton(
+                    onClick = { onAction(OverviewAction.CreateNewEntry) },
+                    containerColor = MaterialTheme.colorScheme.primaryContainer
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(uk.co.zlurgg.thedayto.R.string.create_today_entry)
+                    )
+                }
+            }
+        },
         modifier = modifier,
         topBar = {
             Row(
@@ -396,6 +421,14 @@ private fun OverviewScreen(
             }
         }
     )
+
+    // Entry reminder dialog
+    if (uiState.showEntryReminderDialog) {
+        CreateEntryReminderDialog(
+            onDismiss = { onAction(OverviewAction.DismissEntryReminder) },
+            onCreateEntry = { onAction(OverviewAction.CreateTodayEntry) }
+        )
+    }
 }
 
 @Preview(name = "Light Mode", showBackground = true)

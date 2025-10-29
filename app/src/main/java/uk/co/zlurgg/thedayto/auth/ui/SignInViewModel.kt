@@ -12,7 +12,6 @@ import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 
 class SignInViewModel(
     private val signInUseCases: SignInUseCases
@@ -40,16 +39,8 @@ class SignInViewModel(
             if (result.data != null) {
                 // Sign-in successful
                 _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
-
-                // Check if entry exists for today
-                val todayEntryDate = signInUseCases.checkTodayEntry()
-
-                // Navigate based on entry existence
-                if (todayEntryDate != null) {
-                    _uiEvents.emit(SignInUiEvent.NavigateToOverview)
-                } else {
-                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = DateUtils.getTodayStartEpoch()))
-                }
+                // Always navigate to Overview
+                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
             } else {
                 // Sign-in failed
                 val errorMessage = result.errorMessage ?: "Unknown sign-in error"
@@ -67,15 +58,8 @@ class SignInViewModel(
         viewModelScope.launch {
             // Check sign-in status via UseCase
             if (signInUseCases.checkSignInStatus()) {
-                // Check if entry exists for today
-                val todayEntryDate = signInUseCases.checkTodayEntry()
-
-                // Navigate based on entry existence
-                if (todayEntryDate != null) {
-                    _uiEvents.emit(SignInUiEvent.NavigateToOverview)
-                } else {
-                    _uiEvents.emit(SignInUiEvent.NavigateToEditor(entryDate = DateUtils.getTodayStartEpoch()))
-                }
+                // Always navigate to Overview
+                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
             }
         }
     }

@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
@@ -37,6 +38,7 @@ class OverviewViewModel(
     init {
         getEntries(EntryOrder.Date(OrderType.Descending))
         updateGreeting()
+        checkTodayEntry()
     }
 
     /**
@@ -52,6 +54,28 @@ class OverviewViewModel(
             else -> "Good night"
         }
         _uiState.update { it.copy(greeting = greeting) }
+    }
+
+    /**
+     * Check if today's entry exists and show reminder dialog if needed
+     *
+     * Shows the reminder dialog once per day if:
+     * - No entry exists for today
+     * - Reminder hasn't been shown today yet
+     */
+    private fun checkTodayEntry() {
+        viewModelScope.launch {
+            val todayEpoch = DateUtils.getTodayStartEpoch()
+            val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+
+            val hasTodayEntry = todayEntry != null
+            _uiState.update { it.copy(hasTodayEntry = hasTodayEntry) }
+
+            // Show reminder dialog if no entry + haven't shown today
+            if (!hasTodayEntry && !overviewUseCases.checkEntryReminderShownToday()) {
+                _uiState.update { it.copy(showEntryReminderDialog = true) }
+            }
+        }
     }
 
     fun onAction(action: OverviewAction) {
@@ -135,6 +159,20 @@ class OverviewViewModel(
             is OverviewAction.RequestSignOut -> {
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.ShowSignOutDialog)
+                }
+            }
+
+            is OverviewAction.DismissEntryReminder -> {
+                viewModelScope.launch {
+                    overviewUseCases.markEntryReminderShownToday()
+                    _uiState.update { it.copy(showEntryReminderDialog = false) }
+                }
+            }
+
+            is OverviewAction.CreateTodayEntry,
+            is OverviewAction.CreateNewEntry -> {
+                viewModelScope.launch {
+                    _uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
                 }
             }
         }

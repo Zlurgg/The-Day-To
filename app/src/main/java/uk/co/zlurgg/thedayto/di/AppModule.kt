@@ -12,12 +12,16 @@ import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.journal.data.repository.PreferencesRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.data.repository.MoodColorRepositoryImpl
@@ -66,10 +70,12 @@ val appModule = module {
         )
     }
 
-//    viewModelOf(::AddEditEntryViewModel)
-
-
+    // Journal-specific repositories
     single<EntryRepository> { EntryRepositoryImpl(get<TheDayToDatabase>().entryDao) }
+
+    single<PreferencesRepository> {
+        PreferencesRepositoryImpl(androidContext())
+    }
 
     single {
         OverviewUseCases(
@@ -79,7 +85,9 @@ val appModule = module {
             getEntryByDate = GetEntryByDateUseCase(repository = get()),
             updateEntryUseCase = UpdateEntryUseCase(repository = get()),
             setupNotification = SetupNotificationUseCase(notificationRepository = get()),
-            checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get())
+            checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get()),
+            checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository = get()),
+            markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository = get())
         )
     }
 

@@ -1,13 +1,14 @@
-package uk.co.zlurgg.thedayto.core.data.repository
+package uk.co.zlurgg.thedayto.journal.data.repository
 
 import android.content.Context
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import androidx.core.content.edit
+import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
 import java.time.LocalDate
 
 /**
  * Implementation of PreferencesRepository using Android SharedPreferences
  *
- * Manages application-level preferences and settings persistence.
+ * Manages journal-specific preferences and settings persistence.
  * Uses SharedPreferences for simple key-value storage.
  *
  * @param context Application context for accessing SharedPreferences
@@ -41,11 +42,11 @@ class PreferencesRepositoryImpl(
      */
     override suspend fun markEntryReminderShownToday() {
         val today = LocalDate.now().toString()
-        prefs.edit().putString(KEY_LAST_REMINDER_DATE, today).apply()
+        prefs.edit { putString(KEY_LAST_REMINDER_DATE, today) }
     }
 
     companion object {
-        private const val PREFS_NAME = "app_prefs"
+        private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
     }
 }
