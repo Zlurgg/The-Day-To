@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.R
 fun SettingsMenu(
     hasNotificationPermission: Boolean,
     onRequestNotificationPermission: () -> Unit,
+    onShowTutorial: () -> Unit,
     onSignOut: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -49,6 +50,14 @@ fun SettingsMenu(
                     }
                 )
             }
+
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.help_and_tutorial)) },
+                onClick = {
+                    expanded = false
+                    onShowTutorial()
+                }
+            )
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.sign_out)) },

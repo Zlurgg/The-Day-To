@@ -162,6 +162,12 @@ class OverviewViewModel(
                 }
             }
 
+            is OverviewAction.RequestShowTutorial -> {
+                viewModelScope.launch {
+                    _uiEvents.emit(OverviewUiEvent.ShowTutorialDialog)
+                }
+            }
+
             is OverviewAction.DismissEntryReminder -> {
                 viewModelScope.launch {
                     overviewUseCases.markEntryReminderShownToday()

@@ -63,4 +63,13 @@
     <!-- Tutorial Dialog -->
     <string name="tutorial_dialog_title">How to Use The Day To</string>
     <string name="tutorial_dialog_button">Got It</string>
+    <string name="tutorial_getting_started_title">Getting Started</string>
+    <string name="tutorial_getting_started_content">Welcome! Start by creating your first mood entry. Tap the floating + button on the calendar to begin.</string>
+    <string name="tutorial_creating_entries_title">Creating Entries</string>
+    <string name="tutorial_creating_entries_content">1. Select a mood from the dropdown\n2. Choose a date (defaults to today)\n3. Add optional notes about your day\n4. Tap the save button</string>
+    <string name="tutorial_mood_colors_title">Custom Mood Colors</string>
+    <string name="tutorial_mood_colors_content">Create your own mood-color combinations! When selecting a mood, tap \"Add custom mood color\" to choose a mood name and color that reflects your feelings.</string>
+    <string name="tutorial_calendar_title">Viewing Your Calendar</string>
+    <string name="tutorial_calendar_content">Your month is displayed as a color calendar. Each day shows the color of your mood. Tap any date to view or edit that day\'s entry.</string>
+    <string name="help_and_tutorial">Help &amp; Tutorial</string>
 </resources>
