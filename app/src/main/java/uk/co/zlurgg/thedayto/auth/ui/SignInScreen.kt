@@ -62,7 +62,7 @@ fun SignInScreenRoot(
 
     // Delegate to presenter
     SignInScreen(
-        onSignInClick = { viewModel.signIn(context) },
+        onSignInClick = { viewModel.signIn() },
         snackbarHostState = snackbarHostState
     )
 }

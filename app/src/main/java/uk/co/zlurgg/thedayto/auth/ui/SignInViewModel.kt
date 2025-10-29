@@ -1,6 +1,5 @@
 package uk.co.zlurgg.thedayto.auth.ui
 
-import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -27,14 +26,14 @@ class SignInViewModel(
 
     /**
      * Initiates Google Sign-In flow
-     * @param activityContext Required for credential UI
+     * Context is handled at the data layer via repository
      */
-    fun signIn(activityContext: Context) {
+    fun signIn() {
         viewModelScope.launch {
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
-            // Sign in via UseCase
-            val result = signInUseCases.signIn(activityContext)
+            // Sign in via UseCase (no Context parameter needed)
+            val result = signInUseCases.signIn()
 
             if (result.data != null) {
                 // Sign-in successful

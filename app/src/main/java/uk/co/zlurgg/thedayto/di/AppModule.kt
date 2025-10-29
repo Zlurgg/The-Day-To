@@ -5,11 +5,12 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
+import uk.co.zlurgg.thedayto.auth.data.repository.AuthRepositoryImpl
 import uk.co.zlurgg.thedayto.auth.data.repository.AuthStateRepositoryImpl
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
-import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
 import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
@@ -50,9 +51,9 @@ val appModule = module {
         ).build()
     }
 
-    // Google Sign-In Client (Modern Credential Manager API)
-    single {
-        GoogleAuthUiClient(
+    // Auth Repository (wraps GoogleAuthUiClient)
+    single<AuthRepository> {
+        AuthRepositoryImpl(
             context = androidContext()
         )
     }
@@ -109,11 +110,11 @@ val appModule = module {
     single {
         SignInUseCases(
             signIn = SignInUseCase(
-                googleAuthUiClient = get(),
+                authRepository = get(),
                 authStateRepository = get()
             ),
             checkSignInStatus = CheckSignInStatusUseCase(
-                googleAuthUiClient = get(),
+                authRepository = get(),
                 authStateRepository = get()
             ),
             checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get())
@@ -123,7 +124,7 @@ val appModule = module {
     // Standalone SignOutUseCase - injected separately into OverviewViewModel
     single {
         SignOutUseCase(
-            googleAuthUiClient = get(),
+            authRepository = get(),
             authStateRepository = get()
         )
     }
