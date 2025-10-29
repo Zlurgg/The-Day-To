@@ -10,5 +10,7 @@ data class OverviewUiState(
     val entryMade: Boolean = false,
     val recentlyDeletedEntry: Entry? = null,
     val isLoading: Boolean = false,
-    val greeting: String = ""
+    val greeting: String = "",
+    val showEntryReminderDialog: Boolean = false,
+    val hasTodayEntry: Boolean = true
 )

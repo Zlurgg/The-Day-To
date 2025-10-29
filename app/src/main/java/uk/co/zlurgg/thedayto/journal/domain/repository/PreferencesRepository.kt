@@ -1,9 +1,9 @@
-package uk.co.zlurgg.thedayto.core.domain.repository
+package uk.co.zlurgg.thedayto.journal.domain.repository
 
 /**
- * Repository interface for managing application preferences
+ * Repository interface for managing journal-related preferences
  *
- * Provides access to user preferences and app-level settings stored
+ * Provides access to journal-specific user preferences stored
  * in SharedPreferences. Domain layer interface - implemented in data layer.
  */
 interface PreferencesRepository {

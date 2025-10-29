@@ -7,5 +7,7 @@ data class OverviewUseCases(
     val getEntryByDate: GetEntryByDateUseCase,
     val updateEntryUseCase: UpdateEntryUseCase,
     val setupNotification: SetupNotificationUseCase,
-    val checkNotificationPermission: CheckNotificationPermissionUseCase
+    val checkNotificationPermission: CheckNotificationPermissionUseCase,
+    val checkEntryReminderShownToday: CheckEntryReminderShownTodayUseCase,
+    val markEntryReminderShownToday: MarkEntryReminderShownTodayUseCase
 )
