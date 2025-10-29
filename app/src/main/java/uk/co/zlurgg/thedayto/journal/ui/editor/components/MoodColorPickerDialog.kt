@@ -50,6 +50,8 @@ fun MoodColorPickerDialog(
         // Local state - resets each time dialog opens
         var mood by remember { mutableStateOf("") }
         var selectedColor by remember { mutableStateOf("#000000") }
+        var errorMessage by remember { mutableStateOf<String?>(null) }
+
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
@@ -69,6 +71,8 @@ fun MoodColorPickerDialog(
                             // Enforce max length at UI level
                             if (newValue.length <= InputValidation.MAX_MOOD_LENGTH) {
                                 mood = newValue
+                                // Clear error when user starts typing
+                                errorMessage = null
                             }
                         },
                         label = {
@@ -80,12 +84,21 @@ fun MoodColorPickerDialog(
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.headlineSmall,
+                        isError = errorMessage != null,
                         supportingText = {
-                            Text(
-                                text = "${mood.length}/${InputValidation.MAX_MOOD_LENGTH}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            if (errorMessage != null) {
+                                Text(
+                                    text = errorMessage!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                            } else {
+                                Text(
+                                    text = "${mood.length}/${InputValidation.MAX_MOOD_LENGTH}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     )
 
@@ -108,7 +121,12 @@ fun MoodColorPickerDialog(
             confirmButton = {
                 IconButton(
                     onClick = {
-                        onSave(mood, selectedColor)
+                        // Validate mood before saving
+                        if (mood.trim().isEmpty()) {
+                            errorMessage = "Mood cannot be empty!"
+                        } else {
+                            onSave(mood, selectedColor)
+                        }
                     }
                 ) {
                     Icon(

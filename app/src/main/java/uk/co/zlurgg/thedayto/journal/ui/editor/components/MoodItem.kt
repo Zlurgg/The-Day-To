@@ -120,6 +120,23 @@ fun MoodItem(
             modifier = Modifier
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
         ) {
+            // Show empty state message when no moods exist
+            if (moodColors.isEmpty()) {
+                DropdownMenuItem(
+                    onClick = { /* No action - just informational */ },
+                    enabled = false,
+                    text = {
+                        Text(
+                            text = "No mood colors yet. Create one below!",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+                )
+            }
+
+            // Existing mood colors
             moodColors.forEach { moodColor ->
                 val color = getColor(moodColor.color)
                 DropdownMenuItem(
@@ -167,7 +184,8 @@ fun MoodItem(
                     }
                 )
             }
-            // Button to add a new mood color
+
+            // Button to add a new mood color - ALWAYS shown
             DropdownMenuItem(
                 onClick = {
                     onToggleMoodColorDialog()

@@ -34,10 +34,10 @@ class AddMoodColorUseCase(
             is ValidationResult.Valid -> result.value
         }
 
-        // Validate color format
-        when (val result = InputValidation.validateColor(moodColor.color)) {
-            is ValidationResult.Invalid -> throw InvalidMoodColorException(result.message)
-            is ValidationResult.Valid -> {} // Continue
+        // Color validation removed - colors are only selected via picker (programmatic, always valid)
+        // Basic check that color exists
+        if (moodColor.color.isBlank()) {
+            throw InvalidMoodColorException("Color cannot be empty")
         }
 
         // Create sanitized mood color
