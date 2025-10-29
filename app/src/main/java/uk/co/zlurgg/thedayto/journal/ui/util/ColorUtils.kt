@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.util
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
+import androidx.core.graphics.toColorInt
 import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_light_onSurface
 import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_dark_onSurface
 
@@ -33,3 +34,23 @@ fun Color.getContrastingTextColor(): Color {
         LightText  // Light text for dark backgrounds
     }
 }
+
+/**
+ * Converts a hex color string to a Compose Color object.
+ *
+ * Takes a hex color string (without the '#' prefix) and converts it to a
+ * Compose Color. This is used throughout the app to convert stored hex
+ * color values (e.g., from MoodColor entities) into renderable colors.
+ *
+ * @param colorString Hex color string without '#' prefix (e.g., "FF5733", "4A148C")
+ * @return Compose Color object ready for rendering
+ *
+ * Example:
+ * ```
+ * val color = getColor("FF5733")  // Returns Color(0xFFFF5733)
+ * ```
+ */
+fun getColor(colorString: String): Color {
+    return Color("#$colorString".toColorInt())
+}
+

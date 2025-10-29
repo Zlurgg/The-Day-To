@@ -24,11 +24,6 @@ object InputValidation {
      */
     const val MAX_CONTENT_LENGTH = 5000
 
-    /**
-     * Regex pattern for validating hex color codes
-     * Format: #RRGGBB where each component is 00-FF
-     */
-    private val HEX_COLOR_PATTERN = Regex("^#[0-9A-Fa-f]{6}$")
 
     /**
      * Sanitize text input by removing control characters and trimming whitespace
