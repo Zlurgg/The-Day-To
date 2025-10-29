@@ -73,6 +73,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
+import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -93,6 +94,7 @@ fun OverviewScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var hasNotificationPermission by remember { mutableStateOf(viewModel.hasNotificationPermission()) }
+    var showTutorialDialog by remember { mutableStateOf(false) }
 
     // Permission launcher for Android 13+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -130,8 +132,18 @@ fun OverviewScreenRoot(
                 is OverviewUiEvent.ShowSignOutDialog -> {
                     onShowSignOutDialog()
                 }
+                is OverviewUiEvent.ShowTutorialDialog -> {
+                    showTutorialDialog = true
+                }
             }
         }
+    }
+
+    // Show tutorial dialog when event is triggered
+    if (showTutorialDialog) {
+        TutorialDialog(
+            onDismiss = { showTutorialDialog = false }
+        )
     }
 
     // Delegate to presenter
@@ -205,6 +217,7 @@ private fun OverviewScreen(
                 SettingsMenu(
                     hasNotificationPermission = hasNotificationPermission,
                     onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) },
+                    onShowTutorial = { onAction(OverviewAction.RequestShowTutorial) },
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
             }

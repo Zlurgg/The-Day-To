@@ -6,4 +6,5 @@ sealed interface OverviewUiEvent {
     data class NavigateToEditor(val entryId: Int?) : OverviewUiEvent
     data object RequestNotificationPermission : OverviewUiEvent
     data object ShowSignOutDialog : OverviewUiEvent
+    data object ShowTutorialDialog : OverviewUiEvent
 }

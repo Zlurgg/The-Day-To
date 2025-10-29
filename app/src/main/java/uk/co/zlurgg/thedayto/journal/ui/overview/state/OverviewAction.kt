@@ -9,6 +9,7 @@ sealed interface OverviewAction {
     data object RestoreEntry : OverviewAction
     data object RequestNotificationPermission : OverviewAction
     data object RequestSignOut : OverviewAction
+    data object RequestShowTutorial : OverviewAction
     data object DismissEntryReminder : OverviewAction
     data object CreateTodayEntry : OverviewAction
     data object CreateNewEntry : OverviewAction
