@@ -24,4 +24,22 @@ interface PreferencesRepository {
      * This prevents showing the dialog multiple times on the same day.
      */
     suspend fun markEntryReminderShownToday()
+
+    /**
+     * Check if this is the user's first launch of the app
+     *
+     * Used to determine if default mood colors should be seeded
+     * and first-time setup should be performed.
+     *
+     * @return true if this is first launch, false otherwise
+     */
+    suspend fun isFirstLaunch(): Boolean
+
+    /**
+     * Mark that the first launch setup has been completed
+     *
+     * Called after seeding default mood colors and completing
+     * initial app setup.
+     */
+    suspend fun markFirstLaunchComplete()
 }

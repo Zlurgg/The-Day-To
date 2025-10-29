@@ -39,7 +39,6 @@ fun SignInScreenRoot(
     onNavigateToOverview: () -> Unit
 ) {
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
 
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {

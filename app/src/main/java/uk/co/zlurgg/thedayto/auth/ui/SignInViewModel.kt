@@ -38,6 +38,10 @@ class SignInViewModel(
             if (result.data != null) {
                 // Sign-in successful
                 _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
+
+                // Seed default mood colors on first launch
+                signInUseCases.seedDefaultMoodColors()
+
                 // Always navigate to Overview
                 _uiEvents.emit(SignInUiEvent.NavigateToOverview)
             } else {
