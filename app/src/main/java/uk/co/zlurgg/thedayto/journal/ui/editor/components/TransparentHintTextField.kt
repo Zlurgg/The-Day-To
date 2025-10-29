@@ -3,9 +3,13 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.ui.Alignment
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -19,6 +23,7 @@ import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 @Composable
 fun TransparentHintTextField(
@@ -29,44 +34,74 @@ fun TransparentHintTextField(
     onValueChange: (String) -> Unit,
     textStyle: TextStyle = TextStyle(),
     singleLine: Boolean = false,
-    onFocusChange: (FocusState) -> Unit
+    onFocusChange: (FocusState) -> Unit,
+    maxLength: Int? = null,
+    showCharacterCount: Boolean = false
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .border(
-                width = if (isFocused) 2.dp else 1.dp,
-                color = if (isFocused)
-                    MaterialTheme.colorScheme.primary
-                else
-                    MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                shape = RoundedCornerShape(12.dp)
-            )
-            .padding(16.dp)
-    ) {
-        BasicTextField(
-            value = text,
-            onValueChange = onValueChange,
-            singleLine = singleLine,
-            textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+    Column(modifier = modifier) {
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .onFocusChanged { focusState ->
-                    isFocused = focusState.isFocused
-                    onFocusChange(focusState)
-                }
-        )
-        if (isHintVisible) {
-            Text(
-                text = hint,
-                style = textStyle,
-                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                .background(
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .border(
+                    width = if (isFocused) 2.dp else 1.dp,
+                    color = if (isFocused)
+                        MaterialTheme.colorScheme.primary
+                    else
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                .padding(16.dp)
+        ) {
+            BasicTextField(
+                value = text,
+                onValueChange = { newValue ->
+                    // Enforce max length at UI level if specified
+                    if (maxLength == null || newValue.length <= maxLength) {
+                        onValueChange(newValue)
+                    }
+                },
+                singleLine = singleLine,
+                textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        onFocusChange(focusState)
+                    }
             )
+            if (isHintVisible) {
+                Text(
+                    text = hint,
+                    style = textStyle,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                )
+            }
+        }
+
+        // Character counter
+        if (showCharacterCount && maxLength != null) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 4.dp),
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
+            ) {
+                Text(
+                    text = "${text.length}/$maxLength",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (text.length > maxLength * 0.9) {
+                        MaterialTheme.colorScheme.error
+                    } else {
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                    }
+                )
+            }
         }
     }
 }

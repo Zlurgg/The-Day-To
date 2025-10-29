@@ -3,26 +3,55 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import uk.co.zlurgg.thedayto.journal.domain.util.ValidationResult
 
+/**
+ * Use Case: Add or update a journal entry with comprehensive validation
+ *
+ * Security measures:
+ * - Input length limits to prevent DoS/memory exhaustion
+ * - Input sanitization to remove control characters
+ * - Format validation for all fields
+ * - User-friendly error messages
+ *
+ * @param repository Entry repository for persistence
+ */
 class AddEntryUseCase(
     private val repository: EntryRepository
 ) {
     @Throws(InvalidEntryException::class)
     suspend operator fun invoke(entry: Entry) {
-        if (entry.dateStamp == 0L) {
-            throw InvalidEntryException("The date of the entry must be valid.")
+        // Validate timestamp
+        when (val result = InputValidation.validateTimestamp(entry.dateStamp)) {
+            is ValidationResult.Invalid -> throw InvalidEntryException(result.message)
+            is ValidationResult.Valid -> {} // Continue
         }
-        if (entry.mood.isBlank()) {
-            throw InvalidEntryException("The mood of the entry can't be empty.")
+
+        // Validate and sanitize mood
+        val sanitizedMood = when (val result = InputValidation.validateMood(entry.mood)) {
+            is ValidationResult.Invalid -> throw InvalidEntryException(result.message)
+            is ValidationResult.Valid -> result.value
         }
-        if (entry.color.isBlank()) {
-            throw InvalidEntryException("The color of the entry can't be empty.")
+
+        // Validate and sanitize content (notes)
+        val sanitizedContent = when (val result = InputValidation.validateContent(entry.content)) {
+            is ValidationResult.Invalid -> throw InvalidEntryException(result.message)
+            is ValidationResult.Valid -> result.value
         }
-        repository.insertEntry(entry)
-//        if (repository.getTheDayToEntryByDate(entry.dateStamp) == null) {
-//            repository.insertEntry(entry)
-//        } else {
-//            throw InvalidTheDayToEntryException("Entry already exists for this date.")
-//        }
+
+        // Validate color format
+        when (val result = InputValidation.validateColor(entry.color)) {
+            is ValidationResult.Invalid -> throw InvalidEntryException(result.message)
+            is ValidationResult.Valid -> {} // Continue
+        }
+
+        // Create sanitized entry
+        val sanitizedEntry = entry.copy(
+            mood = sanitizedMood,
+            content = sanitizedContent
+        )
+
+        repository.insertEntry(sanitizedEntry)
     }
 }

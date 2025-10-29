@@ -28,6 +28,7 @@ import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 /**
  * Material3 dialog for creating custom mood-color combinations.
@@ -64,7 +65,12 @@ fun MoodColorPickerDialog(
                     // Mood text field
                     OutlinedTextField(
                         value = mood,
-                        onValueChange = { mood = it },
+                        onValueChange = { newValue ->
+                            // Enforce max length at UI level
+                            if (newValue.length <= InputValidation.MAX_MOOD_LENGTH) {
+                                mood = newValue
+                            }
+                        },
                         label = {
                             Text(
                                 text = stringResource(R.string.mood),
@@ -73,7 +79,14 @@ fun MoodColorPickerDialog(
                         },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
-                        textStyle = MaterialTheme.typography.headlineSmall
+                        textStyle = MaterialTheme.typography.headlineSmall,
+                        supportingText = {
+                            Text(
+                                text = "${mood.length}/${InputValidation.MAX_MOOD_LENGTH}",
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
                     )
 
                     Spacer(modifier = Modifier.height(paddingMedium))
