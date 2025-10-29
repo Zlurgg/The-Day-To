@@ -90,24 +90,6 @@ object InputValidation {
     }
 
     /**
-     * Validate hex color code
-     *
-     * @param color Hex color string (e.g., "#FF5733")
-     * @return ValidationResult with validated color or error message
-     */
-    fun validateColor(color: String): ValidationResult {
-        val trimmed = color.trim()
-
-        return when {
-            trimmed.isBlank() -> ValidationResult.Invalid("Color cannot be empty")
-            !HEX_COLOR_PATTERN.matches(trimmed) -> ValidationResult.Invalid(
-                "Invalid color format (expected #RRGGBB)"
-            )
-            else -> ValidationResult.Valid(trimmed)
-        }
-    }
-
-    /**
      * Validate timestamp
      *
      * @param timestamp Unix epoch timestamp
