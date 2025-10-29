@@ -1,5 +1,7 @@
 package uk.co.zlurgg.thedayto.auth.domain.usecases
 
+import uk.co.zlurgg.thedayto.journal.domain.usecases.auth.SeedDefaultMoodColorsUseCase
+
 /**
  * Aggregator for all SignIn-related UseCases.
  * Injected into SignInViewModel.
@@ -7,5 +9,6 @@ package uk.co.zlurgg.thedayto.auth.domain.usecases
 data class SignInUseCases(
     val signIn: SignInUseCase,
     val checkSignInStatus: CheckSignInStatusUseCase,
-    val checkTodayEntry: CheckTodayEntryUseCase
+    val checkTodayEntry: CheckTodayEntryUseCase,
+    val seedDefaultMoodColors: SeedDefaultMoodColorsUseCase
 )

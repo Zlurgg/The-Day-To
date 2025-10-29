@@ -40,6 +40,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.auth.SeedDefaultMoodColorsUseCase
 
 val appModule = module {
 
@@ -117,7 +118,11 @@ val appModule = module {
                 authRepository = get(),
                 authStateRepository = get()
             ),
-            checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get())
+            checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get()),
+            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(
+                moodColorRepository = get(),
+                preferencesRepository = get()
+            )
         )
     }
 

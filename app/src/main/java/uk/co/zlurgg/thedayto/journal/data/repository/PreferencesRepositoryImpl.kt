@@ -45,8 +45,28 @@ class PreferencesRepositoryImpl(
         prefs.edit { putString(KEY_LAST_REMINDER_DATE, today) }
     }
 
+    /**
+     * Check if this is the user's first launch of the app
+     *
+     * @return true if first launch flag is not set (first time), false otherwise
+     */
+    override suspend fun isFirstLaunch(): Boolean {
+        return !prefs.getBoolean(KEY_FIRST_LAUNCH_COMPLETE, false)
+    }
+
+    /**
+     * Mark that the first launch setup has been completed
+     *
+     * Sets a persistent flag indicating that default mood colors have been
+     * seeded and initial setup is complete.
+     */
+    override suspend fun markFirstLaunchComplete() {
+        prefs.edit { putBoolean(KEY_FIRST_LAUNCH_COMPLETE, true) }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
+        private const val KEY_FIRST_LAUNCH_COMPLETE = "first_launch_complete"
     }
 }
