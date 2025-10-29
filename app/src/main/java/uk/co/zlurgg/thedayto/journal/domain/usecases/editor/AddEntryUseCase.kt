@@ -40,10 +40,10 @@ class AddEntryUseCase(
             is ValidationResult.Valid -> result.value
         }
 
-        // Validate color format
-        when (val result = InputValidation.validateColor(entry.color)) {
-            is ValidationResult.Invalid -> throw InvalidEntryException(result.message)
-            is ValidationResult.Valid -> {} // Continue
+        // Color validation removed - colors are only selected via picker (programmatic, always valid)
+        // Basic check that color exists
+        if (entry.color.isBlank()) {
+            throw InvalidEntryException("Color cannot be empty")
         }
 
         // Create sanitized entry

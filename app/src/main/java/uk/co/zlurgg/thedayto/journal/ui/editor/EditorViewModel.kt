@@ -182,6 +182,38 @@ class EditorViewModel(
                     withContext(Dispatchers.IO) {
                         editorUseCases.deleteMoodColor(action.moodColor)
                     }
+
+                    // Check if the deleted mood was currently selected
+                    val currentState = _uiState.value
+                    if (currentState.entryMood == action.moodColor.mood &&
+                        currentState.entryColor == action.moodColor.color) {
+
+                        // Reset to first available mood color or empty
+                        val remainingMoodColors = currentState.moodColors.filter {
+                            it.id != action.moodColor.id
+                        }
+
+                        if (remainingMoodColors.isNotEmpty()) {
+                            // Default to first mood color in list
+                            val defaultMoodColor = remainingMoodColors.first()
+                            _uiState.update {
+                                it.copy(
+                                    entryMood = defaultMoodColor.mood,
+                                    entryColor = defaultMoodColor.color,
+                                    isMoodHintVisible = false
+                                )
+                            }
+                        } else {
+                            // No mood colors left, reset to empty
+                            _uiState.update {
+                                it.copy(
+                                    entryMood = "",
+                                    entryColor = "",
+                                    isMoodHintVisible = true
+                                )
+                            }
+                        }
+                    }
                 }
             }
 
