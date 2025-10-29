@@ -19,7 +19,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -37,15 +36,15 @@ import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
-import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import java.time.LocalDate
 import java.time.ZoneOffset
 
