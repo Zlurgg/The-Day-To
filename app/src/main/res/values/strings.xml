@@ -45,4 +45,9 @@
     <string name="enable_notifications">Enable Notifications</string>
     <string name="disable_notifications">Disable Notifications</string>
     <string name="sign_out">Sign out</string>
+    <string name="create_today_entry">Create Today\'s Entry</string>
+    <string name="entry_reminder_title">Create Today\'s Entry?</string>
+    <string name="entry_reminder_message">You haven\'t logged your mood for today yet. Would you like to create an entry?</string>
+    <string name="create_entry">Create Entry</string>
+    <string name="not_now">Not Now</string>
 </resources>
