@@ -42,4 +42,21 @@ interface PreferencesRepository {
      * initial app setup.
      */
     suspend fun markFirstLaunchComplete()
+
+    /**
+     * Check if the user has seen the welcome dialog
+     *
+     * Used to determine if the welcome dialog should be shown
+     * on the sign-in screen for first-time users.
+     *
+     * @return true if user has seen the welcome dialog, false otherwise
+     */
+    suspend fun hasSeenWelcomeDialog(): Boolean
+
+    /**
+     * Mark that the user has seen the welcome dialog
+     *
+     * Called after the welcome dialog is dismissed on first launch.
+     */
+    suspend fun markWelcomeDialogSeen()
 }

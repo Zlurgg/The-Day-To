@@ -50,4 +50,17 @@
     <string name="entry_reminder_message">You haven\'t logged your mood for today yet. Would you like to create an entry?</string>
     <string name="create_entry">Create Entry</string>
     <string name="not_now">Not Now</string>
+
+    <!-- Welcome Dialog -->
+    <string name="welcome_dialog_title">Welcome to The Day To</string>
+    <string name="welcome_dialog_subtitle">Your personal mood journal for daily emotional wellbeing</string>
+    <string name="welcome_dialog_features_title">Features</string>
+    <string name="welcome_dialog_features_list">• Track your daily mood with colors\n• Add personal notes and reflections\n• Visualize your month with a color calendar\n• Create custom mood-color combinations\n• Private and secure - all data stored locally</string>
+    <string name="welcome_dialog_privacy_title">Privacy</string>
+    <string name="welcome_dialog_privacy_info">Your journal entries are stored locally on your device. We use Google Sign-In for authentication only - your journal data remains private and is never uploaded to external servers.</string>
+    <string name="welcome_dialog_button">Get Started</string>
+
+    <!-- Tutorial Dialog -->
+    <string name="tutorial_dialog_title">How to Use The Day To</string>
+    <string name="tutorial_dialog_button">Got It</string>
 </resources>
