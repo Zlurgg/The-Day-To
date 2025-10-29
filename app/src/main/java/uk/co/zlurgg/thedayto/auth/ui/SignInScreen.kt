@@ -21,12 +21,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
 import uk.co.zlurgg.thedayto.auth.ui.components.WelcomeHeader
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
+import uk.co.zlurgg.thedayto.core.ui.components.WelcomeDialog
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 
@@ -38,6 +40,7 @@ fun SignInScreenRoot(
     viewModel: SignInViewModel = koinViewModel(),
     onNavigateToOverview: () -> Unit
 ) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
     // Handle one-time UI events
@@ -61,6 +64,8 @@ fun SignInScreenRoot(
 
     // Delegate to presenter
     SignInScreen(
+        showWelcomeDialog = state.showWelcomeDialog,
+        onDismissWelcomeDialog = { viewModel.dismissWelcomeDialog() },
         onSignInClick = { viewModel.signIn() },
         snackbarHostState = snackbarHostState
     )
@@ -71,10 +76,17 @@ fun SignInScreenRoot(
  */
 @Composable
 private fun SignInScreen(
+    showWelcomeDialog: Boolean,
+    onDismissWelcomeDialog: () -> Unit,
     onSignInClick: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
+    // Show welcome dialog for first-time users
+    if (showWelcomeDialog) {
+        WelcomeDialog(onDismiss = onDismissWelcomeDialog)
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         modifier = modifier

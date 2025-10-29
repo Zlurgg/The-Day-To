@@ -24,6 +24,27 @@ class SignInViewModel(
     private val _uiEvents = MutableSharedFlow<SignInUiEvent>()
     val uiEvents = _uiEvents.asSharedFlow()
 
+    init {
+        // Check if user should see welcome dialog (first-time users)
+        viewModelScope.launch {
+            val hasSeenWelcome = signInUseCases.checkWelcomeDialogSeen()
+            if (!hasSeenWelcome) {
+                _state.update { it.copy(showWelcomeDialog = true) }
+            }
+        }
+    }
+
+    /**
+     * Dismisses the welcome dialog and marks it as seen
+     * Called when user closes the first-time welcome dialog
+     */
+    fun dismissWelcomeDialog() {
+        viewModelScope.launch {
+            signInUseCases.markWelcomeDialogSeen()
+            _state.update { it.copy(showWelcomeDialog = false) }
+        }
+    }
+
     /**
      * Initiates Google Sign-In flow
      * Context is handled at the data layer via repository

@@ -64,9 +64,29 @@ class PreferencesRepositoryImpl(
         prefs.edit { putBoolean(KEY_FIRST_LAUNCH_COMPLETE, true) }
     }
 
+    /**
+     * Check if the user has seen the welcome dialog
+     *
+     * @return true if user has seen welcome dialog, false otherwise (first time)
+     */
+    override suspend fun hasSeenWelcomeDialog(): Boolean {
+        return prefs.getBoolean(KEY_WELCOME_DIALOG_SEEN, false)
+    }
+
+    /**
+     * Mark that the user has seen the welcome dialog
+     *
+     * Sets a persistent flag indicating the welcome dialog was displayed
+     * and dismissed by the user.
+     */
+    override suspend fun markWelcomeDialogSeen() {
+        prefs.edit { putBoolean(KEY_WELCOME_DIALOG_SEEN, true) }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
         private const val KEY_FIRST_LAUNCH_COMPLETE = "first_launch_complete"
+        private const val KEY_WELCOME_DIALOG_SEEN = "welcome_dialog_seen"
     }
 }
