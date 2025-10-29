@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!-- Monochrome version for Android 13+ themed icons -->
+    <!-- System will tint this to match user's Material You theme -->
+    <group
+        android:translateX="54"
+        android:translateY="54">
+
+        <!-- Calendar outline -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M-24,-28 L24,-28 L24,28 L-24,28 Z"
+            android:strokeWidth="0" />
+
+        <!-- Calendar header bar -->
+        <path
+            android:fillColor="#FF000000"
+            android:pathData="M-24,-28 L24,-28 L24,-20 L-24,-20 Z"
+            android:strokeWidth="0" />
+
+        <!-- Calendar grid lines -->
+        <!-- Vertical lines -->
+        <path
+            android:pathData="M-16,-20 L-16,28"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M-8,-20 L-8,28"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M0,-20 L0,28"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M8,-20 L8,28"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M16,-20 L16,28"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+
+        <!-- Horizontal lines -->
+        <path
+            android:pathData="M-24,-12 L24,-12"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M-24,-4 L24,-4"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M-24,4 L24,4"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M-24,12 L24,12"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+        <path
+            android:pathData="M-24,20 L24,20"
+            android:strokeWidth="1"
+            android:strokeColor="#FFFFFFFF" />
+
+        <!-- Mood dots (all same color for monochrome) -->
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M-20,-16 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M-4,-8 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M12,0 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M-12,8 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M4,16 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <path
+            android:fillColor="#FFFFFFFF"
+            android:pathData="M20,24 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0" />
+
+        <!-- Calendar border -->
+        <path
+            android:fillColor="#00000000"
+            android:pathData="M-24,-28 L24,-28 L24,28 L-24,28 Z"
+            android:strokeWidth="2"
+            android:strokeColor="#FF000000" />
+
+    </group>
+</vector>
