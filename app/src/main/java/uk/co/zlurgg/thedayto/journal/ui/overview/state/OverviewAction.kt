@@ -13,4 +13,12 @@ sealed interface OverviewAction {
     data object DismissEntryReminder : OverviewAction
     data object CreateTodayEntry : OverviewAction
     data object CreateNewEntry : OverviewAction
+    data object DismissNotificationConfirmDialog : OverviewAction
+    data object OpenNotificationSettings : OverviewAction
+    data object DismissNotificationSettings : OverviewAction
+    data class SaveNotificationSettings(
+        val enabled: Boolean,
+        val hour: Int,
+        val minute: Int
+    ) : OverviewAction
 }

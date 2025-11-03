@@ -13,14 +13,14 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
-import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
@@ -28,48 +28,43 @@ import java.util.concurrent.TimeUnit
 /**
  * Implementation of NotificationRepository.
  *
- * Handles notification scheduling using WorkManager and checks user's
- * entry status by querying the database directly.
+ * Handles notification scheduling using WorkManager based on user preferences.
  *
  * Follows Clean Architecture:
- * - Uses dependency injection (Context + GetEntryByDateUseCase via Koin)
- * - Single source of truth: Database
+ * - Uses dependency injection (Context + PreferencesRepository via Koin)
+ * - Single source of truth: PreferencesRepository for notification settings
  * - Implements domain layer interface
  *
  * @param context Application context for WorkManager and permission checks
- * @param getEntryByDateUseCase Use case for checking if entry exists for a date
+ * @param preferencesRepository Repository for reading/writing notification preferences
  */
 class NotificationRepositoryImpl(
     private val context: Context,
-    private val getEntryByDateUseCase: GetEntryByDateUseCase
+    private val preferencesRepository: PreferencesRepository
 ) : NotificationRepository {
 
     // Repository-level coroutine scope for background operations
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
-    override fun setupDailyNotificationIfNeeded() {
+    override fun setupDailyNotification() {
         // Launch in repository scope to avoid blocking
         repositoryScope.launch {
             try {
-                val systemZone = ZoneId.systemDefault()
-                val yesterday = LocalDate.now()
-                    .atStartOfDay()
-                    .minusDays(1)
-                    .atZone(systemZone)
-                    .toEpochSecond()
+                // Check if notifications are enabled in preferences
+                val isEnabled = preferencesRepository.isNotificationEnabled()
 
-                // Check if entry exists for yesterday using database
-                val yesterdayEntry = getEntryByDateUseCase(yesterday)
-
-                // Schedule notification if:
-                // 1. User made entry yesterday (needs reminder for today)
-                // 2. First-time user (no entry for yesterday - fresh install)
-                if (yesterdayEntry != null) {
-                    scheduleNotification()
-                    Timber.d("Notification scheduled - User created entry yesterday")
-                } else {
-                    Timber.d("Notification NOT needed - No entry yesterday")
+                if (!isEnabled) {
+                    Timber.d("Notifications disabled in preferences - skipping schedule")
+                    cancelNotifications()
+                    return@launch
                 }
+
+                // Get user-configured notification time
+                val hour = preferencesRepository.getNotificationHour()
+                val minute = preferencesRepository.getNotificationMinute()
+
+                scheduleNotification(hour, minute)
+                Timber.d("Notification scheduled for $hour:${minute.toString().padStart(2, '0')}")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to setup daily notification")
             }
@@ -86,6 +81,26 @@ class NotificationRepositoryImpl(
         }
     }
 
+    override fun updateNotificationTime(hour: Int, minute: Int) {
+        repositoryScope.launch {
+            try {
+                // Save new time to preferences
+                preferencesRepository.setNotificationTime(hour, minute)
+
+                // Reschedule with new time (if notifications are enabled)
+                val isEnabled = preferencesRepository.isNotificationEnabled()
+                if (isEnabled) {
+                    scheduleNotification(hour, minute)
+                    Timber.i("Notification rescheduled for $hour:${minute.toString().padStart(2, '0')}")
+                } else {
+                    Timber.d("Notifications disabled - time updated but not scheduled")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to update notification time")
+            }
+        }
+    }
+
     override fun hasNotificationPermission(): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
@@ -99,36 +114,43 @@ class NotificationRepositoryImpl(
     }
 
     /**
-     * Schedules a notification for 9 AM tomorrow using WorkManager.
+     * Schedules a notification for the specified time tomorrow using WorkManager.
      *
      * - Uses REPLACE policy to prevent duplicate notifications
      * - NO network constraint (notifications don't need internet)
-     * - Calculates delay until 9 AM tomorrow in system timezone
+     * - Calculates delay until specified time tomorrow in system timezone
+     *
+     * @param hour hour in 24-hour format (0-23)
+     * @param minute minute (0-59)
      */
-    private fun scheduleNotification() {
+    private fun scheduleNotification(hour: Int, minute: Int) {
         try {
-            // Calculate delay until 9 AM tomorrow (system timezone)
+            // Calculate delay until specified time tomorrow (system timezone)
             val systemZone = ZoneId.systemDefault()
-            val nextNotificationTime = LocalDateTime.now()
-                .plusDays(1)
-                .withHour(9)  // 9 AM notification time
-                .withMinute(0)
+            val now = LocalDateTime.now(systemZone)
+
+            // Calculate next notification time
+            var nextNotificationTime = now
+                .withHour(hour)
+                .withMinute(minute)
                 .withSecond(0)
-                .atZone(systemZone)
-                .toEpochSecond()
+                .withNano(0)
 
-            val currentTime = LocalDateTime.now()
-                .atZone(systemZone)
-                .toEpochSecond()
+            // If the time has already passed today, schedule for tomorrow
+            if (nextNotificationTime.isBefore(now) || nextNotificationTime.isEqual(now)) {
+                nextNotificationTime = nextNotificationTime.plusDays(1)
+            }
 
-            val delay = nextNotificationTime - currentTime
+            val currentEpoch = now.atZone(systemZone).toEpochSecond()
+            val nextEpoch = nextNotificationTime.atZone(systemZone).toEpochSecond()
+            val delay = nextEpoch - currentEpoch
 
             // Create input data for worker
             val data = Data.Builder()
                 .putInt(NOTIFICATION_ID, 0)
                 .build()
 
-            // Create constraints (NO network required - fixed from original)
+            // Create constraints (NO network required)
             val constraints = Constraints.Builder()
                 .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                 .build()
@@ -147,7 +169,7 @@ class NotificationRepositoryImpl(
                 notificationWorker
             ).enqueue()
 
-            Timber.i("Notification scheduled successfully for $delay seconds from now")
+            Timber.i("Notification scheduled for ${delay}s from now at $hour:${minute.toString().padStart(2, '0')}")
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule notification")
         }
