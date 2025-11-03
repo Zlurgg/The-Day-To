@@ -61,10 +61,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         }
 
         // Use pendingIntent for content intent (fallback if deep link fails)
-        val deepLinkPendingIntent = createPendingIntent(
-            deepLink = "https://thedayto.co.uk/editor?entryId=null&showBackButton=true",
-            context = applicationContext
-        )
+        val deepLinkPendingIntent = createPendingIntent(applicationContext)
 
         val notification = NotificationCompat.Builder(applicationContext, NOTIFICATION_CHANNEL)
             .setContentTitle(applicationContext.getString(R.string.notification_title))
@@ -102,10 +99,14 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         notificationManager.notify(id, notification.build())
     }
 
-    /** allows for deep linking to go from notification to screen in app **/
-    private fun createPendingIntent(deepLink: String, context: Context): PendingIntent? {
+    /**
+     * Creates a PendingIntent with deep link to editor screen.
+     *
+     * Deep link opens the editor with entryId=null to create a new entry for today.
+     */
+    private fun createPendingIntent(context: Context): PendingIntent? {
         val startActivityIntent = Intent(
-            Intent.ACTION_VIEW, deepLink.toUri(),
+            Intent.ACTION_VIEW, NOTIFICATION_DEEP_LINK.toUri(),
             context, MainActivity::class.java
         )
         val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
@@ -114,7 +115,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         }
 
         if (resultPendingIntent == null) {
-            Timber.e("Failed to create PendingIntent for deep link: $deepLink")
+            Timber.e("Failed to create PendingIntent for deep link: $NOTIFICATION_DEEP_LINK")
         }
 
         return resultPendingIntent
@@ -125,5 +126,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         const val NOTIFICATION_NAME = "thedayto"
         const val NOTIFICATION_CHANNEL = "thedayto_channel_01"
         const val NOTIFICATION_WORK = "thedayto_notification_work"
+
+        // Deep link to editor screen with null entryId (creates new entry)
+        private const val NOTIFICATION_DEEP_LINK = "https://thedayto.co.uk/editor?entryId=null&showBackButton=true"
     }
 }
