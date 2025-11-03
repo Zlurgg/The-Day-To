@@ -72,10 +72,10 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntryItem
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
-import uk.co.zlurgg.thedayto.journal.ui.overview.components.NotificationConfirmDialog
-import uk.co.zlurgg.thedayto.journal.ui.overview.components.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationConfirmDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -95,7 +95,6 @@ fun OverviewScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var hasNotificationPermission by remember { mutableStateOf(viewModel.hasNotificationPermission()) }
     var showTutorialDialog by remember { mutableStateOf(false) }
 
     // Permission launcher for Android 13+
@@ -104,7 +103,6 @@ fun OverviewScreenRoot(
     ) { isGranted ->
         if (isGranted) {
             viewModel.onNotificationPermissionGranted()
-            hasNotificationPermission = true // Update state to trigger recomposition
         }
     }
 
@@ -144,7 +142,7 @@ fun OverviewScreenRoot(
     // Show tutorial dialog when event is triggered
     if (showTutorialDialog) {
         TutorialDialog(
-            onDismiss = { showTutorialDialog = false }
+            onDismiss = { }
         )
     }
 
@@ -157,8 +155,7 @@ fun OverviewScreenRoot(
                 EditorRoute(entryId = entryId, showBackButton = true)
             )
         },
-        snackbarHostState = snackbarHostState,
-        hasNotificationPermission = hasNotificationPermission
+        snackbarHostState = snackbarHostState
     )
 }
 
@@ -171,7 +168,6 @@ private fun OverviewScreen(
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (Int?) -> Unit,
     snackbarHostState: SnackbarHostState,
-    hasNotificationPermission: Boolean,
     modifier: Modifier = Modifier
 ) {
     val currentDate = LocalDate.now()
@@ -446,6 +442,7 @@ private fun OverviewScreen(
         )
     }
 
+    // Notification confirmation dialog
     if (uiState.showNotificationConfirmDialog) {
         NotificationConfirmDialog(
             onDismiss = { onAction(OverviewAction.DismissNotificationConfirmDialog) },
@@ -453,6 +450,7 @@ private fun OverviewScreen(
         )
     }
 
+    // Notification settings dialog
     if (uiState.showNotificationSettingsDialog) {
         NotificationSettingsDialog(
             enabled = uiState.notificationsEnabled,
@@ -478,8 +476,7 @@ private fun OverviewScreenPreview() {
             ),
             onAction = {},
             onNavigateToEntry = {},
-            snackbarHostState = remember { SnackbarHostState() },
-            hasNotificationPermission = true
+            snackbarHostState = remember { SnackbarHostState() }
         )
     }
 }
@@ -496,8 +493,7 @@ private fun OverviewScreenSingleEntryPreview() {
             ),
             onAction = {},
             onNavigateToEntry = {},
-            snackbarHostState = remember { SnackbarHostState() },
-            hasNotificationPermission = true
+            snackbarHostState = remember { SnackbarHostState() }
         )
     }
 }
@@ -514,8 +510,7 @@ private fun OverviewScreenEmptyPreview() {
             ),
             onAction = {},
             onNavigateToEntry = {},
-            snackbarHostState = remember { SnackbarHostState() },
-            hasNotificationPermission = false
+            snackbarHostState = remember { SnackbarHostState() }
         )
     }
 }

@@ -80,6 +80,50 @@ class OverviewViewModel(
         }
     }
 
+    /**
+     * Load notification settings from preferences.
+     *
+     * Called during initialization to populate notification state.
+     */
+    private fun loadNotificationSettings() {
+        viewModelScope.launch {
+            val settings = overviewUseCases.getNotificationSettings()
+            val hasPermission = overviewUseCases.checkNotificationPermission()
+
+            _uiState.update {
+                it.copy(
+                    notificationsEnabled = settings.enabled,
+                    notificationHour = settings.hour,
+                    notificationMinute = settings.minute,
+                    hasNotificationPermission = hasPermission
+                )
+            }
+        }
+    }
+
+    /**
+     * Called when notification permission is granted.
+     *
+     * Shows the confirmation dialog informing user that notifications are scheduled.
+     */
+    fun onNotificationPermissionGranted() {
+        _uiState.update {
+            it.copy(
+                hasNotificationPermission = true,
+                showNotificationConfirmDialog = true
+            )
+        }
+    }
+
+    /**
+     * Check if app has notification permission.
+     *
+     * Used by OverviewScreenRoot to determine permission state.
+     */
+    fun hasNotificationPermission(): Boolean {
+        return overviewUseCases.checkNotificationPermission()
+    }
+
     fun onAction(action: OverviewAction) {
         when (action) {
             is OverviewAction.Order -> {
@@ -158,6 +202,45 @@ class OverviewViewModel(
                 }
             }
 
+            is OverviewAction.DismissNotificationConfirmDialog -> {
+                _uiState.update { it.copy(showNotificationConfirmDialog = false) }
+            }
+
+            is OverviewAction.OpenNotificationSettings -> {
+                _uiState.update { it.copy(showNotificationSettingsDialog = true) }
+            }
+
+            is OverviewAction.DismissNotificationSettings -> {
+                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+            }
+
+            is OverviewAction.SaveNotificationSettings -> {
+                viewModelScope.launch {
+                    try {
+                        overviewUseCases.saveNotificationSettings(
+                            action.enabled,
+                            action.hour,
+                            action.minute
+                        )
+                        _uiState.update {
+                            it.copy(
+                                notificationsEnabled = action.enabled,
+                                notificationHour = action.hour,
+                                notificationMinute = action.minute,
+                                showNotificationSettingsDialog = false
+                            )
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to save notification settings")
+                        _uiEvents.emit(
+                            OverviewUiEvent.ShowSnackbar(
+                                message = "Failed to save notification settings: ${e.message}"
+                            )
+                        )
+                    }
+                }
+            }
+
             is OverviewAction.RequestSignOut -> {
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.ShowSignOutDialog)
@@ -182,116 +265,6 @@ class OverviewViewModel(
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
                 }
-            }
-
-            is OverviewAction.DismissNotificationConfirmDialog -> {
-                _uiState.update { it.copy(showNotificationConfirmDialog = false) }
-            }
-
-            is OverviewAction.OpenNotificationSettings -> {
-                _uiState.update {
-                    it.copy(
-                        showNotificationConfirmDialog = false,
-                        showNotificationSettingsDialog = true
-                    )
-                }
-            }
-
-            is OverviewAction.DismissNotificationSettings -> {
-                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
-            }
-
-            is OverviewAction.SaveNotificationSettings -> {
-                viewModelScope.launch {
-                    try {
-                        // Save settings and update notification schedule
-                        overviewUseCases.saveNotificationSettings(
-                            enabled = action.enabled,
-                            hour = action.hour,
-                            minute = action.minute
-                        )
-
-                        // Update UI state
-                        _uiState.update {
-                            it.copy(
-                                notificationsEnabled = action.enabled,
-                                notificationHour = action.hour,
-                                notificationMinute = action.minute,
-                                showNotificationSettingsDialog = false
-                            )
-                        }
-
-                        // Show confirmation snackbar
-                        val timeStr = "${action.hour.toString().padStart(2, '0')}:${action.minute.toString().padStart(2, '0')}"
-                        val message = if (action.enabled) {
-                            "Notifications enabled for $timeStr"
-                        } else {
-                            "Notifications disabled"
-                        }
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
-                    } catch (e: Exception) {
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar("Failed to save notification settings")
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Called after notification permission is granted.
-     * Sets up daily notification scheduling and shows confirm dialog.
-     */
-    fun onNotificationPermissionGranted() {
-        viewModelScope.launch {
-            // Enable notifications with default time (9:00 AM)
-            overviewUseCases.saveNotificationSettings(
-                enabled = true,
-                hour = 9,
-                minute = 0
-            )
-
-            // Update state and show confirm dialog
-            _uiState.update {
-                it.copy(
-                    notificationsEnabled = true,
-                    notificationHour = 9,
-                    notificationMinute = 0,
-                    hasNotificationPermission = true,
-                    showNotificationConfirmDialog = true
-                )
-            }
-        }
-    }
-
-    /**
-     * Check if notification permission is granted
-     */
-    fun hasNotificationPermission(): Boolean {
-        return overviewUseCases.checkNotificationPermission()
-    }
-
-    /**
-     * Load notification settings from preferences on init
-     */
-    private fun loadNotificationSettings() {
-        viewModelScope.launch {
-            try {
-                val settings = overviewUseCases.getNotificationSettings()
-                val hasPermission = overviewUseCases.checkNotificationPermission()
-
-                _uiState.update {
-                    it.copy(
-                        notificationsEnabled = settings.enabled,
-                        notificationHour = settings.hour,
-                        notificationMinute = settings.minute,
-                        hasNotificationPermission = hasPermission
-                    )
-                }
-            } catch (e: Exception) {
-                // Log error but don't crash - notifications are not critical
-                Timber.e(e, "Failed to load notification settings")
             }
         }
     }

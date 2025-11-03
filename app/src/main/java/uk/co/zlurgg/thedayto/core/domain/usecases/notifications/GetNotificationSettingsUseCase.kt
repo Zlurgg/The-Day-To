@@ -1,5 +1,6 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
+package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
+import uk.co.zlurgg.thedayto.core.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
 
 /**
@@ -16,9 +17,3 @@ class GetNotificationSettingsUseCase(
         )
     }
 }
-
-data class NotificationSettings(
-    val enabled: Boolean,
-    val hour: Int,
-    val minute: Int
-)
