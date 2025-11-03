@@ -35,6 +35,8 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.SetupNotificationUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckNotificationPermissionUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetNotificationSettingsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.SaveNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
@@ -91,7 +93,12 @@ val appModule = module {
             setupNotification = SetupNotificationUseCase(notificationRepository = get()),
             checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get()),
             checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository = get()),
-            markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository = get())
+            markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository = get()),
+            getNotificationSettings = GetNotificationSettingsUseCase(preferencesRepository = get()),
+            saveNotificationSettings = SaveNotificationSettingsUseCase(
+                preferencesRepository = get(),
+                notificationRepository = get()
+            )
         )
     }
 

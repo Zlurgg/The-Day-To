@@ -9,5 +9,7 @@ data class OverviewUseCases(
     val setupNotification: SetupNotificationUseCase,
     val checkNotificationPermission: CheckNotificationPermissionUseCase,
     val checkEntryReminderShownToday: CheckEntryReminderShownTodayUseCase,
-    val markEntryReminderShownToday: MarkEntryReminderShownTodayUseCase
+    val markEntryReminderShownToday: MarkEntryReminderShownTodayUseCase,
+    val getNotificationSettings: GetNotificationSettingsUseCase,
+    val saveNotificationSettings: SaveNotificationSettingsUseCase
 )

@@ -44,6 +44,14 @@
     <string name="descending">Descending</string>
     <string name="enable_notifications">Enable Notifications</string>
     <string name="disable_notifications">Disable Notifications</string>
+    <string name="notifications">Notifications</string>
+    <string name="notification_confirm_title">Notifications Enabled</string>
+    <string name="notification_confirm_message">Daily reminders are scheduled for 9:00 AM. Tap \"Change Time\" to customize.</string>
+    <string name="change_time">Change Time</string>
+    <string name="notification_settings_title">Notification Settings</string>
+    <string name="enable_daily_reminders">Enable daily reminders</string>
+    <string name="notification_time">Notification time</string>
+    <string name="save">Save</string>
     <string name="sign_out">Sign out</string>
     <string name="create_today_entry">Create Today\'s Entry</string>
     <string name="entry_reminder_title">Create Today\'s Entry?</string>
