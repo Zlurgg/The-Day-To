@@ -70,7 +70,7 @@ val appModule = module {
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             context = androidContext(),
-            getEntryByDateUseCase = GetEntryByDateUseCase(repository = get())
+            preferencesRepository = get()
         )
     }
 

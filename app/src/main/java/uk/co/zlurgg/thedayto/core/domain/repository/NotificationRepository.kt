@@ -9,19 +9,28 @@ package uk.co.zlurgg.thedayto.core.domain.repository
 interface NotificationRepository {
 
     /**
-     * Sets up daily notification if the user has made an entry yesterday
-     * or is a first-time user (entry date = 0).
+     * Sets up daily notification based on user preferences.
      *
      * Should be called after notification permission is granted.
-     * Uses WorkManager to schedule the notification.
+     * Uses WorkManager to schedule the notification at the user-configured time.
+     * If notifications are disabled in preferences, this does nothing.
      */
-    fun setupDailyNotificationIfNeeded()
+    fun setupDailyNotification()
 
     /**
      * Cancels all scheduled notifications.
      * Useful when user signs out or disables notifications.
      */
     fun cancelNotifications()
+
+    /**
+     * Updates the notification schedule with a new time.
+     * Cancels existing notification and schedules a new one.
+     *
+     * @param hour hour in 24-hour format (0-23)
+     * @param minute minute (0-59)
+     */
+    fun updateNotificationTime(hour: Int, minute: Int)
 
     /**
      * Checks if the app has notification permission.

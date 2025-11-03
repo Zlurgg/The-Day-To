@@ -12,5 +12,11 @@ data class OverviewUiState(
     val isLoading: Boolean = false,
     val greeting: String = "",
     val showEntryReminderDialog: Boolean = false,
-    val hasTodayEntry: Boolean = true
+    val hasTodayEntry: Boolean = true,
+    val notificationsEnabled: Boolean = false,
+    val notificationHour: Int = 9,
+    val notificationMinute: Int = 0,
+    val hasNotificationPermission: Boolean = false,
+    val showNotificationConfirmDialog: Boolean = false,
+    val showNotificationSettingsDialog: Boolean = false
 )

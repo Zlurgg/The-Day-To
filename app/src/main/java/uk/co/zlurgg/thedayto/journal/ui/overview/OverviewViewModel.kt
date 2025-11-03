@@ -181,6 +181,28 @@ class OverviewViewModel(
                     _uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
                 }
             }
+
+            is OverviewAction.DismissNotificationConfirmDialog -> {
+                _uiState.update { it.copy(showNotificationConfirmDialog = false) }
+            }
+
+            is OverviewAction.OpenNotificationSettings -> {
+                _uiState.update {
+                    it.copy(
+                        showNotificationConfirmDialog = false,
+                        showNotificationSettingsDialog = true
+                    )
+                }
+            }
+
+            is OverviewAction.DismissNotificationSettings -> {
+                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+            }
+
+            is OverviewAction.SaveNotificationSettings -> {
+                // Placeholder - will implement fully later
+                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+            }
         }
     }
 

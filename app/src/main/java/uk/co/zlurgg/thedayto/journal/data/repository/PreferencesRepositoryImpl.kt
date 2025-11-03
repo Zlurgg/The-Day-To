@@ -83,10 +83,71 @@ class PreferencesRepositoryImpl(
         prefs.edit { putBoolean(KEY_WELCOME_DIALOG_SEEN, true) }
     }
 
+    /**
+     * Check if daily notifications are enabled
+     *
+     * @return true if notifications are enabled, false otherwise (default: false)
+     */
+    override suspend fun isNotificationEnabled(): Boolean {
+        return prefs.getBoolean(KEY_NOTIFICATION_ENABLED, false)
+    }
+
+    /**
+     * Enable or disable daily notifications
+     *
+     * When notifications are disabled, scheduled notifications should be cancelled.
+     * When enabled, notifications should be scheduled based on the configured time.
+     *
+     * @param enabled true to enable notifications, false to disable
+     */
+    override suspend fun setNotificationEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_NOTIFICATION_ENABLED, enabled) }
+    }
+
+    /**
+     * Get the hour for daily notifications (0-23)
+     *
+     * @return hour in 24-hour format, defaults to 9 (9 AM)
+     */
+    override suspend fun getNotificationHour(): Int {
+        return prefs.getInt(KEY_NOTIFICATION_HOUR, DEFAULT_NOTIFICATION_HOUR)
+    }
+
+    /**
+     * Get the minute for daily notifications (0-59)
+     *
+     * @return minute, defaults to 0
+     */
+    override suspend fun getNotificationMinute(): Int {
+        return prefs.getInt(KEY_NOTIFICATION_MINUTE, DEFAULT_NOTIFICATION_MINUTE)
+    }
+
+    /**
+     * Set the time for daily notifications
+     *
+     * Stores the notification time in 24-hour format.
+     * After updating, notifications should be rescheduled with the new time.
+     *
+     * @param hour hour in 24-hour format (0-23)
+     * @param minute minute (0-59)
+     */
+    override suspend fun setNotificationTime(hour: Int, minute: Int) {
+        prefs.edit {
+            putInt(KEY_NOTIFICATION_HOUR, hour)
+            putInt(KEY_NOTIFICATION_MINUTE, minute)
+        }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
         private const val KEY_FIRST_LAUNCH_COMPLETE = "first_launch_complete"
         private const val KEY_WELCOME_DIALOG_SEEN = "welcome_dialog_seen"
+        private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
+        private const val KEY_NOTIFICATION_HOUR = "notification_hour"
+        private const val KEY_NOTIFICATION_MINUTE = "notification_minute"
+
+        private const val DEFAULT_NOTIFICATION_HOUR = 9  // 9 AM
+        private const val DEFAULT_NOTIFICATION_MINUTE = 0
     }
 }

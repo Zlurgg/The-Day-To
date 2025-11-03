@@ -59,4 +59,40 @@ interface PreferencesRepository {
      * Called after the welcome dialog is dismissed on first launch.
      */
     suspend fun markWelcomeDialogSeen()
+
+    /**
+     * Check if daily notifications are enabled
+     *
+     * @return true if notifications are enabled, false otherwise
+     */
+    suspend fun isNotificationEnabled(): Boolean
+
+    /**
+     * Enable or disable daily notifications
+     *
+     * @param enabled true to enable notifications, false to disable
+     */
+    suspend fun setNotificationEnabled(enabled: Boolean)
+
+    /**
+     * Get the hour for daily notifications (0-23)
+     *
+     * @return hour in 24-hour format, defaults to 9 (9 AM)
+     */
+    suspend fun getNotificationHour(): Int
+
+    /**
+     * Get the minute for daily notifications (0-59)
+     *
+     * @return minute, defaults to 0
+     */
+    suspend fun getNotificationMinute(): Int
+
+    /**
+     * Set the time for daily notifications
+     *
+     * @param hour hour in 24-hour format (0-23)
+     * @param minute minute (0-59)
+     */
+    suspend fun setNotificationTime(hour: Int, minute: Int)
 }
