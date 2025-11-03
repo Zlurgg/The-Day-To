@@ -115,15 +115,6 @@ class OverviewViewModel(
         }
     }
 
-    /**
-     * Check if app has notification permission.
-     *
-     * Used by OverviewScreenRoot to determine permission state.
-     */
-    fun hasNotificationPermission(): Boolean {
-        return overviewUseCases.checkNotificationPermission()
-    }
-
     fun onAction(action: OverviewAction) {
         when (action) {
             is OverviewAction.Order -> {
