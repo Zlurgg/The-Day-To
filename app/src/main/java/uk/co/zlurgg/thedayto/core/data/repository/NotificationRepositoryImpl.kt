@@ -14,12 +14,15 @@ import androidx.work.WorkManager
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
-import kotlinx.coroutines.runBlocking
-import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker
-import uk.co.zlurgg.thedayto.core.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker
+import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.ZoneOffset
+import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 /**
@@ -41,29 +44,35 @@ class NotificationRepositoryImpl(
     private val getEntryByDateUseCase: GetEntryByDateUseCase
 ) : NotificationRepository {
 
+    // Repository-level coroutine scope for background operations
+    private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+
     override fun setupDailyNotificationIfNeeded() {
-        try {
-            val yesterday = LocalDate.now()
-                .atStartOfDay()
-                .minusDays(1)
-                .toEpochSecond(ZoneOffset.UTC)
+        // Launch in repository scope to avoid blocking
+        repositoryScope.launch {
+            try {
+                val systemZone = ZoneId.systemDefault()
+                val yesterday = LocalDate.now()
+                    .atStartOfDay()
+                    .minusDays(1)
+                    .atZone(systemZone)
+                    .toEpochSecond()
 
-            // Check if entry exists for yesterday using database
-            val yesterdayEntry = runBlocking {
-                getEntryByDateUseCase(yesterday)
-            }
+                // Check if entry exists for yesterday using database
+                val yesterdayEntry = getEntryByDateUseCase(yesterday)
 
-            // Schedule notification if:
-            // 1. User made entry yesterday (needs reminder for today)
-            // 2. First-time user (no entry for yesterday - fresh install)
-            if (yesterdayEntry != null) {
-                scheduleNotification()
-                Timber.d("Notification scheduled - User created entry yesterday")
-            } else {
-                Timber.d("Notification NOT needed - No entry yesterday")
+                // Schedule notification if:
+                // 1. User made entry yesterday (needs reminder for today)
+                // 2. First-time user (no entry for yesterday - fresh install)
+                if (yesterdayEntry != null) {
+                    scheduleNotification()
+                    Timber.d("Notification scheduled - User created entry yesterday")
+                } else {
+                    Timber.d("Notification NOT needed - No entry yesterday")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to setup daily notification")
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to setup daily notification")
         }
     }
 
@@ -90,23 +99,29 @@ class NotificationRepositoryImpl(
     }
 
     /**
-     * Schedules a notification for the next day using WorkManager.
+     * Schedules a notification for 9 AM tomorrow using WorkManager.
      *
      * - Uses REPLACE policy to prevent duplicate notifications
      * - NO network constraint (notifications don't need internet)
-     * - Calculates delay until tomorrow
+     * - Calculates delay until 9 AM tomorrow in system timezone
      */
     private fun scheduleNotification() {
         try {
-            // Calculate delay until tomorrow (next day at start of day)
-            val userNotificationTime = LocalDateTime.now()
+            // Calculate delay until 9 AM tomorrow (system timezone)
+            val systemZone = ZoneId.systemDefault()
+            val nextNotificationTime = LocalDateTime.now()
                 .plusDays(1)
-                .toEpochSecond(ZoneOffset.UTC)
+                .withHour(9)  // 9 AM notification time
+                .withMinute(0)
+                .withSecond(0)
+                .atZone(systemZone)
+                .toEpochSecond()
 
             val currentTime = LocalDateTime.now()
-                .toEpochSecond(ZoneOffset.UTC)
+                .atZone(systemZone)
+                .toEpochSecond()
 
-            val delay = userNotificationTime - currentTime
+            val delay = nextNotificationTime - currentTime
 
             // Create input data for worker
             val data = Data.Builder()
