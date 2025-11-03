@@ -6,10 +6,9 @@ data class OverviewUseCases(
     val restoreEntry: RestoreEntryUseCase,
     val getEntryByDate: GetEntryByDateUseCase,
     val updateEntryUseCase: UpdateEntryUseCase,
-    val setupNotification: SetupNotificationUseCase,
-    val checkNotificationPermission: CheckNotificationPermissionUseCase,
     val checkEntryReminderShownToday: CheckEntryReminderShownTodayUseCase,
     val markEntryReminderShownToday: MarkEntryReminderShownTodayUseCase,
-    val getNotificationSettings: GetNotificationSettingsUseCase,
-    val saveNotificationSettings: SaveNotificationSettingsUseCase
+    val getNotificationSettings: uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase,
+    val saveNotificationSettings: uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotificationSettingsUseCase,
+    val checkNotificationPermission: uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
 )

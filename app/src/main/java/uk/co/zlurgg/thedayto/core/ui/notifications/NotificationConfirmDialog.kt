@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.ui.overview.components
+package uk.co.zlurgg.thedayto.core.ui.notifications
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -13,8 +13,8 @@ import uk.co.zlurgg.thedayto.R
  * Informs the user that notifications are scheduled for 9 AM and provides
  * an option to change the time via the settings dialog.
  *
- * @param onDismiss Called when the dialog is dismissed
- * @param onChangeTime Called when user wants to change the notification time
+ * @param onDismiss Callback when dialog is dismissed
+ * @param onChangeTime Callback when user wants to change notification time
  */
 @Composable
 fun NotificationConfirmDialog(

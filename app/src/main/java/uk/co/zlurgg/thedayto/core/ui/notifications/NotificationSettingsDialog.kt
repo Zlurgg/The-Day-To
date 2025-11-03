@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.ui.overview.components
+package uk.co.zlurgg.thedayto.core.ui.notifications
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -29,13 +29,12 @@ import uk.co.zlurgg.thedayto.R
  * Notification settings dialog with enable/disable toggle and time picker.
  *
  * Uses Material 3 TimePicker (analog clock) for selecting notification time.
- * Follows Root/Presenter pattern - receives state and callbacks.
  *
  * @param enabled Initial enabled state
  * @param hour Initial hour (0-23)
  * @param minute Initial minute (0-59)
- * @param onDismiss Called when dialog is dismissed without saving
- * @param onSave Called when user saves settings (enabled, hour, minute)
+ * @param onDismiss Callback when dialog is dismissed
+ * @param onSave Callback when settings are saved (enabled, hour, minute)
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,11 +96,7 @@ fun NotificationSettingsDialog(
         confirmButton = {
             TextButton(
                 onClick = {
-                    onSave(
-                        isEnabled,
-                        timePickerState.hour,
-                        timePickerState.minute
-                    )
+                    onSave(isEnabled, timePickerState.hour, timePickerState.minute)
                 }
             ) {
                 Text(text = stringResource(R.string.save))
