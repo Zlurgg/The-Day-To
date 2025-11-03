@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
@@ -39,6 +40,7 @@ class OverviewViewModel(
         getEntries(EntryOrder.Date(OrderType.Descending))
         updateGreeting()
         checkTodayEntry()
+        loadNotificationSettings()
     }
 
     /**
@@ -200,18 +202,67 @@ class OverviewViewModel(
             }
 
             is OverviewAction.SaveNotificationSettings -> {
-                // Placeholder - will implement fully later
-                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+                viewModelScope.launch {
+                    try {
+                        // Save settings and update notification schedule
+                        overviewUseCases.saveNotificationSettings(
+                            enabled = action.enabled,
+                            hour = action.hour,
+                            minute = action.minute
+                        )
+
+                        // Update UI state
+                        _uiState.update {
+                            it.copy(
+                                notificationsEnabled = action.enabled,
+                                notificationHour = action.hour,
+                                notificationMinute = action.minute,
+                                showNotificationSettingsDialog = false
+                            )
+                        }
+
+                        // Show confirmation snackbar
+                        val timeStr = "${action.hour.toString().padStart(2, '0')}:${action.minute.toString().padStart(2, '0')}"
+                        val message = if (action.enabled) {
+                            "Notifications enabled for $timeStr"
+                        } else {
+                            "Notifications disabled"
+                        }
+                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
+                    } catch (e: Exception) {
+                        _uiEvents.emit(
+                            OverviewUiEvent.ShowSnackbar("Failed to save notification settings")
+                        )
+                    }
+                }
             }
         }
     }
 
     /**
      * Called after notification permission is granted.
-     * Sets up daily notification scheduling.
+     * Sets up daily notification scheduling and shows confirm dialog.
      */
     fun onNotificationPermissionGranted() {
-        overviewUseCases.setupNotification()
+        viewModelScope.launch {
+            // Enable notifications with default time (9:00 AM)
+            overviewUseCases.saveNotificationSettings(
+                enabled = true,
+                hour = 9,
+                minute = 0
+            )
+
+            // Update state and show confirm dialog
+            _uiState.update {
+                it.copy(
+                    notificationsEnabled = true,
+                    notificationHour = 9,
+                    notificationMinute = 0,
+                    hasNotificationPermission = true,
+                    showNotificationConfirmDialog = true
+                )
+            }
+        }
     }
 
     /**
@@ -219,6 +270,30 @@ class OverviewViewModel(
      */
     fun hasNotificationPermission(): Boolean {
         return overviewUseCases.checkNotificationPermission()
+    }
+
+    /**
+     * Load notification settings from preferences on init
+     */
+    private fun loadNotificationSettings() {
+        viewModelScope.launch {
+            try {
+                val settings = overviewUseCases.getNotificationSettings()
+                val hasPermission = overviewUseCases.checkNotificationPermission()
+
+                _uiState.update {
+                    it.copy(
+                        notificationsEnabled = settings.enabled,
+                        notificationHour = settings.hour,
+                        notificationMinute = settings.minute,
+                        hasNotificationPermission = hasPermission
+                    )
+                }
+            } catch (e: Exception) {
+                // Log error but don't crash - notifications are not critical
+                Timber.e(e, "Failed to load notification settings")
+            }
+        }
     }
 
     private fun getEntries(entryOrder: EntryOrder) {

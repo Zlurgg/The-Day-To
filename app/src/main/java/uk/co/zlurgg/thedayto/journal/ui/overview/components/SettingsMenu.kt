@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.R
 fun SettingsMenu(
     hasNotificationPermission: Boolean,
     onRequestNotificationPermission: () -> Unit,
+    onOpenNotificationSettings: () -> Unit,
     onShowTutorial: () -> Unit,
     onSignOut: () -> Unit
 ) {
@@ -40,13 +41,21 @@ fun SettingsMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            // Only show "Enable Notifications" if permission not granted
+            // Show "Enable Notifications" or "Notifications" based on permission
             if (!hasNotificationPermission) {
                 DropdownMenuItem(
                     text = { Text(stringResource(R.string.enable_notifications)) },
                     onClick = {
                         expanded = false
                         onRequestNotificationPermission()
+                    }
+                )
+            } else {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.notifications)) },
+                    onClick = {
+                        expanded = false
+                        onOpenNotificationSettings()
                     }
                 )
             }

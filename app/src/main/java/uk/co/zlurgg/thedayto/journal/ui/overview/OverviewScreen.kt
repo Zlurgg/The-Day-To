@@ -72,6 +72,8 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntryItem
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.NotificationConfirmDialog
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
@@ -215,8 +217,9 @@ private fun OverviewScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 SettingsMenu(
-                    hasNotificationPermission = hasNotificationPermission,
+                    hasNotificationPermission = uiState.hasNotificationPermission,
                     onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) },
+                    onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
                     onShowTutorial = { onAction(OverviewAction.RequestShowTutorial) },
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
@@ -440,6 +443,25 @@ private fun OverviewScreen(
         CreateEntryReminderDialog(
             onDismiss = { onAction(OverviewAction.DismissEntryReminder) },
             onCreateEntry = { onAction(OverviewAction.CreateTodayEntry) }
+        )
+    }
+
+    if (uiState.showNotificationConfirmDialog) {
+        NotificationConfirmDialog(
+            onDismiss = { onAction(OverviewAction.DismissNotificationConfirmDialog) },
+            onChangeTime = { onAction(OverviewAction.OpenNotificationSettings) }
+        )
+    }
+
+    if (uiState.showNotificationSettingsDialog) {
+        NotificationSettingsDialog(
+            enabled = uiState.notificationsEnabled,
+            hour = uiState.notificationHour,
+            minute = uiState.notificationMinute,
+            onDismiss = { onAction(OverviewAction.DismissNotificationSettings) },
+            onSave = { enabled, hour, minute ->
+                onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
+            }
         )
     }
 }
