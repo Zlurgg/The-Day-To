@@ -23,8 +23,8 @@ class FakeEntryRepository : EntryRepository {
         return entries.find { it.id == id }
     }
 
-    override suspend fun getEntryByDate(dateStamp: Long): Entry? {
-        return entries.find { it.dateStamp == dateStamp }
+    override suspend fun getEntryByDate(date: Long): Entry? {
+        return entries.find { it.dateStamp == date }
     }
 
     override suspend fun insertEntry(entry: Entry) {
