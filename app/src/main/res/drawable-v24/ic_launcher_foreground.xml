@@ -67,35 +67,50 @@
             android:strokeWidth="0.5"
             android:strokeColor="#E0E0E0" />
 
-        <!-- Mood color dots (Happy - Orange) -->
-        <path
-            android:fillColor="#FFA726"
-            android:pathData="M-20,-16 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Mood colored cells - Week 1 (Row 1) -->
+        <path android:fillColor="#FFA726" android:pathData="M-24,-20 L-16,-20 L-16,-12 L-24,-12 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M-16,-20 L-8,-20 L-8,-12 L-16,-12 Z" />
+        <path android:fillColor="#FFCA28" android:pathData="M-8,-20 L0,-20 L0,-12 L-8,-12 Z" />
+        <path android:fillColor="#EC407A" android:pathData="M0,-20 L8,-20 L8,-12 L0,-12 Z" />
+        <path android:fillColor="#1565C0" android:pathData="M8,-20 L16,-20 L16,-12 L8,-12 Z" />
+        <path android:fillColor="#AB47BC" android:pathData="M16,-20 L24,-20 L24,-12 L16,-12 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M-24,-20 L-16,-20 L-16,-12 L-24,-12 Z" />
 
-        <!-- Mood color dots (Sad - Blue) -->
-        <path
-            android:fillColor="#1565C0"
-            android:pathData="M-4,-8 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Mood colored cells - Week 2 (Row 2) -->
+        <path android:fillColor="#FFCA28" android:pathData="M-24,-12 L-16,-12 L-16,-4 L-24,-4 Z" />
+        <path android:fillColor="#EC407A" android:pathData="M-16,-12 L-8,-12 L-8,-4 L-16,-4 Z" />
+        <path android:fillColor="#FFA726" android:pathData="M-8,-12 L0,-12 L0,-4 L-8,-4 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M0,-12 L8,-12 L8,-4 L0,-4 Z" />
+        <path android:fillColor="#AB47BC" android:pathData="M8,-12 L16,-12 L16,-4 L8,-4 Z" />
+        <path android:fillColor="#1565C0" android:pathData="M16,-12 L24,-12 L24,-4 L16,-4 Z" />
+        <path android:fillColor="#FFCA28" android:pathData="M-24,-12 L-16,-12 L-16,-4 L-24,-4 Z" />
 
-        <!-- Mood color dots (In Love - Pink) -->
-        <path
-            android:fillColor="#EC407A"
-            android:pathData="M12,0 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Mood colored cells - Week 3 (Row 3) -->
+        <path android:fillColor="#AB47BC" android:pathData="M-24,-4 L-16,-4 L-16,4 L-24,4 Z" />
+        <path android:fillColor="#FFA726" android:pathData="M-16,-4 L-8,-4 L-8,4 L-16,4 Z" />
+        <path android:fillColor="#1565C0" android:pathData="M-8,-4 L0,-4 L0,4 L-8,4 Z" />
+        <path android:fillColor="#FFCA28" android:pathData="M0,-4 L8,-4 L8,4 L0,4 Z" />
+        <path android:fillColor="#EC407A" android:pathData="M8,-4 L16,-4 L16,4 L8,4 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M16,-4 L24,-4 L24,4 L16,4 Z" />
+        <path android:fillColor="#FFA726" android:pathData="M-24,-4 L-16,-4 L-16,4 L-24,4 Z" />
 
-        <!-- Mood color dots (Calm - Green) -->
-        <path
-            android:fillColor="#66BB6A"
-            android:pathData="M-12,8 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Mood colored cells - Week 4 (Row 4) -->
+        <path android:fillColor="#66BB6A" android:pathData="M-24,4 L-16,4 L-16,12 L-24,12 Z" />
+        <path android:fillColor="#FFCA28" android:pathData="M-16,4 L-8,4 L-8,12 L-16,12 Z" />
+        <path android:fillColor="#EC407A" android:pathData="M-8,4 L0,4 L0,12 L-8,12 Z" />
+        <path android:fillColor="#AB47BC" android:pathData="M0,4 L8,4 L8,12 L0,12 Z" />
+        <path android:fillColor="#FFA726" android:pathData="M8,4 L16,4 L16,12 L8,12 Z" />
+        <path android:fillColor="#1565C0" android:pathData="M16,4 L24,4 L24,12 L16,12 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M-24,4 L-16,4 L-16,12 L-24,12 Z" />
 
-        <!-- Mood color dots (Excited - Yellow) -->
-        <path
-            android:fillColor="#FFCA28"
-            android:pathData="M4,16 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Mood colored cells - Week 5 (Row 5) - Partial week -->
+        <path android:fillColor="#EC407A" android:pathData="M-24,12 L-16,12 L-16,20 L-24,20 Z" />
+        <path android:fillColor="#1565C0" android:pathData="M-16,12 L-8,12 L-8,20 L-16,20 Z" />
+        <path android:fillColor="#66BB6A" android:pathData="M-8,12 L0,12 L0,20 L-8,20 Z" />
+        <path android:fillColor="#FFCA28" android:pathData="M0,12 L8,12 L8,20 L0,20 Z" />
+        <!-- Last 3 cells of row 5 are empty -->
 
-        <!-- Mood color dots (Anxious - Purple) -->
-        <path
-            android:fillColor="#AB47BC"
-            android:pathData="M20,24 m-2.5,0 a2.5,2.5 0 1,0 5,0 a2.5,2.5 0 1,0 -5,0" />
+        <!-- Week 6 (Row 6) - Last 7 days all empty (showing realistic usage) -->
 
         <!-- Calendar border/outline -->
         <path
