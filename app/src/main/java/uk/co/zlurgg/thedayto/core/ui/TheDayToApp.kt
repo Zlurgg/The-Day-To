@@ -67,7 +67,13 @@ fun TheDayToApp() {
             }
 
             // Editor Screen (Add/Edit Entry)
-            composable<EditorRoute> { backStackEntry ->
+            composable<EditorRoute>(
+                deepLinks = listOf(
+                    navDeepLink<EditorRoute>(
+                        basePath = "https://thedayto.co.uk/editor"
+                    )
+                )
+            ) { backStackEntry ->
                 val editorRoute = backStackEntry.toRoute<EditorRoute>()
                 EditorScreenRoot(
                     navController = navController,
