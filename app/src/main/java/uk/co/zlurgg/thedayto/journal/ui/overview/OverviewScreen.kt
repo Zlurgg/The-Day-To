@@ -165,9 +165,8 @@ fun OverviewScreenRoot(
     // System notification warning dialog
     if (showSystemNotificationDialog) {
         SystemNotificationDisabledDialog(
-            onDismiss = { showSystemNotificationDialog = false },
+            onDismiss = { },
             onOpenSettings = {
-                showSystemNotificationDialog = false
                 openSystemNotificationSettings(context)
             }
         )
@@ -176,9 +175,8 @@ fun OverviewScreenRoot(
     // Permission permanently denied dialog
     if (showPermissionDeniedDialog) {
         PermissionPermanentlyDeniedDialog(
-            onDismiss = { showPermissionDeniedDialog = false },
+            onDismiss = { },
             onOpenSettings = {
-                showPermissionDeniedDialog = false
                 openAppSettings(context)
             }
         )
@@ -497,7 +495,7 @@ private fun OverviewScreen(
 /**
  * Opens the system notification settings screen for this app.
  *
- * Guides user to Android Settings > Apps > [App] > Notifications
+ * Guides user to Android Settings > Apps > App> Notifications
  * where they can enable/disable notifications at the system level.
  */
 private fun openSystemNotificationSettings(context: android.content.Context) {
@@ -522,7 +520,7 @@ private fun openSystemNotificationSettings(context: android.content.Context) {
 /**
  * Opens the app settings screen for this app.
  *
- * Guides user to Android Settings > Apps > [App]
+ * Guides user to Android Settings > Apps > App
  * where they can manage app permissions including notifications.
  */
 private fun openAppSettings(context: android.content.Context) {

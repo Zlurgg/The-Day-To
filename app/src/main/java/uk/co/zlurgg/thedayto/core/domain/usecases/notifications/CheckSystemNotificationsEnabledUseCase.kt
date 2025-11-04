@@ -27,7 +27,7 @@ class CheckSystemNotificationsEnabledUseCase(
     /**
      * Check if notifications are enabled for this app in system settings.
      *
-     * Checks the master notification toggle in Android Settings > Apps > [App] > Notifications.
+     * Checks the master notification toggle in Android Settings > Apps > App > Notifications.
      * This is independent of:
      * - Runtime permission (POST_NOTIFICATIONS for Android 13+)
      * - Notification channels (can be enabled/disabled individually)
