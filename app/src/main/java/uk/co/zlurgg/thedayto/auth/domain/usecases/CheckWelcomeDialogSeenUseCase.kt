@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.domain.usecases
 
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 
 /**
  * Use Case: Check if user has seen the welcome dialog

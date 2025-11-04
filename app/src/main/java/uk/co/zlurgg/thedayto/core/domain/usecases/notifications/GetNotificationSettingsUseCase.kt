@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
 import uk.co.zlurgg.thedayto.core.domain.model.NotificationSettings
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 
 /**
  * Gets notification settings from preferences.

@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.fake
 
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import java.time.LocalDate
 
 /**
