@@ -15,16 +15,34 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.net.toUri
 import androidx.work.Worker
 import androidx.work.WorkerParameters
+import kotlinx.coroutines.runBlocking
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 
-class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params) {
+class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params), KoinComponent {
+
+    // Inject repository via Koin (data layer depends on data layer - Clean Architecture ✅)
+    private val notificationRepository: NotificationRepository by inject()
+
     override fun doWork(): Result {
         // Check if notification permission is granted (Android 13+)
         if (!hasNotificationPermission()) {
             Timber.w("Notification permission not granted - skipping notification")
             return Result.success()  // Not a failure, just can't show notification
+        }
+
+        // Check if notification should be sent (delegates to repository)
+        val shouldSend = runBlocking {
+            notificationRepository.shouldSendNotification()
+        }
+
+        if (!shouldSend) {
+            Timber.d("Notification not needed - skipping")
+            return Result.success()
         }
 
         val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()

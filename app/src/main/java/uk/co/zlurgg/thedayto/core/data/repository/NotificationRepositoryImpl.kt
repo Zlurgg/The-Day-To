@@ -19,7 +19,8 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
@@ -33,13 +34,16 @@ import java.util.concurrent.TimeUnit
  * - Uses dependency injection (Context + PreferencesRepository via Koin)
  * - Single source of truth: PreferencesRepository for notification settings
  * - Implements domain layer interface
+ * - Repository can use domain use cases (proper layer interaction)
  *
  * @param context Application context for WorkManager and permission checks
  * @param preferencesRepository Repository for reading/writing notification preferences
+ * @param checkTodayEntryExists Use case to check if today's entry exists
  */
 class NotificationRepositoryImpl(
     private val context: Context,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val checkTodayEntryExists: CheckTodayEntryExistsUseCase
 ) : NotificationRepository {
 
     // Repository-level coroutine scope for background operations
@@ -108,6 +112,25 @@ class NotificationRepositoryImpl(
             ) == PackageManager.PERMISSION_GRANTED
         } else {
             // Pre-API 33: No runtime permission required
+            true
+        }
+    }
+
+    override suspend fun shouldSendNotification(): Boolean {
+        return try {
+            // Check if an entry already exists for today
+            val hasEntryToday = checkTodayEntryExists()
+
+            if (hasEntryToday) {
+                Timber.d("Entry already exists for today - notification not needed")
+                false
+            } else {
+                Timber.d("No entry for today - notification should be sent")
+                true
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error checking if notification should be sent")
+            // Fail-safe: send notification if we can't determine entry status
             true
         }
     }

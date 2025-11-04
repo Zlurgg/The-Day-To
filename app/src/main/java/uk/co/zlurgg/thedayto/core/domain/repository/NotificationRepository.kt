@@ -39,4 +39,17 @@ interface NotificationRepository {
      * On API < 33, always returns true (permission not required).
      */
     fun hasNotificationPermission(): Boolean
+
+    /**
+     * Determines if a notification should be sent based on current state.
+     *
+     * Checks if an entry already exists for today. If user has already
+     * logged their mood, no reminder notification should be sent.
+     *
+     * This encapsulates the business logic decision of when to send notifications,
+     * keeping the Worker purely focused on infrastructure concerns.
+     *
+     * @return true if notification should be sent, false otherwise
+     */
+    suspend fun shouldSendNotification(): Boolean
 }

@@ -104,14 +104,41 @@ class OverviewViewModel(
     /**
      * Called when notification permission is granted.
      *
-     * Shows the confirmation dialog informing user that notifications are scheduled.
+     * Automatically enables notifications with default time (9:00 AM) and shows
+     * the confirmation dialog informing user that notifications are enabled.
      */
     fun onNotificationPermissionGranted() {
-        _uiState.update {
-            it.copy(
-                hasNotificationPermission = true,
-                showNotificationConfirmDialog = true
-            )
+        viewModelScope.launch {
+            try {
+                // Automatically enable notifications with default time (9:00 AM)
+                overviewUseCases.saveNotificationSettings(
+                    enabled = true,
+                    hour = 9,
+                    minute = 0
+                )
+
+                _uiState.update {
+                    it.copy(
+                        hasNotificationPermission = true,
+                        notificationsEnabled = true,
+                        notificationHour = 9,
+                        notificationMinute = 0,
+                        showNotificationConfirmDialog = true
+                    )
+                }
+
+                Timber.d("Notifications auto-enabled at 9:00 AM")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to auto-enable notifications")
+                _uiState.update {
+                    it.copy(hasNotificationPermission = true)
+                }
+                _uiEvents.emit(
+                    OverviewUiEvent.ShowSnackbar(
+                        message = "Failed to enable notifications. Please try again."
+                    )
+                )
+            }
         }
     }
 
