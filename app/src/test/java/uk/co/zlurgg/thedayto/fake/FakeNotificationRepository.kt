@@ -13,6 +13,7 @@ open class FakeNotificationRepository : NotificationRepository {
     private var scheduledHour: Int = 9
     private var scheduledMinute: Int = 0
     var hasPermission: Boolean = true
+    var shouldSendNotification: Boolean = true
     var setupDailyNotificationCalled: Boolean = false
     var cancelNotificationsCalled: Boolean = false
     var updateNotificationTimeCalled: Boolean = false
@@ -40,6 +41,10 @@ open class FakeNotificationRepository : NotificationRepository {
 
     override fun hasNotificationPermission(): Boolean {
         return hasPermission
+    }
+
+    override suspend fun shouldSendNotification(): Boolean {
+        return shouldSendNotification
     }
 
     /**
