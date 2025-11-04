@@ -117,6 +117,36 @@ class OverviewViewModel(
         Timber.d("Notification permission granted")
     }
 
+    /**
+     * Called when notification permission is denied.
+     *
+     * Checks if permission is permanently denied (Don't ask again).
+     * If permanently denied, shows warning to go to Settings.
+     * Otherwise, just resets toggle state.
+     */
+    fun onNotificationPermissionDenied() {
+        viewModelScope.launch {
+            val shouldShowRationale = overviewUseCases.shouldShowPermissionRationale()
+            val hasPermission = overviewUseCases.checkNotificationPermission()
+
+            if (!shouldShowRationale && !hasPermission) {
+                // Permanently denied - user selected "Don't ask again" or denied multiple times
+                Timber.w("Notification permission permanently denied")
+                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+                _uiEvents.emit(OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog)
+            } else {
+                // Just denied this time - can ask again
+                Timber.w("Notification permission denied")
+                _uiState.update {
+                    it.copy(
+                        hasNotificationPermission = false,
+                        notificationsEnabled = false  // Reset toggle to OFF
+                    )
+                }
+            }
+        }
+    }
+
     fun onAction(action: OverviewAction) {
         when (action) {
             is OverviewAction.Order -> {
@@ -196,7 +226,18 @@ class OverviewViewModel(
             }
 
             is OverviewAction.OpenNotificationSettings -> {
-                _uiState.update { it.copy(showNotificationSettingsDialog = true) }
+                viewModelScope.launch {
+                    // Re-check permission status in case user revoked it in system settings
+                    val hasPermission = overviewUseCases.checkNotificationPermission()
+                    _uiState.update {
+                        it.copy(
+                            showNotificationSettingsDialog = true,
+                            hasNotificationPermission = hasPermission,
+                            // If permission was revoked, ensure toggle is off
+                            notificationsEnabled = if (hasPermission) it.notificationsEnabled else false
+                        )
+                    }
+                }
             }
 
             is OverviewAction.DismissNotificationSettings -> {
@@ -206,11 +247,24 @@ class OverviewViewModel(
             is OverviewAction.SaveNotificationSettings -> {
                 viewModelScope.launch {
                     try {
+                        // Check system notification settings when user tries to enable
+                        if (action.enabled) {
+                            val systemEnabled = overviewUseCases.checkSystemNotificationsEnabled()
+                            if (!systemEnabled) {
+                                Timber.w("System notifications are disabled")
+                                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+                                _uiEvents.emit(OverviewUiEvent.ShowSystemNotificationWarning)
+                                return@launch  // Don't save if system notifications are disabled
+                            }
+                        }
+
+                        // Save notification settings
                         overviewUseCases.saveNotificationSettings(
                             action.enabled,
                             action.hour,
                             action.minute
                         )
+
                         _uiState.update {
                             it.copy(
                                 notificationsEnabled = action.enabled,
@@ -219,6 +273,16 @@ class OverviewViewModel(
                                 showNotificationSettingsDialog = false
                             )
                         }
+
+                        // Show confirmation message
+                        val timeStr = String.format("%02d:%02d", action.hour, action.minute)
+                        val message = if (action.enabled) {
+                            "Daily reminder set for $timeStr"
+                        } else {
+                            "Daily reminders disabled"
+                        }
+                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
+
                     } catch (e: Exception) {
                         Timber.e(e, "Failed to save notification settings")
                         _uiEvents.emit(

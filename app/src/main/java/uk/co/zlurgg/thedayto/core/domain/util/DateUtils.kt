@@ -3,7 +3,8 @@ package uk.co.zlurgg.thedayto.core.domain.util
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-/**
+
+/** TODO: this contains java logic check that we can use this here or move it somewhere else ui
  * Utility functions for date operations.
  * Centralizes date-related business logic.
  */

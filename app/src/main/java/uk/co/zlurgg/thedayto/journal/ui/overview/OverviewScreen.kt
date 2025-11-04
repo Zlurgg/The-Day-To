@@ -1,8 +1,12 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview
 
 import android.Manifest
+import android.content.Intent
 import android.content.res.Configuration
+import android.net.Uri
 import android.os.Build
+import android.provider.Settings
+import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -75,6 +79,8 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialo
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -95,6 +101,9 @@ fun OverviewScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var showTutorialDialog by remember { mutableStateOf(false) }
+    var showSystemNotificationDialog by remember { mutableStateOf(false) }
+    var showPermissionDeniedDialog by remember { mutableStateOf(false) }
+    val context = LocalContext.current
 
     // Permission launcher for Android 13+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -102,6 +111,8 @@ fun OverviewScreenRoot(
     ) { isGranted ->
         if (isGranted) {
             viewModel.onNotificationPermissionGranted()
+        } else {
+            viewModel.onNotificationPermissionDenied()
         }
     }
 
@@ -134,6 +145,12 @@ fun OverviewScreenRoot(
                 is OverviewUiEvent.ShowTutorialDialog -> {
                     showTutorialDialog = true
                 }
+                is OverviewUiEvent.ShowSystemNotificationWarning -> {
+                    showSystemNotificationDialog = true
+                }
+                is OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog -> {
+                    showPermissionDeniedDialog = true
+                }
             }
         }
     }
@@ -142,6 +159,28 @@ fun OverviewScreenRoot(
     if (showTutorialDialog) {
         TutorialDialog(
             onDismiss = { }
+        )
+    }
+
+    // System notification warning dialog
+    if (showSystemNotificationDialog) {
+        SystemNotificationDisabledDialog(
+            onDismiss = { showSystemNotificationDialog = false },
+            onOpenSettings = {
+                showSystemNotificationDialog = false
+                openSystemNotificationSettings(context)
+            }
+        )
+    }
+
+    // Permission permanently denied dialog
+    if (showPermissionDeniedDialog) {
+        PermissionPermanentlyDeniedDialog(
+            onDismiss = { showPermissionDeniedDialog = false },
+            onOpenSettings = {
+                showPermissionDeniedDialog = false
+                openAppSettings(context)
+            }
         )
     }
 
@@ -452,6 +491,51 @@ private fun OverviewScreen(
                 onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
             }
         )
+    }
+}
+
+/**
+ * Opens the system notification settings screen for this app.
+ *
+ * Guides user to Android Settings > Apps > [App] > Notifications
+ * where they can enable/disable notifications at the system level.
+ */
+private fun openSystemNotificationSettings(context: android.content.Context) {
+    val intent = Intent().apply {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+        } else {
+            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+            data = Uri.parse("package:${context.packageName}")
+        }
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        timber.log.Timber.e(e, "Failed to open system notification settings")
+    }
+}
+
+/**
+ * Opens the app settings screen for this app.
+ *
+ * Guides user to Android Settings > Apps > [App]
+ * where they can manage app permissions including notifications.
+ */
+private fun openAppSettings(context: android.content.Context) {
+    val intent = Intent().apply {
+        action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
+        data = Uri.parse("package:${context.packageName}")
+        flags = Intent.FLAG_ACTIVITY_NEW_TASK
+    }
+
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        timber.log.Timber.e(e, "Failed to open app settings")
     }
 }
 

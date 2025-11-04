@@ -34,7 +34,9 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermissionRationaleUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckTodayEntryExistsUseCaseImpl
@@ -99,7 +101,9 @@ val appModule = module {
                 preferencesRepository = get(),
                 notificationRepository = get()
             ),
-            checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get())
+            checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get()),
+            checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(context = androidContext()),
+            shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(context = androidContext())
         )
     }
 
