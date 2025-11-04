@@ -1,15 +1,20 @@
-package uk.co.zlurgg.thedayto.journal.data.repository
+package uk.co.zlurgg.thedayto.core.data.repository
 
 import android.content.Context
 import androidx.core.content.edit
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import java.time.LocalDate
 
 /**
- * Implementation of PreferencesRepository using Android SharedPreferences
+ * Implementation of PreferencesRepository using Android SharedPreferences.
  *
- * Manages journal-specific preferences and settings persistence.
+ * Manages app-wide preferences and settings persistence.
  * Uses SharedPreferences for simple key-value storage.
+ *
+ * This is core infrastructure used across multiple features:
+ * - Journal: entry reminders, first launch setup
+ * - Notifications: notification settings (enabled, time)
+ * - Auth: welcome dialog tracking
  *
  * @param context Application context for accessing SharedPreferences
  */
@@ -20,7 +25,7 @@ class PreferencesRepositoryImpl(
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
     /**
-     * Check if the entry reminder dialog has already been shown today
+     * Check if the entry reminder dialog has already been shown today.
      *
      * Compares the stored date string with today's date to determine
      * if the reminder has already been displayed.
@@ -34,7 +39,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Mark that the entry reminder dialog has been shown today
+     * Mark that the entry reminder dialog has been shown today.
      *
      * Stores the current date as an ISO-8601 date string (YYYY-MM-DD).
      * This allows checking on future app launches whether the reminder
@@ -46,7 +51,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Check if this is the user's first launch of the app
+     * Check if this is the user's first launch of the app.
      *
      * @return true if first launch flag is not set (first time), false otherwise
      */
@@ -55,7 +60,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Mark that the first launch setup has been completed
+     * Mark that the first launch setup has been completed.
      *
      * Sets a persistent flag indicating that default mood colors have been
      * seeded and initial setup is complete.
@@ -65,7 +70,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Check if the user has seen the welcome dialog
+     * Check if the user has seen the welcome dialog.
      *
      * @return true if user has seen welcome dialog, false otherwise (first time)
      */
@@ -74,7 +79,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Mark that the user has seen the welcome dialog
+     * Mark that the user has seen the welcome dialog.
      *
      * Sets a persistent flag indicating the welcome dialog was displayed
      * and dismissed by the user.
@@ -84,7 +89,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Check if daily notifications are enabled
+     * Check if daily notifications are enabled.
      *
      * @return true if notifications are enabled, false otherwise (default: false)
      */
@@ -93,7 +98,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Enable or disable daily notifications
+     * Enable or disable daily notifications.
      *
      * When notifications are disabled, scheduled notifications should be cancelled.
      * When enabled, notifications should be scheduled based on the configured time.
@@ -105,7 +110,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Get the hour for daily notifications (0-23)
+     * Get the hour for daily notifications (0-23).
      *
      * @return hour in 24-hour format, defaults to 9 (9 AM)
      */
@@ -114,7 +119,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Get the minute for daily notifications (0-59)
+     * Get the minute for daily notifications (0-59).
      *
      * @return minute, defaults to 0
      */
@@ -123,7 +128,7 @@ class PreferencesRepositoryImpl(
     }
 
     /**
-     * Set the time for daily notifications
+     * Set the time for daily notifications.
      *
      * Stores the notification time in 24-hour format.
      * After updating, notifications should be rescheduled with the new time.
