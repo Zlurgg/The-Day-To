@@ -88,4 +88,12 @@
     <!-- Permission Permanently Denied Dialog -->
     <string name="permission_denied_title">Permission Required</string>
     <string name="permission_denied_message">Notification permission is required for daily reminders. Please enable it in your device settings:\n\nSettings → Apps → The Day To → Notifications</string>
+
+    <!-- Test Notification -->
+    <string name="send_test_notification">Send Test Notification</string>
+
+    <!-- Time Presets -->
+    <string name="preset_morning">Morning</string>
+    <string name="preset_noon">Noon</string>
+    <string name="preset_evening">Evening</string>
 </resources>
