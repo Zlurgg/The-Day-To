@@ -1,9 +1,12 @@
 package uk.co.zlurgg.thedayto.core.data.repository
 
 import android.Manifest
+import android.app.Activity
+import android.app.NotificationManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
+import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Constraints
 import androidx.work.Data
@@ -132,6 +135,43 @@ class NotificationRepositoryImpl(
             Timber.e(e, "Error checking if notification should be sent")
             // Fail-safe: send notification if we can't determine entry status
             true
+        }
+    }
+
+    override fun areSystemNotificationsEnabled(): Boolean {
+        return try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.areNotificationsEnabled()
+            } else {
+                // Pre-API 24: Use NotificationManagerCompat
+                NotificationManagerCompat.from(context).areNotificationsEnabled()
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error checking system notification status")
+            // Fail-safe: assume enabled if we can't determine
+            true
+        }
+    }
+
+    override fun shouldShowPermissionRationale(): Boolean {
+        return try {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
+                // No runtime permission needed before Android 13
+                return false
+            }
+
+            val activity = context as? Activity
+            if (activity == null) {
+                Timber.w("Context is not an Activity - cannot check permission rationale")
+                return false
+            }
+
+            activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+        } catch (e: Exception) {
+            Timber.e(e, "Error checking permission rationale")
+            // Fail-safe: assume we should not show rationale if we can't determine
+            false
         }
     }
 
