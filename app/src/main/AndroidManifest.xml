@@ -29,9 +29,22 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="thedayto.co.uk/sign-in"
+                    android:host="thedayto.co.uk"
+                    android:pathPrefix="/sign-in"
                     android:scheme="https" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="https"
+                    android:host="thedayto.co.uk"
+                    android:pathPrefix="/editor" />
             </intent-filter>
         </activity>
     </application>
