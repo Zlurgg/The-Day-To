@@ -45,6 +45,7 @@
     <string name="enable_notifications">Enable Notifications</string>
     <string name="disable_notifications">Disable Notifications</string>
     <string name="notifications">Notifications</string>
+    <string name="notification_settings">Notification Settings</string>
     <string name="notification_confirm_title">Notifications Enabled</string>
     <string name="notification_confirm_message">Daily reminders are scheduled for 9:00 AM. Tap \"Change Time\" to customize.</string>
     <string name="change_time">Change Time</string>

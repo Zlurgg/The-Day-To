@@ -15,6 +15,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,11 +30,14 @@ import uk.co.zlurgg.thedayto.R
  * Notification settings dialog with enable/disable toggle and time picker.
  *
  * Uses Material 3 TimePicker (analog clock) for selecting notification time.
+ * When user toggles ON without permission, triggers permission request.
  *
  * @param enabled Initial enabled state
  * @param hour Initial hour (0-23)
  * @param minute Initial minute (0-59)
+ * @param hasPermission Whether notification permission is granted
  * @param onDismiss Callback when dialog is dismissed
+ * @param onRequestPermission Callback to request notification permission
  * @param onSave Callback when settings are saved (enabled, hour, minute)
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -42,7 +46,9 @@ fun NotificationSettingsDialog(
     enabled: Boolean,
     hour: Int,
     minute: Int,
+    hasPermission: Boolean,
     onDismiss: () -> Unit,
+    onRequestPermission: () -> Unit,
     onSave: (enabled: Boolean, hour: Int, minute: Int) -> Unit
 ) {
     var isEnabled by remember { mutableStateOf(enabled) }
@@ -51,6 +57,13 @@ fun NotificationSettingsDialog(
         initialMinute = minute,
         is24Hour = true
     )
+
+    // Auto-enable when permission is granted
+    LaunchedEffect(hasPermission, enabled) {
+        if (hasPermission && enabled && !isEnabled) {
+            isEnabled = true
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -73,7 +86,15 @@ fun NotificationSettingsDialog(
                     )
                     Switch(
                         checked = isEnabled,
-                        onCheckedChange = { isEnabled = it }
+                        onCheckedChange = { newValue ->
+                            if (newValue && !hasPermission) {
+                                // User wants to enable but doesn't have permission
+                                onRequestPermission()
+                            } else {
+                                // Either disabling or already has permission
+                                isEnabled = newValue
+                            }
+                        }
                     )
                 }
 

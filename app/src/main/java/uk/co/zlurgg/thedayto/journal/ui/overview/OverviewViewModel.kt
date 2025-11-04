@@ -104,42 +104,17 @@ class OverviewViewModel(
     /**
      * Called when notification permission is granted.
      *
-     * Automatically enables notifications with default time (9:00 AM) and shows
-     * the confirmation dialog informing user that notifications are enabled.
+     * Updates permission status and keeps settings dialog open so user can
+     * enable notifications and set their preferred time.
      */
     fun onNotificationPermissionGranted() {
-        viewModelScope.launch {
-            try {
-                // Automatically enable notifications with default time (9:00 AM)
-                overviewUseCases.saveNotificationSettings(
-                    enabled = true,
-                    hour = 9,
-                    minute = 0
-                )
-
-                _uiState.update {
-                    it.copy(
-                        hasNotificationPermission = true,
-                        notificationsEnabled = true,
-                        notificationHour = 9,
-                        notificationMinute = 0,
-                        showNotificationConfirmDialog = true
-                    )
-                }
-
-                Timber.d("Notifications auto-enabled at 9:00 AM")
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to auto-enable notifications")
-                _uiState.update {
-                    it.copy(hasNotificationPermission = true)
-                }
-                _uiEvents.emit(
-                    OverviewUiEvent.ShowSnackbar(
-                        message = "Failed to enable notifications. Please try again."
-                    )
-                )
-            }
+        _uiState.update {
+            it.copy(
+                hasNotificationPermission = true,
+                notificationsEnabled = true  // Auto-toggle ON in dialog
+            )
         }
+        Timber.d("Notification permission granted")
     }
 
     fun onAction(action: OverviewAction) {
@@ -218,10 +193,6 @@ class OverviewViewModel(
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.RequestNotificationPermission)
                 }
-            }
-
-            is OverviewAction.DismissNotificationConfirmDialog -> {
-                _uiState.update { it.copy(showNotificationConfirmDialog = false) }
             }
 
             is OverviewAction.OpenNotificationSettings -> {

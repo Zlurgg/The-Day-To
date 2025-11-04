@@ -10,7 +10,6 @@ sealed interface OverviewAction {
 
     // Notification actions
     data object RequestNotificationPermission : OverviewAction
-    data object DismissNotificationConfirmDialog : OverviewAction
     data object OpenNotificationSettings : OverviewAction
     data object DismissNotificationSettings : OverviewAction
     data class SaveNotificationSettings(val enabled: Boolean, val hour: Int, val minute: Int) : OverviewAction
