@@ -13,8 +13,8 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.data.repository.EntryRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.journal.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntriesUseCase
@@ -34,8 +34,10 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotificationSettingsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckTodayEntryExistsUseCaseImpl
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
@@ -71,7 +73,8 @@ val appModule = module {
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             context = androidContext(),
-            preferencesRepository = get()
+            preferencesRepository = get(),
+            checkTodayEntryExists = get()
         )
     }
 
@@ -145,6 +148,12 @@ val appModule = module {
             authRepository = get(),
             authStateRepository = get()
         )
+    }
+
+    // CheckTodayEntryExistsUseCase - bind interface to implementation
+    // Used by NotificationWorker to check if notification should be sent
+    single<CheckTodayEntryExistsUseCase> {
+        CheckTodayEntryExistsUseCaseImpl(repository = get())
     }
 
 }

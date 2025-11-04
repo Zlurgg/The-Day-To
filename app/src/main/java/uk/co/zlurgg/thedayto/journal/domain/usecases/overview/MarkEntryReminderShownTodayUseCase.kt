@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
-import uk.co.zlurgg.thedayto.journal.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 
 /**
  * Use Case: Mark that entry reminder dialog has been shown today
