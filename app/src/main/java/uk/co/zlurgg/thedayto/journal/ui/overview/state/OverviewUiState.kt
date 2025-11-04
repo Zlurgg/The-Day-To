@@ -55,6 +55,5 @@ data class OverviewUiState(
     val notificationHour: Int = 9,
     val notificationMinute: Int = 0,
     val hasNotificationPermission: Boolean = false,
-    val showNotificationConfirmDialog: Boolean = false,
     val showNotificationSettingsDialog: Boolean = false
 )

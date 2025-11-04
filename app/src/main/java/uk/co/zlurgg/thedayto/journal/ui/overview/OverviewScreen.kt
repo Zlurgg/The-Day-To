@@ -74,7 +74,6 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationConfirmDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
@@ -213,8 +212,6 @@ private fun OverviewScreen(
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 SettingsMenu(
-                    hasNotificationPermission = uiState.hasNotificationPermission,
-                    onRequestNotificationPermission = { onAction(OverviewAction.RequestNotificationPermission) },
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
                     onShowTutorial = { onAction(OverviewAction.RequestShowTutorial) },
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
@@ -442,21 +439,15 @@ private fun OverviewScreen(
         )
     }
 
-    // Notification confirmation dialog
-    if (uiState.showNotificationConfirmDialog) {
-        NotificationConfirmDialog(
-            onDismiss = { onAction(OverviewAction.DismissNotificationConfirmDialog) },
-            onChangeTime = { onAction(OverviewAction.OpenNotificationSettings) }
-        )
-    }
-
     // Notification settings dialog
     if (uiState.showNotificationSettingsDialog) {
         NotificationSettingsDialog(
             enabled = uiState.notificationsEnabled,
             hour = uiState.notificationHour,
             minute = uiState.notificationMinute,
+            hasPermission = uiState.hasNotificationPermission,
             onDismiss = { onAction(OverviewAction.DismissNotificationSettings) },
+            onRequestPermission = { onAction(OverviewAction.RequestNotificationPermission) },
             onSave = { enabled, hour, minute ->
                 onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
             }

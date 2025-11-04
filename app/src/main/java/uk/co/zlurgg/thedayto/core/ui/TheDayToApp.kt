@@ -103,11 +103,10 @@ fun TheDayToApp() {
                 // Sign Out Dialog (stateless)
                 if (showSignOutDialog) {
                     SignOutDialog(
-                        onDismiss = { showSignOutDialog = false },
+                        onDismiss = { },
                         onConfirm = {
                             scope.launch {
                                 signOutUseCase()
-                                showSignOutDialog = false
                                 navController.navigate(SignInRoute) {
                                     // Clear entire back stack on sign-out
                                     popUpTo(0) { inclusive = true }

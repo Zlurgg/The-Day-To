@@ -20,8 +20,6 @@ import uk.co.zlurgg.thedayto.R
 
 @Composable
 fun SettingsMenu(
-    hasNotificationPermission: Boolean,
-    onRequestNotificationPermission: () -> Unit,
     onOpenNotificationSettings: () -> Unit,
     onShowTutorial: () -> Unit,
     onSignOut: () -> Unit
@@ -41,24 +39,14 @@ fun SettingsMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            // Show "Enable Notifications" or "Notifications" based on permission
-            if (!hasNotificationPermission) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.enable_notifications)) },
-                    onClick = {
-                        expanded = false
-                        onRequestNotificationPermission()
-                    }
-                )
-            } else {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.notifications)) },
-                    onClick = {
-                        expanded = false
-                        onOpenNotificationSettings()
-                    }
-                )
-            }
+            // Always show "Notification Settings" - permission handled inside dialog
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.notification_settings)) },
+                onClick = {
+                    expanded = false
+                    onOpenNotificationSettings()
+                }
+            )
 
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.help_and_tutorial)) },
