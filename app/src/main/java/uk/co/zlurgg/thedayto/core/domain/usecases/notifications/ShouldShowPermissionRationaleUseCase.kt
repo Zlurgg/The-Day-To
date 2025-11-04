@@ -1,9 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import android.Manifest
-import android.app.Activity
-import android.content.Context
-import android.os.Build
+import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 
 /**
  * Checks if we should show a rationale for notification permission.
@@ -11,19 +8,22 @@ import android.os.Build
  * Returns false if:
  * - Permission is permanently denied ("Don't ask again" selected)
  * - Permission has never been requested
+ * - Running on API < 33 (no runtime permission needed)
  *
  * Returns true if:
  * - Permission was denied but can be requested again
+ *
+ * Following Clean Architecture:
+ * - Single responsibility: Check permission rationale state
+ * - Pure domain layer - no Android framework dependencies
+ * - Delegates to repository for platform-specific implementation
+ *
+ * @param notificationRepository Repository for notification operations
  */
 class ShouldShowPermissionRationaleUseCase(
-    private val context: Context
+    private val notificationRepository: NotificationRepository
 ) {
     operator fun invoke(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            return false  // No runtime permission needed before Android 13
-        }
-
-        val activity = context as? Activity ?: return false
-        return activity.shouldShowRequestPermissionRationale(Manifest.permission.POST_NOTIFICATIONS)
+        return notificationRepository.shouldShowPermissionRationale()
     }
 }

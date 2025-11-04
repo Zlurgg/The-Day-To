@@ -102,8 +102,8 @@ val appModule = module {
                 notificationRepository = get()
             ),
             checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get()),
-            checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(context = androidContext()),
-            shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(context = androidContext())
+            checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationRepository = get()),
+            shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(notificationRepository = get())
         )
     }
 

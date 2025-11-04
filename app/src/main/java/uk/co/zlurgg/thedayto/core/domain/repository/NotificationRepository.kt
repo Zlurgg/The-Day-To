@@ -52,4 +52,31 @@ interface NotificationRepository {
      * @return true if notification should be sent, false otherwise
      */
     suspend fun shouldSendNotification(): Boolean
+
+    /**
+     * Checks if system-level notifications are enabled for this app.
+     *
+     * This checks the device's notification settings, not just permission.
+     * Even with permission granted, user can disable notifications in system settings.
+     *
+     * @return true if notifications are enabled at system level, false otherwise
+     */
+    fun areSystemNotificationsEnabled(): Boolean
+
+    /**
+     * Checks if we should show a rationale for notification permission.
+     *
+     * Returns false if:
+     * - Permission is permanently denied ("Don't ask again" selected)
+     * - Permission has never been requested
+     * - Running on API < 33 (no runtime permission needed)
+     *
+     * Returns true if:
+     * - Permission was denied but can be requested again
+     *
+     * Note: This requires Activity context and should be called from UI layer.
+     *
+     * @return true if rationale should be shown, false otherwise
+     */
+    fun shouldShowPermissionRationale(): Boolean
 }

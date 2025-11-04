@@ -1,8 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import android.app.NotificationManager
-import android.content.Context
-import android.os.Build
+import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 
 /**
  * Use case to check if notifications are enabled at the system level.
@@ -16,13 +14,14 @@ import android.os.Build
  *
  * Following Clean Architecture:
  * - Single responsibility: Check system notification state
- * - No business logic - just queries system state
+ * - Pure domain layer - no Android framework dependencies
+ * - Delegates to repository for platform-specific implementation
  * - Used by ViewModels to make decisions about notification settings
  *
- * @param context Application context for accessing NotificationManager
+ * @param notificationRepository Repository for notification operations
  */
 class CheckSystemNotificationsEnabledUseCase(
-    private val context: Context
+    private val notificationRepository: NotificationRepository
 ) {
     /**
      * Check if notifications are enabled for this app in system settings.
@@ -36,14 +35,6 @@ class CheckSystemNotificationsEnabledUseCase(
      * @return true if system notifications are enabled, false otherwise
      */
     operator fun invoke(): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE)
-                as? NotificationManager
-            notificationManager?.areNotificationsEnabled() ?: false
-        } else {
-            // Pre-API 24: Use NotificationManagerCompat fallback
-            androidx.core.app.NotificationManagerCompat.from(context)
-                .areNotificationsEnabled()
-        }
+        return notificationRepository.areSystemNotificationsEnabled()
     }
 }
