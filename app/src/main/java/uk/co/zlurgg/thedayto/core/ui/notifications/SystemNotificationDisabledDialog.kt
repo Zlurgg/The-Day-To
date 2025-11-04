@@ -9,7 +9,7 @@ import uk.co.zlurgg.thedayto.R
 
 /**
  * Warning dialog shown when user tries to enable notifications but they're
- * disabled at the system level (Android Settings > Apps > [App] > Notifications).
+ * disabled at the system level (Android Settings > Apps > App > Notifications).
  *
  * This helps users understand why notifications aren't working and guides them
  * to the correct settings screen to fix the issue.
