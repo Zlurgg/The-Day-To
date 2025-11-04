@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.core.ui.notifications
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -107,6 +109,73 @@ fun NotificationSettingsDialog(
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 8.dp)
                     )
+
+                    // Quick time presets
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        FilterChip(
+                            selected = timePickerState.hour == 8 && timePickerState.minute == 0,
+                            onClick = {
+                                timePickerState.hour = 8
+                                timePickerState.minute = 0
+                            },
+                            label = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = stringResource(R.string.preset_morning),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = "8:00",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        )
+                        FilterChip(
+                            selected = timePickerState.hour == 12 && timePickerState.minute == 0,
+                            onClick = {
+                                timePickerState.hour = 12
+                                timePickerState.minute = 0
+                            },
+                            label = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = stringResource(R.string.preset_noon),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = "12:00",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        )
+                        FilterChip(
+                            selected = timePickerState.hour == 20 && timePickerState.minute == 0,
+                            onClick = {
+                                timePickerState.hour = 20
+                                timePickerState.minute = 0
+                            },
+                            label = {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Text(
+                                        text = stringResource(R.string.preset_evening),
+                                        style = MaterialTheme.typography.labelSmall
+                                    )
+                                    Text(
+                                        text = "20:00",
+                                        style = MaterialTheme.typography.bodySmall
+                                    )
+                                }
+                            }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(12.dp))
+
                     TimePicker(
                         state = timePickerState,
                         modifier = Modifier.fillMaxWidth()
