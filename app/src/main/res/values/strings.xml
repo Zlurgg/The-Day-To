@@ -53,6 +53,9 @@
     <string name="enable_daily_reminders">Enable daily reminders</string>
     <string name="notification_time">Notification time</string>
     <string name="save">Save</string>
+    <string name="notifications_disabled_title">Notifications Disabled</string>
+    <string name="notifications_disabled_message">Notifications are disabled for The Day To in your system settings. Please enable them to receive daily reminders.</string>
+    <string name="open_settings">Open Settings</string>
     <string name="sign_out">Sign out</string>
     <string name="create_today_entry">Create Today\'s Entry</string>
     <string name="entry_reminder_title">Create Today\'s Entry?</string>
@@ -81,4 +84,8 @@
     <string name="tutorial_calendar_title">Viewing Your Calendar</string>
     <string name="tutorial_calendar_content">Your month is displayed as a color calendar. Each day shows the color of your mood. Tap any date to view or edit that day\'s entry.</string>
     <string name="help_and_tutorial">Help &amp; Tutorial</string>
+
+    <!-- Permission Permanently Denied Dialog -->
+    <string name="permission_denied_title">Permission Required</string>
+    <string name="permission_denied_message">Notification permission is required for daily reminders. Please enable it in your device settings:\n\nSettings → Apps → The Day To → Notifications</string>
 </resources>
