@@ -3,10 +3,8 @@ package uk.co.zlurgg.thedayto.journal.ui.overview
 import android.Manifest
 import android.content.Intent
 import android.content.res.Configuration
-import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.compose.ui.platform.LocalContext
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -46,6 +44,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -53,15 +52,21 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
+import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
+import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
@@ -77,10 +82,6 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntrySortSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthStatistics
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.MonthYearPickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
-import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -186,9 +187,13 @@ fun OverviewScreenRoot(
     OverviewScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onNavigateToEntry = { entryId ->
+        onNavigateToEntry = { entryId, entryDate ->
             navController.navigate(
-                EditorRoute(entryId = entryId, showBackButton = true)
+                EditorRoute(
+                    entryId = entryId,
+                    entryDate = entryDate,
+                    showBackButton = true
+                )
             )
         },
         snackbarHostState = snackbarHostState
@@ -202,7 +207,7 @@ fun OverviewScreenRoot(
 private fun OverviewScreen(
     uiState: OverviewUiState,
     onAction: (OverviewAction) -> Unit,
-    onNavigateToEntry: (Int?) -> Unit,
+    onNavigateToEntry: (entryId: Int?, entryDate: Long?) -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -322,20 +327,41 @@ private fun OverviewScreen(
                 Box(
                     modifier = Modifier
                 ) {
-                    val pagerState = rememberPagerState(
-                        initialPage = date.monthValue - 1,
-                        initialPageOffsetFraction = 0f,
-                        pageCount = { 12 }
-                    )
-                    LaunchedEffect(pagerState) {
-                        snapshotFlow { pagerState.currentPage }.collect { calenderPage ->
-                            if (calenderPage < (date.monthValue - 1)) {
-                                date = date.minusMonths(1)
-                            } else if (calenderPage > (date.monthValue - 1)) {
-                                date = date.plusMonths(1)
+                    // Constants for infinite pager
+                    val initialPage = 1_000_000_000
+
+                    // Helper to calculate month offset between dates
+                    fun calculateDateOffset(current: LocalDate, initial: LocalDate): Long {
+                        return java.time.temporal.ChronoUnit.MONTHS.between(initial, current)
+                    }
+
+                    // Wrap pager in key(date) so it recreates when MonthYearPicker changes date
+                    key(date) {
+                        // Capture the date at the time of pager creation
+                        val pagerCreationDate = date
+
+                        val pagerState = rememberPagerState(
+                            initialPage = initialPage,
+                            initialPageOffsetFraction = 0f,
+                            pageCount = { Int.MAX_VALUE }
+                        )
+
+                        LaunchedEffect(pagerState) {
+                            snapshotFlow { pagerState.currentPage }.collect { page ->
+                                // Calculate how many months we've moved from initial page
+                                val pageOffsetFromInitial = page - initialPage
+
+                                // Calculate how many months date state is from pager creation date
+                                val dateOffsetFromInitial = calculateDateOffset(date, pagerCreationDate)
+
+                                // Only update if they differ (user swiped)
+                                if (pageOffsetFromInitial < dateOffsetFromInitial) {
+                                    date = date.minusMonths(1)
+                                } else if (pageOffsetFromInitial > dateOffsetFromInitial) {
+                                    date = date.plusMonths(1)
+                                }
                             }
                         }
-                    }
                     HorizontalPager(
                         modifier = Modifier,
                         state = pagerState,
@@ -383,35 +409,52 @@ private fun OverviewScreen(
                                             CalenderDay(
                                                 entry = entry,
                                                 modifier = Modifier.clickable {
-                                                    onNavigateToEntry(entry.id)
+                                                    onNavigateToEntry(entry.id, null)
                                                 }
                                             )
                                         } else {
-                                            val isToday = entryDate == currentDate.atStartOfDay()
+                                            // No entry for this date - determine if clickable
+                                            val currentDateEpoch = currentDate.atStartOfDay()
                                                 .toEpochSecond(ZoneOffset.UTC)
+                                            val isToday = entryDate == currentDateEpoch
+                                            val isPast = entryDate < currentDateEpoch
+                                            val isFuture = entryDate > currentDateEpoch
 
                                             Box(
                                                 modifier = Modifier
                                                     .then(
-                                                        if (isToday) {
-                                                            Modifier
+                                                        when {
+                                                            isToday -> Modifier
                                                                 .border(
                                                                     2.dp,
                                                                     MaterialTheme.colorScheme.primary,
                                                                     androidx.compose.foundation.shape.CircleShape
                                                                 )
-                                                                .clickable { onNavigateToEntry(null) }
-                                                        } else {
-                                                            Modifier
+                                                                .clickable {
+                                                                    onNavigateToEntry(null, entryDate)
+                                                                }
+                                                            isPast -> Modifier
+                                                                .clickable {
+                                                                    onNavigateToEntry(null, entryDate)
+                                                                }
+                                                            else -> Modifier  // Future dates not clickable
                                                         }
                                                     ),
                                                 contentAlignment = Alignment.Center
                                             ) {
                                                 Text(
-                                                    modifier = Modifier.alpha(if (isToday) 1f else 0.5f),
+                                                    modifier = Modifier.alpha(
+                                                        when {
+                                                            isToday -> 1f
+                                                            isPast -> 0.7f    // Darker for clickable past dates
+                                                             isFuture -> 0.3f// Very faded for future dates
+                                                            else -> 1f
+                                                        }
+                                                    ),
                                                     text = "$dayNumber",
                                                     style = MaterialTheme.typography.headlineSmall,
-                                                    color = if (isToday) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                                    color = if (isToday) MaterialTheme.colorScheme.primary
+                                                           else MaterialTheme.colorScheme.onSurface,
                                                     overflow = TextOverflow.Ellipsis
                                                 )
                                             }
@@ -421,6 +464,7 @@ private fun OverviewScreen(
                             }
                         }
                     )
+                    } // Close key(date) block
                 }
 
                 Spacer(modifier = Modifier.height(paddingMedium))
@@ -455,7 +499,7 @@ private fun OverviewScreen(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .clickable {
-                                                onNavigateToEntry(entry.id)
+                                                onNavigateToEntry(entry.id, null)
                                             }
                                     )
                                     Spacer(modifier = Modifier.height(paddingMedium))
@@ -500,13 +544,8 @@ private fun OverviewScreen(
  */
 private fun openSystemNotificationSettings(context: android.content.Context) {
     val intent = Intent().apply {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
-            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-        } else {
-            action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-            data = Uri.parse("package:${context.packageName}")
-        }
+        action = Settings.ACTION_APP_NOTIFICATION_SETTINGS
+        putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
         flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
@@ -526,7 +565,7 @@ private fun openSystemNotificationSettings(context: android.content.Context) {
 private fun openAppSettings(context: android.content.Context) {
     val intent = Intent().apply {
         action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-        data = Uri.parse("package:${context.packageName}")
+        data = "package:${context.packageName}".toUri()
         flags = Intent.FLAG_ACTIVITY_NEW_TASK
     }
 
@@ -548,7 +587,7 @@ private fun OverviewScreenPreview() {
                 greeting = "Good morning"
             ),
             onAction = {},
-            onNavigateToEntry = {},
+            onNavigateToEntry = { _, _ -> },
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -565,7 +604,7 @@ private fun OverviewScreenSingleEntryPreview() {
                 greeting = "Good afternoon"
             ),
             onAction = {},
-            onNavigateToEntry = {},
+            onNavigateToEntry = { _, _ -> },
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -582,7 +621,7 @@ private fun OverviewScreenEmptyPreview() {
                 greeting = "Good evening"
             ),
             onAction = {},
-            onNavigateToEntry = {},
+            onNavigateToEntry = { _, _ -> },
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
