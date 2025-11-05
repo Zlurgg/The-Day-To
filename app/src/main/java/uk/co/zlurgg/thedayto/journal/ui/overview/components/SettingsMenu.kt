@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -16,7 +17,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 @Composable
 fun SettingsMenu(
@@ -30,7 +33,7 @@ fun SettingsMenu(
         IconButton(onClick = { expanded = true }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = "Settings"
+                contentDescription = stringResource(R.string.settings)
             )
         }
 
@@ -64,5 +67,18 @@ fun SettingsMenu(
                 }
             )
         }
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun SettingsMenuPreview() {
+    TheDayToTheme {
+        SettingsMenu(
+            onOpenNotificationSettings = {},
+            onShowTutorial = {},
+            onSignOut = {}
+        )
     }
 }

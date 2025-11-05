@@ -116,7 +116,7 @@ class OverviewViewModelTest {
 
         val initialState = testViewModel.uiState.value
         assertFalse("Should not have permission initially", initialState.hasNotificationPermission)
-        assertFalse("Dialog should not be shown initially", initialState.showNotificationConfirmDialog)
+        assertFalse("Dialog should not be shown initially", initialState.showNotificationSettingsDialog)
 
         // When: Permission is granted
         testViewModel.onNotificationPermissionGranted()
@@ -125,7 +125,7 @@ class OverviewViewModelTest {
         // Then: State should be updated
         val newState = testViewModel.uiState.value
         assertTrue("Should have permission", newState.hasNotificationPermission)
-        assertTrue("Confirm dialog should be shown", newState.showNotificationConfirmDialog)
+        assertTrue("Confirm dialog should be shown", newState.showNotificationSettingsDialog)
     }
 
     @Test
@@ -133,189 +133,230 @@ class OverviewViewModelTest {
         // Given: Dialog is shown
         viewModel.onNotificationPermissionGranted()
         testScheduler.advanceUntilIdle()
-        assertTrue("Dialog should be shown", viewModel.uiState.value.showNotificationConfirmDialog)
-
-        // When: User dismisses dialog
-        viewModel.onAction(OverviewAction.DismissNotificationConfirmDialog)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Dialog should be hidden
-        assertFalse("Dialog should be hidden", viewModel.uiState.value.showNotificationConfirmDialog)
-    }
-
-    @Test
-    fun `OpenNotificationSettings - shows settings dialog`() = runTest {
-        // Given: Settings dialog not shown
-        assertFalse("Dialog should not be shown initially", viewModel.uiState.value.showNotificationSettingsDialog)
-
-        // When: User opens settings
-        viewModel.onAction(OverviewAction.OpenNotificationSettings)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Settings dialog should be shown
-        assertTrue("Settings dialog should be shown", viewModel.uiState.value.showNotificationSettingsDialog)
-    }
-
-    @Test
-    fun `DismissNotificationSettings - hides settings dialog`() = runTest {
-        // Given: Settings dialog is shown
-        viewModel.onAction(OverviewAction.OpenNotificationSettings)
-        testScheduler.advanceUntilIdle()
         assertTrue("Dialog should be shown", viewModel.uiState.value.showNotificationSettingsDialog)
 
-        // When: User dismisses settings
-        viewModel.onAction(OverviewAction.DismissNotificationSettings)
-        testScheduler.advanceUntilIdle()
+        @Test
+        fun `OpenNotificationSettings - shows settings dialog`() = runTest {
+            // Given: Settings dialog not shown
+            assertFalse(
+                "Dialog should not be shown initially",
+                viewModel.uiState.value.showNotificationSettingsDialog
+            )
 
-        // Then: Dialog should be hidden
-        assertFalse("Dialog should be hidden", viewModel.uiState.value.showNotificationSettingsDialog)
-    }
-
-    @Test
-    fun `SaveNotificationSettings - saves settings and updates state when enabled`() = runTest {
-        // Given: Initial state
-        assertFalse("Notifications should be disabled initially", viewModel.uiState.value.notificationsEnabled)
-
-        // When: User saves settings with enabled=true
-        viewModel.onAction(OverviewAction.SaveNotificationSettings(
-            enabled = true,
-            hour = 15,
-            minute = 45
-        ))
-        testScheduler.advanceUntilIdle()
-
-        // Then: State should be updated
-        val state = viewModel.uiState.value
-        assertTrue("Notifications should be enabled", state.notificationsEnabled)
-        assertEquals("Hour should be 15", 15, state.notificationHour)
-        assertEquals("Minute should be 45", 45, state.notificationMinute)
-        assertFalse("Settings dialog should be closed", state.showNotificationSettingsDialog)
-
-        // And: Repository should have saved settings
-        assertTrue("Repository should have enabled=true", fakePreferencesRepository.isNotificationEnabled())
-        assertEquals("Repository should have hour=15", 15, fakePreferencesRepository.getNotificationHour())
-        assertEquals("Repository should have minute=45", 45, fakePreferencesRepository.getNotificationMinute())
-
-        // And: Notification should be scheduled
-        assertTrue("Notification should be scheduled", fakeNotificationRepository.updateNotificationTimeCalled)
-        assertTrue("Notification should be scheduled at 15:45", fakeNotificationRepository.isScheduledAt(15, 45))
-    }
-
-    @Test
-    fun `SaveNotificationSettings - cancels notifications when disabled`() = runTest {
-        // Given: Notifications are currently enabled
-        fakePreferencesRepository.setNotificationEnabled(true)
-        fakePreferencesRepository.setNotificationTime(10, 0)
-
-        // When: User disables notifications
-        viewModel.onAction(OverviewAction.SaveNotificationSettings(
-            enabled = false,
-            hour = 10,
-            minute = 0
-        ))
-        testScheduler.advanceUntilIdle()
-
-        // Then: State should be updated
-        assertFalse("Notifications should be disabled", viewModel.uiState.value.notificationsEnabled)
-
-        // And: Repository should have saved disabled state
-        assertFalse("Repository should have enabled=false", fakePreferencesRepository.isNotificationEnabled())
-
-        // And: Notifications should be cancelled
-        assertTrue("Notifications should be cancelled", fakeNotificationRepository.cancelNotificationsCalled)
-    }
-
-    @Test
-    fun `SaveNotificationSettings - shows snackbar on error`() = runTest {
-        // Given: Create a failing use case
-        val failingRepository = FakeNotificationRepository().apply {
-            updateNotificationTimeThrows = true
-        }
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = failingRepository
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User tries to save settings
-        testViewModel.uiEvents.test {
-            testViewModel.onAction(OverviewAction.SaveNotificationSettings(
-                enabled = true,
-                hour = 10,
-                minute = 0
-            ))
+            // When: User opens settings
+            viewModel.onAction(OverviewAction.OpenNotificationSettings)
             testScheduler.advanceUntilIdle()
 
-            // Then: Snackbar event should be emitted with error message
-            val event = awaitItem()
-            assertTrue("Should show snackbar", event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar)
-            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            assertTrue("Error message should contain failure text", snackbarEvent.message.contains("Failed"))
+            // Then: Settings dialog should be shown
+            assertTrue(
+                "Settings dialog should be shown",
+                viewModel.uiState.value.showNotificationSettingsDialog
+            )
         }
-    }
 
-    @Test
-    fun `notification permission state - reflects repository state`() = runTest {
-        // Given: Permission not granted
-        fakeNotificationRepository.hasPermission = false
+        @Test
+        fun `DismissNotificationSettings - hides settings dialog`() = runTest {
+            // Given: Settings dialog is shown
+            viewModel.onAction(OverviewAction.OpenNotificationSettings)
+            testScheduler.advanceUntilIdle()
+            assertTrue(
+                "Dialog should be shown",
+                viewModel.uiState.value.showNotificationSettingsDialog
+            )
 
-        // When: ViewModel loads settings
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
+            // When: User dismisses settings
+            viewModel.onAction(OverviewAction.DismissNotificationSettings)
+            testScheduler.advanceUntilIdle()
 
-        // Then: State should reflect no permission
-        assertFalse("Should not have permission", testViewModel.uiState.value.hasNotificationPermission)
+            // Then: Dialog should be hidden
+            assertFalse(
+                "Dialog should be hidden",
+                viewModel.uiState.value.showNotificationSettingsDialog
+            )
+        }
 
-        // When: Permission is granted
-        fakeNotificationRepository.hasPermission = true
-        testViewModel.onNotificationPermissionGranted()
-        testScheduler.advanceUntilIdle()
+        @Test
+        fun `SaveNotificationSettings - saves settings and updates state when enabled`() = runTest {
+            // Given: Initial state
+            assertFalse(
+                "Notifications should be disabled initially",
+                viewModel.uiState.value.notificationsEnabled
+            )
 
-        // Then: State should reflect permission granted
-        assertTrue("Should have permission", testViewModel.uiState.value.hasNotificationPermission)
-    }
+            // When: User saves settings with enabled=true
+            viewModel.onAction(
+                OverviewAction.SaveNotificationSettings(
+                    enabled = true,
+                    hour = 15,
+                    minute = 45
+                )
+            )
+            testScheduler.advanceUntilIdle()
 
-    @Test
-    fun `notification workflow - complete user journey`() = runTest {
-        // Scenario: User grants permission, opens settings, and configures notifications
+            // Then: State should be updated
+            val state = viewModel.uiState.value
+            assertTrue("Notifications should be enabled", state.notificationsEnabled)
+            assertEquals("Hour should be 15", 15, state.notificationHour)
+            assertEquals("Minute should be 45", 45, state.notificationMinute)
+            assertFalse("Settings dialog should be closed", state.showNotificationSettingsDialog)
 
-        // Step 1: User grants permission
-        viewModel.onNotificationPermissionGranted()
-        testScheduler.advanceUntilIdle()
+            // And: Repository should have saved settings
+            assertTrue(
+                "Repository should have enabled=true",
+                fakePreferencesRepository.isNotificationEnabled()
+            )
+            assertEquals(
+                "Repository should have hour=15",
+                15,
+                fakePreferencesRepository.getNotificationHour()
+            )
+            assertEquals(
+                "Repository should have minute=45",
+                45,
+                fakePreferencesRepository.getNotificationMinute()
+            )
 
-        var state = viewModel.uiState.value
-        assertTrue("Permission should be granted", state.hasNotificationPermission)
-        assertTrue("Confirm dialog should be shown", state.showNotificationConfirmDialog)
+            // And: Notification should be scheduled
+            assertTrue(
+                "Notification should be scheduled",
+                fakeNotificationRepository.updateNotificationTimeCalled
+            )
+            assertTrue(
+                "Notification should be scheduled at 15:45",
+                fakeNotificationRepository.isScheduledAt(15, 45)
+            )
+        }
 
-        // Step 2: User clicks "Change Time" to open settings
-        viewModel.onAction(OverviewAction.DismissNotificationConfirmDialog)
-        viewModel.onAction(OverviewAction.OpenNotificationSettings)
-        testScheduler.advanceUntilIdle()
+        @Test
+        fun `SaveNotificationSettings - cancels notifications when disabled`() = runTest {
+            // Given: Notifications are currently enabled
+            fakePreferencesRepository.setNotificationEnabled(true)
+            fakePreferencesRepository.setNotificationTime(10, 0)
 
-        state = viewModel.uiState.value
-        assertFalse("Confirm dialog should be hidden", state.showNotificationConfirmDialog)
-        assertTrue("Settings dialog should be shown", state.showNotificationSettingsDialog)
+            // When: User disables notifications
+            viewModel.onAction(
+                OverviewAction.SaveNotificationSettings(
+                    enabled = false,
+                    hour = 10,
+                    minute = 0
+                )
+            )
+            testScheduler.advanceUntilIdle()
 
-        // Step 3: User configures notification for 8:30 AM
-        viewModel.onAction(OverviewAction.SaveNotificationSettings(
-            enabled = true,
-            hour = 8,
-            minute = 30
-        ))
-        testScheduler.advanceUntilIdle()
+            // Then: State should be updated
+            assertFalse(
+                "Notifications should be disabled",
+                viewModel.uiState.value.notificationsEnabled
+            )
 
-        state = viewModel.uiState.value
-        assertTrue("Notifications should be enabled", state.notificationsEnabled)
-        assertEquals("Hour should be 8", 8, state.notificationHour)
-        assertEquals("Minute should be 30", 30, state.notificationMinute)
-        assertFalse("Settings dialog should be closed", state.showNotificationSettingsDialog)
+            // And: Repository should have saved disabled state
+            assertFalse(
+                "Repository should have enabled=false",
+                fakePreferencesRepository.isNotificationEnabled()
+            )
 
-        // Verify notification was scheduled
-        assertTrue("Notification should be scheduled at 8:30", fakeNotificationRepository.isScheduledAt(8, 30))
+            // And: Notifications should be cancelled
+            assertTrue(
+                "Notifications should be cancelled",
+                fakeNotificationRepository.cancelNotificationsCalled
+            )
+        }
+
+        @Test
+        fun `SaveNotificationSettings - shows snackbar on error`() = runTest {
+            // Given: Create a failing use case
+            val failingRepository = FakeNotificationRepository().apply {
+                updateNotificationTimeThrows = true
+            }
+            val useCases = createFakeOverviewUseCases(
+                preferencesRepository = fakePreferencesRepository,
+                notificationRepository = failingRepository
+            )
+            val testViewModel = OverviewViewModel(useCases)
+            testScheduler.advanceUntilIdle()
+
+            // When: User tries to save settings
+            testViewModel.uiEvents.test {
+                testViewModel.onAction(
+                    OverviewAction.SaveNotificationSettings(
+                        enabled = true,
+                        hour = 10,
+                        minute = 0
+                    )
+                )
+                testScheduler.advanceUntilIdle()
+
+                // Then: Snackbar event should be emitted with error message
+                val event = awaitItem()
+                assertTrue(
+                    "Should show snackbar",
+                    event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+                )
+                val snackbarEvent =
+                    event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+                assertTrue(
+                    "Error message should contain failure text",
+                    snackbarEvent.message.contains("Failed")
+                )
+            }
+        }
+
+        @Test
+        fun `notification permission state - reflects repository state`() = runTest {
+            // Given: Permission not granted
+            fakeNotificationRepository.hasPermission = false
+
+            // When: ViewModel loads settings
+            val useCases = createFakeOverviewUseCases(
+                preferencesRepository = fakePreferencesRepository,
+                notificationRepository = fakeNotificationRepository
+            )
+            val testViewModel = OverviewViewModel(useCases)
+            testScheduler.advanceUntilIdle()
+
+            // Then: State should reflect no permission
+            assertFalse(
+                "Should not have permission",
+                testViewModel.uiState.value.hasNotificationPermission
+            )
+
+            // When: Permission is granted
+            fakeNotificationRepository.hasPermission = true
+            testViewModel.onNotificationPermissionGranted()
+            testScheduler.advanceUntilIdle()
+
+            // Then: State should reflect permission granted
+            assertTrue(
+                "Should have permission",
+                testViewModel.uiState.value.hasNotificationPermission
+            )
+        }
+
+        @Test
+        fun `notification workflow - complete user journey`() = runTest {
+            // Scenario: User grants permission, opens settings, and configures notifications
+
+            // Step 1: User grants permission
+            viewModel.onNotificationPermissionGranted()
+            testScheduler.advanceUntilIdle()
+
+
+            // Step 3: User configures notification for 8:30 AM
+            viewModel.onAction(
+                OverviewAction.SaveNotificationSettings(
+                    enabled = true,
+                    hour = 8,
+                    minute = 30
+                )
+            )
+            testScheduler.advanceUntilIdle()
+
+
+            // Verify notification was scheduled
+            assertTrue(
+                "Notification should be scheduled at 8:30",
+                fakeNotificationRepository.isScheduledAt(8, 30)
+            )
+        }
     }
 }

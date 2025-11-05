@@ -47,6 +47,14 @@ open class FakeNotificationRepository : NotificationRepository {
         return shouldSendNotification
     }
 
+    override fun areSystemNotificationsEnabled(): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override fun shouldShowPermissionRationale(): Boolean {
+        TODO("Not yet implemented")
+    }
+
     /**
      * Helper method to reset all values to defaults.
      * Useful for cleaning up between tests.

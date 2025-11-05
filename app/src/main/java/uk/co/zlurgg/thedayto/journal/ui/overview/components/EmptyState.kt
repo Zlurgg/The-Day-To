@@ -15,6 +15,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 
 @Composable
 fun EmptyState(
@@ -37,13 +38,13 @@ fun EmptyState(
             style = MaterialTheme.typography.headlineMedium,
             color = MaterialTheme.colorScheme.onSurface
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(UiConstants.EMPTY_STATE_SPACING))
         Text(
             text = "Start tracking your daily moods by tapping on today's date in the calendar",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = 32.dp)
+            modifier = Modifier.padding(horizontal = UiConstants.EMPTY_STATE_PADDING_HORIZONTAL)
         )
     }
 }
