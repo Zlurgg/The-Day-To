@@ -13,10 +13,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 @Composable
 fun DayOfWeekHeader(
+    daySize: Dp,
     modifier: Modifier = Modifier
 ) {
     val daysOfWeek = listOf("M", "T", "W", "T", "F", "S", "S")
@@ -34,7 +36,7 @@ fun DayOfWeekHeader(
     ) {
         daysOfWeek.forEach { day ->
             Box(
-                modifier = Modifier.size(48.dp),
+                modifier = Modifier.size(daySize),
                 contentAlignment = Alignment.Center
             ) {
                 Text(

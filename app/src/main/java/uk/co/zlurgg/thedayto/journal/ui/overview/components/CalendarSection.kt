@@ -4,6 +4,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -77,60 +78,74 @@ fun CalendarSection(
     val emptyCellsAtStart = firstDayOfWeek - 1
     val totalCells = emptyCellsAtStart + daysInMonth
 
-    Column(modifier = modifier) {
-        // Filter entries for current month/year
-        val filteredEntries = entries.filter { entry ->
-            date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
-                    date.year.toString() == datestampToYearValue(entry.dateStamp)
-        }
+    BoxWithConstraints(modifier = modifier) {
+        // Calculate day size to ensure 7 days always fit in available width
+        // Account for FlowRow's padding and spacing between items
+        val horizontalPadding = 32.dp // 16dp padding on each side in FlowRow
+        val totalSpacing = 8.dp * 6 // 6 gaps between 7 days
+        val buffer = 1.dp // Small buffer to account for rounding
+        val availableForDays = maxWidth - horizontalPadding - totalSpacing - buffer
+        val calculatedDaySize = availableForDays / 7
+        // Ensure we never exceed 48dp, but otherwise use calculated size
+        val daySize = if (calculatedDaySize > 48.dp) 48.dp else calculatedDaySize
 
-        // Month statistics summary
-        MonthStatistics(
-            entries = filteredEntries,
-            daysInMonth = daysInMonth,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = paddingMedium)
-        )
+        Column(modifier = Modifier.fillMaxWidth()) {
+            // Filter entries for current month/year
+            val filteredEntries = entries.filter { entry ->
+                date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
+                        date.year.toString() == datestampToYearValue(entry.dateStamp)
+            }
 
-        // Month/Year header with home button
-        MonthYearHeader(
-            date = date,
-            currentDate = currentDate,
-            onHomeClick = { date = currentDate },
-            onHeaderClick = { showMonthYearPicker = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingSmall)
-        )
+            // Month statistics summary
+            MonthStatistics(
+                entries = filteredEntries,
+                daysInMonth = daysInMonth,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = paddingMedium)
+            )
 
-        // Month/Year picker dialog
-        if (showMonthYearPicker) {
-            MonthYearPickerDialog(
-                currentDate = date,
-                onDismiss = { showMonthYearPicker = false },
-                onDateSelected = { newDate ->
-                    date = newDate
-                }
+            // Month/Year header with home button
+            MonthYearHeader(
+                date = date,
+                currentDate = currentDate,
+                onHomeClick = { date = currentDate },
+                onHeaderClick = { showMonthYearPicker = true },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingSmall)
+            )
+
+            // Month/Year picker dialog
+            if (showMonthYearPicker) {
+                MonthYearPickerDialog(
+                    currentDate = date,
+                    onDismiss = { showMonthYearPicker = false },
+                    onDateSelected = { newDate ->
+                        date = newDate
+                    }
+                )
+            }
+
+            // Day-of-week labels
+            DayOfWeekHeader(
+                daySize = daySize,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Calendar grid with infinite pager
+            CalendarMonthGrid(
+                date = date,
+                currentDate = currentDate,
+                entries = entries,
+                daysInMonth = daysInMonth,
+                emptyCellsAtStart = emptyCellsAtStart,
+                totalCells = totalCells,
+                daySize = daySize,
+                onDateChange = { newDate -> date = newDate },
+                onDateClick = onDateClick
             )
         }
-
-        // Day-of-week labels
-        DayOfWeekHeader(
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Calendar grid with infinite pager
-        CalendarMonthGrid(
-            date = date,
-            currentDate = currentDate,
-            entries = entries,
-            daysInMonth = daysInMonth,
-            emptyCellsAtStart = emptyCellsAtStart,
-            totalCells = totalCells,
-            onDateChange = { newDate -> date = newDate },
-            onDateClick = onDateClick
-        )
     }
 }
 
@@ -179,12 +194,14 @@ private fun MonthYearHeader(
             ) {
                 Text(
                     text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.padding(horizontal = paddingSmall))
                 Text(
                     text = date.year.toString(),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
@@ -208,6 +225,7 @@ private fun CalendarMonthGrid(
     daysInMonth: Int,
     emptyCellsAtStart: Int,
     totalCells: Int,
+    daySize: androidx.compose.ui.unit.Dp,
     onDateChange: (LocalDate) -> Unit,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit
 ) {
@@ -282,7 +300,7 @@ private fun CalendarMonthGrid(
                             // Check if this is an empty cell before the first day
                             if (index < emptyCellsAtStart) {
                                 // Empty cell - just a spacer
-                                Box(modifier = Modifier.size(48.dp))
+                                Box(modifier = Modifier.size(daySize))
                             } else {
                                 // Calculate the actual day number (1-based)
                                 val dayNumber = index - emptyCellsAtStart + 1
@@ -297,7 +315,7 @@ private fun CalendarMonthGrid(
                                     CalenderDay(
                                         entry = entry,
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(daySize)
                                             .clickable {
                                                 onDateClick(entry.id, null)
                                             }
@@ -309,7 +327,7 @@ private fun CalendarMonthGrid(
 
                                     Box(
                                         modifier = Modifier
-                                            .size(48.dp)
+                                            .size(daySize)
                                             .then(
                                                 when {
                                                     isToday -> Modifier
