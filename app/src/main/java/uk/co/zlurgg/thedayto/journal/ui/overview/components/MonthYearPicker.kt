@@ -20,8 +20,11 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import java.time.LocalDate
 import java.time.Month
 import java.time.format.TextStyle
@@ -43,7 +46,7 @@ fun MonthYearPickerDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
-                text = "Select Month & Year",
+                text = stringResource(R.string.select_month_and_year),
                 style = MaterialTheme.typography.headlineSmall
             )
         },
@@ -57,9 +60,9 @@ fun MonthYearPickerDialog(
                 )
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.height(100.dp)
+                    horizontalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
+                    verticalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
+                    modifier = Modifier.height(UiConstants.MONTH_PICKER_MONTH_HEIGHT)
                 ) {
                     items(years) { year ->
                         FilterChip(
@@ -77,7 +80,7 @@ fun MonthYearPickerDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(UiConstants.MONTH_PICKER_DIVIDER_SPACING))
 
                 // Month selector
                 Text(
@@ -87,9 +90,9 @@ fun MonthYearPickerDialog(
                 )
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
-                    horizontalArrangement = Arrangement.spacedBy(6.dp),
-                    verticalArrangement = Arrangement.spacedBy(6.dp),
-                    modifier = Modifier.height(220.dp)
+                    horizontalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
+                    verticalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
+                    modifier = Modifier.height(UiConstants.MONTH_PICKER_YEAR_HEIGHT)
                 ) {
                     items(months) { month ->
                         FilterChip(

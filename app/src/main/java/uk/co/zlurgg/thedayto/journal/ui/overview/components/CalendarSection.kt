@@ -5,7 +5,6 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
@@ -53,7 +52,9 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarConstants
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.res.stringResource
 import uk.co.zlurgg.thedayto.R
 
@@ -81,13 +82,17 @@ fun CalendarSection(
     BoxWithConstraints(modifier = modifier) {
         // Calculate day size to ensure 7 days always fit in available width
         // Account for FlowRow's padding and spacing between items
-        val horizontalPadding = 32.dp // 16dp padding on each side in FlowRow
-        val totalSpacing = 8.dp * 6 // 6 gaps between 7 days
-        val buffer = 1.dp // Small buffer to account for rounding
+        val horizontalPadding = CalendarConstants.CALENDAR_HORIZONTAL_PADDING * 2
+        val totalSpacing = CalendarConstants.CALENDAR_DAY_SPACING * (CalendarConstants.DAYS_IN_WEEK - 1)
+        val buffer = CalendarConstants.BUFFER_SIZE
         val availableForDays = maxWidth - horizontalPadding - totalSpacing - buffer
-        val calculatedDaySize = availableForDays / 7
-        // Ensure we never exceed 48dp, but otherwise use calculated size
-        val daySize = if (calculatedDaySize > 48.dp) 48.dp else calculatedDaySize
+        val calculatedDaySize = availableForDays / CalendarConstants.DAYS_IN_WEEK
+        // Ensure we never exceed maximum, but otherwise use calculated size
+        val daySize = if (calculatedDaySize > CalendarConstants.DEFAULT_DAY_SIZE_MAX) {
+            CalendarConstants.DEFAULT_DAY_SIZE_MAX
+        } else {
+            calculatedDaySize
+        }
 
         Column(modifier = Modifier.fillMaxWidth()) {
             // Filter entries for current month/year
@@ -231,7 +236,7 @@ private fun CalendarMonthGrid(
 ) {
     Box {
         // Constants for infinite pager
-        val initialPage = 1_000_000_000
+        val initialPage = CalendarConstants.INITIAL_PAGER_PAGE
 
         // Helper to calculate month offset between dates
         fun calculateDateOffset(current: LocalDate, initial: LocalDate): Long {
@@ -287,14 +292,14 @@ private fun CalendarMonthGrid(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(
-                                start = 16.dp,
-                                end = 16.dp,
+                                start = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
+                                end = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
                                 top = 0.dp,
-                                bottom = 16.dp
+                                bottom = CalendarConstants.CALENDAR_BOTTOM_PADDING
                             ),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        maxItemsInEachRow = 7
+                        horizontalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_DAY_SPACING),
+                        verticalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_ROW_SPACING),
+                        maxItemsInEachRow = CalendarConstants.DAYS_IN_WEEK
                     ) {
                         repeat(totalCells) { index ->
                             // Check if this is an empty cell before the first day
@@ -332,7 +337,7 @@ private fun CalendarMonthGrid(
                                                 when {
                                                     isToday -> Modifier
                                                         .border(
-                                                            2.dp,
+                                                            CalendarConstants.TODAY_BORDER_WIDTH,
                                                             MaterialTheme.colorScheme.primary,
                                                             CircleShape
                                                         )
@@ -353,9 +358,9 @@ private fun CalendarMonthGrid(
                                         Text(
                                             modifier = Modifier.alpha(
                                                 when {
-                                                    isToday -> 1f
-                                                    isPast -> 0.7f    // Darker for clickable past dates
-                                                    else -> 0.3f    // Very faded for future dates
+                                                    isToday -> CalendarConstants.DayAlpha.TODAY
+                                                    isPast -> CalendarConstants.DayAlpha.PAST
+                                                    else -> CalendarConstants.DayAlpha.FUTURE
                                                 }
                                             ),
                                             text = "$dayNumber",

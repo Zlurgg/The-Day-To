@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,8 +12,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
@@ -53,6 +56,29 @@ fun EntrySortSection(
             selected = entryOrder.orderType is OrderType.Descending,
             onClick = { onOrderChange(entryOrder.copy(OrderType.Descending)) },
             label = { Text(stringResource(R.string.descending)) }
+        )
+    }
+}
+
+@Preview(name = "Light Mode - Date Descending", showBackground = true)
+@Preview(name = "Dark Mode - Date Descending", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EntrySortSectionDatePreview() {
+    TheDayToTheme {
+        EntrySortSection(
+            entryOrder = EntryOrder.Date(OrderType.Descending),
+            onOrderChange = {}
+        )
+    }
+}
+
+@Preview(name = "Mood Ascending", showBackground = true)
+@Composable
+private fun EntrySortSectionMoodPreview() {
+    TheDayToTheme {
+        EntrySortSection(
+            entryOrder = EntryOrder.Mood(OrderType.Ascending),
+            onOrderChange = {}
         )
     }
 }

@@ -20,6 +20,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
 import java.time.LocalTime
 
 class OverviewViewModel(
@@ -49,10 +50,10 @@ class OverviewViewModel(
     private fun updateGreeting() {
         val hour = LocalTime.now().hour
         val greeting = when (hour) {
-            in 0..4 -> "Good night"
-            in 5..11 -> "Good morning"
-            in 12..16 -> "Good afternoon"
-            in 17..20 -> "Good evening"
+            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> "Good night"
+            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> "Good morning"
+            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> "Good afternoon"
+            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> "Good evening"
             else -> "Good night"
         }
         _uiState.update { it.copy(greeting = greeting) }
@@ -161,9 +162,9 @@ class OverviewViewModel(
 
             is OverviewAction.DeleteEntry -> {
                 viewModelScope.launch {
-                    // Debounced loading: only show if operation takes > 150ms
+                    // Debounced loading: only show if operation takes longer than threshold
                     val loadingJob = launch {
-                        delay(150)
+                        delay(TimeConstants.LOADING_DEBOUNCE_MS)
                         _uiState.update { it.copy(isLoading = true) }
                     }
 
@@ -192,9 +193,9 @@ class OverviewViewModel(
                 viewModelScope.launch {
                     val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
 
-                    // Debounced loading: only show if operation takes > 150ms
+                    // Debounced loading: only show if operation takes longer than threshold
                     val loadingJob = launch {
-                        delay(150)
+                        delay(TimeConstants.LOADING_DEBOUNCE_MS)
                         _uiState.update { it.copy(isLoading = true) }
                     }
 

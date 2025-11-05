@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,18 +15,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
+import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
 fun EntryItem(
     entry: Entry,
-    modifier: Modifier
+    modifier: Modifier = Modifier
 ) {
     val moodColor = getColor(entry.color)
     val textColor = moodColor.getContrastingTextColor()
@@ -33,8 +34,8 @@ fun EntryItem(
     Card(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp,
-            pressedElevation = 4.dp
+            defaultElevation = UiConstants.ENTRY_CARD_ELEVATION_DEFAULT,
+            pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED
         ),
         colors = CardDefaults.cardColors(
             containerColor = moodColor.copy(alpha = 0.9f)
@@ -43,8 +44,8 @@ fun EntryItem(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(4.dp)
+                .padding(UiConstants.ENTRY_CARD_PADDING),
+            verticalArrangement = Arrangement.spacedBy(UiConstants.ENTRY_ITEM_SPACING)
         ) {
             // Header: Mood (left) + Date (right)
             Row(
@@ -79,5 +80,38 @@ fun EntryItem(
                 )
             }
         }
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EntryItemPreview() {
+    TheDayToTheme {
+        EntryItem(
+            entry = Entry(
+                mood = "Happy",
+                content = "Had a wonderful day with family and friends. Everything went well!",
+                dateStamp = System.currentTimeMillis(),
+                color = "#4CAF50",
+                id = 1
+            )
+        )
+    }
+}
+
+@Preview(name = "No Content", showBackground = true)
+@Composable
+private fun EntryItemNoContentPreview() {
+    TheDayToTheme {
+        EntryItem(
+            entry = Entry(
+                mood = "Tired",
+                content = "",
+                dateStamp = System.currentTimeMillis(),
+                color = "#9C27B0",
+                id = 2
+            )
+        )
     }
 }

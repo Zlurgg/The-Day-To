@@ -1,8 +1,10 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -12,18 +14,20 @@ import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
-import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
-import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
+import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
 fun CalenderDay(
     entry: Entry,
-    modifier: Modifier,
-    cornerRadius: Dp = 10.dp,
+    modifier: Modifier = Modifier,
+    cornerRadius: Dp = 10.dp
 ) {
     val color = getColor(entry.color)
     Box(
@@ -59,4 +63,20 @@ fun CalenderDay(
     }
 }
 
-
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CalenderDayPreview() {
+    TheDayToTheme {
+        CalenderDay(
+            entry = Entry(
+                mood = "Happy",
+                content = "Great day!",
+                dateStamp = System.currentTimeMillis(),
+                color = "#4CAF50",
+                id = 1
+            ),
+            modifier = Modifier.size(48.dp)
+        )
+    }
+}

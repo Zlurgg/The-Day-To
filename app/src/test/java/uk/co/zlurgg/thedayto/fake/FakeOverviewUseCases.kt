@@ -53,6 +53,8 @@ fun createFakeOverviewUseCases(
         markEntryReminderShownToday = markEntryReminderShownToday,
         getNotificationSettings = getNotificationSettings,
         saveNotificationSettings = saveNotificationSettings,
-        checkNotificationPermission = checkNotificationPermission
+        checkNotificationPermission = checkNotificationPermission,
+        checkSystemNotificationsEnabled = TODO(),
+        shouldShowPermissionRationale = TODO()
     )
 }

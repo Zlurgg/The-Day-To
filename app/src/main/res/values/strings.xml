@@ -97,4 +97,6 @@
     <string name="preset_noon">Noon</string>
     <string name="preset_evening">Evening</string>
     <string name="return_to_current_month">Return to current month</string>
+    <string name="select_month_and_year">Select Month &amp; Year</string>
+    <string name="settings">Settings</string>
 </resources>

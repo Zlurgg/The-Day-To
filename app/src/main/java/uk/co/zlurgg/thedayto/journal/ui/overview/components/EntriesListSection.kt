@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -8,10 +9,13 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
-import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
 /**
  * Section displaying the list of journal entries with sorting controls.
@@ -52,5 +56,47 @@ fun EntriesListSection(
                 Spacer(modifier = Modifier.height(paddingMedium))
             }
         }
+    }
+}
+
+@Preview(name = "Light Mode - With Entries", showBackground = true)
+@Preview(name = "Dark Mode - With Entries", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EntriesListSectionPreview() {
+    TheDayToTheme {
+        EntriesListSection(
+            entries = listOf(
+                Entry(
+                    mood = "Happy",
+                    content = "Had a great day!",
+                    dateStamp = System.currentTimeMillis(),
+                    color = "#4CAF50",
+                    id = 1
+                ),
+                Entry(
+                    mood = "Productive",
+                    content = "Got a lot done today",
+                    dateStamp = System.currentTimeMillis() - 86400000,
+                    color = "#2196F3",
+                    id = 2
+                )
+            ),
+            entryOrder = EntryOrder.Date(OrderType.Descending),
+            onOrderChange = {},
+            onEntryClick = {}
+        )
+    }
+}
+
+@Preview(name = "Empty State", showBackground = true)
+@Composable
+private fun EntriesListSectionEmptyPreview() {
+    TheDayToTheme {
+        EntriesListSection(
+            entries = emptyList(),
+            entryOrder = EntryOrder.Date(OrderType.Descending),
+            onOrderChange = {},
+            onEntryClick = {}
+        )
     }
 }
