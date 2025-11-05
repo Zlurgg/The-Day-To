@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
 import java.time.LocalTime
+import java.util.Locale
 
 class OverviewViewModel(
     private val overviewUseCases: OverviewUseCases
@@ -276,7 +277,7 @@ class OverviewViewModel(
                         }
 
                         // Show confirmation message
-                        val timeStr = String.format("%02d:%02d", action.hour, action.minute)
+                        val timeStr = String.format(Locale.getDefault(),"%02d:%02d", action.hour, action.minute)
                         val message = if (action.enabled) {
                             "Daily reminder set for $timeStr"
                         } else {
