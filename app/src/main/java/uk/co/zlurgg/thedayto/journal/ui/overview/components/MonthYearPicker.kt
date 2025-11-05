@@ -97,7 +97,7 @@ fun MonthYearPickerDialog(
                             onClick = { selectedMonth = month.value },
                             label = {
                                 Text(
-                                    text = month.name.take(3),
+                                    text = month.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center

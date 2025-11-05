@@ -72,9 +72,9 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
-import uk.co.zlurgg.thedayto.core.ui.util.datestampToMonthValue
-import uk.co.zlurgg.thedayto.core.ui.util.datestampToYearValue
-import uk.co.zlurgg.thedayto.core.ui.util.dayToDatestampForCurrentMonthAndYear
+import uk.co.zlurgg.thedayto.journal.ui.util.datestampToMonthValue
+import uk.co.zlurgg.thedayto.journal.ui.util.datestampToYearValue
+import uk.co.zlurgg.thedayto.journal.ui.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalenderDay
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.DayOfWeekHeader
