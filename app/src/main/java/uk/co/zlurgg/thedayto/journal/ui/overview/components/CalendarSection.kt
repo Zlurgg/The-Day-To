@@ -33,10 +33,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import android.content.res.Configuration
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -48,6 +50,8 @@ import uk.co.zlurgg.thedayto.journal.ui.util.datestampToYearValue
 import uk.co.zlurgg.thedayto.journal.ui.util.dayToDatestampForCurrentMonthAndYear
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.ui.res.stringResource
 import uk.co.zlurgg.thedayto.R
@@ -271,7 +275,7 @@ private fun CalendarMonthGrid(
                                 bottom = 16.dp
                             ),
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(4.dp),
                         maxItemsInEachRow = 7
                     ) {
                         repeat(totalCells) { index ->
@@ -350,6 +354,34 @@ private fun CalendarMonthGrid(
                 }
             )
         } // Close key(date) block
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CalendarSectionPreview() {
+    TheDayToTheme {
+        CalendarSection(
+            entries = SampleEntries.allSamples,
+            currentDate = LocalDate.now(),
+            onDateClick = { _, _ -> },
+            modifier = Modifier.fillMaxWidth()
+        )
+    }
+}
+
+@Preview(name = "Empty Calendar - Light", showBackground = true)
+@Preview(name = "Empty Calendar - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun CalendarSectionEmptyPreview() {
+    TheDayToTheme {
+        CalendarSection(
+            entries = emptyList(),
+            currentDate = LocalDate.now(),
+            onDateClick = { _, _ -> },
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 }
 
