@@ -34,8 +34,10 @@ import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -88,6 +90,8 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
 import java.time.LocalDate
 import java.time.ZoneOffset
+import java.time.format.TextStyle
+import java.util.Locale
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -285,22 +289,48 @@ private fun OverviewScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(paddingSmall)
-                        .clickable { showMonthYearPicker = true },
+                        .padding(paddingSmall),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row {
-                        Text(
-                            text = date.month.toString(),
-                            style = MaterialTheme.typography.titleLarge
-                        )
-                        Spacer(modifier = Modifier.padding(horizontal = paddingSmall))
-                        Text(
-                            text = date.year.toString(),
-                            style = MaterialTheme.typography.titleLarge
-                        )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        // Home button - always visible, disabled when on current month
+                        val isCurrentMonth = date.year == currentDate.year && date.monthValue == currentDate.monthValue
+
+                        IconButton(
+                            onClick = { date = currentDate },
+                            enabled = !isCurrentMonth
+                        ) {
+                            Icon(
+                                imageVector = Icons.Filled.Home,
+                                contentDescription = "Return to current month",
+                                tint = if (isCurrentMonth) {
+                                    MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
+                                } else {
+                                    MaterialTheme.colorScheme.primary
+                                }
+                            )
+                        }
+
+                        // Month/Year text (clickable for picker)
+                        Row(
+                            modifier = Modifier.clickable { showMonthYearPicker = true }
+                        ) {
+                            Text(
+                                text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            Spacer(modifier = Modifier.padding(horizontal = paddingSmall))
+                            Text(
+                                text = date.year.toString(),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                        }
                     }
+
                     Text(
                         text = "▼",
                         style = MaterialTheme.typography.labelSmall,
@@ -418,7 +448,6 @@ private fun OverviewScreen(
                                                 .toEpochSecond(ZoneOffset.UTC)
                                             val isToday = entryDate == currentDateEpoch
                                             val isPast = entryDate < currentDateEpoch
-                                            val isFuture = entryDate > currentDateEpoch
 
                                             Box(
                                                 modifier = Modifier
@@ -447,8 +476,7 @@ private fun OverviewScreen(
                                                         when {
                                                             isToday -> 1f
                                                             isPast -> 0.7f    // Darker for clickable past dates
-                                                             isFuture -> 0.3f// Very faded for future dates
-                                                            else -> 1f
+                                                            else -> 0.3f    // Very faded for future dates
                                                         }
                                                     ),
                                                     text = "$dayNumber",
