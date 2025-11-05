@@ -5,6 +5,13 @@ import android.content.res.Configuration
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,6 +21,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.FloatingActionButton
@@ -183,8 +192,17 @@ private fun OverviewScreen(
     Scaffold(
         snackbarHost = { SnackbarHost(snackbarHostState) },
         floatingActionButton = {
-            // Only show FAB when today's entry is missing
-            if (!uiState.hasTodayEntry) {
+            // Only show FAB when today's entry is missing with smooth animation
+            AnimatedVisibility(
+                visible = !uiState.hasTodayEntry,
+                enter = scaleIn(
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessMedium
+                    )
+                ) + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
                 FloatingActionButton(
                     onClick = { onAction(OverviewAction.CreateNewEntry) },
                     containerColor = MaterialTheme.colorScheme.primaryContainer
@@ -223,6 +241,7 @@ private fun OverviewScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
+                    .verticalScroll(rememberScrollState())
                     .padding(paddingXXSmall)
             ) {
                 // Calendar section with month navigation
@@ -241,7 +260,7 @@ private fun OverviewScreen(
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxWidth()
                 )
             }
         }

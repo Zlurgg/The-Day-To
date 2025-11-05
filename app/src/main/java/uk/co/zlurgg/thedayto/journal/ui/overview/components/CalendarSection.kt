@@ -5,19 +5,21 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -47,6 +49,8 @@ import uk.co.zlurgg.thedayto.journal.ui.util.dayToDatestampForCurrentMonthAndYea
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import androidx.compose.foundation.gestures.Orientation
+import androidx.compose.ui.res.stringResource
+import uk.co.zlurgg.thedayto.R
 
 /**
  * Self-contained calendar section with month navigation and date selection.
@@ -155,7 +159,7 @@ private fun MonthYearHeader(
             ) {
                 Icon(
                     imageVector = Icons.Filled.Home,
-                    contentDescription = "Return to current month",
+                    contentDescription = stringResource(R.string.return_to_current_month),
                     tint = if (isCurrentMonth) {
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                     } else {
@@ -166,7 +170,8 @@ private fun MonthYearHeader(
 
             // Month/Year text (clickable for picker)
             Row(
-                modifier = Modifier.clickable { onHeaderClick() }
+                modifier = Modifier.clickable { onHeaderClick() },
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
@@ -177,20 +182,20 @@ private fun MonthYearHeader(
                     text = date.year.toString(),
                     style = MaterialTheme.typography.titleLarge
                 )
+                Icon(
+                    imageVector = Icons.Filled.ArrowDropDown,
+                    contentDescription = "Select month and year",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
             }
         }
-
-        Text(
-            text = "▼",
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 
 /**
  * Infinite horizontal pager for calendar months with swipe navigation.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun CalendarMonthGrid(
     date: LocalDate,
@@ -255,23 +260,25 @@ private fun CalendarMonthGrid(
                     Orientation.Horizontal
                 ),
                 pageContent = { _ ->
-                    LazyVerticalGrid(
-                        modifier = Modifier.systemBarsPadding(),
-                        columns = GridCells.Fixed(7),
-                        contentPadding = PaddingValues(
-                            start = 16.dp,
-                            end = 16.dp,
-                            top = 0.dp,
-                            bottom = 16.dp
-                        ),
+                    // Use FlowRow instead of LazyVerticalGrid to avoid nested scroll issues
+                    FlowRow(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                start = 16.dp,
+                                end = 16.dp,
+                                top = 0.dp,
+                                bottom = 16.dp
+                            ),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        maxItemsInEachRow = 7
                     ) {
-                        items(totalCells) { index ->
+                        repeat(totalCells) { index ->
                             // Check if this is an empty cell before the first day
                             if (index < emptyCellsAtStart) {
                                 // Empty cell - just a spacer
-                                Box(modifier = Modifier)
+                                Box(modifier = Modifier.size(48.dp))
                             } else {
                                 // Calculate the actual day number (1-based)
                                 val dayNumber = index - emptyCellsAtStart + 1
@@ -285,9 +292,11 @@ private fun CalendarMonthGrid(
                                 if (entry != null) {
                                     CalenderDay(
                                         entry = entry,
-                                        modifier = Modifier.clickable {
-                                            onDateClick(entry.id, null)
-                                        }
+                                        modifier = Modifier
+                                            .size(48.dp)
+                                            .clickable {
+                                                onDateClick(entry.id, null)
+                                            }
                                     )
                                 } else {
                                     // No entry for this date - determine if clickable
@@ -296,21 +305,24 @@ private fun CalendarMonthGrid(
 
                                     Box(
                                         modifier = Modifier
+                                            .size(48.dp)
                                             .then(
                                                 when {
                                                     isToday -> Modifier
                                                         .border(
                                                             2.dp,
                                                             MaterialTheme.colorScheme.primary,
-                                                            androidx.compose.foundation.shape.CircleShape
+                                                            CircleShape
                                                         )
                                                         .clickable {
                                                             onDateClick(null, entryDate)
                                                         }
+
                                                     isPast -> Modifier
                                                         .clickable {
                                                             onDateClick(null, entryDate)
                                                         }
+
                                                     else -> Modifier  // Future dates not clickable
                                                 }
                                             ),
