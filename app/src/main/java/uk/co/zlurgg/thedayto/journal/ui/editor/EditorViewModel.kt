@@ -3,7 +3,6 @@ package uk.co.zlurgg.thedayto.journal.ui.editor
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
@@ -72,9 +70,7 @@ class EditorViewModel(
                     }
 
                     try {
-                        val entry = withContext(Dispatchers.IO) {
-                            editorUseCases.getEntryUseCase(entryId)
-                        }
+                        val entry = editorUseCases.getEntryUseCase(entryId)
                         entry?.let {
                             loadingJob.cancel() // Cancel if finished quickly
                             Timber.d("Successfully loaded entry with ID: ${it.id}")
@@ -162,16 +158,14 @@ class EditorViewModel(
                 viewModelScope.launch {
                     try {
                         Timber.d("Saving new mood color: ${action.mood.trim()}")
-                        withContext(Dispatchers.IO) {
-                            editorUseCases.addMoodColorUseCase(
-                                MoodColor(
-                                    mood = action.mood.trim(),
-                                    color = action.colorHex,
-                                    dateStamp = DateUtils.getTodayStartEpoch(),
-                                    id = null
-                                )
+                        editorUseCases.addMoodColorUseCase(
+                            MoodColor(
+                                mood = action.mood.trim(),
+                                color = action.colorHex,
+                                dateStamp = DateUtils.getTodayStartEpoch(),
+                                id = null
                             )
-                        }
+                        )
                         // Close dialog after successful save
                         Timber.d("Successfully saved mood color: ${action.mood.trim()}")
                         _uiState.update { it.copy(isMoodColorSectionVisible = false) }
@@ -189,9 +183,7 @@ class EditorViewModel(
             is EditorAction.DeleteMoodColor -> {
                 viewModelScope.launch {
                     Timber.d("Deleting mood color: ${action.moodColor.mood}")
-                    withContext(Dispatchers.IO) {
-                        editorUseCases.deleteMoodColor(action.moodColor)
-                    }
+                    editorUseCases.deleteMoodColor(action.moodColor)
 
                     // Check if the deleted mood was currently selected
                     val currentState = _uiState.value
@@ -239,17 +231,15 @@ class EditorViewModel(
                     }
 
                     try {
-                        withContext(Dispatchers.IO) {
-                            editorUseCases.addEntryUseCase(
-                                Entry(
-                                    content = state.entryContent,
-                                    dateStamp = state.entryDate,
-                                    mood = state.entryMood,
-                                    color = state.entryColor,
-                                    id = state.currentEntryId
-                                )
+                        editorUseCases.addEntryUseCase(
+                            Entry(
+                                content = state.entryContent,
+                                dateStamp = state.entryDate,
+                                mood = state.entryMood,
+                                color = state.entryColor,
+                                id = state.currentEntryId
                             )
-                        }
+                        )
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully saved entry")
                         _uiState.update { it.copy(isLoading = false) }
