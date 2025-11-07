@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -15,16 +14,18 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
-import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
-import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
-import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
+import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
+import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -44,12 +45,15 @@ class EditorViewModel(
     private var getMoodColorsJob: Job? = null
 
     init {
+        Timber.d("EditorViewModel initialized")
+
         // Load mood colors
         loadMoodColors()
 
         // Set entry date from navigation parameter if provided
         savedStateHandle.get<Long>("entryDate")?.let { entryDate ->
             if (entryDate != -1L) {
+                Timber.d("Setting entry date from navigation: $entryDate")
                 _uiState.update { it.copy(entryDate = entryDate) }
                 updateMoodHint()
             }
@@ -61,11 +65,10 @@ class EditorViewModel(
         // Load existing entry if editing
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
             if (entryId != -1) {
+                Timber.d("Loading existing entry with ID: $entryId")
                 viewModelScope.launch {
-                    // Debounced loading: only show if operation takes > 150ms
-                    val loadingJob = launch {
-                        delay(150)
-                        _uiState.update { it.copy(isLoading = true) }
+                    val loadingJob = launchDebouncedLoading { isLoading ->
+                        _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
                     try {
@@ -74,6 +77,7 @@ class EditorViewModel(
                         }
                         entry?.let {
                             loadingJob.cancel() // Cancel if finished quickly
+                            Timber.d("Successfully loaded entry with ID: ${it.id}")
                             _uiState.update { state ->
                                 state.copy(
                                     currentEntryId = it.id,
@@ -89,6 +93,7 @@ class EditorViewModel(
                         } ?: run {
                             // Entry not found
                             loadingJob.cancel()
+                            Timber.w("Entry not found with ID: $entryId")
                             _uiState.update { it.copy(isLoading = false) }
                             _uiEvents.emit(
                                 EditorUiEvent.ShowSnackbar(
@@ -98,6 +103,7 @@ class EditorViewModel(
                         }
                     } catch (e: Exception) {
                         loadingJob.cancel()
+                        Timber.e(e, "Failed to load entry with ID: $entryId")
                         _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
@@ -155,6 +161,7 @@ class EditorViewModel(
             is EditorAction.SaveMoodColor -> {
                 viewModelScope.launch {
                     try {
+                        Timber.d("Saving new mood color: ${action.mood.trim()}")
                         withContext(Dispatchers.IO) {
                             editorUseCases.addMoodColorUseCase(
                                 MoodColor(
@@ -166,8 +173,10 @@ class EditorViewModel(
                             )
                         }
                         // Close dialog after successful save
+                        Timber.d("Successfully saved mood color: ${action.mood.trim()}")
                         _uiState.update { it.copy(isMoodColorSectionVisible = false) }
                     } catch (e: InvalidMoodColorException) {
+                        Timber.e(e, "Failed to save mood color: ${action.mood.trim()}")
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
                                 message = e.message ?: "Couldn't save mood color"
@@ -179,6 +188,7 @@ class EditorViewModel(
 
             is EditorAction.DeleteMoodColor -> {
                 viewModelScope.launch {
+                    Timber.d("Deleting mood color: ${action.moodColor.mood}")
                     withContext(Dispatchers.IO) {
                         editorUseCases.deleteMoodColor(action.moodColor)
                     }
@@ -196,6 +206,7 @@ class EditorViewModel(
                         if (remainingMoodColors.isNotEmpty()) {
                             // Default to first mood color in list
                             val defaultMoodColor = remainingMoodColors.first()
+                            Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
                             _uiState.update {
                                 it.copy(
                                     entryMood = defaultMoodColor.mood,
@@ -205,6 +216,7 @@ class EditorViewModel(
                             }
                         } else {
                             // No mood colors left, reset to empty
+                            Timber.w("No mood colors remaining after deletion")
                             _uiState.update {
                                 it.copy(
                                     entryMood = "",
@@ -220,11 +232,10 @@ class EditorViewModel(
             is EditorAction.SaveEntry -> {
                 viewModelScope.launch {
                     val state = _uiState.value
+                    Timber.d("Saving entry: mood=${state.entryMood}, date=${state.entryDate}, id=${state.currentEntryId}")
 
-                    // Debounced loading: only show if operation takes > 150ms
-                    val loadingJob = launch {
-                        delay(150)
-                        _uiState.update { it.copy(isLoading = true) }
+                    val loadingJob = launchDebouncedLoading { isLoading ->
+                        _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
                     try {
@@ -240,10 +251,12 @@ class EditorViewModel(
                             )
                         }
                         loadingJob.cancel() // Cancel if finished quickly
+                        Timber.d("Successfully saved entry")
                         _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(EditorUiEvent.SaveEntry)
                     } catch (e: InvalidEntryException) {
                         loadingJob.cancel()
+                        Timber.e(e, "Failed to save entry")
                         _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
