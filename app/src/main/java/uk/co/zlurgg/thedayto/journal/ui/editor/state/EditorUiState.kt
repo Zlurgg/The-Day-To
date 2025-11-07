@@ -9,7 +9,7 @@ data class EditorUiState(
     val entryDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
     val entryMood: String = "",
     val entryContent: String = "",
-    val entryColor: String = "#000000",
+    val entryColor: String = "",  // Empty string indicates no color selected
     val currentEntryId: Int? = null,
 
     // Mood colors list (for dropdown)

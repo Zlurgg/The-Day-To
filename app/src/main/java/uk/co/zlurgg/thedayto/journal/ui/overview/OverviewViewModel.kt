@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
+import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import java.time.LocalTime
 import java.util.Locale
 
@@ -164,7 +165,9 @@ class OverviewViewModel(
 
             is OverviewAction.DeleteEntry -> {
                 viewModelScope.launch {
-                    val loadingJob = launchDebouncedLoading()
+                    val loadingJob = launchDebouncedLoading { isLoading ->
+                        _uiState.update { it.copy(isLoading = isLoading) }
+                    }
 
                     try {
                         overviewUseCases.deleteEntry(action.entry)
@@ -190,7 +193,9 @@ class OverviewViewModel(
             is OverviewAction.RestoreEntry -> {
                 viewModelScope.launch {
                     val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
-                    val loadingJob = launchDebouncedLoading()
+                    val loadingJob = launchDebouncedLoading { isLoading ->
+                        _uiState.update { it.copy(isLoading = isLoading) }
+                    }
 
                     try {
                         overviewUseCases.restoreEntry(deletedEntry)
@@ -328,16 +333,5 @@ class OverviewViewModel(
                 }
             }
             .launchIn(viewModelScope)
-    }
-
-    /**
-     * Creates a debounced loading job that only shows loading state if operation takes longer than threshold.
-     * Must be cancelled when operation completes to prevent showing loading state unnecessarily.
-     */
-    private fun CoroutineScope.launchDebouncedLoading(delayMs: Long = TimeConstants.LOADING_DEBOUNCE_MS): Job {
-        return launch {
-            delay(delayMs)
-            _uiState.update { it.copy(isLoading = true) }
-        }
     }
 }
