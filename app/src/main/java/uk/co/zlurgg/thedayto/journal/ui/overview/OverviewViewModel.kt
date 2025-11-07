@@ -2,9 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -14,15 +12,15 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
+import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
-import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import java.time.LocalTime
 import java.util.Locale
 
