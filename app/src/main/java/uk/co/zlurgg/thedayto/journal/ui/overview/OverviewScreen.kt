@@ -135,16 +135,17 @@ fun OverviewScreenRoot(
     // Show tutorial dialog when event is triggered
     if (showTutorialDialog) {
         TutorialDialog(
-            onDismiss = { }
+            onDismiss = { showTutorialDialog = false }
         )
     }
 
     // System notification warning dialog
     if (showSystemNotificationDialog) {
         SystemNotificationDisabledDialog(
-            onDismiss = { },
+            onDismiss = { showSystemNotificationDialog = false },
             onOpenSettings = {
                 AndroidSystemUtils.openSystemNotificationSettings(context)
+                showSystemNotificationDialog = false
             }
         )
     }
@@ -152,9 +153,10 @@ fun OverviewScreenRoot(
     // Permission permanently denied dialog
     if (showPermissionDeniedDialog) {
         PermissionPermanentlyDeniedDialog(
-            onDismiss = { },
+            onDismiss = { showPermissionDeniedDialog = false },
             onOpenSettings = {
                 AndroidSystemUtils.openAppSettings(context)
+                showPermissionDeniedDialog = false
             }
         )
     }
