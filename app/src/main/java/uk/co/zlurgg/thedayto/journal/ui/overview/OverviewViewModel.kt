@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.overview
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -163,11 +164,7 @@ class OverviewViewModel(
 
             is OverviewAction.DeleteEntry -> {
                 viewModelScope.launch {
-                    // Debounced loading: only show if operation takes longer than threshold
-                    val loadingJob = launch {
-                        delay(TimeConstants.LOADING_DEBOUNCE_MS)
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
+                    val loadingJob = launchDebouncedLoading()
 
                     try {
                         overviewUseCases.deleteEntry(action.entry)
@@ -193,12 +190,7 @@ class OverviewViewModel(
             is OverviewAction.RestoreEntry -> {
                 viewModelScope.launch {
                     val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
-
-                    // Debounced loading: only show if operation takes longer than threshold
-                    val loadingJob = launch {
-                        delay(TimeConstants.LOADING_DEBOUNCE_MS)
-                        _uiState.update { it.copy(isLoading = true) }
-                    }
+                    val loadingJob = launchDebouncedLoading()
 
                     try {
                         overviewUseCases.restoreEntry(deletedEntry)
@@ -277,7 +269,7 @@ class OverviewViewModel(
                         }
 
                         // Show confirmation message
-                        val timeStr = String.format(Locale.getDefault(),"%02d:%02d", action.hour, action.minute)
+                        val timeStr = String.format(Locale.getDefault(), "%02d:%02d", action.hour, action.minute)
                         val message = if (action.enabled) {
                             "Daily reminder set for $timeStr"
                         } else {
@@ -336,5 +328,16 @@ class OverviewViewModel(
                 }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Creates a debounced loading job that only shows loading state if operation takes longer than threshold.
+     * Must be cancelled when operation completes to prevent showing loading state unnecessarily.
+     */
+    private fun CoroutineScope.launchDebouncedLoading(delayMs: Long = TimeConstants.LOADING_DEBOUNCE_MS): Job {
+        return launch {
+            delay(delayMs)
+            _uiState.update { it.copy(isLoading = true) }
+        }
     }
 }
