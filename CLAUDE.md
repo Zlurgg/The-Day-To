@@ -83,7 +83,11 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 ./gradlew check
 ```
 
-**Note**: Currently there are no test files in the project. Tests need to be added as part of the modernization effort (see Implementation Status section).
+**Note**: Test infrastructure is in place with MockK, Turbine, and coroutine testing support. Current status:
+- ✅ OverviewViewModel tests complete (363 lines, 12+ test cases)
+- ✅ 6 Fake implementations (repositories, use cases)
+- ❌ EditorViewModel and SignInViewModel tests needed
+- ❌ No instrumented tests (androidTest directory empty)
 
 ### Code Quality & Linting
 
@@ -244,10 +248,10 @@ Data Layer (data/)               <- Data sources and repositories
 ## Tech Stack
 
 ### Core Framework
-- **Language**: Kotlin 2.2.20
+- **Language**: Kotlin 2.2.21
 - **UI**: Jetpack Compose with Material 3
 - **Architecture**: MVVM + Clean Architecture
-- **Navigation**: Jetpack Navigation Compose
+- **Navigation**: Jetpack Navigation Compose (v2.9.5)
 
 ### Dependency Injection
 - **Framework**: Koin 4.1.1
@@ -255,31 +259,36 @@ Data Layer (data/)               <- Data sources and repositories
 - **Rule**: ALL dependencies must be injected (no manual instantiation)
 
 ### Data Persistence
-- **Database**: Room 2.8.2
+- **Database**: Room 2.8.3
 - **Preferences**: SharedPreferences via repository pattern
 - **Strategy**: Offline-first, local storage
 
 ### Background Work
-- **Framework**: WorkManager 2.10.5
+- **Framework**: WorkManager 2.11.0
 - **Use Case**: Daily notification scheduling
 
 ### Authentication
 - **Provider**: Google Sign-In + Firebase Auth
-- **Status**: Currently deprecated - needs update to Google Identity Services
+- **Status**: ✅ **MODERNIZED** - Using Credential Manager API (androidx.credentials v1.5.0, GoogleID v1.1.1)
+- **Implementation**: Modern Google Identity Services with GetGoogleIdOption and GoogleIdTokenCredential
 
 ### Networking (Future)
-- **HTTP Client**: Retrofit 3.0.0 + OkHttp 5.2.1
+- **HTTP Client**: Retrofit 3.0.0 + OkHttp 5.3.0
 - **Serialization**: Moshi (preferred) or Gson
 
 ### Logging
-- **Framework**: Timber
-- **Usage**: Replace Log.d/Log.e with Timber throughout app
-- **Setup**: Initialize in Application class, plant DebugTree for debug builds
+- **Framework**: Timber 5.0.1
+- **Status**: ✅ **IMPLEMENTED** - Fully integrated throughout app
+- **Setup**: Initialized in TheDayToApplication.kt, DebugTree planted for debug builds
+- **Usage**: All logging uses Timber.d/e/w - no println() or Log.* calls
 
 ### Testing
 - **Unit Tests**: JUnit 4
 - **Instrumentation**: AndroidX Test
-- **Mocking**: MockK (to be added)
+- **Mocking**: MockK 1.14.6 ✅ **IMPLEMENTED**
+- **Flow Testing**: Turbine 1.2.1 ✅ **IMPLEMENTED**
+- **Coroutines Testing**: kotlinx-coroutines-test 1.10.2 ✅ **IMPLEMENTED**
+- **Current Coverage**: Partial (OverviewViewModel tests complete - 363 lines, 12+ test cases)
 - **Coverage Target**: 70%+ for ViewModels and Use Cases
 
 ---
@@ -819,55 +828,109 @@ Following [Android Room documentation](https://developer.android.com/training/da
    - No manual instantiation
    - Proper constructor injection throughout
 
-### 🔄 In Progress
+5. **ViewModel State Management** ✅
+   - ✅ All 3 ViewModels follow single StateFlow<UiState> pattern
+   - ✅ Separate SharedFlow for one-time events (UiEvent)
+   - ✅ Proper use of `.update {}` for state changes
+   - ✅ No multiple mutable states anti-pattern
 
-5. **ViewModel State Management**
-   - Partially complete - some ViewModels use StateFlow pattern
-   - Need to verify all ViewModels follow single StateFlow<UiState> pattern
-   - Ensure proper Root/Presenter composable separation
+6. **Root/Presenter Pattern** ✅
+   - ✅ All 3 screens (Overview, Editor, SignIn) follow Root/Presenter separation
+   - ✅ Root composables handle ViewModel, state collection, side effects
+   - ✅ Presenter composables (private) are pure UI with state + callbacks
+   - ✅ Multiple @Preview functions for all screens
+
+7. **Timber Logging** ✅
+   - ✅ Timber 5.0.1 dependency added
+   - ✅ Initialized in TheDayToApplication.kt
+   - ✅ Used throughout codebase (OverviewViewModel, GoogleAuthUiClient, EditorViewModel)
+   - ✅ No println() or Log.* calls found
+
+8. **Google Sign-In Update** ✅
+   - ✅ Modernized to Credential Manager API
+   - ✅ Uses androidx.credentials (v1.5.0) and GoogleID (v1.1.1)
+   - ✅ Implements GetGoogleIdOption and GoogleIdTokenCredential
+   - ✅ No deprecated Firebase auth flow
+   - ✅ Proper error handling with user-friendly messages
+
+9. **Error Handling** ✅
+   - ✅ Resource wrapper created (core/domain/resource/Resource.kt)
+   - ✅ Domain exceptions (InvalidEntryException, InvalidMoodColorException)
+   - ✅ Try-catch in repositories with proper error propagation
+   - ✅ ViewModels emit error events via ShowSnackbar
+   - ✅ UI displays errors via Snackbar
+
+10. **Code Cleanup - Magic Numbers** ✅
+    - ✅ 83 lines of constants extracted
+    - ✅ TimeConstants.kt (greeting ranges, loading debounce)
+    - ✅ CalendarConstants.kt (layout dimensions, pager settings)
+    - ✅ UiConstants.kt (spacing, elevations)
+    - ✅ core/ui/theme/Dimensions.kt (global padding constants)
+    - ⚠️ 2 TODOs remain in code (see Remaining Tasks)
+
+11. **Test Infrastructure** ✅
+    - ✅ MockK 1.14.6 added
+    - ✅ Turbine 1.2.1 for Flow testing
+    - ✅ Coroutines test support (v1.10.2)
+    - ✅ OverviewViewModel tests complete (363 lines, 12+ test cases)
+    - ✅ 6 Fake implementations (repositories, use cases)
+    - ⚠️ Test coverage needs expansion (see Remaining Tasks)
 
 ### 📋 Remaining Tasks
 
 ### High Priority
 
-6. **Add Timber Logging**
-   - Add Timber dependency to build.gradle.kts
-   - Initialize in Application class
-   - Replace any Log.d/Log.e calls with Timber
+12. **Update README.md to Portfolio Quality**
+    - Current README is just a placeholder
+    - Need: professional introduction, architecture diagram, features list
+    - Need: installation instructions, tech stack, screenshots
+    - Target: Match quality of My-Bookshelf reference
 
-7. **Update Google Sign-In**
-   - Replace deprecated Firebase auth flow
-   - Use Google Identity Services
-   - Update to Credential Manager API
+13. **Add LICENSE File**
+    - No LICENSE file exists
+    - Add MIT License (recommended)
+    - Include copyright year and author
+
+14. **Configure ProGuard/R8 Rules for Release**
+    - proguard-rules.pro exists but is empty
+    - Add keep rules for Koin, Room, Retrofit, Timber, Firebase
+    - Test release build doesn't crash
+    - Enable minification: `isMinifyEnabled = true`
+
+15. **Expand Test Coverage**
+    - Add EditorViewModel tests
+    - Add SignInViewModel tests
+    - Add Use Case unit tests (critical paths)
+    - Add Repository tests with in-memory database
+    - Set up code coverage reporting (JaCoCo)
+    - Target: 70%+ for ViewModels and Use Cases
 
 ### Medium Priority
 
-8. **Error Handling**
-   - Create Resource/Result sealed class
-   - Add error handling in repositories
-   - Display errors in UI
+16. **Resolve TODOs in Code**
+    - `journal/domain/repository/EntryRepository.kt:6` - Document Flow usage logic
+    - `core/domain/util/DateUtils.kt:7` - Review Java logic placement
 
-9. **Code Cleanup**
-   - Remove all commented code
-   - Extract magic numbers to constants
-   - Improve naming consistency
+17. **Add Instrumented Tests**
+    - Basic UI flow tests (Sign In → Create Entry → View Entry)
+    - Database migration tests (when needed)
+    - WorkManager notification tests
 
-10. **Testing**
-    - Add ViewModel unit tests
-    - Add Use Case tests
-    - Add Repository tests (with fakes)
+18. **Data Privacy Documentation**
+    - Document what data is stored locally
+    - Document Firebase/Google Sign-In data usage
+    - Add to README (for transparency, not Google Play requirement)
 
 ### Low Priority
 
-11. **Documentation**
-    - Update README to match My-Bookshelf quality
-    - Add KDoc comments for public APIs
-    - Create architecture diagram
+19. **Documentation**
+    - Add KDoc comments for public APIs (currently inconsistent)
+    - Create architecture diagram for README/docs
+    - Add release notes template
 
-12. **Notification Improvements**
-    - Remove network constraint from WorkManager
-    - Add user-configurable notification time
-    - Improve notification content
+20. **Notification Improvements** (Already Partially Done)
+    - ✅ User-configurable notification time (implemented in OverviewScreen)
+    - ⚠️ Network constraint from WorkManager (verify if needed)
 
 ---
 
@@ -1027,23 +1090,42 @@ Based on [Android's Common Mistakes](https://developer.android.com/topic/archite
 
 ---
 
-## Release Checklist
+## GitHub Release Checklist
 
-Before publishing to GitHub:
+Before publishing to GitHub as a portfolio project:
 
-- [ ] All tests passing
-- [ ] No commented code
-- [ ] Comprehensive README with screenshots
-- [ ] LICENSE file added (MIT recommended)
-- [ ] .gitignore properly configured
-- [ ] No hardcoded secrets/API keys
-- [ ] Privacy policy statement
-- [ ] Architecture documentation
-- [ ] Code coverage >70%
-- [ ] ProGuard/R8 rules configured
-- [ ] App icons and branding complete
-- [ ] Version code/name updated
-- [ ] Release notes prepared
+### Required (Must Have)
+- [ ] **Comprehensive README.md** - Professional introduction, features, screenshots, architecture
+- [ ] **LICENSE file** - MIT License recommended
+- [ ] **No hardcoded secrets** - Use local.properties or environment variables
+- [ ] **.gitignore properly configured** - Exclude build files, API keys
+- [ ] **No commented code** - Clean, production-ready codebase
+- [ ] **Architecture documentation** - Explain Clean Architecture approach
+
+### Highly Recommended
+- [ ] **All unit tests passing** - At least core functionality tested
+- [ ] **Code coverage >70%** - ViewModels and Use Cases
+- [ ] **Version code/name updated** - Semantic versioning (v1.0.0)
+- [ ] **Release notes prepared** - Initial release description
+- [ ] **Data privacy statement** - What data is stored, how Google Sign-In works
+- [ ] **Contributing guidelines** - If accepting contributions
+
+### Optional (Nice to Have)
+- [ ] **ProGuard/R8 rules configured** - For release builds
+- [ ] **App icons/branding complete** - Professional appearance
+- [ ] **Demo video/GIFs** - Show app in action
+- [ ] **CI/CD setup** - GitHub Actions for automated builds/tests
+- [ ] **Issue templates** - Bug reports, feature requests
+
+### Current Status
+✅ Architecture excellent (Clean Architecture, MVVM)
+✅ No hardcoded secrets
+✅ .gitignore configured
+✅ No commented code (only 2 TODOs)
+⚠️ Tests partial (OverviewViewModel complete, need more)
+❌ README needs complete rewrite
+❌ LICENSE missing
+❌ Code coverage not measured
 
 ---
 
@@ -1072,4 +1154,4 @@ Before publishing to GitHub:
 
 This is a living document. Update as the project evolves and new patterns emerge.
 
-Last Updated: 2025-10-26
+Last Updated: 2025-11-07
