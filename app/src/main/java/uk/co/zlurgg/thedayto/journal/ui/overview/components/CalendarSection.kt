@@ -317,7 +317,7 @@ private fun CalendarMonthGrid(
                                 val entry = entries.find { it.dateStamp == entryDate }
 
                                 if (entry != null) {
-                                    CalenderDay(
+                                    CalendarDay(
                                         entry = entry,
                                         modifier = Modifier
                                             .size(daySize)

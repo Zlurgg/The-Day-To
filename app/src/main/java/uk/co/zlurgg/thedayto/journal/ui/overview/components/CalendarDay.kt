@@ -24,7 +24,7 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
-fun CalenderDay(
+fun CalendarDay(
     entry: Entry,
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 10.dp
@@ -66,9 +66,9 @@ fun CalenderDay(
 @Preview(name = "Light Mode", showBackground = true)
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun CalenderDayPreview() {
+private fun CalendarDayPreview() {
     TheDayToTheme {
-        CalenderDay(
+        CalendarDay(
             entry = Entry(
                 mood = "Happy",
                 content = "Great day!",
