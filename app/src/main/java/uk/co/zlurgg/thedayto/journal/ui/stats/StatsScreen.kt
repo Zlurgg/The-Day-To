@@ -33,7 +33,6 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MonthlyBreakdownCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MoodDistributionCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.TotalStatsCard
-import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsAction
 import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsUiState
 import java.time.LocalDate
 

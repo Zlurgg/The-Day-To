@@ -10,7 +10,6 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
-import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsAction
 import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsUiState
 
 class StatsViewModel(
@@ -23,15 +22,6 @@ class StatsViewModel(
 
     init {
         loadStats()
-    }
-
-    fun onAction(action: StatsAction) {
-        when (action) {
-            is StatsAction.Refresh -> loadStats()
-            is StatsAction.NavigateBack -> {
-                // Navigation handled in screen composable
-            }
-        }
     }
 
     private fun loadStats() {
