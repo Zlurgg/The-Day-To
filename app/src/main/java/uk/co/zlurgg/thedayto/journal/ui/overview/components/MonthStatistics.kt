@@ -24,8 +24,8 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 fun MonthStatistics(
     entries: List<Entry>,
     daysInMonth: Int,
+    modifier: Modifier = Modifier,
     onStatsClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     val entryCount = entries.size
     val completionPercentage = if (daysInMonth > 0) {

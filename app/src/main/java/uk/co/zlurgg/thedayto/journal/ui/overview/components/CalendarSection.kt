@@ -66,9 +66,9 @@ import uk.co.zlurgg.thedayto.R
 fun CalendarSection(
     entries: List<Entry>,
     currentDate: LocalDate,
+    modifier: Modifier = Modifier,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
     onStatsClick: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     var date by remember { mutableStateOf(currentDate) }
     var showMonthYearPicker by remember { mutableStateOf(false) }
