@@ -33,7 +33,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import uk.co.zlurgg.thedayto.journal.ui.stats.StatsConstants
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MonthlyBreakdownCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MoodDistributionCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.TotalStatsCard
