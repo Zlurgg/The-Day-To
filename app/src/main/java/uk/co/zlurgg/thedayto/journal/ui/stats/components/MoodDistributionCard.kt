@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.stats.components
 
 import android.content.res.Configuration
 import androidx.compose.foundation.background
+import androidx.core.graphics.toColorInt
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,8 +80,8 @@ private fun MoodDistributionItem(moodCount: StatsUiState.MoodCount) {
                     .size(16.dp)
                     .background(
                         color = try {
-                            Color(android.graphics.Color.parseColor(moodCount.color))
-                        } catch (e: IllegalArgumentException) {
+                            Color(moodCount.color.toColorInt())
+                        } catch (_: IllegalArgumentException) {
                             MaterialTheme.colorScheme.primary
                         },
                         shape = CircleShape

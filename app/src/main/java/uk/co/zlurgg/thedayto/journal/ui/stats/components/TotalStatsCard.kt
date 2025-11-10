@@ -19,6 +19,7 @@ import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 @Composable
 fun TotalStatsCard(
@@ -55,7 +56,7 @@ fun TotalStatsCard(
                 )
                 StatItem(
                     label = "Avg / Month",
-                    value = String.format("%.1f", averageEntriesPerMonth)
+                    value = String.format(Locale.getDefault(), "%.1f", averageEntriesPerMonth)
                 )
             }
 
