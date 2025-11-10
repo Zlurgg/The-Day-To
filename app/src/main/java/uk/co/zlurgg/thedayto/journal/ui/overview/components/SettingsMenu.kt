@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.journal.ui.overview.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,6 +26,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
     onShowTutorial: () -> Unit,
+    onNavigateToStats: () -> Unit,
     onSignOut: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -42,6 +44,21 @@ fun SettingsMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
+            // Statistics
+            DropdownMenuItem(
+                text = { Text("Statistics") },
+                onClick = {
+                    expanded = false
+                    onNavigateToStats()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.BarChart,
+                        contentDescription = null
+                    )
+                }
+            )
+
             // Always show "Notification Settings" - permission handled inside dialog
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.notification_settings)) },
@@ -78,6 +95,7 @@ private fun SettingsMenuPreview() {
         SettingsMenu(
             onOpenNotificationSettings = {},
             onShowTutorial = {},
+            onNavigateToStats = {},
             onSignOut = {}
         )
     }
