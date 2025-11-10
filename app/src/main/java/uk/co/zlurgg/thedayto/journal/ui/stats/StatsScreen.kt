@@ -49,7 +49,6 @@ fun StatsScreenRoot(
 
     StatsScreen(
         uiState = uiState,
-        onAction = viewModel::onAction,
         onNavigateBack = onNavigateBack
     )
 }
@@ -61,7 +60,6 @@ fun StatsScreenRoot(
 @Composable
 private fun StatsScreen(
     uiState: StatsUiState,
-    onAction: (StatsAction) -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -185,7 +183,6 @@ private fun StatsScreenPreview() {
                 isLoading = false,
                 isEmpty = false
             ),
-            onAction = {},
             onNavigateBack = {}
         )
     }
@@ -197,7 +194,6 @@ private fun StatsScreenEmptyPreview() {
     TheDayToTheme {
         StatsScreen(
             uiState = StatsUiState(isEmpty = true, isLoading = false),
-            onAction = {},
             onNavigateBack = {}
         )
     }
@@ -209,7 +205,6 @@ private fun StatsScreenLoadingPreview() {
     TheDayToTheme {
         StatsScreen(
             uiState = StatsUiState(isLoading = true),
-            onAction = {},
             onNavigateBack = {}
         )
     }
