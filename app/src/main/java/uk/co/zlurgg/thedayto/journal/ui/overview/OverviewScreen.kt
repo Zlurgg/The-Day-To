@@ -174,6 +174,9 @@ fun OverviewScreenRoot(
                 )
             )
         },
+        onNavigateToStats = {
+            navController.navigate(uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute)
+        },
         snackbarHostState = snackbarHostState
     )
 }
@@ -186,6 +189,7 @@ private fun OverviewScreen(
     uiState: OverviewUiState,
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (entryId: Int?, entryDate: Long?) -> Unit,
+    onNavigateToStats: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -234,6 +238,7 @@ private fun OverviewScreen(
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
                     onShowTutorial = { onAction(OverviewAction.RequestShowTutorial) },
+                    onNavigateToStats = onNavigateToStats,
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
             }
@@ -251,6 +256,7 @@ private fun OverviewScreen(
                     entries = uiState.entries,
                     currentDate = currentDate,
                     onDateClick = onNavigateToEntry,
+                    onStatsClick = onNavigateToStats,
                     modifier = Modifier.fillMaxWidth()
                 )
 
@@ -304,6 +310,7 @@ private fun OverviewScreenPreview() {
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
+            onNavigateToStats = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -321,6 +328,7 @@ private fun OverviewScreenSingleEntryPreview() {
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
+            onNavigateToStats = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -338,6 +346,7 @@ private fun OverviewScreenEmptyPreview() {
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
+            onNavigateToStats = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

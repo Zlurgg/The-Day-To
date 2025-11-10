@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
+package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry
 
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository

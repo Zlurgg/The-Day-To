@@ -1,5 +1,8 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
+
 data class OverviewUseCases(
     val getEntries: GetEntriesUseCase,
     val deleteEntry: DeleteEntryUseCase,

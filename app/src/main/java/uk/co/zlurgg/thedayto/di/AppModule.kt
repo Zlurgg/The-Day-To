@@ -17,22 +17,23 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkEntryReminderShownTodayUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.data.repository.MoodColorRepositoryImpl
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.DeleteMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
@@ -47,7 +48,10 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.auth.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
 
 val appModule = module {
 
@@ -87,12 +91,17 @@ val appModule = module {
         PreferencesRepositoryImpl(androidContext())
     }
 
+    // Shared Entry Use Cases (used by multiple features)
+    single { GetEntriesUseCase(repository = get()) }
+    single { GetEntryByDateUseCase(repository = get()) }
+    single { GetEntryUseCase(repository = get()) }
+
     single {
         OverviewUseCases(
-            getEntries = GetEntriesUseCase(repository = get()),
+            getEntries = get(),
             deleteEntry = DeleteEntryUseCase(repository = get()),
             restoreEntry = RestoreEntryUseCase(repository = get()),
-            getEntryByDate = GetEntryByDateUseCase(repository = get()),
+            getEntryByDate = get(),
             updateEntryUseCase = UpdateEntryUseCase(repository = get()),
             checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository = get()),
             markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository = get()),
@@ -109,15 +118,23 @@ val appModule = module {
 
     single<MoodColorRepository> { MoodColorRepositoryImpl(get<TheDayToDatabase>().moodColorDao) }
 
+    // Shared MoodColor Use Cases (used by multiple features)
+    single { GetMoodColorsUseCase(repository = get()) }
+    single { GetMoodColorUseCase(repository = get()) }
+    single { AddMoodColorUseCase(repository = get()) }
+    single { UpdateMoodColorUseCase(repository = get()) }
+    single { DeleteMoodColorUseCase(repository = get()) }
+    single { SeedDefaultMoodColorsUseCase(moodColorRepository = get(), preferencesRepository = get()) }
+
     single {
         EditorUseCases(
-            getEntryUseCase = GetEntryUseCase(repository = get()),
+            getEntryUseCase = get(),
             addEntryUseCase = AddEntryUseCase(repository = get()),
-            getMoodColors = GetMoodColorsUseCase(repository = get()),
-            deleteMoodColor = DeleteMoodColorUseCase(repository = get()),
-            addMoodColorUseCase = AddMoodColorUseCase(repository = get()),
-            getMoodColorUseCase = GetMoodColorUseCase(repository = get()),
-            updateMoodColorUseCase = UpdateMoodColorUseCase(repository = get())
+            getMoodColors = get(),
+            deleteMoodColor = get(),
+            addMoodColorUseCase = get(),
+            getMoodColorUseCase = get(),
+            updateMoodColorUseCase = get()
         )
     }
 
@@ -133,10 +150,7 @@ val appModule = module {
                 authStateRepository = get()
             ),
             checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get()),
-            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(
-                moodColorRepository = get(),
-                preferencesRepository = get()
-            ),
+            seedDefaultMoodColors = get(),
             checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(
                 preferencesRepository = get()
             ),
@@ -158,6 +172,15 @@ val appModule = module {
     // Used by NotificationWorker to check if notification should be sent
     single<CheckTodayEntryExistsUseCase> {
         CheckTodayEntryExistsUseCaseImpl(repository = get())
+    }
+
+    // Stats UseCases
+    single {
+        StatsUseCases(
+            calculateTotalStats = CalculateTotalStatsUseCase(),
+            calculateMoodDistribution = CalculateMoodDistributionUseCase(),
+            calculateMonthlyBreakdown = CalculateMonthlyBreakdownUseCase()
+        )
     }
 
 }

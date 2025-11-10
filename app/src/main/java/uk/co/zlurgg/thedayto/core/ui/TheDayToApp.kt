@@ -26,8 +26,10 @@ import uk.co.zlurgg.thedayto.auth.ui.components.SignOutDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.SignInRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
 import uk.co.zlurgg.thedayto.journal.ui.editor.EditorScreenRoot
 import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewScreenRoot
+import uk.co.zlurgg.thedayto.journal.ui.stats.StatsScreenRoot
 
 /**
  * Main navigation graph for The Day To app
@@ -115,6 +117,15 @@ fun TheDayToApp() {
                         }
                     )
                 }
+            }
+
+            // Stats Screen
+            composable<StatsRoute> {
+                StatsScreenRoot(
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
+                )
             }
         }
     }

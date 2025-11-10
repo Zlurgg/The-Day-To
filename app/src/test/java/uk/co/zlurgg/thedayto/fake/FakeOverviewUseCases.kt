@@ -8,12 +8,12 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermis
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntriesUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 
 /**
  * Creates a fake OverviewUseCases instance for testing.

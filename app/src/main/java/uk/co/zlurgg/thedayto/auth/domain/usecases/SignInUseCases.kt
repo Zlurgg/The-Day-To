@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.domain.usecases
 
-import uk.co.zlurgg.thedayto.journal.domain.usecases.auth.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 
 /**
  * Aggregator for all SignIn-related UseCases.

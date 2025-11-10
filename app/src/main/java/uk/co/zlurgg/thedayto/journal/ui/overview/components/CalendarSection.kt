@@ -67,6 +67,7 @@ fun CalendarSection(
     entries: List<Entry>,
     currentDate: LocalDate,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
+    onStatsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var date by remember { mutableStateOf(currentDate) }
@@ -105,6 +106,7 @@ fun CalendarSection(
             MonthStatistics(
                 entries = filteredEntries,
                 daysInMonth = daysInMonth,
+                onStatsClick = onStatsClick,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = paddingMedium)

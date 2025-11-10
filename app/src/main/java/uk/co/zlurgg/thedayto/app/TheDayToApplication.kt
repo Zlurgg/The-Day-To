@@ -10,6 +10,7 @@ import uk.co.zlurgg.thedayto.di.editorModule
 import uk.co.zlurgg.thedayto.di.appModule
 import uk.co.zlurgg.thedayto.di.overviewModule
 import uk.co.zlurgg.thedayto.di.signInModule
+import uk.co.zlurgg.thedayto.di.statsModule
 
 class TheDayToApplication : Application() {
     override fun onCreate() {
@@ -29,7 +30,8 @@ class TheDayToApplication : Application() {
                 appModule,
                 editorModule,
                 overviewModule,
-                signInModule
+                signInModule,
+                statsModule
             )
         }
     }
