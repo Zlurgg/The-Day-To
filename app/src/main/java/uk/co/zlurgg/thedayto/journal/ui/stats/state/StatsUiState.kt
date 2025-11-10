@@ -19,7 +19,8 @@ data class StatsUiState(
 
     // UI state
     val isLoading: Boolean = true,
-    val isEmpty: Boolean = false
+    val isEmpty: Boolean = false,
+    val error: String? = null
 ) {
     /**
      * Mood count with color for display

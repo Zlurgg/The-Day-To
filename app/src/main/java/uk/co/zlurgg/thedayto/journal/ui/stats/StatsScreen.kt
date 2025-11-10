@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -30,6 +33,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.journal.ui.stats.StatsConstants
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MonthlyBreakdownCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MoodDistributionCard
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.TotalStatsCard
@@ -79,6 +83,14 @@ private fun StatsScreen(
         modifier = modifier
     ) { paddingValues ->
         when {
+            uiState.error != null -> {
+                ErrorStatsState(
+                    message = uiState.error,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues)
+                )
+            }
             uiState.isLoading -> {
                 Box(
                     modifier = Modifier
@@ -134,22 +146,55 @@ private fun StatsScreen(
 }
 
 @Composable
-private fun EmptyStatsState(modifier: Modifier = Modifier) {
+private fun ErrorStatsState(
+    message: String,
+    modifier: Modifier = Modifier
+) {
     Column(
-        modifier = modifier.padding(32.dp),
+        modifier = modifier.padding(StatsConstants.STATE_MESSAGE_PADDING),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Text(
-            text = "📊",
-            style = MaterialTheme.typography.displayLarge
+        Icon(
+            imageVector = Icons.Default.Error,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.error
         )
-        Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_ICON_SPACING))
+        Text(
+            text = "Error",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_TEXT_SPACING))
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.error
+        )
+    }
+}
+
+@Composable
+private fun EmptyStatsState(modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier.padding(StatsConstants.STATE_MESSAGE_PADDING),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.BarChart,
+            contentDescription = null,
+            modifier = Modifier.size(64.dp),
+            tint = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_ICON_SPACING))
         Text(
             text = "No stats yet",
             style = MaterialTheme.typography.headlineMedium
         )
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_TEXT_SPACING))
         Text(
             text = "Start logging your mood to see your progress and insights!",
             style = MaterialTheme.typography.bodyLarge,

@@ -26,52 +26,64 @@ class StatsViewModel(
 
     private fun loadStats() {
         viewModelScope.launch {
-            Timber.d("Loading stats")
-            getEntriesUseCase().collect { entries ->
-                Timber.d("Calculating stats for ${entries.size} entries")
+            try {
+                Timber.d("Loading stats")
+                getEntriesUseCase().collect { entries ->
+                    Timber.d("Calculating stats for ${entries.size} entries")
 
-                if (entries.isEmpty()) {
+                    if (entries.isEmpty()) {
+                        _uiState.update {
+                            it.copy(
+                                isEmpty = true,
+                                isLoading = false,
+                                error = null
+                            )
+                        }
+                        return@collect
+                    }
+
+                    // Delegate calculations to use cases
+                    val totalStats = statsUseCases.calculateTotalStats(entries)
+                    val moodDistribution = statsUseCases.calculateMoodDistribution(entries)
+                    val monthlyBreakdown = statsUseCases.calculateMonthlyBreakdown(entries)
+
                     _uiState.update {
                         it.copy(
-                            isEmpty = true,
-                            isLoading = false
+                            totalEntries = entries.size,
+                            firstEntryDate = totalStats.firstEntryDate,
+                            averageEntriesPerMonth = totalStats.averageEntriesPerMonth,
+                            moodDistribution = moodDistribution.map { mood ->
+                                StatsUiState.MoodCount(
+                                    mood = mood.mood,
+                                    color = mood.color,
+                                    count = mood.count
+                                )
+                            },
+                            monthlyBreakdown = monthlyBreakdown.map { month ->
+                                StatsUiState.MonthStats(
+                                    month = month.month,
+                                    year = month.year,
+                                    monthValue = month.monthValue,
+                                    entryCount = month.entryCount,
+                                    completionRate = month.completionRate
+                                )
+                            },
+                            isEmpty = false,
+                            isLoading = false,
+                            error = null
                         )
                     }
-                    return@collect
+
+                    Timber.d("Stats calculated successfully")
                 }
-
-                // Delegate calculations to use cases
-                val totalStats = statsUseCases.calculateTotalStats(entries)
-                val moodDistribution = statsUseCases.calculateMoodDistribution(entries)
-                val monthlyBreakdown = statsUseCases.calculateMonthlyBreakdown(entries)
-
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading stats")
                 _uiState.update {
                     it.copy(
-                        totalEntries = entries.size,
-                        firstEntryDate = totalStats.firstEntryDate,
-                        averageEntriesPerMonth = totalStats.averageEntriesPerMonth,
-                        moodDistribution = moodDistribution.map { mood ->
-                            StatsUiState.MoodCount(
-                                mood = mood.mood,
-                                color = mood.color,
-                                count = mood.count
-                            )
-                        },
-                        monthlyBreakdown = monthlyBreakdown.map { month ->
-                            StatsUiState.MonthStats(
-                                month = month.month,
-                                year = month.year,
-                                monthValue = month.monthValue,
-                                entryCount = month.entryCount,
-                                completionRate = month.completionRate
-                            )
-                        },
-                        isEmpty = false,
-                        isLoading = false
+                        isLoading = false,
+                        error = "Failed to load statistics. Please try again."
                     )
                 }
-
-                Timber.d("Stats calculated successfully")
             }
         }
     }
