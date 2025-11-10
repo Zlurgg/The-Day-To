@@ -19,3 +19,6 @@ data class EditorRoute(
     val entryDate: Long? = null,  // Epoch timestamp for pre-filling date when creating new entry
     val showBackButton: Boolean = false
 )
+
+@Serializable
+data object StatsRoute

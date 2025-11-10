@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
+package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository

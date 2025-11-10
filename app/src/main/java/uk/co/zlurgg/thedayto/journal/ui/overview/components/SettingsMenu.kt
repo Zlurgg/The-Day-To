@@ -3,8 +3,11 @@ package uk.co.zlurgg.thedayto.journal.ui.overview.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.HelpOutline
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -65,6 +68,12 @@ fun SettingsMenu(
                 onClick = {
                     expanded = false
                     onOpenNotificationSettings()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Notifications,
+                        contentDescription = null
+                    )
                 }
             )
 
@@ -73,6 +82,12 @@ fun SettingsMenu(
                 onClick = {
                     expanded = false
                     onShowTutorial()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.HelpOutline,
+                        contentDescription = null
+                    )
                 }
             )
 
@@ -81,6 +96,12 @@ fun SettingsMenu(
                 onClick = {
                     expanded = false
                     onSignOut()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Logout,
+                        contentDescription = null
+                    )
                 }
             )
         }

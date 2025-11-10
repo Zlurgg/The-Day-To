@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +24,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 fun MonthStatistics(
     entries: List<Entry>,
     daysInMonth: Int,
+    onStatsClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val entryCount = entries.size
@@ -31,7 +33,7 @@ fun MonthStatistics(
     } else 0
 
     Card(
-        modifier = modifier,
+        modifier = modifier.clickable { onStatsClick() },
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
