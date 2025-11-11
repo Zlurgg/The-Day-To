@@ -9,7 +9,7 @@ import uk.co.zlurgg.thedayto.journal.data.model.MoodColorEntity
 
 @Database(
     entities = [EntryEntity::class, MoodColorEntity::class],
-    version = 1,
+    version = 2,
     exportSchema = false
 )
 abstract class TheDayToDatabase : RoomDatabase() {
