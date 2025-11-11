@@ -17,12 +17,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 
 @Composable
 fun MonthStatistics(
-    entries: List<Entry>,
+    entries: List<EntryWithMoodColor>,
     daysInMonth: Int,
     modifier: Modifier = Modifier,
     onStatsClick: () -> Unit = {},
@@ -96,9 +96,9 @@ private fun MonthStatisticsPreview() {
     TheDayToTheme {
         MonthStatistics(
             entries = listOf(
-                Entry(mood = "Happy", content = "Great!", dateStamp = 1L, color = "#4CAF50", id = 1),
-                Entry(mood = "Sad", content = "Not good", dateStamp = 2L, color = "#F44336", id = 2),
-                Entry(mood = "Neutral", content = "Ok", dateStamp = 3L, color = "#FFC107", id = 3)
+                EntryWithMoodColor(id = 1, moodColorId = 1, moodName = "Happy", moodColor = "4CAF50", content = "Great!", dateStamp = 1L),
+                EntryWithMoodColor(id = 2, moodColorId = 2, moodName = "Sad", moodColor = "F44336", content = "Not good", dateStamp = 2L),
+                EntryWithMoodColor(id = 3, moodColorId = 3, moodName = "Neutral", moodColor = "FFC107", content = "Ok", dateStamp = 3L)
             ),
             daysInMonth = 31
         )

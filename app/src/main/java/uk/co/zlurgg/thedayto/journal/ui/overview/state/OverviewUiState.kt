@@ -2,7 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 
 /**
  * UI state for the Overview screen following Google's MAD single ViewModel per screen pattern.
@@ -10,10 +10,10 @@ import uk.co.zlurgg.thedayto.journal.domain.model.Entry
  */
 data class OverviewUiState(
     // Entry-related state
-    val entries: List<Entry> = emptyList(),
+    val entries: List<EntryWithMoodColor> = emptyList(),
     val entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     val entryMade: Boolean = false,
-    val recentlyDeletedEntry: Entry? = null,
+    val recentlyDeletedEntry: EntryWithMoodColor? = null,
     val isLoading: Boolean = false,
 
     // Screen-level state

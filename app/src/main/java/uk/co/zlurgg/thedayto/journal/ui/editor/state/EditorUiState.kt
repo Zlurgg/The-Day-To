@@ -7,9 +7,8 @@ import java.time.ZoneOffset
 data class EditorUiState(
     // Entry data
     val entryDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
-    val entryMood: String = "",
+    val selectedMoodColorId: Int? = null,  // null indicates no mood selected
     val entryContent: String = "",
-    val entryColor: String = "",  // Empty string indicates no color selected
     val currentEntryId: Int? = null,
 
     // Mood colors list (for dropdown)

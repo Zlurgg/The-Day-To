@@ -18,18 +18,18 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
 import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
 fun CalendarDay(
-    entry: Entry,
+    entry: EntryWithMoodColor,
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 10.dp
 ) {
-    val color = getColor(entry.color)
+    val color = getColor(entry.moodColor)
     Box(
         modifier = modifier
     ) {
@@ -69,12 +69,13 @@ fun CalendarDay(
 private fun CalendarDayPreview() {
     TheDayToTheme {
         CalendarDay(
-            entry = Entry(
-                mood = "Happy",
+            entry = EntryWithMoodColor(
+                id = 1,
+                moodColorId = 1,
+                moodName = "Happy",
+                moodColor = "4CAF50",
                 content = "Great day!",
-                dateStamp = System.currentTimeMillis(),
-                color = "#4CAF50",
-                id = 1
+                dateStamp = System.currentTimeMillis()
             ),
             modifier = Modifier.size(48.dp)
         )

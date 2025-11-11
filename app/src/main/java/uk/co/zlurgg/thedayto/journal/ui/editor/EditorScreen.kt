@@ -168,13 +168,12 @@ private fun EditorScreen(
 
             // Mood Selection
             MoodItem(
-                selectedMood = uiState.entryMood,
+                selectedMoodColorId = uiState.selectedMoodColorId,
                 moodColors = uiState.moodColors,
                 hint = uiState.moodHint,
                 showMoodColorDialog = uiState.isMoodColorSectionVisible,
-                onMoodSelected = { mood, colorHex ->
-                    onAction(EditorAction.EnteredMood(mood))
-                    onAction(EditorAction.EnteredColor(colorHex))
+                onMoodSelected = { moodColorId ->
+                    onAction(EditorAction.SelectMoodColor(moodColorId))
                 },
                 onDeleteMoodColor = { moodColor ->
                     onAction(EditorAction.DeleteMoodColor(moodColor))
@@ -212,9 +211,9 @@ private fun EditorScreenNewEntryPreview() {
         EditorScreen(
             uiState = EditorUiState(
                 moodColors = listOf(
-                    MoodColor("Cheerful", "FFF59D", System.currentTimeMillis(), 1),
-                    MoodColor("Calm", "4A148C", System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "4CAF50", System.currentTimeMillis(), 3)
+                    MoodColor("Cheerful", "FFF59D", false, System.currentTimeMillis(), 1),
+                    MoodColor("Calm", "4A148C", false, System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "4CAF50", false, System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
@@ -233,16 +232,15 @@ private fun EditorScreenEditEntryPreview() {
         EditorScreen(
             uiState = EditorUiState(
                 entryDate = LocalDate.now().minusDays(2).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
-                entryMood = "Happy",
+                selectedMoodColorId = 1,
                 entryContent = "Had a great day at work! Finished the new feature and got positive feedback from the team.",
-                entryColor = "4CAF50",
                 isMoodHintVisible = false,
                 isContentHintVisible = false,
                 currentEntryId = 1,
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1),
-                    MoodColor("Peaceful", "2196F3", System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "FF9800", System.currentTimeMillis(), 3)
+                    MoodColor("Happy", "4CAF50", false, System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "2196F3", false, System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "FF9800", false, System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
@@ -260,11 +258,11 @@ private fun EditorScreenLoadingPreview() {
     TheDayToTheme {
         EditorScreen(
             uiState = EditorUiState(
-                entryMood = "Happy",
+                selectedMoodColorId = 1,
                 entryContent = "Sample content",
                 isLoading = true,
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", System.currentTimeMillis(), 1)
+                    MoodColor("Happy", "4CAF50", false, System.currentTimeMillis(), 1)
                 )
             ),
             onAction = {},

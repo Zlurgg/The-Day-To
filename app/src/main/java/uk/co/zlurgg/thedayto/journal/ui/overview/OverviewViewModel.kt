@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
+import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
@@ -168,7 +169,7 @@ class OverviewViewModel(
                     }
 
                     try {
-                        overviewUseCases.deleteEntry(action.entry)
+                        overviewUseCases.deleteEntry(action.entry.toEntry())
                         loadingJob.cancel()
                         _uiState.update {
                             it.copy(
@@ -196,7 +197,7 @@ class OverviewViewModel(
                     }
 
                     try {
-                        overviewUseCases.restoreEntry(deletedEntry)
+                        overviewUseCases.restoreEntry(deletedEntry.toEntry())
                         loadingJob.cancel()
                         _uiState.update {
                             it.copy(
