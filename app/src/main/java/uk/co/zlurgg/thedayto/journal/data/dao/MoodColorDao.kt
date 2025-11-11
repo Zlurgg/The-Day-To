@@ -11,7 +11,7 @@ import uk.co.zlurgg.thedayto.journal.data.model.MoodColorEntity
 
 @Dao
 interface MoodColorDao {
-    @Query("SELECT * FROM mood_color WHERE isDeleted = false")
+    @Query("SELECT * FROM mood_color WHERE isDeleted = 0")
     fun getMoodColors(): Flow<List<MoodColorEntity>>
 
     @Query("SELECT * FROM mood_color WHERE id = :id")
@@ -23,7 +23,7 @@ interface MoodColorDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMoodColor(moodColor: MoodColorEntity)
 
-    @Query("UPDATE mood_color SET isDeleted = true WHERE id = :id")
+    @Query("UPDATE mood_color SET isDeleted = 1 WHERE id = :id")
     suspend fun deleteMoodColor(id: Int)
 
     @Update
