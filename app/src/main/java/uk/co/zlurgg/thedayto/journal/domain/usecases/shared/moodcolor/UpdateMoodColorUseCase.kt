@@ -1,7 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
-import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
 class UpdateMoodColorUseCase(
