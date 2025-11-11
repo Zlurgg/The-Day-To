@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.stats
 
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -11,7 +11,7 @@ import java.time.temporal.ChronoUnit
  */
 class CalculateTotalStatsUseCase {
 
-    operator fun invoke(entries: List<Entry>): TotalStats {
+    operator fun invoke(entries: List<EntryWithMoodColor>): TotalStats {
         if (entries.isEmpty()) {
             return TotalStats(
                 firstEntryDate = null,
@@ -28,14 +28,14 @@ class CalculateTotalStatsUseCase {
         )
     }
 
-    private fun calculateFirstEntryDate(entries: List<Entry>): LocalDate? {
+    private fun calculateFirstEntryDate(entries: List<EntryWithMoodColor>): LocalDate? {
         val oldestEntry = entries.minByOrNull { it.dateStamp } ?: return null
         return Instant.ofEpochSecond(oldestEntry.dateStamp)
             .atZone(ZoneOffset.UTC)
             .toLocalDate()
     }
 
-    private fun calculateAverageEntriesPerMonth(entries: List<Entry>, firstDate: LocalDate?): Float {
+    private fun calculateAverageEntriesPerMonth(entries: List<EntryWithMoodColor>, firstDate: LocalDate?): Float {
         if (firstDate == null) return 0f
 
         val now = LocalDate.now()

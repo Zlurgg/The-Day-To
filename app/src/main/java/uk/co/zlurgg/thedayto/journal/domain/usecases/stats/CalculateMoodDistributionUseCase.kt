@@ -1,19 +1,19 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.stats
 
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 
 /**
  * Calculates mood distribution from entries, sorted by frequency
  */
 class CalculateMoodDistributionUseCase {
 
-    operator fun invoke(entries: List<Entry>, limit: Int = 5): List<MoodDistribution> {
+    operator fun invoke(entries: List<EntryWithMoodColor>, limit: Int = 5): List<MoodDistribution> {
         return entries
-            .groupBy { it.mood }
+            .groupBy { it.moodName }
             .map { (mood, moodEntries) ->
                 MoodDistribution(
                     mood = mood,
-                    color = moodEntries.first().color,
+                    color = moodEntries.first().moodColor,
                     count = moodEntries.size
                 )
             }

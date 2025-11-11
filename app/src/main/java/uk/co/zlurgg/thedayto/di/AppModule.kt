@@ -131,7 +131,7 @@ val appModule = module {
     single {
         EditorUseCases(
             getEntryUseCase = get(),
-            addEntryUseCase = AddEntryUseCase(repository = get()),
+            addEntryUseCase = AddEntryUseCase(repository = get(), moodColorRepository = get()),
             getMoodColors = get(),
             deleteMoodColor = get(),
             addMoodColorUseCase = get(),
