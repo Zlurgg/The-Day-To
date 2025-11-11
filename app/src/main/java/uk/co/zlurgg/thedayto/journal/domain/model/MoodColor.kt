@@ -5,7 +5,7 @@ data class MoodColor(
     val color: String,
     val isDeleted: Boolean = false,
     val dateStamp: Long,
-    val id: Int = 0
+    val id: Int? = null
 )
 
 class InvalidMoodColorException(message: String) : Exception(message)

@@ -13,5 +13,5 @@ data class MoodColorEntity(
     val color: String,
     val isDeleted: Boolean = false,
     val dateStamp: Long,
-    @PrimaryKey(autoGenerate = true) val id: Int = 0
+    @PrimaryKey(autoGenerate = true) val id: Int? = null
 )
