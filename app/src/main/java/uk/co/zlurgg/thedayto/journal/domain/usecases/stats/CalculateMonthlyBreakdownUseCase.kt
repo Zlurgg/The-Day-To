@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.stats
 
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import java.time.Instant
 import java.time.YearMonth
 import java.time.ZoneOffset
@@ -12,7 +12,7 @@ import java.util.Locale
  */
 class CalculateMonthlyBreakdownUseCase {
 
-    operator fun invoke(entries: List<Entry>, limit: Int = 6): List<MonthlyStats> {
+    operator fun invoke(entries: List<EntryWithMoodColor>, limit: Int = 6): List<MonthlyStats> {
         return entries
             .groupBy { entry ->
                 val date = Instant.ofEpochSecond(entry.dateStamp)

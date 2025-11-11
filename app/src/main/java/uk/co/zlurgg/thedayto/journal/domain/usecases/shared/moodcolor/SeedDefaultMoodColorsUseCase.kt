@@ -37,13 +37,13 @@ class SeedDefaultMoodColorsUseCase(
 
         // Default mood colors with psychology-based colors
         val defaultMoodColors = listOf(
-            MoodColor(mood = "Happy", color = "FFA726", dateStamp = timestamp, id = null),
-            MoodColor(mood = "Sad", color = "1565C0", dateStamp = timestamp, id = null),
-            MoodColor(mood = "In Love", color = "EC407A", dateStamp = timestamp, id = null),
-            MoodColor(mood = "Calm", color = "66BB6A", dateStamp = timestamp, id = null),
-            MoodColor(mood = "Excited", color = "FFEB3B", dateStamp = timestamp, id = null),
-            MoodColor(mood = "Anxious", color = "8E24AA", dateStamp = timestamp, id = null),
-            MoodColor(mood = "Grateful", color = "26A69A", dateStamp = timestamp, id = null)
+            MoodColor(mood = "Happy", color = "FFA726", dateStamp = timestamp),
+            MoodColor(mood = "Sad", color = "1565C0", dateStamp = timestamp),
+            MoodColor(mood = "In Love", color = "EC407A", dateStamp = timestamp),
+            MoodColor(mood = "Calm", color = "66BB6A", dateStamp = timestamp),
+            MoodColor(mood = "Excited", color = "FFEB3B", dateStamp = timestamp),
+            MoodColor(mood = "Anxious", color = "8E24AA", dateStamp = timestamp),
+            MoodColor(mood = "Grateful", color = "26A69A", dateStamp = timestamp)
         )
 
         // Insert all default mood colors

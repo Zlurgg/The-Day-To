@@ -8,6 +8,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.ValidationResult
 
 /**
  * Use Case: Add a custom mood-color mapping with comprehensive validation
+ * Implements "create or restore" logic - if mood name exists but is deleted, restore it
  *
  * Security measures:
  * - Input length limits for mood names
@@ -40,11 +41,27 @@ class AddMoodColorUseCase(
             throw InvalidMoodColorException("Color cannot be empty")
         }
 
-        // Create sanitized mood color
-        val sanitizedMoodColor = moodColor.copy(
-            mood = sanitizedMood
-        )
+        // Check if mood exists (deleted or active)
+        val existing = repository.getMoodColorByName(sanitizedMood)
 
-        repository.insertMoodColor(sanitizedMoodColor)
+        when {
+            existing == null -> {
+                // Create new mood
+                val sanitizedMoodColor = moodColor.copy(mood = sanitizedMood)
+                repository.insertMoodColor(sanitizedMoodColor)
+            }
+            existing.isDeleted -> {
+                // Restore deleted mood with new color
+                repository.updateMoodColor(
+                    existing.copy(color = moodColor.color, isDeleted = false)
+                )
+            }
+            else -> {
+                // Active duplicate - throw error
+                throw InvalidMoodColorException(
+                    "A mood with the name \"$sanitizedMood\" already exists."
+                )
+            }
+        }
     }
 }
