@@ -41,8 +41,8 @@ class AddMoodColorUseCase(
             throw InvalidMoodColorException("Color cannot be empty")
         }
 
-        // Check if mood exists (deleted or active)
-        val existing = repository.getMoodColorByName(sanitizedMood)
+        // Check if mood exists (deleted or active) - case-insensitive lookup
+        val existing = repository.getMoodColorByName(sanitizedMood.trim().lowercase())
 
         when {
             existing == null -> {

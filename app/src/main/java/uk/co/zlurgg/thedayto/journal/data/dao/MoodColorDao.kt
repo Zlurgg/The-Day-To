@@ -16,8 +16,8 @@ interface MoodColorDao {
     @Query("SELECT * FROM mood_color WHERE id = :id")
     suspend fun getMoodColorById(id: Int): MoodColorEntity?
 
-    @Query("SELECT * FROM mood_color WHERE mood = :mood")
-    suspend fun getMoodColorByName(mood: String): MoodColorEntity?
+    @Query("SELECT * FROM mood_color WHERE moodNormalized = :moodNormalized")
+    suspend fun getMoodColorByName(moodNormalized: String): MoodColorEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertMoodColor(moodColor: MoodColorEntity)

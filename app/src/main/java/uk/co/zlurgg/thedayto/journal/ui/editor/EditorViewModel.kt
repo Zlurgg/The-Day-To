@@ -24,8 +24,6 @@ import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
-import java.time.LocalDate
-import java.time.ZoneOffset
 
 class EditorViewModel(
     private val editorUseCases: EditorUseCases,
