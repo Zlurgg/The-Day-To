@@ -60,7 +60,9 @@ val appModule = module {
             androidApplication(),
             TheDayToDatabase::class.java,
             TheDayToDatabase.DATABASE_NAME
-        ).build()
+        )
+            .fallbackToDestructiveMigration()
+            .build()
     }
 
     // Auth Repository (wraps GoogleAuthUiClient)
