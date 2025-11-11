@@ -53,12 +53,8 @@ class EditorViewModel(
             if (entryDate != -1L) {
                 Timber.d("Setting entry date from navigation: $entryDate")
                 _uiState.update { it.copy(entryDate = entryDate) }
-                updateMoodHint()
             }
         }
-
-        // Update hint for initial state
-        updateMoodHint()
 
         // Load existing entry if editing
         savedStateHandle.get<Int>("entryId")?.let { entryId ->
@@ -78,9 +74,8 @@ class EditorViewModel(
                                 state.copy(
                                     currentEntryId = it.id,
                                     entryDate = it.dateStamp,
-                                    entryMood = it.mood,
+                                    selectedMoodColorId = it.moodColorId,
                                     entryContent = it.content,
-                                    entryColor = it.color,
                                     isMoodHintVisible = false,
                                     isContentHintVisible = false,
                                     isLoading = false
@@ -118,15 +113,11 @@ class EditorViewModel(
                 _uiState.update { it.copy(entryDate = action.date) }
             }
 
-            is EditorAction.EnteredMood -> {
-                _uiState.update { it.copy(entryMood = action.mood) }
-            }
-
-            is EditorAction.ChangeMoodFocus -> {
+            is EditorAction.SelectMoodColor -> {
                 _uiState.update {
                     it.copy(
-                        isMoodHintVisible = !action.focusState.isFocused &&
-                                it.entryMood.isBlank()
+                        selectedMoodColorId = action.moodColorId,
+                        isMoodHintVisible = false
                     )
                 }
             }
@@ -142,10 +133,6 @@ class EditorViewModel(
                                 it.entryContent.isBlank()
                     )
                 }
-            }
-
-            is EditorAction.EnteredColor -> {
-                _uiState.update { it.copy(entryColor = action.color) }
             }
 
             is EditorAction.ToggleMoodColorSection -> {
@@ -183,14 +170,13 @@ class EditorViewModel(
             is EditorAction.DeleteMoodColor -> {
                 viewModelScope.launch {
                     Timber.d("Deleting mood color: ${action.moodColor.mood}")
-                    editorUseCases.deleteMoodColor(action.moodColor)
+                    editorUseCases.deleteMoodColor(action.moodColor.id ?: return@launch)
 
                     // Check if the deleted mood was currently selected
                     val currentState = _uiState.value
-                    if (currentState.entryMood == action.moodColor.mood &&
-                        currentState.entryColor == action.moodColor.color) {
+                    if (currentState.selectedMoodColorId == action.moodColor.id) {
 
-                        // Reset to first available mood color or empty
+                        // Reset to first available mood color or null
                         val remainingMoodColors = currentState.moodColors.filter {
                             it.id != action.moodColor.id
                         }
@@ -201,18 +187,16 @@ class EditorViewModel(
                             Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
                             _uiState.update {
                                 it.copy(
-                                    entryMood = defaultMoodColor.mood,
-                                    entryColor = defaultMoodColor.color,
+                                    selectedMoodColorId = defaultMoodColor.id,
                                     isMoodHintVisible = false
                                 )
                             }
                         } else {
-                            // No mood colors left, reset to empty
+                            // No mood colors left, reset to null
                             Timber.w("No mood colors remaining after deletion")
                             _uiState.update {
                                 it.copy(
-                                    entryMood = "",
-                                    entryColor = "",
+                                    selectedMoodColorId = null,
                                     isMoodHintVisible = true
                                 )
                             }
@@ -224,7 +208,19 @@ class EditorViewModel(
             is EditorAction.SaveEntry -> {
                 viewModelScope.launch {
                     val state = _uiState.value
-                    Timber.d("Saving entry: mood=${state.entryMood}, date=${state.entryDate}, id=${state.currentEntryId}")
+
+                    // Validate moodColorId is selected
+                    val moodColorId = state.selectedMoodColorId
+                    if (moodColorId == null) {
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar(
+                                message = "Please select a mood"
+                            )
+                        )
+                        return@launch
+                    }
+
+                    Timber.d("Saving entry: moodColorId=$moodColorId, date=${state.entryDate}, id=${state.currentEntryId}")
 
                     val loadingJob = launchDebouncedLoading { isLoading ->
                         _uiState.update { it.copy(isLoading = isLoading) }
@@ -233,10 +229,9 @@ class EditorViewModel(
                     try {
                         editorUseCases.addEntryUseCase(
                             Entry(
+                                moodColorId = moodColorId,
                                 content = state.entryContent,
                                 dateStamp = state.entryDate,
-                                mood = state.entryMood,
-                                color = state.entryColor,
                                 id = state.currentEntryId
                             )
                         )
@@ -257,22 +252,6 @@ class EditorViewModel(
                 }
             }
         }
-    }
-
-    /**
-     * Update mood hint based on whether the entry is for today or a previous day
-     */
-    private fun updateMoodHint() {
-        val isToday = _uiState.value.entryDate == LocalDate.now().atStartOfDay()
-            .toEpochSecond(ZoneOffset.UTC)
-
-        val hint = if (isToday) {
-            "How're you feeling today?"
-        } else {
-            "How were you feeling that day?"
-        }
-
-        _uiState.update { it.copy(moodHint = hint) }
     }
 
     private fun loadMoodColors() {

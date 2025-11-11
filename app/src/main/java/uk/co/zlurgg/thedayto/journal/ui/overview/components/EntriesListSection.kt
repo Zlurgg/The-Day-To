@@ -23,7 +23,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
  */
 @Composable
 fun EntriesListSection(
-    entries: List<Entry>,
+    entries: List<uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor>,
     entryOrder: EntryOrder,
     onOrderChange: (EntryOrder) -> Unit,
     onEntryClick: (entryId: Int?) -> Unit,
@@ -66,19 +66,21 @@ private fun EntriesListSectionPreview() {
     TheDayToTheme {
         EntriesListSection(
             entries = listOf(
-                Entry(
-                    mood = "Happy",
+                uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor(
+                    id = 1,
+                    moodColorId = 1,
+                    moodName = "Happy",
+                    moodColor = "4CAF50",
                     content = "Had a great day!",
-                    dateStamp = System.currentTimeMillis(),
-                    color = "#4CAF50",
-                    id = 1
+                    dateStamp = System.currentTimeMillis()
                 ),
-                Entry(
-                    mood = "Productive",
+                uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor(
+                    id = 2,
+                    moodColorId = 2,
+                    moodName = "Productive",
+                    moodColor = "2196F3",
                     content = "Got a lot done today",
-                    dateStamp = System.currentTimeMillis() - 86400000,
-                    color = "#2196F3",
-                    id = 2
+                    dateStamp = System.currentTimeMillis() - 86400000
                 )
             ),
             entryOrder = EntryOrder.Date(OrderType.Descending),

@@ -47,11 +47,11 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColor
  * Pure presenter component for mood selection with color picker.
  * No ViewModel dependency - receives all state and callbacks as parameters.
  *
- * @param selectedMood The currently selected mood text
+ * @param selectedMoodColorId The currently selected mood color ID (null if none selected)
  * @param moodColors List of available mood-color combinations
  * @param hint Hint text to display
  * @param showMoodColorDialog Whether to show the mood color picker dialog
- * @param onMoodSelected Callback when a mood is selected (mood, colorHex)
+ * @param onMoodSelected Callback when a mood is selected (moodColorId)
  * @param onDeleteMoodColor Callback to delete a mood color
  * @param onToggleMoodColorDialog Callback to toggle the mood color picker dialog
  * @param onSaveMoodColor Callback to save a new mood color (mood, colorHex)
@@ -60,11 +60,11 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColor
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
 @Composable
 fun MoodItem(
-    selectedMood: String,
+    selectedMoodColorId: Int?,
     moodColors: List<MoodColor>,
     hint: String,
     showMoodColorDialog: Boolean,
-    onMoodSelected: (mood: String, colorHex: String) -> Unit,
+    onMoodSelected: (moodColorId: Int) -> Unit,
     onDeleteMoodColor: (MoodColor) -> Unit,
     onToggleMoodColorDialog: () -> Unit,
     onSaveMoodColor: (mood: String, colorHex: String) -> Unit,
@@ -72,6 +72,10 @@ fun MoodItem(
 ) {
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
+
+    // Find the selected mood color by ID
+    val selectedMoodColor = moodColors.find { it.id == selectedMoodColorId }
+    val displayText = selectedMoodColor?.mood ?: ""
 
     ExposedDropdownMenuBox(
         expanded = mExpanded,
@@ -81,7 +85,7 @@ fun MoodItem(
         modifier = modifier
     ) {
         OutlinedTextField(
-            value = selectedMood,
+            value = displayText,
             onValueChange = { /* Read-only, changes via dropdown */ },
             textStyle = MaterialTheme.typography.headlineSmall,
             colors = OutlinedTextFieldDefaults.colors(
@@ -141,7 +145,7 @@ fun MoodItem(
                 val color = getColor(moodColor.color)
                 DropdownMenuItem(
                     onClick = {
-                        onMoodSelected(moodColor.mood, moodColor.color)
+                        moodColor.id?.let { onMoodSelected(it) }
                         mExpanded = false
                     },
                     text = {
@@ -220,8 +224,7 @@ fun MoodItem(
         onDismiss = onToggleMoodColorDialog,
         onSave = { mood, colorHex ->
             onSaveMoodColor(mood, colorHex)
-            // Auto-select the newly created mood color
-            onMoodSelected(mood, colorHex)
+            // Note: Auto-selection is now handled by ViewModel after save completes
         }
     )
 }

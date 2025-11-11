@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.fake
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 
 /**
@@ -19,12 +20,24 @@ class FakeEntryRepository : EntryRepository {
         emit(entries.toList())
     }
 
+    override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getEntryById(id: Int): Entry? {
         return entries.find { it.id == id }
     }
 
+    override suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor? {
+        TODO("Not yet implemented")
+    }
+
     override suspend fun getEntryByDate(date: Long): Entry? {
         return entries.find { it.dateStamp == date }
+    }
+
+    override suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor? {
+        TODO("Not yet implemented")
     }
 
     override suspend fun insertEntry(entry: Entry) {

@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.dp
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarUtils
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToMonthValue
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToYearValue
@@ -64,7 +63,7 @@ import uk.co.zlurgg.thedayto.R
  */
 @Composable
 fun CalendarSection(
-    entries: List<Entry>,
+    entries: List<uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor>,
     currentDate: LocalDate,
     modifier: Modifier = Modifier,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
@@ -228,7 +227,7 @@ private fun MonthYearHeader(
 private fun CalendarMonthGrid(
     date: LocalDate,
     currentDate: LocalDate,
-    entries: List<Entry>,
+    entries: List<uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor>,
     daysInMonth: Int,
     emptyCellsAtStart: Int,
     totalCells: Int,

@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
 import uk.co.zlurgg.thedayto.journal.ui.util.getColor
@@ -25,10 +25,10 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
 fun EntryItem(
-    entry: Entry,
+    entry: EntryWithMoodColor,
     modifier: Modifier = Modifier
 ) {
-    val moodColor = getColor(entry.color)
+    val moodColor = getColor(entry.moodColor)
     val textColor = moodColor.getContrastingTextColor()
 
     Card(
@@ -54,7 +54,7 @@ fun EntryItem(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = entry.mood,
+                    text = entry.moodName,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
                     color = textColor,
@@ -89,12 +89,13 @@ fun EntryItem(
 private fun EntryItemPreview() {
     TheDayToTheme {
         EntryItem(
-            entry = Entry(
-                mood = "Happy",
+            entry = EntryWithMoodColor(
+                id = 1,
+                moodColorId = 1,
+                moodName = "Happy",
+                moodColor = "4CAF50",
                 content = "Had a wonderful day with family and friends. Everything went well!",
-                dateStamp = System.currentTimeMillis(),
-                color = "#4CAF50",
-                id = 1
+                dateStamp = System.currentTimeMillis()
             )
         )
     }
@@ -105,12 +106,13 @@ private fun EntryItemPreview() {
 private fun EntryItemNoContentPreview() {
     TheDayToTheme {
         EntryItem(
-            entry = Entry(
-                mood = "Tired",
+            entry = EntryWithMoodColor(
+                id = 2,
+                moodColorId = 2,
+                moodName = "Tired",
+                moodColor = "9C27B0",
                 content = "",
-                dateStamp = System.currentTimeMillis(),
-                color = "#9C27B0",
-                id = 2
+                dateStamp = System.currentTimeMillis()
             )
         )
     }
