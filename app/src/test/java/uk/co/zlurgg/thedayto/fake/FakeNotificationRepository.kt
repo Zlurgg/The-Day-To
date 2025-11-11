@@ -48,11 +48,11 @@ open class FakeNotificationRepository : NotificationRepository {
     }
 
     override fun areSystemNotificationsEnabled(): Boolean {
-        TODO("Not yet implemented")
+        return true  // Default to enabled for tests
     }
 
     override fun shouldShowPermissionRationale(): Boolean {
-        TODO("Not yet implemented")
+        return false  // Default to false (permission not permanently denied) for tests
     }
 
     /**

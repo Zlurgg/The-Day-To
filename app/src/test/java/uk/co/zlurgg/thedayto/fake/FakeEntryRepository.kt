@@ -20,8 +20,17 @@ class FakeEntryRepository : EntryRepository {
         emit(entries.toList())
     }
 
-    override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> {
-        TODO("Not yet implemented")
+    override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> = flow {
+        emit(entries.map { entry ->
+            EntryWithMoodColor(
+                id = entry.id,
+                moodColorId = entry.moodColorId,
+                moodName = "Test Mood",  // Dummy data for testing
+                moodColor = "4CAF50",    // Green color
+                content = entry.content,
+                dateStamp = entry.dateStamp
+            )
+        })
     }
 
     override suspend fun getEntryById(id: Int): Entry? {
@@ -29,7 +38,15 @@ class FakeEntryRepository : EntryRepository {
     }
 
     override suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor? {
-        TODO("Not yet implemented")
+        val entry = entries.find { it.id == id } ?: return null
+        return EntryWithMoodColor(
+            id = entry.id,
+            moodColorId = entry.moodColorId,
+            moodName = "Test Mood",
+            moodColor = "4CAF50",
+            content = entry.content,
+            dateStamp = entry.dateStamp
+        )
     }
 
     override suspend fun getEntryByDate(date: Long): Entry? {
@@ -37,7 +54,15 @@ class FakeEntryRepository : EntryRepository {
     }
 
     override suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor? {
-        TODO("Not yet implemented")
+        val entry = entries.find { it.dateStamp == date } ?: return null
+        return EntryWithMoodColor(
+            id = entry.id,
+            moodColorId = entry.moodColorId,
+            moodName = "Test Mood",
+            moodColor = "4CAF50",
+            content = entry.content,
+            dateStamp = entry.dateStamp
+        )
     }
 
     override suspend fun insertEntry(entry: Entry) {
