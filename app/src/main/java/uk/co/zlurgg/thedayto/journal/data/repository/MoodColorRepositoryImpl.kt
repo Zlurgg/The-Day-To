@@ -15,12 +15,16 @@ class MoodColorRepositoryImpl(
         return dao.insertMoodColor(moodColor.toEntity())
     }
 
-    override suspend fun deleteMoodColor(moodColor: MoodColor) {
-        return dao.deleteMoodColor(moodColor.toEntity())
+    override suspend fun deleteMoodColor(id: Int) {
+        return dao.deleteMoodColor(id)
     }
 
     override suspend fun getMoodColorById(id: Int): MoodColor? {
         return dao.getMoodColorById(id)?.toDomain()
+    }
+
+    override suspend fun getMoodColorByName(mood: String): MoodColor? {
+        return dao.getMoodColorByName(mood)?.toDomain()
     }
 
     override fun getMoodColors(): Flow<List<MoodColor>> {
