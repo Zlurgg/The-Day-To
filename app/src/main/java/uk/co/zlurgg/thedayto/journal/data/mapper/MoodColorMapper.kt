@@ -15,7 +15,8 @@ fun MoodColorEntity.toDomain(): MoodColor {
 
 fun MoodColor.toEntity(): MoodColorEntity {
     return MoodColorEntity(
-        mood = mood,
+        mood = mood,  // Preserve original case for display
+        moodNormalized = mood.trim().lowercase(),  // Normalize for uniqueness
         color = color,
         isDeleted = isDeleted,
         dateStamp = dateStamp,

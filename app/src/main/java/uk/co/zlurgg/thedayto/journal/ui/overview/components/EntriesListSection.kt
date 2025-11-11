@@ -14,7 +14,6 @@ import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
 /**
