@@ -7,6 +7,7 @@ fun MoodColorEntity.toDomain(): MoodColor {
     return MoodColor(
         mood = mood,
         color = color,
+        isDeleted = isDeleted,
         dateStamp = dateStamp,
         id = id
     )
@@ -16,6 +17,7 @@ fun MoodColor.toEntity(): MoodColorEntity {
     return MoodColorEntity(
         mood = mood,
         color = color,
+        isDeleted = isDeleted,
         dateStamp = dateStamp,
         id = id
     )
