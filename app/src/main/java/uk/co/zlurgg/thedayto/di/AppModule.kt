@@ -61,7 +61,7 @@ val appModule = module {
             TheDayToDatabase::class.java,
             TheDayToDatabase.DATABASE_NAME
         )
-            .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(dropAllTables = true)
             .build()
     }
 
