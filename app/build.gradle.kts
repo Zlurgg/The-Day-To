@@ -90,11 +90,34 @@ dependencies {
     testImplementation(libs.androidx.work.testing)
     testImplementation(libs.robolectric)
 
+    // Instrumented Tests
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.mockk.android)
+
+    // AndroidX Test - Core
+    androidTestImplementation(libs.androidx.test.core.ktx)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.junit.ktx)
+
+    // Room Testing
+    androidTestImplementation(libs.androidx.room.testing)
+
+    // Coroutines Testing (for instrumented tests)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+
+    // WorkManager Testing
+    androidTestImplementation(libs.androidx.work.testing)
+
+    // Koin Testing
+    androidTestImplementation(libs.koin.test)
+    androidTestImplementation(libs.koin.test.junit4)
+
+    // Turbine (for Flow testing in instrumented tests)
+    androidTestImplementation(libs.turbine)
 
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
