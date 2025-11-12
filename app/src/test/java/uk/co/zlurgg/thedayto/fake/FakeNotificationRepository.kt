@@ -14,6 +14,8 @@ open class FakeNotificationRepository : NotificationRepository {
     private var scheduledMinute: Int = 0
     var hasPermission: Boolean = true
     var shouldSendNotification: Boolean = true
+    var shouldShowRationale: Boolean = false
+    var systemNotificationsEnabled: Boolean = true
     var setupDailyNotificationCalled: Boolean = false
     var cancelNotificationsCalled: Boolean = false
     var updateNotificationTimeCalled: Boolean = false
@@ -48,11 +50,11 @@ open class FakeNotificationRepository : NotificationRepository {
     }
 
     override fun areSystemNotificationsEnabled(): Boolean {
-        return true  // Default to enabled for tests
+        return systemNotificationsEnabled
     }
 
     override fun shouldShowPermissionRationale(): Boolean {
-        return false  // Default to false (permission not permanently denied) for tests
+        return shouldShowRationale
     }
 
     /**
@@ -64,6 +66,9 @@ open class FakeNotificationRepository : NotificationRepository {
         scheduledHour = 9
         scheduledMinute = 0
         hasPermission = true
+        shouldSendNotification = true
+        shouldShowRationale = false
+        systemNotificationsEnabled = true
         setupDailyNotificationCalled = false
         cancelNotificationsCalled = false
         updateNotificationTimeCalled = false
