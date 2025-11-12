@@ -312,7 +312,7 @@ Follow [Kotlin Style Guide](https://developer.android.com/kotlin/style-guide) an
    - Use appropriate log levels: `Timber.d()`, `Timber.e()`, `Timber.w()`
    - Include meaningful context in log messages
    - Never use `println()` or `Log.*` directly
-   ```kotlin
+   ```text
    // ✅ CORRECT
    Timber.d("Loading entry for date: $date")
    Timber.e(exception, "Failed to save entry")
@@ -339,7 +339,7 @@ Follow [Kotlin Style Guide](https://developer.android.com/kotlin/style-guide) an
    - Use for UI state variants: `sealed interface UiState`
    - Use for one-time events: `sealed interface UiEvent`
    - Use for Result types: `sealed interface Result<out T>`
-   ```kotlin
+   ```text
    // ✅ Recommended - sealed interface over sealed class
    sealed interface UiState {
        data object Loading : UiState
@@ -364,7 +364,7 @@ Follow [Kotlin Style Guide](https://developer.android.com/kotlin/style-guide) an
 
 Per [Android ViewModel documentation](https://developer.android.com/topic/libraries/architecture/viewmodel):
 
-```kotlin
+```text
 // ✅ CORRECT - Google's recommended pattern
 data class EntryUiState(
     val entryDate: Long = System.currentTimeMillis(),
@@ -412,7 +412,7 @@ class MyViewModel : ViewModel() {
 ### Dependency Injection Rules
 
 1. **No Manual Instantiation**
-   ```kotlin
+   ```text
    // ❌ WRONG
    class MainActivity {
        private val authClient by lazy { GoogleAuthUiClient(this) }
@@ -425,7 +425,7 @@ class MyViewModel : ViewModel() {
    ```
 
 2. **Constructor Injection**
-   ```kotlin
+   ```text
    // ✅ CORRECT
    class MyViewModel(
        private val repository: MyRepository,
@@ -434,7 +434,7 @@ class MyViewModel : ViewModel() {
    ```
 
 3. **Repository Injection**
-   ```kotlin
+   ```text
    // ❌ WRONG
    class MyViewModel(context: Context) : ViewModel() {
        private val prefRepo = TheDayToPrefRepository(context)
@@ -449,7 +449,7 @@ class MyViewModel : ViewModel() {
 ### Error Handling
 
 1. **Use Result/Resource Wrapper**
-   ```kotlin
+   ```text
    sealed class Resource<T> {
        data class Success<T>(val data: T) : Resource<T>()
        data class Error<T>(val message: String) : Resource<T>()
@@ -477,7 +477,7 @@ Following [Jetpack Compose Best Practices](https://developer.android.com/jetpack
 
    **IMPORTANT**: Use the Root/Presenter pattern for all screen-level composables (as seen in My-Bookshelf):
 
-   ```kotlin
+   ```text
    // ✅ CORRECT - Root composable (container)
    @Composable
    fun MyScreenRoot(
@@ -576,7 +576,7 @@ Following [Jetpack Compose Best Practices](https://developer.android.com/jetpack
    - Add `@Preview` for all major Composables
    - Include light and dark theme previews
    - Use `@PreviewParameter` for different states
-   ```kotlin
+   ```text
    @Preview(name = "Light Mode", showBackground = true)
    @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
    @Composable
@@ -605,7 +605,7 @@ Following [Clean Architecture principles](https://developer.android.com/topic/ar
 
 ### 1. Domain Models (Pure Kotlin)
 
-```kotlin
+```text
 // ✅ domain/model/Entry.kt - Pure Kotlin, no @Entity
 package uk.co.zlurgg.thedayto.journal.domain.model
 
@@ -622,7 +622,7 @@ class InvalidEntryException(message: String) : Exception(message)
 
 ### 2. Data Entities (Room)
 
-```kotlin
+```text
 // ✅ data/model/EntryEntity.kt - Room @Entity
 package uk.co.zlurgg.thedayto.journal.data.model
 
@@ -641,7 +641,7 @@ data class EntryEntity(
 
 ### 3. Mappers (Conversion Layer)
 
-```kotlin
+```text
 // ✅ data/mapper/EntryMapper.kt - Extension functions
 package uk.co.zlurgg.thedayto.journal.data.mapper
 
@@ -671,7 +671,7 @@ fun Entry.toEntity(): EntryEntity {
 
 ### 4. DAOs (Data Layer)
 
-```kotlin
+```text
 // ✅ data/dao/EntryDao.kt - Works with entities
 package uk.co.zlurgg.thedayto.journal.data.dao
 
@@ -691,7 +691,7 @@ interface EntryDao {
 
 ### 5. Repository Interface (Domain Layer)
 
-```kotlin
+```text
 // ✅ domain/repository/EntryRepository.kt - Returns domain models
 package uk.co.zlurgg.thedayto.journal.domain.repository
 
@@ -706,7 +706,7 @@ interface EntryRepository {
 
 ### 6. Repository Implementation (Data Layer)
 
-```kotlin
+```text
 // ✅ data/repository/EntryRepositoryImpl.kt - Uses mappers
 package uk.co.zlurgg.thedayto.journal.data.repository
 
@@ -751,7 +751,7 @@ Following [Android Room documentation](https://developer.android.com/training/da
 1. **Versioning**
    - Increment version on schema changes
    - **Note**: No migrations needed for pre-release - clean deployment
-   ```kotlin
+   ```text
    @Database(
        entities = [EntryEntity::class, MoodColorEntity::class],
        version = 1,  // Increment when schema changes (no migration needed pre-release)
@@ -778,7 +778,7 @@ Following [Android Room documentation](https://developer.android.com/training/da
    - Use `suspend fun` for one-shot operations
    - Avoid `LiveData` - prefer Flow for modern architecture
    - **DAOs work with data entities, NOT domain models**
-   ```kotlin
+   ```text
    // ✅ CORRECT - Google's recommended pattern
    @Dao
    interface EntryDao {
@@ -1081,7 +1081,7 @@ This project implements a comprehensive testing strategy aligned with Google's M
 - **Key Tests**: State transitions, error handling, navigation events, user actions
 
 **Example Pattern:**
-```kotlin
+```text
 @Test
 fun `onAction SaveEntry creates entry and navigates back`() = runTest {
     // Given: Valid entry data
@@ -1117,7 +1117,7 @@ fun `onAction SaveEntry creates entry and navigates back`() = runTest {
 - **Key Tests**: Foreign key constraints, JOIN queries, soft delete, Flow emissions
 
 **Example Pattern:**
-```kotlin
+```text
 @Test(expected = SQLiteConstraintException::class)
 fun insertEntry_fails_when_moodColorId_does_not_exist() = runTest {
     // Given: Empty mood color table
@@ -1139,7 +1139,7 @@ fun insertEntry_fails_when_moodColorId_does_not_exist() = runTest {
 
 **1. Reactive Fakes with MutableStateFlow**
 Fake repositories must emit on data changes to simulate Room's reactive behavior:
-```kotlin
+```text
 class FakeMoodColorRepository : MoodColorRepository {
     private val _moodColors = MutableStateFlow<List<MoodColor>>(emptyList())
 
@@ -1157,7 +1157,7 @@ class FakeMoodColorRepository : MoodColorRepository {
 
 **2. SharedFlow Event Collection Pattern**
 Always start collecting events BEFORE triggering actions:
-```kotlin
+```text
 // ✅ CORRECT - Collect before action
 viewModel.uiEvents.test {
     viewModel.onAction(SomeAction)
@@ -1174,7 +1174,7 @@ viewModel.uiEvents.test {
 
 **3. Test Outcomes, Not Timing**
 Avoid timing-dependent tests by testing final outcomes:
-```kotlin
+```text
 // ✅ CORRECT - Test final state
 viewModel.onAction(SaveMoodColor("Happy", "4CAF50"))
 testScheduler.advanceUntilIdle()  // Wait for all async work
@@ -1189,7 +1189,7 @@ delay(100)  // Brittle! Timing assumption
 
 **4. JOIN Support in Fakes**
 EntryRepository fake needs MoodColorRepository for proper JOIN simulation:
-```kotlin
+```text
 class FakeEntryRepository(
     private val moodColorRepository: FakeMoodColorRepository? = null
 ) : EntryRepository {
