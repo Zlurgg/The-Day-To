@@ -24,7 +24,7 @@ class MoodColorRepositoryImpl(
     }
 
     override suspend fun getMoodColorByName(mood: String): MoodColor? {
-        return dao.getMoodColorByName(mood)?.toDomain()
+        return dao.getMoodColorByName(mood.trim().lowercase())?.toDomain()
     }
 
     override fun getMoodColors(): Flow<List<MoodColor>> {

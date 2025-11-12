@@ -42,7 +42,8 @@ class AddMoodColorUseCase(
         }
 
         // Check if mood exists (deleted or active) - case-insensitive lookup
-        val existing = repository.getMoodColorByName(sanitizedMood.trim().lowercase())
+        // Note: Repository handles normalization internally
+        val existing = repository.getMoodColorByName(sanitizedMood)
 
         when {
             existing == null -> {
