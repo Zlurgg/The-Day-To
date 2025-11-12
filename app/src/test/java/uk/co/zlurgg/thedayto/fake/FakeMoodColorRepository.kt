@@ -71,6 +71,14 @@ class FakeMoodColorRepository : MoodColorRepository {
     }
 
     /**
+     * Helper method to get mood color by ID synchronously.
+     * Includes deleted mood colors. Used for simulating JOIN operations.
+     */
+    fun getMoodColorByIdSync(id: Int): MoodColor? {
+        return moodColors.find { it.id == id }
+    }
+
+    /**
      * Helper method to add default mood colors for testing.
      */
     fun addDefaultMoods() {

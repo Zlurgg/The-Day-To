@@ -9,8 +9,12 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 /**
  * Fake implementation of EntryRepository for testing.
  * Stores entries in memory and provides synchronous access for test verification.
+ *
+ * Can optionally accept a FakeMoodColorRepository to simulate proper JOIN behavior.
  */
-class FakeEntryRepository : EntryRepository {
+class FakeEntryRepository(
+    private val moodColorRepository: FakeMoodColorRepository? = null
+) : EntryRepository {
 
     // In-memory storage for testing
     private val entries = mutableListOf<Entry>()
@@ -22,11 +26,14 @@ class FakeEntryRepository : EntryRepository {
 
     override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> = flow {
         emit(entries.map { entry ->
+            // If moodColorRepository is provided, do a proper join (simulates real DB behavior)
+            val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
+
             EntryWithMoodColor(
                 id = entry.id,
                 moodColorId = entry.moodColorId,
-                moodName = "Test Mood",  // Dummy data for testing
-                moodColor = "4CAF50",    // Green color
+                moodName = moodColor?.mood ?: "Test Mood",  // Use actual mood name from join
+                moodColor = moodColor?.color ?: "4CAF50",   // Use actual color from join
                 content = entry.content,
                 dateStamp = entry.dateStamp
             )
@@ -39,11 +46,12 @@ class FakeEntryRepository : EntryRepository {
 
     override suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor? {
         val entry = entries.find { it.id == id } ?: return null
+        val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
         return EntryWithMoodColor(
             id = entry.id,
             moodColorId = entry.moodColorId,
-            moodName = "Test Mood",
-            moodColor = "4CAF50",
+            moodName = moodColor?.mood ?: "Test Mood",
+            moodColor = moodColor?.color ?: "4CAF50",
             content = entry.content,
             dateStamp = entry.dateStamp
         )
@@ -55,11 +63,12 @@ class FakeEntryRepository : EntryRepository {
 
     override suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor? {
         val entry = entries.find { it.dateStamp == date } ?: return null
+        val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
         return EntryWithMoodColor(
             id = entry.id,
             moodColorId = entry.moodColorId,
-            moodName = "Test Mood",
-            moodColor = "4CAF50",
+            moodName = moodColor?.mood ?: "Test Mood",
+            moodColor = moodColor?.color ?: "4CAF50",
             content = entry.content,
             dateStamp = entry.dateStamp
         )
