@@ -31,7 +31,7 @@ roomRuntime = "2.8.3"
 compose-material-icons-extended = "1.7.8"
 material3-adaptive = "1.2.0"
 
-androidGradlePlugin = "8.13.0"
+androidGradlePlugin = "8.13.1"
 kotlin = "2.2.21"
 kotlinKsp = "2.2.20-2.0.4"
 hiltAndroid = "2.57.2"
