@@ -581,19 +581,16 @@ class OverviewViewModelTest {
     }
 
     @Test
-    fun `RequestShowTutorial action - emits tutorial dialog event`() = runTest {
-        // When: User requests tutorial
-        viewModel.uiEvents.test {
-            viewModel.onAction(OverviewAction.RequestShowTutorial)
-            testScheduler.advanceUntilIdle()
+    fun `RequestShowTutorial action - shows tutorial dialog via state`() = runTest {
+        // When: User requests tutorial from settings menu
+        viewModel.onAction(OverviewAction.RequestShowTutorial)
+        testScheduler.advanceUntilIdle()
 
-            // Then: Tutorial dialog event should be emitted
-            val event = awaitItem()
-            assertTrue(
-                "Should show tutorial dialog",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowTutorialDialog
-            )
-        }
+        // Then: Tutorial dialog state should be true
+        assertTrue(
+            "Should show tutorial dialog via state",
+            viewModel.uiState.value.showTutorialDialog
+        )
     }
 
     @Test

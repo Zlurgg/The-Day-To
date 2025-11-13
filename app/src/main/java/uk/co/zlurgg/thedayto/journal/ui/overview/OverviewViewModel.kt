@@ -83,7 +83,7 @@ class OverviewViewModel(
      *
      * For first-time users:
      * - Shows tutorial dialog to explain app usage
-     * - Marks first launch as complete
+     * - First launch marked complete only when tutorial dismissed
      *
      * For returning users without today's entry:
      * - Shows reminder dialog once per day
@@ -102,8 +102,8 @@ class OverviewViewModel(
             if (!hasTodayEntry) {
                 if (isFirstLaunch) {
                     // First-time users see tutorial (Getting Started)
-                    _uiEvents.emit(OverviewUiEvent.ShowTutorialDialog)
-                    overviewUseCases.markFirstLaunchComplete()
+                    Timber.d("First time user - showing tutorial dialog")
+                    _uiState.update { it.copy(showTutorialDialog = true) }
                 } else if (!overviewUseCases.checkEntryReminderShownToday()) {
                     // Returning users see entry reminder
                     _uiState.update { it.copy(showEntryReminderDialog = true) }
@@ -328,9 +328,7 @@ class OverviewViewModel(
             }
 
             is OverviewAction.RequestShowTutorial -> {
-                viewModelScope.launch {
-                    _uiEvents.emit(OverviewUiEvent.ShowTutorialDialog)
-                }
+                _uiState.update { it.copy(showTutorialDialog = true) }
             }
 
             is OverviewAction.RequestShowHelp -> {
@@ -347,6 +345,11 @@ class OverviewViewModel(
 
             is OverviewAction.DismissTutorial -> {
                 viewModelScope.launch {
+                    Timber.d("Tutorial dismissed - marking first launch complete")
+                    // Mark first launch complete only when user actually dismisses tutorial
+                    overviewUseCases.markFirstLaunchComplete()
+                    _uiState.update { it.copy(showTutorialDialog = false) }
+
                     // After tutorial is dismissed, check if entry reminder should be shown
                     // This creates the flow: Tutorial → Entry Reminder → Create Entry
                     val todayEpoch = DateUtils.getTodayStartEpoch()

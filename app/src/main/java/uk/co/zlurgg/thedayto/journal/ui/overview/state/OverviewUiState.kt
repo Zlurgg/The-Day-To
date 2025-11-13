@@ -22,6 +22,7 @@ data class OverviewUiState(
 
     // Dialog state
     val showEntryReminderDialog: Boolean = false,
+    val showTutorialDialog: Boolean = false,
 
     // Notification settings state
     val notificationsEnabled: Boolean = false,

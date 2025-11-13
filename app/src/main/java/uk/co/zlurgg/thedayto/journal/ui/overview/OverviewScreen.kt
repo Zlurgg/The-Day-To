@@ -79,7 +79,6 @@ fun OverviewScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showTutorialDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
     var showAboutDialog by remember { mutableStateOf(false) }
     var showSystemNotificationDialog by remember { mutableStateOf(false) }
@@ -123,9 +122,6 @@ fun OverviewScreenRoot(
                 is OverviewUiEvent.ShowSignOutDialog -> {
                     onShowSignOutDialog()
                 }
-                is OverviewUiEvent.ShowTutorialDialog -> {
-                    showTutorialDialog = true
-                }
                 is OverviewUiEvent.ShowHelpDialog -> {
                     showHelpDialog = true
                 }
@@ -142,11 +138,10 @@ fun OverviewScreenRoot(
         }
     }
 
-    // Show tutorial dialog when event is triggered (first-time users)
-    if (showTutorialDialog) {
+    // Show tutorial dialog for first-time users
+    if (uiState.showTutorialDialog) {
         OverviewTutorialDialog(
             onDismiss = {
-                showTutorialDialog = false
                 viewModel.onAction(OverviewAction.DismissTutorial)
             }
         )
