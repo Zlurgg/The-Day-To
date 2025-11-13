@@ -28,7 +28,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 @Composable
 fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
-    onShowTutorial: () -> Unit,
+    onShowHelp: () -> Unit,
     onNavigateToStats: () -> Unit,
     onSignOut: () -> Unit
 ) {
@@ -81,7 +81,7 @@ fun SettingsMenu(
                 text = { Text(stringResource(R.string.help_and_tutorial)) },
                 onClick = {
                     expanded = false
-                    onShowTutorial()
+                    onShowHelp()
                 },
                 leadingIcon = {
                     Icon(
@@ -115,7 +115,7 @@ private fun SettingsMenuPreview() {
     TheDayToTheme {
         SettingsMenu(
             onOpenNotificationSettings = {},
-            onShowTutorial = {},
+            onShowHelp = {},
             onNavigateToStats = {},
             onSignOut = {}
         )
