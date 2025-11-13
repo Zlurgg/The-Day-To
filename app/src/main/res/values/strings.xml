@@ -85,6 +85,16 @@
     <string name="tutorial_calendar_content">Your month is displayed as a color calendar. Each day shows the color of your mood. Tap any date to view or edit that day\'s entry.</string>
     <string name="help_and_tutorial">Help &amp; Tutorial</string>
 
+    <!-- Editor Tutorial Dialog -->
+    <string name="editor_tutorial_dialog_title">Creating Your First Entry</string>
+    <string name="editor_tutorial_dialog_button">Got It</string>
+    <string name="editor_tutorial_mood_colors_title">Mood Colors</string>
+    <string name="editor_tutorial_mood_colors_content">Mood colors help you visually track your emotions. Tap a color to select it for today, or create custom colors with the + button to match your unique feelings.</string>
+    <string name="editor_tutorial_notes_title">Adding Notes</string>
+    <string name="editor_tutorial_notes_content">Notes are optional but provide context for your mood. Use them to reflect on your day, what happened, or how you\'re feeling. They appear in your calendar timeline.</string>
+    <string name="editor_tutorial_saving_title">Saving Your Entry</string>
+    <string name="editor_tutorial_saving_content">Tap \"Save\" to log your entry. You can create one entry per day, but you can always edit it later by tapping the day on your calendar.</string>
+
     <!-- Permission Permanently Denied Dialog -->
     <string name="permission_denied_title">Permission Required</string>
     <string name="permission_denied_message">Notification permission is required for daily reminders. Please enable it in your device settings:\n\nSettings → Apps → The Day To → Notifications</string>

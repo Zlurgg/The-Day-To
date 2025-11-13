@@ -89,6 +89,25 @@ class PreferencesRepositoryImpl(
     }
 
     /**
+     * Check if the user has seen the editor tutorial.
+     *
+     * @return true if user has seen editor tutorial, false otherwise (first time)
+     */
+    override suspend fun hasSeenEditorTutorial(): Boolean {
+        return prefs.getBoolean(KEY_EDITOR_TUTORIAL_SEEN, false)
+    }
+
+    /**
+     * Mark that the user has seen the editor tutorial.
+     *
+     * Sets a persistent flag indicating the editor tutorial was displayed
+     * and dismissed by the user on first entry creation.
+     */
+    override suspend fun markEditorTutorialSeen() {
+        prefs.edit { putBoolean(KEY_EDITOR_TUTORIAL_SEEN, true) }
+    }
+
+    /**
      * Check if daily notifications are enabled.
      *
      * @return true if notifications are enabled, false otherwise (default: false)
@@ -148,6 +167,7 @@ class PreferencesRepositoryImpl(
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
         private const val KEY_FIRST_LAUNCH_COMPLETE = "first_launch_complete"
         private const val KEY_WELCOME_DIALOG_SEEN = "welcome_dialog_seen"
+        private const val KEY_EDITOR_TUTORIAL_SEEN = "editor_tutorial_seen"
         private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
         private const val KEY_NOTIFICATION_HOUR = "notification_hour"
         private const val KEY_NOTIFICATION_MINUTE = "notification_minute"

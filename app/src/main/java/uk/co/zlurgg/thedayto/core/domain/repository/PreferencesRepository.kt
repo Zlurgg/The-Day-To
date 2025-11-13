@@ -67,6 +67,23 @@ interface PreferencesRepository {
     suspend fun markWelcomeDialogSeen()
 
     /**
+     * Check if the user has seen the editor tutorial.
+     *
+     * Used to determine if the editor tutorial should be shown
+     * on the first entry creation.
+     *
+     * @return true if user has seen the editor tutorial, false otherwise
+     */
+    suspend fun hasSeenEditorTutorial(): Boolean
+
+    /**
+     * Mark that the user has seen the editor tutorial.
+     *
+     * Called after the editor tutorial is dismissed on first entry creation.
+     */
+    suspend fun markEditorTutorialSeen()
+
+    /**
      * Check if daily notifications are enabled.
      *
      * @return true if notifications are enabled, false otherwise
