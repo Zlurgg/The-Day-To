@@ -62,11 +62,14 @@ class OverviewViewModel(
     }
 
     /**
-     * Check if today's entry exists and show reminder dialog if needed
+     * Check if today's entry exists and show appropriate dialog
      *
-     * Shows the reminder dialog once per day if:
-     * - No entry exists for today
-     * - Reminder hasn't been shown today yet
+     * For first-time users:
+     * - Shows tutorial dialog to explain app usage
+     * - Marks first launch as complete
+     *
+     * For returning users without today's entry:
+     * - Shows reminder dialog once per day
      */
     private fun checkTodayEntry() {
         viewModelScope.launch {
@@ -76,9 +79,18 @@ class OverviewViewModel(
             val hasTodayEntry = todayEntry != null
             _uiState.update { it.copy(hasTodayEntry = hasTodayEntry) }
 
-            // Show reminder dialog if no entry + haven't shown today
-            if (!hasTodayEntry && !overviewUseCases.checkEntryReminderShownToday()) {
-                _uiState.update { it.copy(showEntryReminderDialog = true) }
+            // Check if this is first launch
+            val isFirstLaunch = overviewUseCases.checkFirstLaunch()
+
+            if (!hasTodayEntry) {
+                if (isFirstLaunch) {
+                    // First-time users see tutorial (Getting Started)
+                    _uiEvents.emit(OverviewUiEvent.ShowTutorialDialog)
+                    overviewUseCases.markFirstLaunchComplete()
+                } else if (!overviewUseCases.checkEntryReminderShownToday()) {
+                    // Returning users see entry reminder
+                    _uiState.update { it.copy(showEntryReminderDialog = true) }
+                }
             }
         }
     }

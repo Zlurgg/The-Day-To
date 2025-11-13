@@ -51,7 +51,6 @@ class SeedDefaultMoodColorsUseCase(
             moodColorRepository.insertMoodColor(moodColor)
         }
 
-        // Mark first launch as complete
-        preferencesRepository.markFirstLaunchComplete()
+        // Note: First launch is marked complete in OverviewViewModel after tutorial is shown
     }
 }
