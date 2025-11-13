@@ -25,7 +25,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -59,6 +61,7 @@ fun EditorScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    var showEditorTutorialDialog by remember { mutableStateOf(false) }
 
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {
@@ -72,6 +75,9 @@ fun EditorScreenRoot(
                         // Remove editor from back stack
                         popUpTo(OverviewRoute) { inclusive = false }
                     }
+                }
+                is EditorUiEvent.ShowEditorTutorial -> {
+                    showEditorTutorialDialog = true
                 }
             }
         }
@@ -90,6 +96,13 @@ fun EditorScreenRoot(
         showBackButton = showBackButton,
         snackbarHostState = snackbarHostState
     )
+
+    // Show editor tutorial dialog for first-time users
+    if (showEditorTutorialDialog) {
+        uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog(
+            onDismiss = { showEditorTutorialDialog = false }
+        )
+    }
 }
 
 /**
