@@ -249,10 +249,14 @@ private fun CalendarMonthGrid(
             // Capture the date at the time of pager creation
             val pagerCreationDate = date
 
+            // Calculate max page: can go back infinitely, but forward only to current month
+            val monthsToCurrentFromCreation = CalendarUtils.calculateMonthsBetween(pagerCreationDate, currentDate)
+            val maxPageIndex = initialPage + monthsToCurrentFromCreation.toInt()
+
             val pagerState = rememberPagerState(
                 initialPage = initialPage,
                 initialPageOffsetFraction = 0f,
-                pageCount = { Int.MAX_VALUE }
+                pageCount = { maxPageIndex + 1 }
             )
 
             LaunchedEffect(pagerState) {

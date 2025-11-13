@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -39,8 +40,16 @@ fun MonthYearPickerDialog(
     var selectedYear by remember { mutableIntStateOf(currentDate.year) }
     var selectedMonth by remember { mutableIntStateOf(currentDate.monthValue) }
 
+    val now = LocalDate.now()
     val months = Month.entries
-    val years = (2020..LocalDate.now().year + 1).toList()
+    val years = (2020..now.year).toList()
+
+    // Reset selected month if it becomes invalid when switching to current year
+    LaunchedEffect(selectedYear) {
+        if (selectedYear == now.year && selectedMonth > now.monthValue) {
+            selectedMonth = now.monthValue
+        }
+    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -88,13 +97,21 @@ fun MonthYearPickerDialog(
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
+
+                // Filter out future months when current year is selected
+                val availableMonths = if (selectedYear == now.year) {
+                    months.filter { it.value <= now.monthValue }
+                } else {
+                    months
+                }
+
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
                     verticalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
                     modifier = Modifier.height(UiConstants.MONTH_PICKER_YEAR_HEIGHT)
                 ) {
-                    items(months) { month ->
+                    items(availableMonths) { month ->
                         FilterChip(
                             selected = month.value == selectedMonth,
                             onClick = { selectedMonth = month.value },
