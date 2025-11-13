@@ -65,11 +65,11 @@ class OverviewViewModel(
 
         // Select time-appropriate greeting list
         val greetingList = when (hour) {
-            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> GreetingConstants.NIGHT_GREETINGS
-            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> GreetingConstants.MORNING_GREETINGS
-            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> GreetingConstants.AFTERNOON_GREETINGS
-            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> GreetingConstants.EVENING_GREETINGS
-            else -> GreetingConstants.NIGHT_GREETINGS  // 9pm - 11pm defaults to night
+            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> GreetingConstants.NIGHT_GREETINGS  // 12am - 4am
+            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> GreetingConstants.MORNING_GREETINGS  // 5am - 11am
+            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> GreetingConstants.AFTERNOON_GREETINGS  // 12pm - 4pm
+            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> GreetingConstants.EVENING_GREETINGS  // 5pm - 8pm
+            else -> GreetingConstants.NIGHT_GREETINGS  // 9pm - 11pm (late evening defaults to night)
         }
 
         // Pick random greeting from appropriate list
