@@ -18,6 +18,7 @@ sealed interface OverviewAction {
     data object RequestSignOut : OverviewAction
     data object RequestShowTutorial : OverviewAction
     data object RequestShowHelp : OverviewAction
+    data object RequestShowAbout : OverviewAction
     data object DismissTutorial : OverviewAction
     data object DismissEntryReminder : OverviewAction
     data object CreateTodayEntry : OverviewAction

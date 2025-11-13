@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material3.DropdownMenu
@@ -29,6 +30,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
     onShowHelp: () -> Unit,
+    onShowAbout: () -> Unit,
     onNavigateToStats: () -> Unit,
     onSignOut: () -> Unit
 ) {
@@ -92,6 +94,20 @@ fun SettingsMenu(
             )
 
             DropdownMenuItem(
+                text = { Text(stringResource(R.string.about)) },
+                onClick = {
+                    expanded = false
+                    onShowAbout()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Info,
+                        contentDescription = null
+                    )
+                }
+            )
+
+            DropdownMenuItem(
                 text = { Text(stringResource(R.string.sign_out)) },
                 onClick = {
                     expanded = false
@@ -116,6 +132,7 @@ private fun SettingsMenuPreview() {
         SettingsMenu(
             onOpenNotificationSettings = {},
             onShowHelp = {},
+            onShowAbout = {},
             onNavigateToStats = {},
             onSignOut = {}
         )

@@ -120,8 +120,7 @@ class EditorViewModel(
             val hasSeenTutorial = editorUseCases.checkEditorTutorialSeen()
             if (!hasSeenTutorial) {
                 Timber.d("First time creating entry - showing editor tutorial")
-                _uiEvents.emit(EditorUiEvent.ShowEditorTutorial)
-                editorUseCases.markEditorTutorialSeen()
+                _uiState.update { it.copy(showEditorTutorial = true) }
             }
         }
     }
@@ -221,6 +220,14 @@ class EditorViewModel(
                             }
                         }
                     }
+                }
+            }
+
+            is EditorAction.DismissEditorTutorial -> {
+                viewModelScope.launch {
+                    Timber.d("Editor tutorial dismissed - marking as seen")
+                    editorUseCases.markEditorTutorialSeen()
+                    _uiState.update { it.copy(showEditorTutorial = false) }
                 }
             }
 

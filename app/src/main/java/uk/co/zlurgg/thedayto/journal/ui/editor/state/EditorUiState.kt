@@ -18,6 +18,7 @@ data class EditorUiState(
     val isMoodHintVisible: Boolean = true,
     val isContentHintVisible: Boolean = true,
     val isMoodColorSectionVisible: Boolean = false,
+    val showEditorTutorial: Boolean = false,
 
     // Hints
     val moodHint: String = "How're you feeling today?",  // Dynamic hint based on date

@@ -46,6 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
@@ -80,6 +81,7 @@ fun OverviewScreenRoot(
     val snackbarHostState = remember { SnackbarHostState() }
     var showTutorialDialog by remember { mutableStateOf(false) }
     var showHelpDialog by remember { mutableStateOf(false) }
+    var showAboutDialog by remember { mutableStateOf(false) }
     var showSystemNotificationDialog by remember { mutableStateOf(false) }
     var showPermissionDeniedDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -127,6 +129,9 @@ fun OverviewScreenRoot(
                 is OverviewUiEvent.ShowHelpDialog -> {
                     showHelpDialog = true
                 }
+                is OverviewUiEvent.ShowAboutDialog -> {
+                    showAboutDialog = true
+                }
                 is OverviewUiEvent.ShowSystemNotificationWarning -> {
                     showSystemNotificationDialog = true
                 }
@@ -151,6 +156,13 @@ fun OverviewScreenRoot(
     if (showHelpDialog) {
         HelpDialog(
             onDismiss = { showHelpDialog = false }
+        )
+    }
+
+    // Show about dialog from settings menu
+    if (showAboutDialog) {
+        AboutDialog(
+            onDismiss = { showAboutDialog = false }
         )
     }
 
@@ -253,6 +265,7 @@ private fun OverviewScreen(
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
                     onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
+                    onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )

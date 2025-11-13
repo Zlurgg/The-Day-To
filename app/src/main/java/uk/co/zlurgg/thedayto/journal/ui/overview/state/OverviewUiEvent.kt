@@ -10,4 +10,5 @@ sealed interface OverviewUiEvent {
     data object ShowSignOutDialog : OverviewUiEvent
     data object ShowTutorialDialog : OverviewUiEvent
     data object ShowHelpDialog : OverviewUiEvent
+    data object ShowAboutDialog : OverviewUiEvent
 }

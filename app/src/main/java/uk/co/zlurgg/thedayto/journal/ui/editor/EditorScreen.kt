@@ -61,7 +61,6 @@ fun EditorScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    var showEditorTutorialDialog by remember { mutableStateOf(false) }
 
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {
@@ -75,9 +74,6 @@ fun EditorScreenRoot(
                         // Remove editor from back stack
                         popUpTo(OverviewRoute) { inclusive = false }
                     }
-                }
-                is EditorUiEvent.ShowEditorTutorial -> {
-                    showEditorTutorialDialog = true
                 }
             }
         }
@@ -98,9 +94,9 @@ fun EditorScreenRoot(
     )
 
     // Show editor tutorial dialog for first-time users
-    if (showEditorTutorialDialog) {
+    if (uiState.showEditorTutorial) {
         uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog(
-            onDismiss = { showEditorTutorialDialog = false }
+            onDismiss = { viewModel.onAction(EditorAction.DismissEditorTutorial) }
         )
     }
 }
