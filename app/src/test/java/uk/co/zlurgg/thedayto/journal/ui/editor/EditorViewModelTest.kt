@@ -20,8 +20,11 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
+import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
@@ -49,6 +52,7 @@ class EditorViewModelTest {
     private lateinit var viewModel: EditorViewModel
     private lateinit var fakeEntryRepository: FakeEntryRepository
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
+    private lateinit var fakePreferencesRepository: FakePreferencesRepository
     private lateinit var savedStateHandle: SavedStateHandle
 
     private val testDispatcher = UnconfinedTestDispatcher()
@@ -59,6 +63,7 @@ class EditorViewModelTest {
 
         fakeEntryRepository = FakeEntryRepository()
         fakeMoodColorRepository = FakeMoodColorRepository()
+        fakePreferencesRepository = FakePreferencesRepository()
         savedStateHandle = SavedStateHandle()
 
         // Seed with default mood colors
@@ -78,7 +83,9 @@ class EditorViewModelTest {
             addMoodColorUseCase = AddMoodColorUseCase(fakeMoodColorRepository),
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
-            updateMoodColorUseCase = UpdateMoodColorUseCase(fakeMoodColorRepository)
+            updateMoodColorUseCase = UpdateMoodColorUseCase(fakeMoodColorRepository),
+            checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),
+            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository)
         )
         return EditorViewModel(editorUseCases, savedStateHandle)
     }

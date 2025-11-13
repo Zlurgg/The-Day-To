@@ -7,8 +7,10 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotification
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermissionRationaleUseCase
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckFirstLaunchUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkEntryReminderShownTodayUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkFirstLaunchCompleteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
@@ -39,6 +41,8 @@ fun createFakeOverviewUseCases(
 
     val checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository)
     val markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository)
+    val checkFirstLaunch = CheckFirstLaunchUseCase(preferencesRepository)
+    val markFirstLaunchComplete = MarkFirstLaunchCompleteUseCase(preferencesRepository)
 
     // Create real entry use cases with fake repository
     val getEntries = GetEntriesUseCase(entryRepository)
@@ -55,6 +59,8 @@ fun createFakeOverviewUseCases(
         updateEntryUseCase = updateEntry,
         checkEntryReminderShownToday = checkEntryReminderShownToday,
         markEntryReminderShownToday = markEntryReminderShownToday,
+        checkFirstLaunch = checkFirstLaunch,
+        markFirstLaunchComplete = markFirstLaunchComplete,
         getNotificationSettings = getNotificationSettings,
         saveNotificationSettings = saveNotificationSettings,
         checkNotificationPermission = checkNotificationPermission,
