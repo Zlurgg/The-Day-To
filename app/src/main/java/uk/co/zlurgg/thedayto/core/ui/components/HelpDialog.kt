@@ -1,5 +1,9 @@
 package uk.co.zlurgg.thedayto.core.ui.components
 
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -10,11 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.AnnotatedString
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 
@@ -44,12 +44,94 @@ fun HelpDialog(
             )
         },
         text = {
-            Text(
-                text = parseFormattedText(stringResource(R.string.help_dialog_content)),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.verticalScroll(rememberScrollState())
-            )
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Creating Entries section
+                Text(
+                    text = stringResource(R.string.help_dialog_creating_entries_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.help_dialog_creating_entries_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(paddingMedium))
+
+                // Custom Mood Colors section
+                Text(
+                    text = stringResource(R.string.help_dialog_mood_colors_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.help_dialog_mood_colors_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(paddingMedium))
+
+                // Calendar View section
+                Text(
+                    text = stringResource(R.string.help_dialog_calendar_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.help_dialog_calendar_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(paddingMedium))
+
+                // Notifications section
+                Text(
+                    text = stringResource(R.string.help_dialog_notifications_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.help_dialog_notifications_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+
+                Spacer(modifier = Modifier.height(paddingMedium))
+
+                // Editing Entries section
+                Text(
+                    text = stringResource(R.string.help_dialog_editing_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                Text(
+                    text = stringResource(R.string.help_dialog_editing_content),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
@@ -62,34 +144,4 @@ fun HelpDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         modifier = Modifier.padding(paddingMedium)
     )
-}
-
-/**
- * Parse simple HTML-like formatting in strings
- * Supports <b>text</b> for bold
- */
-private fun parseFormattedText(text: String): AnnotatedString {
-    return buildAnnotatedString {
-        var currentIndex = 0
-        val boldRegex = Regex("<b>(.*?)</b>")
-
-        boldRegex.findAll(text).forEach { matchResult ->
-            // Add text before the bold tag
-            if (matchResult.range.first > currentIndex) {
-                append(text.substring(currentIndex, matchResult.range.first))
-            }
-
-            // Add bold text
-            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append(matchResult.groupValues[1])
-            }
-
-            currentIndex = matchResult.range.last + 1
-        }
-
-        // Add remaining text after last bold tag
-        if (currentIndex < text.length) {
-            append(text.substring(currentIndex))
-        }
-    }
 }
