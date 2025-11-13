@@ -50,6 +50,8 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckFirstLaunchUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkFirstLaunchCompleteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
@@ -115,6 +117,8 @@ val appModule = module {
             updateEntryUseCase = UpdateEntryUseCase(repository = get()),
             checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository = get()),
             markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository = get()),
+            checkFirstLaunch = CheckFirstLaunchUseCase(preferencesRepository = get()),
+            markFirstLaunchComplete = MarkFirstLaunchCompleteUseCase(preferencesRepository = get()),
             getNotificationSettings = GetNotificationSettingsUseCase(preferencesRepository = get()),
             saveNotificationSettings = SaveNotificationSettingsUseCase(
                 preferencesRepository = get(),
