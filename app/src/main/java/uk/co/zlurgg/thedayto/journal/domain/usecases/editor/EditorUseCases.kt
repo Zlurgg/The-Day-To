@@ -16,5 +16,8 @@ data class EditorUseCases(
     val addMoodColorUseCase: AddMoodColorUseCase,
     val deleteMoodColor: DeleteMoodColorUseCase,
     val getMoodColors: GetMoodColorsUseCase,
-    val updateMoodColorUseCase: UpdateMoodColorUseCase
+    val updateMoodColorUseCase: UpdateMoodColorUseCase,
+    // Tutorial UseCases
+    val checkEditorTutorialSeen: CheckEditorTutorialSeenUseCase,
+    val markEditorTutorialSeen: MarkEditorTutorialSeenUseCase
 )

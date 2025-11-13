@@ -148,7 +148,9 @@ val appModule = module {
             deleteMoodColor = get(),
             addMoodColorUseCase = get(),
             getMoodColorUseCase = get(),
-            updateMoodColorUseCase = get()
+            updateMoodColorUseCase = get(),
+            checkEditorTutorialSeen = uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
+            markEditorTutorialSeen = uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase(preferencesRepository = get())
         )
     }
 
