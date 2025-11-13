@@ -54,53 +54,74 @@ class EditorViewModel(
             }
         }
 
-        // Load existing entry if editing
-        savedStateHandle.get<Int>("entryId")?.let { entryId ->
-            if (entryId != -1) {
-                Timber.d("Loading existing entry with ID: $entryId")
-                viewModelScope.launch {
-                    val loadingJob = launchDebouncedLoading { isLoading ->
-                        _uiState.update { it.copy(isLoading = isLoading) }
-                    }
+        // Load existing entry if editing, or show tutorial for new entries
+        val entryId = savedStateHandle.get<Int>("entryId")
+        if (entryId != null && entryId != -1) {
+            // Load existing entry
+            Timber.d("Loading existing entry with ID: $entryId")
+            viewModelScope.launch {
+                val loadingJob = launchDebouncedLoading { isLoading ->
+                    _uiState.update { it.copy(isLoading = isLoading) }
+                }
 
-                    try {
-                        val entry = editorUseCases.getEntryUseCase(entryId)
-                        entry?.let {
-                            loadingJob.cancel() // Cancel if finished quickly
-                            Timber.d("Successfully loaded entry with ID: ${it.id}")
-                            _uiState.update { state ->
-                                state.copy(
-                                    currentEntryId = it.id,
-                                    entryDate = it.dateStamp,
-                                    selectedMoodColorId = it.moodColorId,
-                                    entryContent = it.content,
-                                    isMoodHintVisible = false,
-                                    isContentHintVisible = false,
-                                    isLoading = false
-                                )
-                            }
-                        } ?: run {
-                            // Entry not found
-                            loadingJob.cancel()
-                            Timber.w("Entry not found with ID: $entryId")
-                            _uiState.update { it.copy(isLoading = false) }
-                            _uiEvents.emit(
-                                EditorUiEvent.ShowSnackbar(
-                                    message = "Entry not found"
-                                )
+                try {
+                    val entry = editorUseCases.getEntryUseCase(entryId)
+                    entry?.let {
+                        loadingJob.cancel() // Cancel if finished quickly
+                        Timber.d("Successfully loaded entry with ID: ${it.id}")
+                        _uiState.update { state ->
+                            state.copy(
+                                currentEntryId = it.id,
+                                entryDate = it.dateStamp,
+                                selectedMoodColorId = it.moodColorId,
+                                entryContent = it.content,
+                                isMoodHintVisible = false,
+                                isContentHintVisible = false,
+                                isLoading = false
                             )
                         }
-                    } catch (e: Exception) {
+                    } ?: run {
+                        // Entry not found
                         loadingJob.cancel()
-                        Timber.e(e, "Failed to load entry with ID: $entryId")
+                        Timber.w("Entry not found with ID: $entryId")
                         _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
-                                message = "Failed to load entry: ${e.message}"
+                                message = "Entry not found"
                             )
                         )
                     }
+                } catch (e: Exception) {
+                    loadingJob.cancel()
+                    Timber.e(e, "Failed to load entry with ID: $entryId")
+                    _uiState.update { it.copy(isLoading = false) }
+                    _uiEvents.emit(
+                        EditorUiEvent.ShowSnackbar(
+                            message = "Failed to load entry: ${e.message}"
+                        )
+                    )
                 }
+            }
+        } else {
+            // New entry (entryId is null or -1) - check if tutorial should be shown
+            checkAndShowEditorTutorial()
+        }
+    }
+
+    /**
+     * Check if editor tutorial should be shown for first-time entry creation
+     *
+     * Shows the editor tutorial if:
+     * - User hasn't seen it before
+     * - This is a new entry (not editing existing)
+     */
+    private fun checkAndShowEditorTutorial() {
+        viewModelScope.launch {
+            val hasSeenTutorial = editorUseCases.checkEditorTutorialSeen()
+            if (!hasSeenTutorial) {
+                Timber.d("First time creating entry - showing editor tutorial")
+                _uiEvents.emit(EditorUiEvent.ShowEditorTutorial)
+                editorUseCases.markEditorTutorialSeen()
             }
         }
     }
