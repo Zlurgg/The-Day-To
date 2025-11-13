@@ -316,6 +316,26 @@ class OverviewViewModel(
                 }
             }
 
+            is OverviewAction.RequestShowHelp -> {
+                viewModelScope.launch {
+                    _uiEvents.emit(OverviewUiEvent.ShowHelpDialog)
+                }
+            }
+
+            is OverviewAction.DismissTutorial -> {
+                viewModelScope.launch {
+                    // After tutorial is dismissed, check if entry reminder should be shown
+                    // This creates the flow: Tutorial → Entry Reminder → Create Entry
+                    val todayEpoch = DateUtils.getTodayStartEpoch()
+                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+
+                    if (todayEntry == null && !overviewUseCases.checkEntryReminderShownToday()) {
+                        Timber.d("Tutorial dismissed, showing entry reminder")
+                        _uiState.update { it.copy(showEntryReminderDialog = true) }
+                    }
+                }
+            }
+
             is OverviewAction.DismissEntryReminder -> {
                 viewModelScope.launch {
                     overviewUseCases.markEntryReminderShownToday()

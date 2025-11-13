@@ -46,7 +46,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.core.ui.components.TutorialDialog
+import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
@@ -58,6 +58,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalendarSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntriesListSection
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.OverviewTutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
@@ -78,6 +79,7 @@ fun OverviewScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     var showTutorialDialog by remember { mutableStateOf(false) }
+    var showHelpDialog by remember { mutableStateOf(false) }
     var showSystemNotificationDialog by remember { mutableStateOf(false) }
     var showPermissionDeniedDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
@@ -122,6 +124,9 @@ fun OverviewScreenRoot(
                 is OverviewUiEvent.ShowTutorialDialog -> {
                     showTutorialDialog = true
                 }
+                is OverviewUiEvent.ShowHelpDialog -> {
+                    showHelpDialog = true
+                }
                 is OverviewUiEvent.ShowSystemNotificationWarning -> {
                     showSystemNotificationDialog = true
                 }
@@ -132,10 +137,20 @@ fun OverviewScreenRoot(
         }
     }
 
-    // Show tutorial dialog when event is triggered
+    // Show tutorial dialog when event is triggered (first-time users)
     if (showTutorialDialog) {
-        TutorialDialog(
-            onDismiss = { showTutorialDialog = false }
+        OverviewTutorialDialog(
+            onDismiss = {
+                showTutorialDialog = false
+                viewModel.onAction(OverviewAction.DismissTutorial)
+            }
+        )
+    }
+
+    // Show help dialog from settings menu
+    if (showHelpDialog) {
+        HelpDialog(
+            onDismiss = { showHelpDialog = false }
         )
     }
 
@@ -237,7 +252,7 @@ private fun OverviewScreen(
                 )
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
-                    onShowTutorial = { onAction(OverviewAction.RequestShowTutorial) },
+                    onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                     onNavigateToStats = onNavigateToStats,
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
