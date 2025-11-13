@@ -75,12 +75,25 @@
     <!-- First-Time Tutorial Dialog (shown after sign-in) -->
     <string name="tutorial_dialog_title">Getting Started</string>
     <string name="tutorial_dialog_button">Got It</string>
-    <string name="tutorial_welcome_content">Ready to start tracking your mood?\n\n• Tap the + button to create your first entry\n• Choose a mood color that reflects how you feel\n• Enable notifications for daily reminders\n• Your calendar fills with colors over time\n\nTip: Access Help &amp; Tutorial anytime from the menu!</string>
+    <string name="tutorial_dialog_subtitle">Ready to start tracking your mood?</string>
+    <string name="tutorial_dialog_quick_start_title">Quick Start</string>
+    <string name="tutorial_dialog_quick_start_content">• Tap the + button to create your first entry\n• Choose a mood color that reflects how you feel\n• Add optional notes about your day</string>
+    <string name="tutorial_dialog_tips_title">Tips</string>
+    <string name="tutorial_dialog_tips_content">• Enable notifications for daily reminders\n• Your calendar fills with colors over time\n• Access Help &amp; Tutorial anytime from the menu</string>
 
     <!-- Help Dialog (shown from settings menu) -->
     <string name="help_dialog_title">How to Use The Day To</string>
     <string name="help_dialog_button">Got It</string>
-    <string name="help_dialog_content"><b>Creating Entries</b>\nTap the + button to log your daily mood. Select a mood color, add optional notes, and save.\n\n<b>Custom Mood Colors</b>\nTap + when selecting a mood to create your own mood-color combinations.\n\n<b>Calendar View</b>\nYour month displays as a color calendar. Tap any date to view or edit that day\'s entry.\n\n<b>Notifications</b>\nEnable daily reminders in settings to get gentle nudges at your preferred time.\n\n<b>Editing Entries</b>\nTap any colored date on the calendar to edit or view that entry\'s notes.</string>
+    <string name="help_dialog_creating_entries_title">Creating Entries</string>
+    <string name="help_dialog_creating_entries_content">Tap the + button to log your daily mood. Select a mood color, add optional notes, and save.</string>
+    <string name="help_dialog_mood_colors_title">Custom Mood Colors</string>
+    <string name="help_dialog_mood_colors_content">Tap + when selecting a mood to create your own mood-color combinations.</string>
+    <string name="help_dialog_calendar_title">Calendar View</string>
+    <string name="help_dialog_calendar_content">Your month displays as a color calendar. Tap any date to view or edit that day\'s entry.</string>
+    <string name="help_dialog_notifications_title">Notifications</string>
+    <string name="help_dialog_notifications_content">Enable daily reminders in settings to get gentle nudges at your preferred time.</string>
+    <string name="help_dialog_editing_title">Editing Entries</string>
+    <string name="help_dialog_editing_content">Tap any colored date on the calendar to edit or view that entry\'s notes.</string>
 
     <!-- Legacy tutorial strings (kept for reference, not currently used) -->
     <string name="tutorial_getting_started_title">Getting Started</string>
