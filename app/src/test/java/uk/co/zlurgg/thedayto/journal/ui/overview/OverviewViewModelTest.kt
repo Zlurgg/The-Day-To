@@ -672,4 +672,34 @@ class OverviewViewModelTest {
         assertFalse("Dialog should be closed", viewModel.uiState.value.showNotificationSettingsDialog)
     }
 
+    // Greeting Tests
+    @Test
+    fun `updateGreeting - sets greeting on init`() = runTest {
+        // Then: Greeting should be set (not empty)
+        testScheduler.advanceUntilIdle()
+
+        val greeting = viewModel.uiState.value.greeting
+        assertTrue(
+            "Greeting should be set on init",
+            greeting.isNotEmpty()
+        )
+    }
+
+    @Test
+    fun `updateGreeting - greeting is one of valid options`() = runTest {
+        // Then: Greeting should be from one of the valid greeting lists
+        testScheduler.advanceUntilIdle()
+
+        val greeting = viewModel.uiState.value.greeting
+        val allGreetings = uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.MORNING_GREETINGS +
+                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.AFTERNOON_GREETINGS +
+                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.EVENING_GREETINGS +
+                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.NIGHT_GREETINGS
+
+        assertTrue(
+            "Greeting should be from valid greeting lists",
+            allGreetings.contains(greeting)
+        )
+    }
+
 }
