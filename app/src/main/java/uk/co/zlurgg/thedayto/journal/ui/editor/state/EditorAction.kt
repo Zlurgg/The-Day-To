@@ -11,5 +11,6 @@ sealed interface EditorAction {
     data object ToggleMoodColorSection : EditorAction
     data class SaveMoodColor(val mood: String, val colorHex: String) : EditorAction
     data class DeleteMoodColor(val moodColor: MoodColor) : EditorAction
+    data object DismissEditorTutorial : EditorAction
     data object SaveEntry : EditorAction
 }

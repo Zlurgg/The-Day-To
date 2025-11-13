@@ -21,9 +21,12 @@ import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
+import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Locale
+import kotlin.random.Random
 
 class OverviewViewModel(
     private val overviewUseCases: OverviewUseCases
@@ -47,17 +50,31 @@ class OverviewViewModel(
     }
 
     /**
-     * Update greeting based on current time of day
+     * Update greeting based on current time of day with randomized variety.
+     *
+     * Uses date-based seed to ensure the same greeting is shown throughout the day,
+     * preventing the greeting from changing on every screen visit.
      */
     private fun updateGreeting() {
         val hour = LocalTime.now().hour
-        val greeting = when (hour) {
-            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> "Good night"
-            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> "Good morning"
-            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> "Good afternoon"
-            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> "Good evening"
-            else -> "Good night"
+        val today = LocalDate.now()
+
+        // Use date as seed for consistent greeting throughout the day
+        val seed = today.year * 10000 + today.monthValue * 100 + today.dayOfMonth
+        val random = Random(seed.toLong())
+
+        // Select time-appropriate greeting list
+        val greetingList = when (hour) {
+            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> GreetingConstants.NIGHT_GREETINGS
+            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> GreetingConstants.MORNING_GREETINGS
+            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> GreetingConstants.AFTERNOON_GREETINGS
+            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> GreetingConstants.EVENING_GREETINGS
+            else -> GreetingConstants.NIGHT_GREETINGS  // 9pm - 11pm defaults to night
         }
+
+        // Pick random greeting from appropriate list
+        val greeting = greetingList[random.nextInt(greetingList.size)]
+
         _uiState.update { it.copy(greeting = greeting) }
     }
 
@@ -319,6 +336,12 @@ class OverviewViewModel(
             is OverviewAction.RequestShowHelp -> {
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.ShowHelpDialog)
+                }
+            }
+
+            is OverviewAction.RequestShowAbout -> {
+                viewModelScope.launch {
+                    _uiEvents.emit(OverviewUiEvent.ShowAboutDialog)
                 }
             }
 
