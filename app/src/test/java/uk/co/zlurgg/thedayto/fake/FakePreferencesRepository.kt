@@ -13,6 +13,7 @@ class FakePreferencesRepository : PreferencesRepository {
     private var entryReminderDate: LocalDate? = null
     private var isFirstLaunch: Boolean = true
     private var welcomeDialogSeen: Boolean = false
+    private var editorTutorialSeen: Boolean = false
     private var notificationEnabled: Boolean = false
     private var notificationHour: Int = 9
     private var notificationMinute: Int = 0
@@ -39,6 +40,14 @@ class FakePreferencesRepository : PreferencesRepository {
 
     override suspend fun markWelcomeDialogSeen() {
         welcomeDialogSeen = true
+    }
+
+    override suspend fun hasSeenEditorTutorial(): Boolean {
+        return editorTutorialSeen
+    }
+
+    override suspend fun markEditorTutorialSeen() {
+        editorTutorialSeen = true
     }
 
     override suspend fun isNotificationEnabled(): Boolean {
@@ -70,6 +79,7 @@ class FakePreferencesRepository : PreferencesRepository {
         entryReminderDate = null
         isFirstLaunch = true
         welcomeDialogSeen = false
+        editorTutorialSeen = false
         notificationEnabled = false
         notificationHour = 9
         notificationMinute = 0

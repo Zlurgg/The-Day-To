@@ -473,9 +473,10 @@ class OverviewViewModelTest {
 
     @Test
     fun `checkTodayEntry - shows reminder when no entry and not shown today`() = runTest {
-        // Given: No today entry and reminder not shown
+        // Given: No today entry and reminder not shown (post-tutorial state)
         val fakeEntryRepo = FakeEntryRepository()
         fakePreferencesRepository.reset()  // Reset to ensure reminder not shown
+        fakePreferencesRepository.markFirstLaunchComplete()  // Simulate post-tutorial state
 
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
@@ -516,9 +517,10 @@ class OverviewViewModelTest {
 
     @Test
     fun `DismissEntryReminder action - marks reminder as shown and hides dialog`() = runTest {
-        // Given: Reminder dialog is showing
+        // Given: Reminder dialog is showing (post-tutorial state)
         val fakeEntryRepo = FakeEntryRepository()
         fakePreferencesRepository.reset()
+        fakePreferencesRepository.markFirstLaunchComplete()  // Simulate post-tutorial state
 
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,

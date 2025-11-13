@@ -184,8 +184,8 @@ class SignInViewModelTest {
         val moodColors = fakeMoodColorRepository.getMoodColorsSync()
         assertEquals("Should have 7 default mood colors", 7, moodColors.size)
 
-        // And: First launch should be marked complete
-        assertFalse("First launch should be marked complete", fakePreferencesRepository.isFirstLaunch())
+        // And: First launch should still be true (marked complete after tutorial shown on Overview)
+        assertTrue("First launch should still be true", fakePreferencesRepository.isFirstLaunch())
     }
 
     @Test
