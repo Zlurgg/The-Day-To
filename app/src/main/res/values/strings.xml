@@ -24,6 +24,7 @@
     <!-- Color Mood -->
     <string name="create_new_mood_color">Create new mood color</string>
     <string name="edit_mood_color">Edit Mood Color</string>
+    <string name="edit_mood_color_button">Edit mood color</string>
     <string name="cancel_mood_color_creation">Cancel mood color creation</string>
 
     <!-- Add edit daily entry -->
