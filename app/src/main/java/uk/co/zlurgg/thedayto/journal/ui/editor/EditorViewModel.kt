@@ -284,6 +284,11 @@ class EditorViewModel(
                 }
             }
 
+            is EditorAction.ToggleDatePicker -> {
+                Timber.d("Toggling date picker dialog")
+                _uiState.update { it.copy(showDatePicker = !it.showDatePicker) }
+            }
+
             is EditorAction.SaveEntry -> {
                 viewModelScope.launch {
                     val state = _uiState.value

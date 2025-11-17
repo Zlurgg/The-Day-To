@@ -18,7 +18,7 @@ fun datestampToFormattedDate(date: Long): String {
     val month = dt.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     val year = dt.year
 
-    return "$day $month, $year"
+    return "$day $month $year"
 }
 
 fun datestampToDay(date: Long): Int {

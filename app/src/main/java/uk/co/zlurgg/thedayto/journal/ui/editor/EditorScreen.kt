@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor
 
 import android.content.res.Configuration
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -41,6 +42,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
+import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
@@ -175,11 +177,14 @@ private fun EditorScreen(
                 .padding(paddingMedium)
                 .imePadding()
         ) {
-            // Date display (read-only)
+            // Date display (clickable to open date picker)
             Text(
                 text = datestampToFormattedDate(uiState.entryDate),
                 style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.clickable {
+                    onAction(EditorAction.ToggleDatePicker)
+                }
             )
             Spacer(modifier = Modifier.height(paddingMedium))
 
@@ -239,6 +244,22 @@ private fun EditorScreen(
                 }
             )
         }
+    }
+
+    // Date picker dialog
+    if (uiState.showDatePicker) {
+        EditorDatePickerDialog(
+            currentDate = java.time.Instant.ofEpochSecond(uiState.entryDate)
+                .atZone(ZoneOffset.UTC)
+                .toLocalDate(),
+            onDismiss = {
+                onAction(EditorAction.ToggleDatePicker)
+            },
+            onDateSelected = { selectedDate ->
+                val epochSeconds = selectedDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond()
+                onAction(EditorAction.EnteredDate(epochSeconds))
+            }
+        )
     }
 }
 
