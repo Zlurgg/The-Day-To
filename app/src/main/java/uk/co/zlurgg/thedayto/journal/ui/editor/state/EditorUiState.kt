@@ -19,6 +19,7 @@ data class EditorUiState(
     val isContentHintVisible: Boolean = true,
     val isMoodColorSectionVisible: Boolean = false,
     val showEditorTutorial: Boolean = false,
+    val showDatePicker: Boolean = false,
 
     // Edit mood color dialog state
     val showEditMoodColorDialog: Boolean = false,
