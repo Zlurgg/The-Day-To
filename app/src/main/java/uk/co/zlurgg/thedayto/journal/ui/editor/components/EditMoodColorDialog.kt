@@ -83,7 +83,7 @@ fun EditMoodColorDialog(
                         textStyle = MaterialTheme.typography.headlineSmall,
                         supportingText = {
                             Text(
-                                text = "Mood name cannot be changed",
+                                text = stringResource(R.string.mood_name_cannot_be_changed),
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
