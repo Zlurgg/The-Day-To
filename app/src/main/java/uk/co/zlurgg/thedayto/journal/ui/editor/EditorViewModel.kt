@@ -69,17 +69,8 @@ class EditorViewModel(
                     entry?.let {
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully loaded entry with ID: ${it.id}")
-                        _uiState.update { state ->
-                            state.copy(
-                                currentEntryId = it.id,
-                                entryDate = it.dateStamp,
-                                selectedMoodColorId = it.moodColorId,
-                                entryContent = it.content,
-                                isMoodHintVisible = false,
-                                isContentHintVisible = false,
-                                isLoading = false
-                            )
-                        }
+                        loadEntryIntoState(it)
+                        _uiState.update { it.copy(isLoading = false) }
                     } ?: run {
                         // Entry not found
                         loadingJob.cancel()
@@ -125,10 +116,74 @@ class EditorViewModel(
         }
     }
 
+    /**
+     * Load entry data into UI state
+     *
+     * @param entry The entry to load
+     */
+    private fun loadEntryIntoState(entry: Entry) {
+        Timber.d("Loading entry into state: id=${entry.id}")
+        _uiState.update { state ->
+            state.copy(
+                currentEntryId = entry.id,
+                entryDate = entry.dateStamp,
+                selectedMoodColorId = entry.moodColorId,
+                entryContent = entry.content,
+                isMoodHintVisible = false,
+                isContentHintVisible = false
+            )
+        }
+    }
+
+    /**
+     * Reset UI state to blank (for new entry)
+     *
+     * @param date The date for the new entry
+     */
+    private fun resetToBlankState(date: Long) {
+        Timber.d("Resetting to blank state for date: $date")
+        _uiState.update { state ->
+            state.copy(
+                currentEntryId = null,
+                entryDate = date,
+                selectedMoodColorId = null,
+                entryContent = "",
+                isMoodHintVisible = true,
+                isContentHintVisible = true
+            )
+        }
+    }
+
     fun onAction(action: EditorAction) {
         when (action) {
             is EditorAction.EnteredDate -> {
-                _uiState.update { it.copy(entryDate = action.date) }
+                viewModelScope.launch {
+                    Timber.d("Date changed to: ${action.date}, checking for existing entry")
+
+                    try {
+                        // Check if entry exists for this date
+                        val existingEntry = editorUseCases.getEntryByDateUseCase(action.date)
+
+                        if (existingEntry != null) {
+                            // Load existing entry for this date
+                            Timber.d("Found existing entry for date, loading: id=${existingEntry.id}")
+                            loadEntryIntoState(existingEntry)
+                        } else {
+                            // No entry for this date - reset to blank state
+                            Timber.d("No entry found for date, resetting to blank state")
+                            resetToBlankState(action.date)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to load entry for date: ${action.date}")
+                        // On error, reset to blank state so user can still create entry
+                        resetToBlankState(action.date)
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar(
+                                message = "Failed to load entry for this date"
+                            )
+                        )
+                    }
+                }
             }
 
             is EditorAction.SelectMoodColor -> {

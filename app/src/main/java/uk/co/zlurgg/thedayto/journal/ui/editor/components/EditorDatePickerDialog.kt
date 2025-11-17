@@ -97,7 +97,7 @@ fun EditorDatePickerDialog(
     }
 }
 
-@Preview(showBackground = true)
+@Preview(showBackground = true, locale = "en")
 @Composable
 private fun EditorDatePickerDialogPreview() {
     TheDayToTheme {
