@@ -57,7 +57,7 @@ class GetEntriesUseCaseTest {
             assertEquals("Mood color should match", "4CAF50", entries[0].moodColor)
             assertEquals("MoodColorId should match", 1, entries[0].moodColorId)
             assertEquals("Content should match", "Great day!", entries[0].content)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -70,7 +70,7 @@ class GetEntriesUseCaseTest {
             // Then: Should return empty list
             val entries = awaitItem()
             assertTrue("Should be empty", entries.isEmpty())
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -94,7 +94,7 @@ class GetEntriesUseCaseTest {
             // Then: Should return all entries with correct mood data
             val entries = awaitItem()
             assertEquals("Should have 3 entries", 3, entries.size)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -122,7 +122,7 @@ class GetEntriesUseCaseTest {
             assertEquals("First entry should have latest date", 3000L, entries[0].dateStamp)
             assertEquals("Second entry should have middle date", 2000L, entries[1].dateStamp)
             assertEquals("Third entry should have earliest date", 1000L, entries[2].dateStamp)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -146,7 +146,7 @@ class GetEntriesUseCaseTest {
             assertEquals("First entry should have earliest date", 1000L, entries[0].dateStamp)
             assertEquals("Second entry should have middle date", 2000L, entries[1].dateStamp)
             assertEquals("Third entry should have latest date", 3000L, entries[2].dateStamp)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -178,7 +178,7 @@ class GetEntriesUseCaseTest {
             assertEquals("First should be Anxious", "Anxious", entries[0].moodName)
             assertEquals("Second should be happy", "happy", entries[1].moodName)
             assertEquals("Third should be Sad", "Sad", entries[2].moodName)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -206,7 +206,7 @@ class GetEntriesUseCaseTest {
             assertEquals("First should be sad", "sad", entries[0].moodName)
             assertEquals("Second should be HAPPY", "HAPPY", entries[1].moodName)
             assertEquals("Third should be Anxious", "Anxious", entries[2].moodName)
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -233,7 +233,7 @@ class GetEntriesUseCaseTest {
             val entries = awaitItem()
             assertEquals("Should have 3 entries", 3, entries.size)
             assertTrue("All should have same mood", entries.all { it.moodName == "Happy" })
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -259,7 +259,7 @@ class GetEntriesUseCaseTest {
             val entries = awaitItem()
             assertEquals("Should have 3 entries", 3, entries.size)
             assertTrue("All should have same date", entries.all { it.dateStamp == sameDate })
-            awaitComplete()
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }
