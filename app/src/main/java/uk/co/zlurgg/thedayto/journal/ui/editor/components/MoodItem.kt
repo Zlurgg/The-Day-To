@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Cancel
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -53,6 +54,7 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColor
  * @param showMoodColorDialog Whether to show the mood color picker dialog
  * @param onMoodSelected Callback when a mood is selected (moodColorId)
  * @param onDeleteMoodColor Callback to delete a mood color
+ * @param onEditMoodColor Callback to edit a mood color
  * @param onToggleMoodColorDialog Callback to toggle the mood color picker dialog
  * @param onSaveMoodColor Callback to save a new mood color (mood, colorHex)
  * @param modifier Optional modifier
@@ -66,6 +68,7 @@ fun MoodItem(
     showMoodColorDialog: Boolean,
     onMoodSelected: (moodColorId: Int) -> Unit,
     onDeleteMoodColor: (MoodColor) -> Unit,
+    onEditMoodColor: (MoodColor) -> Unit,
     onToggleMoodColorDialog: () -> Unit,
     onSaveMoodColor: (mood: String, colorHex: String) -> Unit,
     modifier: Modifier = Modifier
@@ -171,6 +174,20 @@ fun MoodItem(
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
+
+                            // Edit button
+                            IconButton(
+                                onClick = {
+                                    onEditMoodColor(moodColor)
+                                    mExpanded = false
+                                }
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Edit,
+                                    contentDescription = stringResource(R.string.edit_mood_color_button),
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                            }
 
                             // Delete button
                             IconButton(
