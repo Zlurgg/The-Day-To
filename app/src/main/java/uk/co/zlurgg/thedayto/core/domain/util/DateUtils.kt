@@ -3,10 +3,13 @@ package uk.co.zlurgg.thedayto.core.domain.util
 import java.time.LocalDate
 import java.time.ZoneOffset
 
-
-/** TODO: this contains java logic check that we can use this here or move it somewhere else ui
+/**
  * Utility functions for date operations.
  * Centralizes date-related business logic.
+ *
+ * Note: Uses standard Java Time API (java.time.*) which is allowed in the domain layer.
+ * Domain layer can use standard Java/Kotlin libraries - it's Android framework dependencies
+ * (e.g., android.* packages) that should be avoided to maintain framework independence.
  */
 object DateUtils {
     /**
