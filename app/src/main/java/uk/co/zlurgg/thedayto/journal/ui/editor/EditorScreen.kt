@@ -40,6 +40,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
+import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -185,6 +186,9 @@ private fun EditorScreen(
                 onDeleteMoodColor = { moodColor ->
                     onAction(EditorAction.DeleteMoodColor(moodColor))
                 },
+                onEditMoodColor = { moodColor ->
+                    onAction(EditorAction.EditMoodColor(moodColor))
+                },
                 onToggleMoodColorDialog = {
                     onAction(EditorAction.ToggleMoodColorSection)
                 },
@@ -204,6 +208,24 @@ private fun EditorScreen(
                 },
                 onFocusChange = { focusState ->
                     onAction(EditorAction.ChangeContentFocus(focusState))
+                }
+            )
+        }
+    }
+
+    // Edit mood color dialog
+    uiState.editingMoodColor?.let { editingMood ->
+        if (uiState.showEditMoodColorDialog) {
+            EditMoodColorDialog(
+                moodColor = editingMood,
+                showDialog = true,
+                onDismiss = {
+                    onAction(EditorAction.CloseEditMoodColorDialog)
+                },
+                onSave = { newColorHex ->
+                    editingMood.id?.let { id ->
+                        onAction(EditorAction.UpdateMoodColor(id, newColorHex))
+                    }
                 }
             )
         }
