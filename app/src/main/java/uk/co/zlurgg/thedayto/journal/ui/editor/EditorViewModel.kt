@@ -223,6 +223,59 @@ class EditorViewModel(
                 }
             }
 
+            is EditorAction.EditMoodColor -> {
+                Timber.d("Opening edit dialog for mood: ${action.moodColor.mood}")
+                _uiState.update {
+                    it.copy(
+                        showEditMoodColorDialog = true,
+                        editingMoodColor = action.moodColor
+                    )
+                }
+            }
+
+            is EditorAction.UpdateMoodColor -> {
+                viewModelScope.launch {
+                    try {
+                        Timber.d("Updating mood color: id=${action.moodColorId}, newColor=${action.newColorHex}")
+
+                        editorUseCases.updateMoodColorUseCase(
+                            id = action.moodColorId,
+                            newColor = action.newColorHex
+                        )
+
+                        // Close dialog
+                        _uiState.update {
+                            it.copy(
+                                showEditMoodColorDialog = false,
+                                editingMoodColor = null
+                            )
+                        }
+
+                        Timber.d("Successfully updated mood color")
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar("Mood color updated")
+                        )
+                    } catch (e: InvalidMoodColorException) {
+                        Timber.e(e, "Failed to update mood color")
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar(
+                                message = e.message ?: "Couldn't update mood color"
+                            )
+                        )
+                    }
+                }
+            }
+
+            is EditorAction.CloseEditMoodColorDialog -> {
+                Timber.d("Closing edit mood color dialog")
+                _uiState.update {
+                    it.copy(
+                        showEditMoodColorDialog = false,
+                        editingMoodColor = null
+                    )
+                }
+            }
+
             is EditorAction.DismissEditorTutorial -> {
                 viewModelScope.launch {
                     Timber.d("Editor tutorial dismissed - marking as seen")

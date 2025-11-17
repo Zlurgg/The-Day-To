@@ -30,6 +30,7 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import androidx.core.graphics.toColorInt
 
 /**
  * Material3 dialog for editing the color of an existing mood.
@@ -97,8 +98,8 @@ fun EditMoodColorDialog(
                     // Set initial color on the picker
                     val initialColor = remember(moodColor) {
                         try {
-                            Color(android.graphics.Color.parseColor("#${moodColor.color}"))
-                        } catch (e: Exception) {
+                            Color("#${moodColor.color}".toColorInt())
+                        } catch (_: Exception) {
                             Color.Black
                         }
                     }
