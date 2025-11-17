@@ -220,7 +220,7 @@ fun MoodItem(
                     ) {
                         Icon(
                             imageVector = Icons.Default.AddCircle,
-                            contentDescription = null,
+                            contentDescription = stringResource(R.string.add_custom_mood_color),
                             tint = MaterialTheme.colorScheme.primary
                         )
                         Spacer(modifier = Modifier.width(8.dp))

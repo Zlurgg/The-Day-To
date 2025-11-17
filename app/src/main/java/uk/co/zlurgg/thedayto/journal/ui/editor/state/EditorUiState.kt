@@ -30,4 +30,11 @@ data class EditorUiState(
 
     // Loading state
     val isLoading: Boolean = false
-)
+) {
+    /**
+     * Indicates whether the entry can be saved.
+     * Save is only allowed when a mood color has been selected.
+     */
+    val canSave: Boolean
+        get() = selectedMoodColorId != null
+}

@@ -1,7 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -45,6 +44,5 @@ fun ContentItem(
         showCharacterCount = true,
         modifier = modifier
             .fillMaxWidth()
-            .height(200.dp)  // Fixed height to avoid FAB overlap
     )
 }

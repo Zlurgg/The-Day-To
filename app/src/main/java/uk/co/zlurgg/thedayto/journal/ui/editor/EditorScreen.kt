@@ -1,13 +1,13 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor
 
 import android.content.res.Configuration
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -120,13 +121,15 @@ private fun EditorScreen(
                     .systemBarsPadding()
             ) {
                 if (showBackButton) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.back),
-                        modifier = Modifier
-                            .padding(paddingMedium)
-                            .clickable { onNavigateBack() }
-                    )
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.padding(paddingMedium)
+                    ) {
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
                 }
             }
         },
@@ -135,10 +138,11 @@ private fun EditorScreen(
             if (!uiState.isMoodColorSectionVisible) {
                 FloatingActionButton(
                     onClick = { onAction(EditorAction.SaveEntry) },
-                    containerColor = if (uiState.isLoading)
-                        MaterialTheme.colorScheme.secondary
-                    else
-                        MaterialTheme.colorScheme.primaryContainer
+                    containerColor = when {
+                        uiState.isLoading -> MaterialTheme.colorScheme.secondary
+                        !uiState.canSave -> MaterialTheme.colorScheme.surfaceVariant
+                        else -> MaterialTheme.colorScheme.primaryContainer
+                    }
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
@@ -149,7 +153,11 @@ private fun EditorScreen(
                     } else {
                         Icon(
                             imageVector = Icons.Default.Save,
-                            contentDescription = stringResource(R.string.save_entry)
+                            contentDescription = stringResource(R.string.save_entry),
+                            tint = if (uiState.canSave)
+                                MaterialTheme.colorScheme.onPrimaryContainer
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
                         )
                     }
                 }
@@ -165,6 +173,7 @@ private fun EditorScreen(
                 .fillMaxSize()
                 .padding(padding)
                 .padding(paddingMedium)
+                .imePadding()
         ) {
             // Date display (read-only)
             Text(
@@ -208,7 +217,8 @@ private fun EditorScreen(
                 },
                 onFocusChange = { focusState ->
                     onAction(EditorAction.ChangeContentFocus(focusState))
-                }
+                },
+                modifier = Modifier.weight(1f)
             )
         }
     }
