@@ -20,6 +20,10 @@ data class EditorUiState(
     val isMoodColorSectionVisible: Boolean = false,
     val showEditorTutorial: Boolean = false,
 
+    // Edit mood color dialog state
+    val showEditMoodColorDialog: Boolean = false,
+    val editingMoodColor: MoodColor? = null,
+
     // Hints
     val moodHint: String = "How're you feeling today?",  // Dynamic hint based on date
     val contentHint: String = "Any additional info?",
