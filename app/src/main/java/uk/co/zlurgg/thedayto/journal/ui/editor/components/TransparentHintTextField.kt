@@ -3,8 +3,11 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +44,7 @@ fun TransparentHintTextField(
         Box(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(0.8f)
                 .background(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     shape = RoundedCornerShape(12.dp)
@@ -53,6 +57,7 @@ fun TransparentHintTextField(
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     shape = RoundedCornerShape(12.dp)
                 )
+                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             BasicTextField(
@@ -100,5 +105,8 @@ fun TransparentHintTextField(
                 )
             }
         }
+
+        // Spacer to create bottom padding (20% of available space)
+        Spacer(modifier = Modifier.weight(0.2f))
     }
 }

@@ -469,7 +469,7 @@ class EditorViewModelTest {
             // Then: Error event should be emitted
             val event = awaitItem()
             assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertEquals("Should show select mood message", "Please select a mood", (event as EditorUiEvent.ShowSnackbar).message)
+            assertEquals("Should show select mood message", "Please select or create a mood", (event as EditorUiEvent.ShowSnackbar).message)
             cancelAndIgnoreRemainingEvents()
         }
     }

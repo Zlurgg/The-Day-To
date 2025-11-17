@@ -178,7 +178,7 @@ class EditorViewModel(
                         Timber.e(e, "Failed to save mood color: ${action.mood.trim()}")
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
-                                message = e.message ?: "Couldn't save mood color"
+                                message = e.message ?: "Couldn't save mood color!"
                             )
                         )
                     }
@@ -293,7 +293,7 @@ class EditorViewModel(
                     if (moodColorId == null) {
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
-                                message = "Please select a mood"
+                                message = "Please select or create a mood"
                             )
                         )
                         return@launch
