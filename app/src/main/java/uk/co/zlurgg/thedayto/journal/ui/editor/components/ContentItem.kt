@@ -5,7 +5,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
-import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 /**
