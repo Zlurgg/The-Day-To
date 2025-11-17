@@ -25,6 +25,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
@@ -78,6 +79,7 @@ class EditorViewModelTest {
     private fun createViewModel(): EditorViewModel {
         val editorUseCases = EditorUseCases(
             getEntryUseCase = GetEntryUseCase(fakeEntryRepository),
+            getEntryByDateUseCase = GetEntryByDateUseCase(fakeEntryRepository),
             addEntryUseCase = AddEntryUseCase(fakeEntryRepository, fakeMoodColorRepository),
             getMoodColorUseCase = GetMoodColorUseCase(fakeMoodColorRepository),
             addMoodColorUseCase = AddMoodColorUseCase(fakeMoodColorRepository),

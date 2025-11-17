@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.editor
 
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,6 +15,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -28,6 +30,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,8 +45,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
-import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
+import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -178,14 +181,25 @@ private fun EditorScreen(
                 .imePadding()
         ) {
             // Date display (clickable to open date picker)
-            Text(
-                text = datestampToFormattedDate(uiState.entryDate),
-                style = MaterialTheme.typography.titleLarge,
-                color = MaterialTheme.colorScheme.onSurface,
+            Row(
                 modifier = Modifier.clickable {
                     onAction(EditorAction.ToggleDatePicker)
-                }
-            )
+                },
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = datestampToFormattedDate(uiState.entryDate),
+                    style = MaterialTheme.typography.titleLarge,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Icon(
+                    imageVector = Icons.Default.CalendarToday,
+                    contentDescription = stringResource(R.string.pick_a_date),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.size(20.dp)
+                )
+            }
             Spacer(modifier = Modifier.height(paddingMedium))
 
             // Mood Selection
