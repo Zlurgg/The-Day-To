@@ -72,6 +72,13 @@ class FakePreferencesRepository : PreferencesRepository {
     }
 
     /**
+     * Helper method to set editor tutorial seen state for testing.
+     */
+    fun setEditorTutorialSeen(seen: Boolean) {
+        editorTutorialSeen = seen
+    }
+
+    /**
      * Helper method to reset all values to defaults.
      * Useful for cleaning up between tests.
      */

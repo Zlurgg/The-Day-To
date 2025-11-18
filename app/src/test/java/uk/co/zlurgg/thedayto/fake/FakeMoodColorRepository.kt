@@ -17,7 +17,7 @@ class FakeMoodColorRepository : MoodColorRepository {
     private val _moodColors = MutableStateFlow<List<MoodColor>>(emptyList())
     private var nextId = 1
 
-    override suspend fun insertMoodColor(moodColor: MoodColor) {
+    override suspend fun insertMoodColor(moodColor: MoodColor): Long {
         val moodColorWithId = if (moodColor.id == null) {
             moodColor.copy(id = nextId++)
         } else {
@@ -27,6 +27,7 @@ class FakeMoodColorRepository : MoodColorRepository {
         currentList.removeIf { it.id == moodColorWithId.id }
         currentList.add(moodColorWithId)
         _moodColors.value = currentList
+        return moodColorWithId.id!!.toLong()
     }
 
     override suspend fun deleteMoodColor(id: Int) {
