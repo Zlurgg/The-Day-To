@@ -15,9 +15,10 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
  * - Methods using `suspend` (e.g., insertMoodColor, getMoodColorById, deleteMoodColor):
  *   These are one-time operations that execute once and return a result. Use these for
  *   single queries or write operations where you don't need to observe changes.
+ *   `insertMoodColor` returns the auto-generated ID of the newly inserted mood color.
  */
 interface MoodColorRepository {
-    suspend fun insertMoodColor(moodColor: MoodColor)
+    suspend fun insertMoodColor(moodColor: MoodColor): Long
     suspend fun deleteMoodColor(id: Int)
     suspend fun getMoodColorById(id: Int): MoodColor?
     suspend fun getMoodColorByName(mood: String): MoodColor?

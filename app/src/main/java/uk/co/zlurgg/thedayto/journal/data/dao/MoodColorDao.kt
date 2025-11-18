@@ -20,7 +20,7 @@ interface MoodColorDao {
     suspend fun getMoodColorByName(moodNormalized: String): MoodColorEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertMoodColor(moodColor: MoodColorEntity)
+    suspend fun insertMoodColor(moodColor: MoodColorEntity): Long
 
     @Query("UPDATE mood_color SET isDeleted = 1 WHERE id = :id")
     suspend fun deleteMoodColor(id: Int)
