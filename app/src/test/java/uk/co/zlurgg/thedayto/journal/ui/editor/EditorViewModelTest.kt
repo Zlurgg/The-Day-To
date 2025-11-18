@@ -34,7 +34,11 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 /**
  * Unit tests for EditorViewModel.
@@ -506,6 +510,360 @@ class EditorViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertFalse("Loading should be false after completion", state.isLoading)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // ============================================================
+    // Auto-Select New Mood Color Tests (Item #24)
+    // ============================================================
+
+    @Test
+    fun `SaveMoodColor action auto-selects newly created mood color`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: No mood is selected initially
+        viewModel.uiState.test {
+            assertNull("No mood should be selected initially", awaitItem().selectedMoodColorId)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // When: New mood color is created
+        viewModel.onAction(EditorAction.SaveMoodColor(mood = "Excited", colorHex = "FFA500"))
+
+        // Then: New mood should be auto-selected
+        viewModel.uiState.test {
+            val state = awaitItem()
+            val excitedMood = state.moodColors.find { it.mood == "Excited" }
+            assertTrue("Excited mood should exist", excitedMood != null)
+            assertEquals("Excited should be auto-selected", excitedMood!!.id, state.selectedMoodColorId)
+            assertFalse("Mood hint should be hidden", state.isMoodHintVisible)
+            assertFalse("Dialog should be closed", state.isMoodColorSectionVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `SaveMoodColor action auto-selects restored deleted mood color`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: A deleted mood exists
+        val deletedMood = TestDataBuilders.createMoodColor(mood = "Nostalgic", id = 99, isDeleted = true)
+        fakeMoodColorRepository.insertMoodColor(deletedMood)
+
+        // When: Mood is restored by creating same name with new color
+        viewModel.onAction(EditorAction.SaveMoodColor(mood = "Nostalgic", colorHex = "0000FF"))
+
+        // Then: Restored mood should be auto-selected
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals("Restored mood should be auto-selected", 99, state.selectedMoodColorId)
+            assertFalse("Mood hint should be hidden", state.isMoodHintVisible)
+            assertFalse("Dialog should be closed", state.isMoodColorSectionVisible)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // ============================================================
+    // Dynamic Mood Prompts Tests
+    // ============================================================
+
+    @Test
+    fun `initialization sets today prompt when no date provided`() = runTest {
+        // When: ViewModel is created without navigation date
+        viewModel = createViewModel()
+
+        // Then: Should use a TODAY prompt
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(
+                "Mood hint should be from TODAY_PROMPTS",
+                EditorPromptConstants.TODAY_PROMPTS.contains(state.moodHint)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `EnteredDate action updates mood hint for past date`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: A date in the past (2024-01-01)
+        val pastDate = Instant.parse("2024-01-01T00:00:00Z").epochSecond
+
+        // When: Date is changed to past
+        viewModel.onAction(EditorAction.EnteredDate(pastDate))
+
+        // Then: Mood hint should be from PAST_PROMPTS
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(
+                "Mood hint should be from PAST_PROMPTS for past date",
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `EnteredDate action updates mood hint for future date`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: A date in the future (tomorrow)
+        val tomorrow = LocalDate.now().plusDays(1)
+        val futureDate = tomorrow.atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+
+        // When: Date is changed to future
+        viewModel.onAction(EditorAction.EnteredDate(futureDate))
+
+        // Then: Mood hint should be from FUTURE_PROMPTS
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(
+                "Mood hint should be from FUTURE_PROMPTS for future date",
+                EditorPromptConstants.FUTURE_PROMPTS.contains(state.moodHint)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `sets past prompt when navigating with past date`() = runTest {
+        // Given: Navigation parameter with past date
+        val pastDate = Instant.parse("2024-01-01T00:00:00Z").epochSecond
+        savedStateHandle["entryDate"] = pastDate
+
+        // When: ViewModel is created
+        viewModel = createViewModel()
+
+        // Then: Should use a PAST prompt
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertEquals("Entry date should be set", pastDate, state.entryDate)
+            assertTrue(
+                "Mood hint should be from PAST_PROMPTS",
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `loading existing entry sets mood hint based on entry date`() = runTest {
+        // Given: An existing entry with past date
+        val pastDate = Instant.parse("2024-01-01T00:00:00Z").epochSecond
+        val moodColor = TestDataBuilders.createMoodColor(id = 1)
+        fakeMoodColorRepository.insertMoodColor(moodColor)
+        val entry = TestDataBuilders.createEntry(
+            moodColorId = 1,
+            content = "Old entry",
+            dateStamp = pastDate,
+            id = 1
+        )
+        fakeEntryRepository.insertEntry(entry)
+
+        savedStateHandle["entryId"] = 1
+
+        // When: ViewModel is created
+        viewModel = createViewModel()
+
+        // Then: Mood hint should match entry's date context
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue(
+                "Mood hint should be from PAST_PROMPTS for past entry",
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // ============================================================
+    // Editor Tutorial Tests
+    // ============================================================
+
+    @Test
+    fun `shows editor tutorial for first-time users creating new entry`() = runTest {
+        // Given: User hasn't seen tutorial
+        fakePreferencesRepository.setEditorTutorialSeen(false)
+
+        // When: ViewModel is created for new entry (no entryId)
+        viewModel = createViewModel()
+
+        // Then: Tutorial should be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Tutorial should be shown", state.showEditorTutorial)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `does not show editor tutorial for returning users`() = runTest {
+        // Given: User has seen tutorial
+        fakePreferencesRepository.setEditorTutorialSeen(true)
+
+        // When: ViewModel is created for new entry
+        viewModel = createViewModel()
+
+        // Then: Tutorial should not be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Tutorial should not be shown", state.showEditorTutorial)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `does not show editor tutorial when editing existing entry`() = runTest {
+        // Given: User hasn't seen tutorial BUT is editing an existing entry
+        fakePreferencesRepository.setEditorTutorialSeen(false)
+        val entry = TestDataBuilders.createEntry(moodColorId = 1, id = 1)
+        fakeEntryRepository.insertEntry(entry)
+        savedStateHandle["entryId"] = 1
+
+        // When: ViewModel is created
+        viewModel = createViewModel()
+
+        // Then: Tutorial should not be shown (only for new entries)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Tutorial should not be shown when editing", state.showEditorTutorial)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `DismissEditorTutorial action marks tutorial as seen and hides it`() = runTest {
+        // Given: Tutorial is showing
+        fakePreferencesRepository.setEditorTutorialSeen(false)
+        viewModel = createViewModel()
+
+        // When: Tutorial is dismissed
+        viewModel.onAction(EditorAction.DismissEditorTutorial)
+
+        // Then: Tutorial should be hidden
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Tutorial should be hidden", state.showEditorTutorial)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Tutorial should be marked as seen in preferences
+        assertTrue("Tutorial should be marked as seen", fakePreferencesRepository.hasSeenEditorTutorial())
+    }
+
+    // ============================================================
+    // Mood Color Edit Dialog Tests
+    // ============================================================
+
+    @Test
+    fun `CloseEditMoodColorDialog action clears dialog state`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: Edit dialog is open with a mood color
+        val moodColor = fakeMoodColorRepository.getMoodColorById(1)!!
+        viewModel.onAction(EditorAction.EditMoodColor(moodColor))
+
+        // When: Dialog is closed
+        viewModel.onAction(EditorAction.CloseEditMoodColorDialog)
+
+        // Then: Dialog should be closed and editing mood cleared
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Edit dialog should be closed", state.showEditMoodColorDialog)
+            assertNull("Editing mood color should be null", state.editingMoodColor)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `UpdateMoodColor action updates mood color and closes dialog`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: A mood color to update
+        val originalMood = fakeMoodColorRepository.getMoodColorById(1)!!
+        val newColor = "00FF00" // Green
+
+        // When: Mood color is updated (collect events first)
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.UpdateMoodColor(
+                moodColorId = originalMood.id!!,
+                newColorHex = newColor
+            ))
+
+            // Then: Success event should be emitted
+            val event = awaitItem()
+            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
+            assertEquals("Should show success message", "Mood color updated", (event as EditorUiEvent.ShowSnackbar).message)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Dialog should be closed
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Dialog should be closed", state.showEditMoodColorDialog)
+            assertNull("Editing mood should be null", state.editingMoodColor)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Mood color should be updated in repository
+        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!)!!
+        assertEquals("Color should be updated", newColor, updated.color)
+    }
+
+    @Test
+    fun `UpdateMoodColor action emits error for invalid mood color`() = runTest {
+        viewModel = createViewModel()
+
+        // When: Updating with invalid ID (collect events first)
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.UpdateMoodColor(
+                moodColorId = 999, // Non-existent
+                newColorHex = "FF0000"
+            ))
+
+            // Then: Error event should be emitted
+            val event = awaitItem()
+            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
+            assertTrue("Should contain error message", (event as EditorUiEvent.ShowSnackbar).message.isNotEmpty())
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    // ============================================================
+    // Date Picker Toggle Tests
+    // ============================================================
+
+    @Test
+    fun `ToggleDatePicker action shows date picker`() = runTest {
+        viewModel = createViewModel()
+
+        // When: Date picker is toggled
+        viewModel.onAction(EditorAction.ToggleDatePicker)
+
+        // Then: Date picker should be visible
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Date picker should be visible", state.showDatePicker)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `ToggleDatePicker action hides date picker when already shown`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: Date picker is visible
+        viewModel.onAction(EditorAction.ToggleDatePicker)
+
+        // When: Toggled again
+        viewModel.onAction(EditorAction.ToggleDatePicker)
+
+        // Then: Date picker should be hidden
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Date picker should be hidden", state.showDatePicker)
             cancelAndIgnoreRemainingEvents()
         }
     }
