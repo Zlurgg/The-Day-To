@@ -86,8 +86,11 @@ fun TransparentHintTextField(
             }
         }
 
-        // Character counter
+        // Character counter - enhanced visibility
         if (showCharacterCount && maxLength != null) {
+            val isNearLimit = text.length > maxLength * 0.9
+            val isAtLimit = text.length >= maxLength
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -96,12 +99,22 @@ fun TransparentHintTextField(
             ) {
                 Text(
                     text = "${text.length}/$maxLength",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = if (text.length > maxLength * 0.9) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    }
+                    style = MaterialTheme.typography.bodyMedium, // Increased from bodySmall
+                    color = when {
+                        isAtLimit -> MaterialTheme.colorScheme.error
+                        isNearLimit -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+                        else -> MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                    },
+                    modifier = Modifier
+                        .background(
+                            color = if (isNearLimit) {
+                                MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
+                            } else {
+                                MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
+                            },
+                            shape = RoundedCornerShape(8.dp)
+                        )
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }
