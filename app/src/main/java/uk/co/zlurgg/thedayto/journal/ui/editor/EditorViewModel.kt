@@ -251,7 +251,7 @@ class EditorViewModel(
                 viewModelScope.launch {
                     try {
                         Timber.d("Saving new mood color: ${action.mood.trim()}")
-                        editorUseCases.addMoodColorUseCase(
+                        val newMoodColorId = editorUseCases.addMoodColorUseCase(
                             MoodColor(
                                 mood = action.mood.trim(),
                                 color = action.colorHex,
@@ -259,9 +259,15 @@ class EditorViewModel(
                                 id = null
                             )
                         )
-                        // Close dialog after successful save
-                        Timber.d("Successfully saved mood color: ${action.mood.trim()}")
-                        _uiState.update { it.copy(isMoodColorSectionVisible = false) }
+                        // Auto-select the newly created/restored mood color
+                        Timber.d("Successfully saved mood color: ${action.mood.trim()}, auto-selecting ID: $newMoodColorId")
+                        _uiState.update {
+                            it.copy(
+                                isMoodColorSectionVisible = false,
+                                selectedMoodColorId = newMoodColorId,
+                                isMoodHintVisible = false // Hide hint since mood is now selected
+                            )
+                        }
                     } catch (e: InvalidMoodColorException) {
                         Timber.e(e, "Failed to save mood color: ${action.mood.trim()}")
                         _uiEvents.emit(

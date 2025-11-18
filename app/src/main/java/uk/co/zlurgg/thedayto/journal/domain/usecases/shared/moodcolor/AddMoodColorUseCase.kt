@@ -17,12 +17,13 @@ import uk.co.zlurgg.thedayto.journal.domain.util.ValidationResult
  * - User-friendly error messages
  *
  * @param repository MoodColor repository for persistence
+ * @return The ID of the newly created or restored mood color
  */
 class AddMoodColorUseCase(
     private val repository: MoodColorRepository
 ) {
     @Throws(InvalidMoodColorException::class)
-    suspend operator fun invoke(moodColor: MoodColor) {
+    suspend operator fun invoke(moodColor: MoodColor): Int {
         // Validate timestamp
         when (val result = InputValidation.validateTimestamp(moodColor.dateStamp)) {
             is ValidationResult.Invalid -> throw InvalidMoodColorException(result.message)
@@ -45,17 +46,19 @@ class AddMoodColorUseCase(
         // Note: Repository handles normalization internally
         val existing = repository.getMoodColorByName(sanitizedMood)
 
-        when {
+        return when {
             existing == null -> {
-                // Create new mood
+                // Create new mood - return auto-generated ID
                 val sanitizedMoodColor = moodColor.copy(mood = sanitizedMood)
-                repository.insertMoodColor(sanitizedMoodColor)
+                val newId = repository.insertMoodColor(sanitizedMoodColor)
+                newId.toInt() // Room returns Long, convert to Int for consistency
             }
             existing.isDeleted -> {
-                // Restore deleted mood with new color
+                // Restore deleted mood with new color - return existing ID
                 repository.updateMoodColor(
                     existing.copy(color = moodColor.color, isDeleted = false)
                 )
+                existing.id!! // ID must exist for deleted mood
             }
             else -> {
                 // Active duplicate - throw error

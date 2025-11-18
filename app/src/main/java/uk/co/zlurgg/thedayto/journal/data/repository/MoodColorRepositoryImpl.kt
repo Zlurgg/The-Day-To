@@ -11,7 +11,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 class MoodColorRepositoryImpl(
     private val dao: MoodColorDao
 ) : MoodColorRepository {
-    override suspend fun insertMoodColor(moodColor: MoodColor) {
+    override suspend fun insertMoodColor(moodColor: MoodColor): Long {
         return dao.insertMoodColor(moodColor.toEntity())
     }
 
