@@ -3,11 +3,10 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +56,6 @@ fun TransparentHintTextField(
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
                     shape = RoundedCornerShape(12.dp)
                 )
-                .verticalScroll(rememberScrollState())
                 .padding(16.dp)
         ) {
             BasicTextField(
@@ -71,7 +69,7 @@ fun TransparentHintTextField(
                 singleLine = singleLine,
                 textStyle = textStyle.copy(color = MaterialTheme.colorScheme.onSurface),
                 modifier = Modifier
-                    .fillMaxWidth()
+                    .fillMaxSize()
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         onFocusChange(focusState)
