@@ -24,6 +24,10 @@ import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 class EditorViewModel(
     private val editorUseCases: EditorUseCases,
@@ -31,7 +35,9 @@ class EditorViewModel(
 ) : ViewModel() {
 
     // Single source of truth for UI state
-    private val _uiState = MutableStateFlow(EditorUiState())
+    private val _uiState = MutableStateFlow(EditorUiState(
+        moodHint = EditorPromptConstants.TODAY_PROMPTS.random() // Default to today prompt
+    ))
     val uiState = _uiState.asStateFlow()
 
     // One-time UI events
@@ -50,7 +56,10 @@ class EditorViewModel(
         savedStateHandle.get<Long>("entryDate")?.let { entryDate ->
             if (entryDate != -1L) {
                 Timber.d("Setting entry date from navigation: $entryDate")
-                _uiState.update { it.copy(entryDate = entryDate) }
+                _uiState.update { it.copy(
+                    entryDate = entryDate,
+                    moodHint = getMoodHintForDate(entryDate)
+                ) }
             }
         }
 
@@ -117,6 +126,28 @@ class EditorViewModel(
     }
 
     /**
+     * Get appropriate mood hint based on the selected date.
+     *
+     * Returns a random prompt from:
+     * - TODAY_PROMPTS if date is today
+     * - PAST_PROMPTS if date is in the past
+     * - FUTURE_PROMPTS if date is in the future
+     *
+     * @param dateEpochSeconds The date in epoch seconds (UTC)
+     * @return A contextual mood prompt string
+     */
+    private fun getMoodHintForDate(dateEpochSeconds: Long): String {
+        val selectedDate = Instant.ofEpochSecond(dateEpochSeconds).atZone(ZoneOffset.UTC).toLocalDate()
+        val today = LocalDate.now()
+
+        return when {
+            selectedDate.isEqual(today) -> EditorPromptConstants.TODAY_PROMPTS.random()
+            selectedDate.isBefore(today) -> EditorPromptConstants.PAST_PROMPTS.random()
+            else -> EditorPromptConstants.FUTURE_PROMPTS.random()
+        }
+    }
+
+    /**
      * Load entry data into UI state
      *
      * @param entry The entry to load
@@ -130,7 +161,8 @@ class EditorViewModel(
                 selectedMoodColorId = entry.moodColorId,
                 entryContent = entry.content,
                 isMoodHintVisible = false,
-                isContentHintVisible = false
+                isContentHintVisible = false,
+                moodHint = getMoodHintForDate(entry.dateStamp)
             )
         }
     }
@@ -149,7 +181,8 @@ class EditorViewModel(
                 selectedMoodColorId = null,
                 entryContent = "",
                 isMoodHintVisible = true,
-                isContentHintVisible = true
+                isContentHintVisible = true,
+                moodHint = getMoodHintForDate(date)
             )
         }
     }

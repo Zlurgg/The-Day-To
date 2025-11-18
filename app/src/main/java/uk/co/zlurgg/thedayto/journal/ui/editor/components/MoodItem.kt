@@ -93,9 +93,18 @@ fun MoodItem(
             textStyle = MaterialTheme.typography.headlineSmall,
             colors = OutlinedTextFieldDefaults.colors(
                 cursorColor = MaterialTheme.colorScheme.primary,
-                focusedBorderColor = MaterialTheme.colorScheme.surface,
-                unfocusedBorderColor = MaterialTheme.colorScheme.surface,
-                focusedLabelColor = MaterialTheme.colorScheme.surface,
+                // Use primary color border when mood is selected, outline when not
+                focusedBorderColor = if (selectedMoodColorId != null) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outline
+                },
+                unfocusedBorderColor = if (selectedMoodColorId != null) {
+                    MaterialTheme.colorScheme.primary
+                } else {
+                    MaterialTheme.colorScheme.outline
+                },
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
             ),
             keyboardOptions = KeyboardOptions(
                 keyboardType = KeyboardType.Ascii,
@@ -109,11 +118,21 @@ fun MoodItem(
                     mMoodFieldSize = coordinates.size.toSize()
                 },
             label = {
-                Text(
-                    text = hint,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontSize = 12.sp
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = hint,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontSize = 12.sp
+                    )
+                    Text(
+                        text = "*",
+                        color = MaterialTheme.colorScheme.error,
+                        fontSize = 12.sp
+                    )
+                }
             },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded)
