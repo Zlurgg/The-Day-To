@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.journal.ui.editor
 import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,7 +29,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -384,7 +388,7 @@ private fun UnsavedChangesDialog(
     onDiscard: () -> Unit,
     onKeepEditing: () -> Unit
 ) {
-    androidx.compose.material3.AlertDialog(
+    AlertDialog(
         onDismissRequest = onKeepEditing,
         title = {
             Text(text = stringResource(R.string.unsaved_changes_title))
@@ -393,12 +397,12 @@ private fun UnsavedChangesDialog(
             Text(text = stringResource(R.string.unsaved_changes_message))
         },
         confirmButton = {
-            androidx.compose.material3.TextButton(onClick = onDiscard) {
+            TextButton(onClick = onDiscard) {
                 Text(text = stringResource(R.string.discard))
             }
         },
         dismissButton = {
-            androidx.compose.material3.TextButton(onClick = onKeepEditing) {
+            TextButton(onClick = onKeepEditing) {
                 Text(text = stringResource(R.string.keep_editing))
             }
         }
@@ -417,10 +421,10 @@ private fun LoadErrorBanner(
     onRetry: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    androidx.compose.material3.Surface(
+    Surface(
         modifier = Modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer,
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(8.dp)
     ) {
         Row(
             modifier = Modifier
@@ -431,7 +435,7 @@ private fun LoadErrorBanner(
         ) {
             // Error icon
             Icon(
-                imageVector = androidx.compose.material.icons.Icons.Default.Error,
+                imageVector = Icons.Default.Error,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onErrorContainer,
                 modifier = Modifier.size(24.dp)
@@ -446,7 +450,7 @@ private fun LoadErrorBanner(
             )
 
             // Retry button
-            androidx.compose.material3.TextButton(onClick = onRetry) {
+            TextButton(onClick = onRetry) {
                 Text(
                     text = stringResource(R.string.retry),
                     color = MaterialTheme.colorScheme.onErrorContainer
