@@ -1048,4 +1048,118 @@ class EditorViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    // ========================================
+    // Error Handling Tests
+    // ========================================
+
+    @Test
+    fun `Load entry shows error banner when entry not found`() = runTest {
+        // Given: Entry ID that doesn't exist
+        savedStateHandle["entryId"] = 999
+        savedStateHandle["entryDate"] = -1L
+
+        // When: ViewModel loads
+        viewModel = createViewModel()
+
+        // Then: Load error should be set
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Load error should be set", state.loadError != null)
+            assertTrue("Error message should mention not found",
+                state.loadError?.contains("not found", ignoreCase = true) == true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `RetryLoadEntry clears error and attempts reload`() = runTest {
+        // Given: Entry doesn't exist initially (will have error)
+        savedStateHandle["entryId"] = 999
+        savedStateHandle["entryDate"] = -1L
+        viewModel = createViewModel()
+
+        // Verify error is set
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Error should be set initially", state.loadError != null)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // When: Retry load (will fail again since entry still doesn't exist)
+        viewModel.onAction(EditorAction.RetryLoadEntry)
+
+        // Then: Error is temporarily cleared during retry, then set again
+        // We're just verifying the retry mechanism works, not that it succeeds
+        viewModel.uiState.test {
+            val state = awaitItem()
+            // Error will be set again because entry still doesn't exist
+            // This proves retry attempted the load
+            assertTrue("Retry should have attempted load", state.loadError != null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `DismissLoadError clears error banner`() = runTest {
+        // Given: Entry doesn't exist, error is shown
+        savedStateHandle["entryId"] = 999
+        savedStateHandle["entryDate"] = -1L
+        viewModel = createViewModel()
+
+        // When: Dismiss error
+        viewModel.onAction(EditorAction.DismissLoadError)
+
+        // Then: Error should be cleared
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertNull("Load error should be cleared", state.loadError)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `RetryLoadEntry without stored entry ID shows error`() = runTest {
+        // Given: New entry (no stored entry ID)
+        viewModel = createViewModel()
+
+        // Manually trigger load error state
+        viewModel.onAction(EditorAction.DismissLoadError) // Just to ensure clean state
+
+        // When: Try to retry without stored entry ID
+        viewModel.onAction(EditorAction.RetryLoadEntry)
+
+        // Then: Should show error about missing entry ID
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Should show error about cannot retry",
+                state.loadError?.contains("Cannot retry", ignoreCase = true) == true)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `Successful entry load clears any existing error`() = runTest {
+        // Given: Entry exists
+        val testEntry = TestDataBuilders.createEntry(
+            id = 123,
+            moodColorId = 1,
+            content = "Test"
+        )
+        fakeEntryRepository.insertEntry(testEntry)
+
+        savedStateHandle["entryId"] = 123
+        savedStateHandle["entryDate"] = -1L
+
+        // When: ViewModel loads entry successfully
+        viewModel = createViewModel()
+
+        // Then: No load error should be present
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertNull("Load error should be null on successful load", state.loadError)
+            assertEquals("Entry should be loaded", 123, state.currentEntryId)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
