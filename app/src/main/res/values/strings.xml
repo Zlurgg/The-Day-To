@@ -32,7 +32,6 @@
     <!-- Add edit daily entry -->
     <string name="back">Back</string>
     <string name="save_entry">Save entry</string>
-    <string name="entry_saved">Entry saved</string>
     <string name="date_picker_dropdown_button">Date picker dropdown button</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>

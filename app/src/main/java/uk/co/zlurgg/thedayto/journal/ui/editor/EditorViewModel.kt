@@ -415,7 +415,6 @@ class EditorViewModel(
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully saved entry")
                         _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(EditorUiEvent.ShowSnackbar("Entry saved"))
                         _uiEvents.emit(EditorUiEvent.SaveEntry)
                     } catch (e: InvalidEntryException) {
                         loadingJob.cancel()
