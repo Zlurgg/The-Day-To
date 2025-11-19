@@ -17,4 +17,7 @@ sealed interface EditorAction {
     data object DismissEditorTutorial : EditorAction
     data object ToggleDatePicker : EditorAction
     data object SaveEntry : EditorAction
+    data object RequestNavigateBack : EditorAction
+    data object ConfirmDiscardChanges : EditorAction
+    data object DismissUnsavedChangesDialog : EditorAction
 }

@@ -80,6 +80,12 @@ fun EditorScreenRoot(
                         popUpTo(OverviewRoute) { inclusive = false }
                     }
                 }
+                is EditorUiEvent.NavigateBack -> {
+                    navController.navigate(OverviewRoute) {
+                        // Remove editor from back stack
+                        popUpTo(OverviewRoute) { inclusive = false }
+                    }
+                }
             }
         }
     }
@@ -88,12 +94,6 @@ fun EditorScreenRoot(
     EditorScreen(
         uiState = uiState,
         onAction = viewModel::onAction,
-        onNavigateBack = {
-            navController.navigate(OverviewRoute) {
-                // Remove editor from back stack
-                popUpTo(OverviewRoute) { inclusive = false }
-            }
-        },
         showBackButton = showBackButton,
         snackbarHostState = snackbarHostState
     )
@@ -113,7 +113,6 @@ fun EditorScreenRoot(
 private fun EditorScreen(
     uiState: EditorUiState,
     onAction: (EditorAction) -> Unit,
-    onNavigateBack: () -> Unit,
     showBackButton: Boolean,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
@@ -127,7 +126,7 @@ private fun EditorScreen(
             ) {
                 if (showBackButton) {
                     IconButton(
-                        onClick = onNavigateBack,
+                        onClick = { onAction(EditorAction.RequestNavigateBack) },
                         modifier = Modifier.padding(paddingMedium)
                     ) {
                         Icon(
@@ -286,6 +285,14 @@ private fun EditorScreen(
             }
         )
     }
+
+    // Show unsaved changes dialog
+    if (uiState.showUnsavedChangesDialog) {
+        UnsavedChangesDialog(
+            onDiscard = { onAction(EditorAction.ConfirmDiscardChanges) },
+            onKeepEditing = { onAction(EditorAction.DismissUnsavedChangesDialog) }
+        )
+    }
 }
 
 @Preview(name = "New Entry - Light", showBackground = true)
@@ -302,7 +309,6 @@ private fun EditorScreenNewEntryPreview() {
                 )
             ),
             onAction = {},
-            onNavigateBack = {},
             showBackButton = false,
             snackbarHostState = remember { SnackbarHostState() }
         )
@@ -329,7 +335,6 @@ private fun EditorScreenEditEntryPreview() {
                 )
             ),
             onAction = {},
-            onNavigateBack = {},
             showBackButton = true,
             snackbarHostState = remember { SnackbarHostState() }
         )
@@ -351,9 +356,39 @@ private fun EditorScreenLoadingPreview() {
                 )
             ),
             onAction = {},
-            onNavigateBack = {},
             showBackButton = true,
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
+}
+
+/**
+ * Unsaved Changes Dialog
+ *
+ * Displays a confirmation dialog when the user attempts to navigate back with unsaved changes.
+ */
+@Composable
+private fun UnsavedChangesDialog(
+    onDiscard: () -> Unit,
+    onKeepEditing: () -> Unit
+) {
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onKeepEditing,
+        title = {
+            Text(text = stringResource(R.string.unsaved_changes_title))
+        },
+        text = {
+            Text(text = stringResource(R.string.unsaved_changes_message))
+        },
+        confirmButton = {
+            androidx.compose.material3.TextButton(onClick = onDiscard) {
+                Text(text = stringResource(R.string.discard))
+            }
+        },
+        dismissButton = {
+            androidx.compose.material3.TextButton(onClick = onKeepEditing) {
+                Text(text = stringResource(R.string.keep_editing))
+            }
+        }
+    )
 }

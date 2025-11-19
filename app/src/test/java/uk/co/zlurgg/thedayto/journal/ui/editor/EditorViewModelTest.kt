@@ -867,4 +867,185 @@ class EditorViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
     }
+
+    // ========================================
+    // Unsaved Changes Dialog Tests
+    // ========================================
+
+    @Test
+    fun `RequestNavigateBack navigates immediately when no changes made`() = runTest {
+        viewModel = createViewModel()
+
+        // When: Request navigate back with no changes
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.RequestNavigateBack)
+
+            // Then: Should emit NavigateBack event (no dialog)
+            val event = awaitItem()
+            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
+        }
+
+        // And: Dialog should not be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Dialog should not be shown", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `RequestNavigateBack shows dialog when mood changed`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: User selects a mood
+        viewModel.onAction(EditorAction.SelectMoodColor(1))
+
+        // When: Request navigate back
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // Then: Dialog should be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Dialog should be shown", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `RequestNavigateBack shows dialog when content changed`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: User enters content
+        viewModel.onAction(EditorAction.EnteredContent("Some notes"))
+
+        // When: Request navigate back
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // Then: Dialog should be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Dialog should be shown", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `RequestNavigateBack shows dialog when date changed`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: User changes date
+        val yesterday = LocalDate.now().minusDays(1).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        viewModel.onAction(EditorAction.EnteredDate(yesterday))
+
+        // When: Request navigate back
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // Then: Dialog should be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Dialog should be shown", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `ConfirmDiscardChanges closes dialog and navigates`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: User has unsaved changes and dialog is shown
+        viewModel.onAction(EditorAction.SelectMoodColor(1))
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // When: User confirms discard
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.ConfirmDiscardChanges)
+
+            // Then: Should emit NavigateBack event
+            val event = awaitItem()
+            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
+        }
+
+        // And: Dialog should be closed
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Dialog should be closed", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `DismissUnsavedChangesDialog closes dialog without navigating`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: User has unsaved changes and dialog is shown
+        viewModel.onAction(EditorAction.SelectMoodColor(1))
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // When: User dismisses dialog
+        viewModel.onAction(EditorAction.DismissUnsavedChangesDialog)
+
+        // Then: Dialog should be closed
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertFalse("Dialog should be closed", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Should remain on editor (no NavigateBack event)
+        // Note: We don't assert on events here because none should be emitted
+    }
+
+    @Test
+    fun `RequestNavigateBack navigates immediately when editing saved entry with no changes`() = runTest {
+        // Given: Existing entry loaded
+        val testEntry = TestDataBuilders.createEntry(
+            id = 123,
+            moodColorId = 1,
+            content = "Original content",
+            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        )
+        fakeEntryRepository.insertEntry(testEntry)
+
+        savedStateHandle["entryId"] = 123
+        savedStateHandle["entryDate"] = -1L
+        viewModel = createViewModel()
+
+        // When: Request navigate back without making changes
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.RequestNavigateBack)
+
+            // Then: Should navigate immediately (no dialog)
+            val event = awaitItem()
+            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
+        }
+    }
+
+    @Test
+    fun `RequestNavigateBack shows dialog when editing saved entry and mood changed`() = runTest {
+        // Given: Existing entry loaded
+        val testEntry = TestDataBuilders.createEntry(
+            id = 123,
+            moodColorId = 1,
+            content = "Original content",
+            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        )
+        fakeEntryRepository.insertEntry(testEntry)
+
+        savedStateHandle["entryId"] = 123
+        savedStateHandle["entryDate"] = -1L
+        viewModel = createViewModel()
+
+        // When: User changes mood
+        viewModel.onAction(EditorAction.SelectMoodColor(2))
+
+        // And: Request navigate back
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+
+        // Then: Dialog should be shown
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Dialog should be shown for modified entry", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
 }
