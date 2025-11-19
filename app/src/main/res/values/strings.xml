@@ -38,6 +38,11 @@
     <string name="pick_a_date">Pick a date</string>
     <string name="delete_custom_mood_color">delete custom mood color</string>
     <string name="add_custom_mood_color">add custom mood color</string>
+    <string name="unsaved_changes_title">Discard changes?</string>
+    <string name="unsaved_changes_message">You have unsaved changes. Do you want to discard them?</string>
+    <string name="discard">Discard</string>
+    <string name="keep_editing">Keep Editing</string>
+    <string name="mood_required_error">Please select or create a mood</string>
 
     <!-- Entries -->
     <string name="your_month_in_colour">Your month in colour</string>

@@ -46,6 +46,11 @@ class EditorViewModel(
 
     private var getMoodColorsJob: Job? = null
 
+    // Original state for detecting unsaved changes
+    private var originalMoodColorId: Int? = null
+    private var originalContent: String = ""
+    private var originalDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+
     init {
         Timber.d("EditorViewModel initialized")
 
@@ -56,6 +61,7 @@ class EditorViewModel(
         savedStateHandle.get<Long>("entryDate")?.let { entryDate ->
             if (entryDate != -1L) {
                 Timber.d("Setting entry date from navigation: $entryDate")
+                originalDate = entryDate
                 _uiState.update { it.copy(
                     entryDate = entryDate,
                     moodHint = getMoodHintForDate(entryDate)
@@ -154,6 +160,11 @@ class EditorViewModel(
      */
     private fun loadEntryIntoState(entry: Entry) {
         Timber.d("Loading entry into state: id=${entry.id}")
+        // Store original values for unsaved changes detection
+        originalMoodColorId = entry.moodColorId
+        originalContent = entry.content
+        originalDate = entry.dateStamp
+
         _uiState.update { state ->
             state.copy(
                 currentEntryId = entry.id,
@@ -185,6 +196,21 @@ class EditorViewModel(
                 moodHint = getMoodHintForDate(date)
             )
         }
+    }
+
+    /**
+     * Check if there are unsaved changes in the editor
+     *
+     * Compares current state with original values to determine if user has made changes
+     * that haven't been saved yet.
+     *
+     * @return true if there are unsaved changes, false otherwise
+     */
+    private fun hasUnsavedChanges(): Boolean {
+        val currentState = _uiState.value
+        return currentState.selectedMoodColorId != originalMoodColorId ||
+                currentState.entryContent != originalContent ||
+                currentState.entryDate != originalDate
     }
 
     fun onAction(action: EditorAction) {
@@ -427,6 +453,34 @@ class EditorViewModel(
                         )
                     }
                 }
+            }
+
+            is EditorAction.RequestNavigateBack -> {
+                Timber.d("Back button pressed, checking for unsaved changes")
+                if (hasUnsavedChanges()) {
+                    // Show unsaved changes dialog
+                    Timber.d("Unsaved changes detected, showing dialog")
+                    _uiState.update { it.copy(showUnsavedChangesDialog = true) }
+                } else {
+                    // No unsaved changes, navigate back immediately
+                    Timber.d("No unsaved changes, navigating back")
+                    viewModelScope.launch {
+                        _uiEvents.emit(EditorUiEvent.NavigateBack)
+                    }
+                }
+            }
+
+            is EditorAction.ConfirmDiscardChanges -> {
+                Timber.d("User confirmed discard changes")
+                _uiState.update { it.copy(showUnsavedChangesDialog = false) }
+                viewModelScope.launch {
+                    _uiEvents.emit(EditorUiEvent.NavigateBack)
+                }
+            }
+
+            is EditorAction.DismissUnsavedChangesDialog -> {
+                Timber.d("User dismissed unsaved changes dialog")
+                _uiState.update { it.copy(showUnsavedChangesDialog = false) }
             }
         }
     }
