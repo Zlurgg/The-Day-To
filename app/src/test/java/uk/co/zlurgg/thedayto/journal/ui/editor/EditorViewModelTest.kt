@@ -427,9 +427,14 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Entry should be created and SaveEntry event emitted
-            val event = awaitItem()
-            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
+            // Then: Success snackbar should be shown first
+            val snackbarEvent = awaitItem()
+            assertTrue("First event should be ShowSnackbar", snackbarEvent is EditorUiEvent.ShowSnackbar)
+            assertEquals("Should show success message", "Entry saved", (snackbarEvent as EditorUiEvent.ShowSnackbar).message)
+
+            // Then: SaveEntry event should be emitted
+            val saveEvent = awaitItem()
+            assertTrue("Second event should be SaveEntry", saveEvent is EditorUiEvent.SaveEntry)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -453,9 +458,14 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Entry should be updated
-            val event = awaitItem()
-            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
+            // Then: Success snackbar should be shown first
+            val snackbarEvent = awaitItem()
+            assertTrue("First event should be ShowSnackbar", snackbarEvent is EditorUiEvent.ShowSnackbar)
+            assertEquals("Should show success message", "Entry saved", (snackbarEvent as EditorUiEvent.ShowSnackbar).message)
+
+            // Then: SaveEntry event should be emitted
+            val saveEvent = awaitItem()
+            assertTrue("Second event should be SaveEntry", saveEvent is EditorUiEvent.SaveEntry)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -464,20 +474,20 @@ class EditorViewModelTest {
     }
 
     @Test
-    fun `SaveEntry action emits error when no mood is selected`() = runTest {
+    fun `SaveEntry action shows inline error when no mood is selected`() = runTest {
         viewModel = createViewModel()
         viewModel.onAction(EditorAction.EnteredContent("Content without mood"))
 
-        // When: Trying to save without selecting a mood (collect events first)
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.SaveEntry)
+        // When: Trying to save without selecting a mood
+        viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Error event should be emitted
-            val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertEquals("Should show select mood message", "Please select or create a mood", (event as EditorUiEvent.ShowSnackbar).message)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Then: Inline error should be set in state
+        val state = viewModel.uiState.value
+        assertEquals("Should show inline error", "Please select or create a mood", state.moodError)
+
+        // And: No entry should be saved
+        val entries = fakeEntryRepository.getEntriesSync()
+        assertEquals("Should have 0 entries", 0, entries.size)
     }
 
     @Test

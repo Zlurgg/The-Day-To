@@ -29,6 +29,9 @@ data class EditorUiState(
     val moodHint: String = "How're you feeling today?",  // Dynamic hint based on date
     val contentHint: String = "Any additional info?",
 
+    // Validation errors
+    val moodError: String? = null,
+
     // Loading state
     val isLoading: Boolean = false
 ) {
