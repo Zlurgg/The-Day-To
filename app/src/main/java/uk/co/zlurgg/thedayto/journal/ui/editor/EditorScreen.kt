@@ -224,6 +224,17 @@ private fun EditorScreen(
                     onAction(EditorAction.SaveMoodColor(mood, colorHex))
                 }
             )
+
+            // Show validation error if present
+            uiState.moodError?.let { errorMessage ->
+                Text(
+                    text = errorMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(start = 4.dp, top = 4.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(paddingMedium))
 
             // Content

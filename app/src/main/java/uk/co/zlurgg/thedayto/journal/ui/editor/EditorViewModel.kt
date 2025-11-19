@@ -223,7 +223,8 @@ class EditorViewModel(
                 _uiState.update {
                     it.copy(
                         selectedMoodColorId = action.moodColorId,
-                        isMoodHintVisible = false
+                        isMoodHintVisible = false,
+                        moodError = null // Clear error when mood selected
                     )
                 }
             }
@@ -265,7 +266,8 @@ class EditorViewModel(
                             it.copy(
                                 isMoodColorSectionVisible = false,
                                 selectedMoodColorId = newMoodColorId,
-                                isMoodHintVisible = false // Hide hint since mood is now selected
+                                isMoodHintVisible = false, // Hide hint since mood is now selected
+                                moodError = null // Clear error since mood is now selected
                             )
                         }
                     } catch (e: InvalidMoodColorException) {
@@ -390,11 +392,8 @@ class EditorViewModel(
                     // Validate moodColorId is selected
                     val moodColorId = state.selectedMoodColorId
                     if (moodColorId == null) {
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = "Please select or create a mood"
-                            )
-                        )
+                        // Show inline error
+                        _uiState.update { it.copy(moodError = "Please select or create a mood") }
                         return@launch
                     }
 
@@ -416,6 +415,7 @@ class EditorViewModel(
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully saved entry")
                         _uiState.update { it.copy(isLoading = false) }
+                        _uiEvents.emit(EditorUiEvent.ShowSnackbar("Entry saved"))
                         _uiEvents.emit(EditorUiEvent.SaveEntry)
                     } catch (e: InvalidEntryException) {
                         loadingJob.cancel()
