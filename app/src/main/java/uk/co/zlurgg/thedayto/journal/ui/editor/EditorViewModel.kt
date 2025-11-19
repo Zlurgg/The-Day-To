@@ -51,6 +51,9 @@ class EditorViewModel(
     private var originalContent: String = ""
     private var originalDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
 
+    // Store entry ID for retry on load failure
+    private var loadingEntryId: Int? = null
+
     init {
         Timber.d("EditorViewModel initialized")
 
@@ -72,42 +75,10 @@ class EditorViewModel(
         // Load existing entry if editing, or show tutorial for new entries
         val entryId = savedStateHandle.get<Int>("entryId")
         if (entryId != null && entryId != -1) {
+            // Store for potential retry
+            loadingEntryId = entryId
             // Load existing entry
-            Timber.d("Loading existing entry with ID: $entryId")
-            viewModelScope.launch {
-                val loadingJob = launchDebouncedLoading { isLoading ->
-                    _uiState.update { it.copy(isLoading = isLoading) }
-                }
-
-                try {
-                    val entry = editorUseCases.getEntryUseCase(entryId)
-                    entry?.let {
-                        loadingJob.cancel() // Cancel if finished quickly
-                        Timber.d("Successfully loaded entry with ID: ${it.id}")
-                        loadEntryIntoState(it)
-                        _uiState.update { it.copy(isLoading = false) }
-                    } ?: run {
-                        // Entry not found
-                        loadingJob.cancel()
-                        Timber.w("Entry not found with ID: $entryId")
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = "Entry not found"
-                            )
-                        )
-                    }
-                } catch (e: Exception) {
-                    loadingJob.cancel()
-                    Timber.e(e, "Failed to load entry with ID: $entryId")
-                    _uiState.update { it.copy(isLoading = false) }
-                    _uiEvents.emit(
-                        EditorUiEvent.ShowSnackbar(
-                            message = "Failed to load entry: ${e.message}"
-                        )
-                    )
-                }
-            }
+            loadEntry(entryId)
         } else {
             // New entry (entryId is null or -1) - check if tutorial should be shown
             checkAndShowEditorTutorial()
@@ -127,6 +98,51 @@ class EditorViewModel(
             if (!hasSeenTutorial) {
                 Timber.d("First time creating entry - showing editor tutorial")
                 _uiState.update { it.copy(showEditorTutorial = true) }
+            }
+        }
+    }
+
+    /**
+     * Load an entry by ID from the database
+     *
+     * Shows loading state, handles errors with persistent banner, and loads entry into state on success.
+     *
+     * @param entryId The ID of the entry to load
+     */
+    private fun loadEntry(entryId: Int) {
+        Timber.d("Loading existing entry with ID: $entryId")
+        viewModelScope.launch {
+            val loadingJob = launchDebouncedLoading { isLoading ->
+                _uiState.update { it.copy(isLoading = isLoading) }
+            }
+
+            try {
+                val entry = editorUseCases.getEntryUseCase(entryId)
+                entry?.let {
+                    loadingJob.cancel() // Cancel if finished quickly
+                    Timber.d("Successfully loaded entry with ID: ${it.id}")
+                    loadEntryIntoState(it)
+                    _uiState.update { it.copy(isLoading = false, loadError = null) }
+                } ?: run {
+                    // Entry not found - show persistent error
+                    loadingJob.cancel()
+                    Timber.w("Entry not found with ID: $entryId")
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            loadError = "Entry not found. It may have been deleted."
+                        )
+                    }
+                }
+            } catch (e: Exception) {
+                loadingJob.cancel()
+                Timber.e(e, "Failed to load entry with ID: $entryId")
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        loadError = "Failed to load entry: ${e.message ?: "Unknown error"}"
+                    )
+                }
             }
         }
     }
@@ -481,6 +497,22 @@ class EditorViewModel(
             is EditorAction.DismissUnsavedChangesDialog -> {
                 Timber.d("User dismissed unsaved changes dialog")
                 _uiState.update { it.copy(showUnsavedChangesDialog = false) }
+            }
+
+            is EditorAction.RetryLoadEntry -> {
+                Timber.d("Retrying entry load")
+                _uiState.update { it.copy(loadError = null) }
+                loadingEntryId?.let { entryId ->
+                    loadEntry(entryId)
+                } ?: run {
+                    Timber.w("Cannot retry: no entry ID stored")
+                    _uiState.update { it.copy(loadError = "Cannot retry: no entry ID") }
+                }
+            }
+
+            is EditorAction.DismissLoadError -> {
+                Timber.d("Dismissing load error banner")
+                _uiState.update { it.copy(loadError = null) }
             }
         }
     }
