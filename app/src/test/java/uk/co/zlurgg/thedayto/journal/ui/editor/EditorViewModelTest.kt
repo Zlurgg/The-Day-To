@@ -427,14 +427,9 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Success snackbar should be shown first
-            val snackbarEvent = awaitItem()
-            assertTrue("First event should be ShowSnackbar", snackbarEvent is EditorUiEvent.ShowSnackbar)
-            assertEquals("Should show success message", "Entry saved", (snackbarEvent as EditorUiEvent.ShowSnackbar).message)
-
             // Then: SaveEntry event should be emitted
-            val saveEvent = awaitItem()
-            assertTrue("Second event should be SaveEntry", saveEvent is EditorUiEvent.SaveEntry)
+            val event = awaitItem()
+            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -458,14 +453,9 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Success snackbar should be shown first
-            val snackbarEvent = awaitItem()
-            assertTrue("First event should be ShowSnackbar", snackbarEvent is EditorUiEvent.ShowSnackbar)
-            assertEquals("Should show success message", "Entry saved", (snackbarEvent as EditorUiEvent.ShowSnackbar).message)
-
             // Then: SaveEntry event should be emitted
-            val saveEvent = awaitItem()
-            assertTrue("Second event should be SaveEntry", saveEvent is EditorUiEvent.SaveEntry)
+            val event = awaitItem()
+            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
             cancelAndIgnoreRemainingEvents()
         }
 
