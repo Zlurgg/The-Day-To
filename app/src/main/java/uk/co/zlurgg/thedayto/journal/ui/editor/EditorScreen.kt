@@ -463,7 +463,7 @@ private fun LoadErrorBanner(
                 modifier = Modifier.size(24.dp)
             ) {
                 Icon(
-                    imageVector = androidx.compose.material.icons.Icons.Default.Close,
+                    imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.dismiss_error),
                     tint = MaterialTheme.colorScheme.onErrorContainer
                 )
