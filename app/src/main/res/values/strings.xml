@@ -43,6 +43,8 @@
     <string name="discard">Discard</string>
     <string name="keep_editing">Keep Editing</string>
     <string name="mood_required_error">Please select or create a mood</string>
+    <string name="retry">Retry</string>
+    <string name="dismiss_error">Dismiss error</string>
 
     <!-- Entries -->
     <string name="your_month_in_colour">Your month in colour</string>

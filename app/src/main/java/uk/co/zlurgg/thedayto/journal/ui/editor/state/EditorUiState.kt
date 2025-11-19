@@ -35,6 +35,9 @@ data class EditorUiState(
     // Validation errors
     val moodError: String? = null,
 
+    // Load error (persistent, for critical failures)
+    val loadError: String? = null,
+
     // Loading state
     val isLoading: Boolean = false
 ) {

@@ -20,4 +20,6 @@ sealed interface EditorAction {
     data object RequestNavigateBack : EditorAction
     data object ConfirmDiscardChanges : EditorAction
     data object DismissUnsavedChangesDialog : EditorAction
+    data object RetryLoadEntry : EditorAction
+    data object DismissLoadError : EditorAction
 }

@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
@@ -179,6 +181,16 @@ private fun EditorScreen(
                 .padding(paddingMedium)
                 .imePadding()
         ) {
+            // Error banner (persistent for load failures)
+            if (uiState.loadError != null) {
+                LoadErrorBanner(
+                    errorMessage = uiState.loadError,
+                    onRetry = { onAction(EditorAction.RetryLoadEntry) },
+                    onDismiss = { onAction(EditorAction.DismissLoadError) }
+                )
+                Spacer(modifier = Modifier.height(paddingMedium))
+            }
+
             // Date display (clickable to open date picker)
             Row(
                 modifier = Modifier.clickable {
@@ -391,4 +403,67 @@ private fun UnsavedChangesDialog(
             }
         }
     )
+}
+
+/**
+ * Load Error Banner
+ *
+ * Displays a persistent error banner at the top of the screen when entry loading fails.
+ * Includes retry and dismiss actions.
+ */
+@Composable
+private fun LoadErrorBanner(
+    errorMessage: String,
+    onRetry: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    androidx.compose.material3.Surface(
+        modifier = Modifier.fillMaxWidth(),
+        color = MaterialTheme.colorScheme.errorContainer,
+        shape = androidx.compose.foundation.shape.RoundedCornerShape(8.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            // Error icon
+            Icon(
+                imageVector = androidx.compose.material.icons.Icons.Default.Error,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.size(24.dp)
+            )
+
+            // Error message
+            Text(
+                text = errorMessage,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier.weight(1f)
+            )
+
+            // Retry button
+            androidx.compose.material3.TextButton(onClick = onRetry) {
+                Text(
+                    text = stringResource(R.string.retry),
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+
+            // Dismiss button
+            IconButton(
+                onClick = onDismiss,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = androidx.compose.material.icons.Icons.Default.Close,
+                    contentDescription = stringResource(R.string.dismiss_error),
+                    tint = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
+        }
+    }
 }
