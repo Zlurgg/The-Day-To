@@ -292,7 +292,7 @@ fun MoodItem(
 @Composable
 private fun EmptyDropdownContentPreview() {
     TheDayToTheme {
-        androidx.compose.foundation.layout.Column(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
@@ -300,20 +300,18 @@ private fun EmptyDropdownContentPreview() {
             val moodColors = emptyList<MoodColor>()
 
             // Empty state message
-            if (moodColors.isEmpty()) {
-                DropdownMenuItem(
-                    onClick = { },
-                    enabled = false,
-                    text = {
-                        Text(
-                            text = stringResource(R.string.empty_mood_list_message),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
-                )
-            }
+            DropdownMenuItem(
+                onClick = { },
+                enabled = false,
+                text = {
+                    Text(
+                        text = stringResource(R.string.empty_mood_list_message),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            )
 
             // Highlighted + Add button (when empty)
             DropdownMenuItem(
@@ -323,14 +321,10 @@ private fun EmptyDropdownContentPreview() {
                         modifier = Modifier
                             .fillMaxWidth()
                             .then(
-                                if (moodColors.isEmpty()) {
-                                    Modifier.background(
-                                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                } else {
-                                    Modifier
-                                }
+                                Modifier.background(
+                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
+                                    shape = MaterialTheme.shapes.small
+                                )
                             ),
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.Center
