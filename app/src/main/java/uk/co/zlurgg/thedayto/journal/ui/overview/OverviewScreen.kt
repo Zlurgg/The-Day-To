@@ -46,16 +46,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
-import uk.co.zlurgg.thedayto.core.util.AndroidSystemUtils
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
+import uk.co.zlurgg.thedayto.core.util.AndroidSystemUtils
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalendarSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntriesListSection
@@ -197,7 +200,7 @@ fun OverviewScreenRoot(
             )
         },
         onNavigateToStats = {
-            navController.navigate(uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute)
+            navController.navigate(StatsRoute)
         },
         snackbarHostState = snackbarHostState
     )
@@ -237,7 +240,7 @@ private fun OverviewScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(uk.co.zlurgg.thedayto.R.string.create_today_entry)
+                        contentDescription = stringResource(R.string.create_today_entry)
                     )
                 }
             }
@@ -248,7 +251,7 @@ private fun OverviewScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .systemBarsPadding()
-                    .padding(uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall),
+                    .padding(paddingSmall),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {

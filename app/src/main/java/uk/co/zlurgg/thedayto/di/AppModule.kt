@@ -36,7 +36,9 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
@@ -153,8 +155,8 @@ val appModule = module {
             addMoodColorUseCase = get(),
             getMoodColorUseCase = get(),
             updateMoodColorUseCase = get(),
-            checkEditorTutorialSeen = uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
-            markEditorTutorialSeen = uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase(preferencesRepository = get())
+            checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
+            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(preferencesRepository = get())
         )
     }
 

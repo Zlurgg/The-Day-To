@@ -67,7 +67,7 @@ private fun EntriesListSectionPreview() {
     TheDayToTheme {
         EntriesListSection(
             entries = listOf(
-                uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor(
+                EntryWithMoodColor(
                     id = 1,
                     moodColorId = 1,
                     moodName = "Happy",
@@ -75,7 +75,7 @@ private fun EntriesListSectionPreview() {
                     content = "Had a great day!",
                     dateStamp = System.currentTimeMillis()
                 ),
-                uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor(
+                EntryWithMoodColor(
                     id = 2,
                     moodColorId = 2,
                     moodName = "Productive",
