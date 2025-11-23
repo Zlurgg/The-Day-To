@@ -10,6 +10,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
@@ -74,7 +79,28 @@ fun TheDayToApp() {
                     navDeepLink<EditorRoute>(
                         basePath = "https://thedayto.co.uk/editor"
                     )
-                )
+                ),
+                // Slide up when navigating TO editor
+                enterTransition = {
+                    slideInVertically(
+                        initialOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeIn(animationSpec = tween(durationMillis = 300))
+                },
+                // Slide down when navigating AWAY from editor (forward navigation)
+                exitTransition = {
+                    slideOutVertically(
+                        targetOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                },
+                // Slide down when BACK button pressed (popping back stack)
+                popExitTransition = {
+                    slideOutVertically(
+                        targetOffsetY = { fullHeight -> fullHeight },
+                        animationSpec = tween(durationMillis = 300)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                }
             ) { backStackEntry ->
                 val editorRoute = backStackEntry.toRoute<EditorRoute>()
                 EditorScreenRoot(
@@ -84,7 +110,7 @@ fun TheDayToApp() {
             }
 
             // Overview Screen (Calendar + Entry List)
-            composable<OverviewRoute> {
+            composable<OverviewRoute>() {
                 val signOutUseCase: SignOutUseCase = koinInject()
                 val scope = rememberCoroutineScope()
                 var showSignOutDialog by remember { mutableStateOf(false) }
