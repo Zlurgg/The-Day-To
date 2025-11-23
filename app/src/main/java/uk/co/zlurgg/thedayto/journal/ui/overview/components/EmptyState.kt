@@ -21,8 +21,8 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 
 @Composable
 fun EmptyState(
+    modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier
