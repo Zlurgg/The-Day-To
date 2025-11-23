@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
@@ -521,7 +522,7 @@ class EditorViewModel(
         getMoodColorsJob?.cancel()
         getMoodColorsJob = editorUseCases.getMoodColors(
             MoodColorOrder.Date(
-                uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending
+                OrderType.Descending
             )
         )
             .onEach { moodColors ->
