@@ -6,6 +6,8 @@ import kotlinx.coroutines.flow.map
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+import java.time.LocalDate
+import java.time.ZoneOffset
 
 /**
  * Fake implementation of EntryRepository for testing.
@@ -41,6 +43,42 @@ class FakeEntryRepository(
                 )
             }
         }
+    }
+
+    override fun getEntriesForMonth(month: Int, year: Int): Flow<List<EntryWithMoodColor>> {
+        require(month in 1..12) { "Month must be between 1 and 12, got: $month" }
+        require(year > 0) { "Year must be positive, got: $year" }
+
+        val (startEpoch, endEpoch) = getMonthRange(month, year)
+
+        return _entries.map { entries ->
+            entries
+                .filter { it.dateStamp >= startEpoch && it.dateStamp < endEpoch }
+                .map { entry ->
+                    val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
+                    EntryWithMoodColor(
+                        id = entry.id,
+                        moodColorId = entry.moodColorId,
+                        moodName = moodColor?.mood ?: "Test Mood",
+                        moodColor = moodColor?.color ?: "4CAF50",
+                        content = entry.content,
+                        dateStamp = entry.dateStamp
+                    )
+                }
+        }
+    }
+
+    private fun getMonthRange(month: Int, year: Int): Pair<Long, Long> {
+        val startOfMonth = LocalDate.of(year, month, 1)
+            .atStartOfDay()
+            .toEpochSecond(ZoneOffset.UTC)
+
+        val startOfNextMonth = LocalDate.of(year, month, 1)
+            .plusMonths(1)
+            .atStartOfDay()
+            .toEpochSecond(ZoneOffset.UTC)
+
+        return Pair(startOfMonth, startOfNextMonth)
     }
 
     override suspend fun getEntryById(id: Int): Entry? {

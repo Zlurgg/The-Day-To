@@ -15,6 +15,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 
 /**
@@ -46,6 +47,7 @@ fun createFakeOverviewUseCases(
 
     // Create real entry use cases with fake repository
     val getEntries = GetEntriesUseCase(entryRepository)
+    val getEntriesForMonth = GetEntriesForMonthUseCase(entryRepository)
     val deleteEntry = DeleteEntryUseCase(entryRepository)
     val restoreEntry = RestoreEntryUseCase(entryRepository)
     val getEntryByDate = GetEntryByDateUseCase(entryRepository)
@@ -53,6 +55,7 @@ fun createFakeOverviewUseCases(
 
     return OverviewUseCases(
         getEntries = getEntries,
+        getEntriesForMonth = getEntriesForMonth,
         deleteEntry = deleteEntry,
         restoreEntry = restoreEntry,
         getEntryByDate = getEntryByDate,
