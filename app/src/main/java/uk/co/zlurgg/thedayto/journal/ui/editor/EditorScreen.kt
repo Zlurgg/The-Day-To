@@ -205,7 +205,7 @@ private fun EditorScreen(
             ) {
                 Text(
                     text = datestampToFormattedDate(uiState.entryDate),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
