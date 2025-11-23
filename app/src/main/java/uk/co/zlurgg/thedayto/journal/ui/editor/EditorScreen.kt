@@ -38,6 +38,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -123,6 +125,8 @@ private fun EditorScreen(
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Scaffold(
         topBar = {
             Row(
@@ -147,7 +151,10 @@ private fun EditorScreen(
             // Hide FAB when mood color picker is visible
             if (!uiState.isMoodColorSectionVisible) {
                 FloatingActionButton(
-                    onClick = { onAction(EditorAction.SaveEntry) },
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onAction(EditorAction.SaveEntry)
+                    },
                     containerColor = when {
                         uiState.isLoading -> MaterialTheme.colorScheme.secondary
                         !uiState.canSave -> MaterialTheme.colorScheme.surfaceVariant
