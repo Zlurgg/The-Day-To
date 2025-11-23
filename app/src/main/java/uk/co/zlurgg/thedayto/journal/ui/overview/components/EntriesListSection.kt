@@ -14,6 +14,7 @@ import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
 /**
@@ -22,12 +23,12 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
  */
 @Composable
 fun EntriesListSection(
-    entries: List<uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor>,
+    entries: List<EntryWithMoodColor>,
     entryOrder: EntryOrder,
     onOrderChange: (EntryOrder) -> Unit,
     onEntryClick: (entryId: Int?) -> Unit,
+    modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
         // Entry sorting controls
