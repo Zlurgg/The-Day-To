@@ -191,6 +191,18 @@ class OverviewViewModel(
                 getEntries(entryOrder = action.entryOrder)
             }
 
+            is OverviewAction.OnMonthChanged -> {
+                Timber.d("Month changed to ${action.month}/${action.year}")
+                _uiState.update {
+                    it.copy(
+                        displayedMonth = action.month,
+                        displayedYear = action.year
+                    )
+                }
+                // Fetch entries for the new month
+                getEntries(_uiState.value.entryOrder)
+            }
+
             is OverviewAction.DeleteEntry -> {
                 viewModelScope.launch {
                     val loadingJob = launchDebouncedLoading { isLoading ->
@@ -378,9 +390,20 @@ class OverviewViewModel(
         }
     }
 
+    /**
+     * Get entries for the currently displayed month.
+     *
+     * Filters entries at the database level for optimal performance.
+     * Automatically updates when database changes (new/updated/deleted entries).
+     */
     private fun getEntries(entryOrder: EntryOrder) {
         getEntriesJob?.cancel()
-        getEntriesJob = overviewUseCases.getEntries(entryOrder)
+        val currentState = _uiState.value
+        getEntriesJob = overviewUseCases.getEntriesForMonth(
+            month = currentState.displayedMonth,
+            year = currentState.displayedYear,
+            entryOrder = entryOrder
+        )
             .onEach { entries ->
                 _uiState.update {
                     it.copy(
