@@ -70,6 +70,7 @@ fun CalendarSection(
     modifier: Modifier = Modifier,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
     onStatsClick: () -> Unit = {},
+    onMonthChanged: (month: Int, year: Int) -> Unit = { _, _ -> }
 ) {
     BoxWithConstraints(modifier = modifier) {
         // Calculate day size to ensure 7 days always fit in available width
@@ -92,7 +93,8 @@ fun CalendarSection(
             entries = entries,
             daySize = daySize,
             onStatsClick = onStatsClick,
-            onDateClick = onDateClick
+            onDateClick = onDateClick,
+            onMonthChanged = onMonthChanged
         )
     }
 }
@@ -106,10 +108,16 @@ private fun CalendarContent(
     entries: List<EntryWithMoodColor>,
     daySize: Dp,
     onStatsClick: () -> Unit,
-    onDateClick: (entryId: Int?, entryDate: Long?) -> Unit
+    onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
+    onMonthChanged: (month: Int, year: Int) -> Unit
 ) {
     var date by remember { mutableStateOf(currentDate) }
     var showMonthYearPicker by remember { mutableStateOf(false) }
+
+    // Notify parent when month changes
+    LaunchedEffect(date.monthValue, date.year) {
+        onMonthChanged(date.monthValue, date.year)
+    }
 
     // Calculate derived values from date
     val daysInMonth = date.lengthOfMonth()
