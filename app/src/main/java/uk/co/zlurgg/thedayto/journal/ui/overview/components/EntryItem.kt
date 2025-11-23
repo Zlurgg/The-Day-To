@@ -55,7 +55,7 @@ fun EntryItem(
             ) {
                 Text(
                     text = entry.moodName,
-                    style = MaterialTheme.typography.titleMedium,
+                    style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.SemiBold,
                     color = textColor,
                     overflow = TextOverflow.Ellipsis,
@@ -63,7 +63,7 @@ fun EntryItem(
                 )
                 Text(
                     text = datestampToFormattedDate(entry.dateStamp),
-                    style = MaterialTheme.typography.labelMedium,
+                    style = MaterialTheme.typography.labelLarge,
                     color = textColor.copy(alpha = 0.8f),
                     overflow = TextOverflow.Ellipsis
                 )
@@ -73,7 +73,7 @@ fun EntryItem(
             if (entry.content.isNotBlank()) {
                 Text(
                     text = entry.content,
-                    style = MaterialTheme.typography.bodySmall,
+                    style = MaterialTheme.typography.bodyMedium,
                     color = textColor,
                     maxLines = 2,
                     overflow = TextOverflow.Ellipsis

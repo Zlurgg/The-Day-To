@@ -63,7 +63,7 @@ fun MonthYearPickerDialog(
             Column {
                 // Year selector
                 Text(
-                    text = "Year",
+                    text = stringResource(R.string.month_picker_year_label),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -93,7 +93,7 @@ fun MonthYearPickerDialog(
 
                 // Month selector
                 Text(
-                    text = "Month",
+                    text = stringResource(R.string.month_picker_month_label),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 4.dp)
                 )
@@ -136,12 +136,12 @@ fun MonthYearPickerDialog(
                     onDismiss()
                 }
             ) {
-                Text("OK")
+                Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancel")
+                Text(stringResource(R.string.cancel))
             }
         }
     )

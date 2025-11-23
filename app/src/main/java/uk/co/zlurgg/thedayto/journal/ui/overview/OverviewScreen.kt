@@ -254,7 +254,7 @@ private fun OverviewScreen(
             ) {
                 Text(
                     text = uiState.greeting,
-                    style = MaterialTheme.typography.headlineMedium,
+                    style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 SettingsMenu(
@@ -294,6 +294,7 @@ private fun OverviewScreen(
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
+                    onCreateEntry = { onNavigateToEntry(null, null) },
                     modifier = Modifier.fillMaxWidth()
                 )
             }

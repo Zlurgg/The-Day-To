@@ -26,6 +26,7 @@ fun EntriesListSection(
     entryOrder: EntryOrder,
     onOrderChange: (EntryOrder) -> Unit,
     onEntryClick: (entryId: Int?) -> Unit,
+    onCreateEntry: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
@@ -40,7 +41,7 @@ fun EntriesListSection(
 
         // Show empty state if no entries, otherwise show list
         if (entries.isEmpty()) {
-            EmptyState()
+            EmptyState(onCreateEntry = onCreateEntry)
         } else {
             // Render entries in Column (parent screen is scrollable)
             entries.forEach { entry ->

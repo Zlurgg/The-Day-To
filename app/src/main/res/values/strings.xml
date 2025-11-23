@@ -54,6 +54,9 @@
     <string name="date">Date</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
+    <string name="empty_state_title">No entries yet</string>
+    <string name="empty_state_description">Start tracking your daily moods by tapping on today\'s date in the calendar</string>
+    <string name="empty_state_create_button">Create Your First Entry</string>
     <string name="enable_notifications">Enable Notifications</string>
     <string name="disable_notifications">Disable Notifications</string>
     <string name="notifications">Notifications</string>
@@ -141,8 +144,22 @@
     <string name="preset_evening">Evening</string>
     <string name="return_to_current_month">Return to current month</string>
     <string name="select_month_and_year">Select Month &amp; Year</string>
+    <string name="month_picker_year_label">Year</string>
+    <string name="month_picker_month_label">Month</string>
     <string name="settings">Settings</string>
     <string name="statistics">Statistics</string>
+
+    <!-- Statistics Labels -->
+    <string name="stats_entries_label">Entries</string>
+    <string name="stats_days_logged_label">Days Logged</string>
+    <string name="stats_days_in_month_label">Days in Month</string>
+
+    <!-- Settings Menu Icon Descriptions -->
+    <string name="icon_description_statistics">View statistics</string>
+    <string name="icon_description_notifications">Notification settings</string>
+    <string name="icon_description_help">Help and tutorial</string>
+    <string name="icon_description_about">About The Day To</string>
+    <string name="icon_description_sign_out">Sign out</string>
 
     <!-- About Dialog -->
     <string name="about_dialog_title">About The Day To</string>

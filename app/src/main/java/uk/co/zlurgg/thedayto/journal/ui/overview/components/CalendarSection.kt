@@ -230,18 +230,18 @@ private fun MonthYearHeader(
             ) {
                 Text(
                     text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Spacer(modifier = Modifier.padding(horizontal = paddingSmall))
                 Text(
                     text = date.year.toString(),
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
-                    contentDescription = "Select month and year",
+                    contentDescription = stringResource(R.string.select_month_and_year),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
@@ -399,7 +399,7 @@ private fun CalendarMonthGrid(
                                                 }
                                             ),
                                             text = "$dayNumber",
-                                            style = MaterialTheme.typography.headlineSmall,
+                                            style = MaterialTheme.typography.headlineMedium,
                                             color = if (isToday) MaterialTheme.colorScheme.primary
                                             else MaterialTheme.colorScheme.onSurface,
                                             overflow = TextOverflow.Ellipsis
