@@ -91,15 +91,15 @@ fun TheDayToApp() {
                 exitTransition = {
                     slideOutVertically(
                         targetOffsetY = { fullHeight -> fullHeight },
-                        animationSpec = tween(durationMillis = 300)
-                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                        animationSpec = tween(durationMillis = 600)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 600))
                 },
                 // Slide down when BACK button pressed (popping back stack)
                 popExitTransition = {
                     slideOutVertically(
                         targetOffsetY = { fullHeight -> fullHeight },
-                        animationSpec = tween(durationMillis = 300)
-                    ) + fadeOut(animationSpec = tween(durationMillis = 300))
+                        animationSpec = tween(durationMillis = 600)
+                    ) + fadeOut(animationSpec = tween(durationMillis = 600))
                 }
             ) { backStackEntry ->
                 val editorRoute = backStackEntry.toRoute<EditorRoute>()

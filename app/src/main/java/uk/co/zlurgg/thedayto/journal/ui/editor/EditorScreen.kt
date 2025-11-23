@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Error
@@ -55,13 +56,13 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
+import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -111,7 +112,7 @@ fun EditorScreenRoot(
 
     // Show editor tutorial dialog for first-time users
     if (uiState.showEditorTutorial) {
-        uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog(
+        EditorTutorialDialog(
             onDismiss = { viewModel.onAction(EditorAction.DismissEditorTutorial) }
         )
     }
@@ -223,16 +224,22 @@ private fun EditorScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                Icon(
+                    imageVector = Icons.Default.CalendarToday,
+                    contentDescription = stringResource(R.string.pick_a_date),
+                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
+                    modifier = Modifier.size(24.dp)
+                )
                 Text(
                     text = datestampToFormattedDate(uiState.entryDate),
                     style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = stringResource(R.string.pick_a_date),
+                    imageVector = Icons.Default.ArrowDropDown,
+                    contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(24.dp)
                 )
             }
             Spacer(modifier = Modifier.height(paddingMedium))
