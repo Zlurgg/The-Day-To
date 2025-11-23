@@ -218,6 +218,8 @@ class OverviewViewModel(
                                 isLoading = false
                             )
                         }
+                        // Show snackbar with undo option
+                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted", actionLabel = "Undo"))
                     } catch (e: Exception) {
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
@@ -246,6 +248,7 @@ class OverviewViewModel(
                                 isLoading = false
                             )
                         }
+                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry restored"))
                     } catch (e: Exception) {
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
@@ -256,6 +259,10 @@ class OverviewViewModel(
                         )
                     }
                 }
+            }
+
+            is OverviewAction.ClearRecentlyDeleted -> {
+                _uiState.update { it.copy(recentlyDeletedEntry = null) }
             }
 
             is OverviewAction.RequestNotificationPermission -> {

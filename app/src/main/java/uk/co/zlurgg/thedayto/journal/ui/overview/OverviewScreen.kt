@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -29,9 +30,12 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -104,7 +108,23 @@ fun OverviewScreenRoot(
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is OverviewUiEvent.ShowSnackbar -> {
-                    snackbarHostState.showSnackbar(event.message)
+                    val result = snackbarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = event.actionLabel,
+                        withDismissAction = false,
+                        duration = androidx.compose.material3.SnackbarDuration.Short
+                    )
+                    // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
+                    if (event.actionLabel == "Undo") {
+                        when (result) {
+                            androidx.compose.material3.SnackbarResult.ActionPerformed -> {
+                                viewModel.onAction(OverviewAction.RestoreEntry)
+                            }
+                            androidx.compose.material3.SnackbarResult.Dismissed -> {
+                                viewModel.onAction(OverviewAction.ClearRecentlyDeleted)
+                            }
+                        }
+                    }
                 }
                 is OverviewUiEvent.NavigateToSignIn -> {
                     onNavigateToSignIn()
@@ -221,7 +241,43 @@ private fun OverviewScreen(
     val currentDate = LocalDate.now()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState,
+                modifier = Modifier.padding(paddingMedium)
+            ) { data ->
+                Snackbar(
+                    modifier = Modifier
+                        .padding(horizontal = paddingSmall)
+                        .widthIn(max = 600.dp),
+                    action = {
+                        data.visuals.actionLabel?.let { actionLabel ->
+                            TextButton(
+                                onClick = { data.performAction() },
+                                modifier = Modifier.padding(horizontal = paddingSmall)
+                            ) {
+                                Text(
+                                    text = actionLabel,
+                                    style = MaterialTheme.typography.labelLarge,
+                                    color = MaterialTheme.colorScheme.inversePrimary
+                                )
+                            }
+                        }
+                    },
+                    dismissAction = null,
+                    actionOnNewLine = false,
+                    shape = MaterialTheme.shapes.large,
+                    containerColor = MaterialTheme.colorScheme.inverseSurface,
+                    contentColor = MaterialTheme.colorScheme.inverseOnSurface
+                ) {
+                    Text(
+                        text = data.visuals.message,
+                        style = MaterialTheme.typography.bodyLarge,
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
+        },
         floatingActionButton = {
             // Only show FAB when today's entry is missing with smooth animation
             AnimatedVisibility(
@@ -297,6 +353,7 @@ private fun OverviewScreen(
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
+                    onDeleteEntry = { entry -> onAction(OverviewAction.DeleteEntry(entry)) },
                     onCreateEntry = { onNavigateToEntry(null, null) },
                     modifier = Modifier.fillMaxWidth()
                 )
