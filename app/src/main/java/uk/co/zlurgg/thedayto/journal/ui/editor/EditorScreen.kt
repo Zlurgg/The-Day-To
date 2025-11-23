@@ -1,6 +1,13 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -83,16 +90,12 @@ fun EditorScreenRoot(
                     snackbarHostState.showSnackbar(event.message)
                 }
                 is EditorUiEvent.SaveEntry -> {
-                    navController.navigate(OverviewRoute) {
-                        // Remove editor from back stack
-                        popUpTo(OverviewRoute) { inclusive = false }
-                    }
+                    // Pop back stack to trigger exit animation
+                    navController.navigateUp()
                 }
                 is EditorUiEvent.NavigateBack -> {
-                    navController.navigate(OverviewRoute) {
-                        // Remove editor from back stack
-                        popUpTo(OverviewRoute) { inclusive = false }
-                    }
+                    // Pop back stack to trigger exit animation
+                    navController.navigateUp()
                 }
             }
         }
@@ -148,8 +151,12 @@ private fun EditorScreen(
             }
         },
         floatingActionButton = {
-            // Hide FAB when mood color picker is visible
-            if (!uiState.isMoodColorSectionVisible) {
+            // Hide FAB when mood color picker is visible with scale animation
+            AnimatedVisibility(
+                visible = !uiState.isMoodColorSectionVisible,
+                enter = scaleIn() + fadeIn(),
+                exit = scaleOut() + fadeOut()
+            ) {
                 FloatingActionButton(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -192,14 +199,20 @@ private fun EditorScreen(
                 .padding(paddingMedium)
                 .imePadding()
         ) {
-            // Error banner (persistent for load failures)
-            if (uiState.loadError != null) {
-                LoadErrorBanner(
-                    errorMessage = uiState.loadError,
-                    onRetry = { onAction(EditorAction.RetryLoadEntry) },
-                    onDismiss = { onAction(EditorAction.DismissLoadError) }
-                )
-                Spacer(modifier = Modifier.height(paddingMedium))
+            // Error banner (persistent for load failures) with slide-down animation
+            AnimatedVisibility(
+                visible = uiState.loadError != null,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Column {
+                    LoadErrorBanner(
+                        errorMessage = uiState.loadError ?: "",
+                        onRetry = { onAction(EditorAction.RetryLoadEntry) },
+                        onDismiss = { onAction(EditorAction.DismissLoadError) }
+                    )
+                    Spacer(modifier = Modifier.height(paddingMedium))
+                }
             }
 
             // Date display (clickable to open date picker)
