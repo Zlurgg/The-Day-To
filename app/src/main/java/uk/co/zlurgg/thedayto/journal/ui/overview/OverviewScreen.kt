@@ -280,12 +280,15 @@ private fun OverviewScreen(
                     currentDate = currentDate,
                     onDateClick = onNavigateToEntry,
                     onStatsClick = onNavigateToStats,
+                    onMonthChanged = { month, year ->
+                        onAction(OverviewAction.OnMonthChanged(month, year))
+                    },
                     modifier = Modifier.fillMaxWidth()
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Entries list section with sorting
+                // Entries list section with sorting (entries already filtered at database level)
                 EntriesListSection(
                     entries = uiState.entries,
                     entryOrder = uiState.entryOrder,
