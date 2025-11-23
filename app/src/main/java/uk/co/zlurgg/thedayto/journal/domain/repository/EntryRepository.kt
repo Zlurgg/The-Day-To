@@ -20,6 +20,21 @@ import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 interface EntryRepository {
     fun getEntries(): Flow<List<Entry>>
     fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>>
+
+    /**
+     * Get entries for a specific month and year.
+     * Filters at the database level for optimal performance.
+     *
+     * This method moves the filtering logic from the UI layer to the data layer,
+     * improving performance by querying only the necessary data and reducing memory usage.
+     *
+     * @param month Month value (1-12)
+     * @param year Year value (e.g., 2024)
+     * @return Flow of entries with mood colors for the specified month
+     * @throws IllegalArgumentException if month is not in 1..12 or year is not positive
+     */
+    fun getEntriesForMonth(month: Int, year: Int): Flow<List<EntryWithMoodColor>>
+
     suspend fun getEntryById(id: Int): Entry?
     suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor?
     suspend fun getEntryByDate(date: Long): Entry?
