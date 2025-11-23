@@ -25,6 +25,26 @@ interface EntryDao {
     """)
     fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColorEntity>>
 
+    /**
+     * Get entries within a specific date range (for month filtering).
+     *
+     * Filters entries at the database level using a WHERE clause for optimal performance.
+     * This approach scales efficiently as users accumulate entries over time.
+     *
+     * @param startEpoch Start of the range (inclusive) - epoch seconds
+     * @param endEpoch End of the range (exclusive) - epoch seconds
+     * @return Flow of entries with mood colors within the date range, ordered by date descending
+     */
+    @Query("""
+        SELECT e.id, e.moodColorId, e.content, e.dateStamp,
+               mc.mood as moodName, mc.color as moodColor
+        FROM entry e
+        INNER JOIN mood_color mc ON e.moodColorId = mc.id
+        WHERE e.dateStamp >= :startEpoch AND e.dateStamp < :endEpoch
+        ORDER BY e.dateStamp DESC
+    """)
+    fun getEntriesForMonth(startEpoch: Long, endEpoch: Long): Flow<List<EntryWithMoodColorEntity>>
+
     @Query("SELECT * FROM entry WHERE id = :id")
     suspend fun getEntryById(id: Int): EntryEntity?
 
