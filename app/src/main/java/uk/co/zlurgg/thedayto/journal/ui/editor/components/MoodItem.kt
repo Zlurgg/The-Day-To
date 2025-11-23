@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
 import android.content.res.Configuration.UI_MODE_NIGHT_YES
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -138,6 +139,21 @@ fun MoodItem(
                     )
                 }
             },
+            leadingIcon = {
+                // Show color indicator when a mood is selected
+                selectedMoodColor?.let { mood ->
+                    Box(
+                        modifier = Modifier
+                            .size(24.dp)
+                            .background(getColor(mood.color), CircleShape)
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                shape = CircleShape
+                            )
+                    )
+                }
+            },
             trailingIcon = {
                 ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded)
             }
@@ -181,11 +197,16 @@ fun MoodItem(
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            // Color indicator - prominent circle
+                            // Color indicator - prominent circle with border
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(32.dp)
                                     .background(color, CircleShape)
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                        shape = CircleShape
+                                    )
                             )
 
                             Spacer(modifier = Modifier.width(12.dp))
@@ -296,8 +317,6 @@ private fun EmptyDropdownContentPreview() {
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
         ) {
-            val moodColors = emptyList<MoodColor>()
-
             // Empty state message
             DropdownMenuItem(
                 onClick = { },
@@ -377,10 +396,16 @@ private fun DropdownWithMoodsPreview() {
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
+                            // Color indicator - prominent circle with border
                             Box(
                                 modifier = Modifier
-                                    .size(24.dp)
+                                    .size(32.dp)
                                     .background(color, CircleShape)
+                                    .border(
+                                        width = 1.dp,
+                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                        shape = CircleShape
+                                    )
                             )
                             Spacer(modifier = Modifier.width(12.dp))
                             Text(
