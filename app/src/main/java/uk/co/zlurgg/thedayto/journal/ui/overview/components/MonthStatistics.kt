@@ -14,8 +14,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
@@ -52,15 +54,15 @@ fun MonthStatistics(
             verticalAlignment = Alignment.CenterVertically
         ) {
             StatItem(
-                label = "Entries",
+                label = stringResource(R.string.stats_entries_label),
                 value = entryCount.toString()
             )
             StatItem(
-                label = "Days Logged",
+                label = stringResource(R.string.stats_days_logged_label),
                 value = "$completionPercentage%"
             )
             StatItem(
-                label = "Days in Month",
+                label = stringResource(R.string.stats_days_in_month_label),
                 value = daysInMonth.toString()
             )
         }
@@ -83,7 +85,7 @@ private fun StatItem(
         )
         Text(
             text = label,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelLarge,
             color = MaterialTheme.colorScheme.onSurfaceVariant
         )
     }

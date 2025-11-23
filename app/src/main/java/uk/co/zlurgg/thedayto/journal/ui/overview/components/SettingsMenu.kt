@@ -51,7 +51,7 @@ fun SettingsMenu(
         ) {
             // Statistics
             DropdownMenuItem(
-                text = { Text("Statistics") },
+                text = { Text(stringResource(R.string.statistics)) },
                 onClick = {
                     expanded = false
                     onNavigateToStats()
@@ -59,7 +59,7 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.BarChart,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.icon_description_statistics)
                     )
                 }
             )
@@ -74,7 +74,7 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.icon_description_notifications)
                     )
                 }
             )
@@ -88,7 +88,7 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.icon_description_help)
                     )
                 }
             )
@@ -102,7 +102,7 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Info,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.icon_description_about)
                     )
                 }
             )
@@ -116,7 +116,7 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = null
+                        contentDescription = stringResource(R.string.icon_description_sign_out)
                     )
                 }
             )
