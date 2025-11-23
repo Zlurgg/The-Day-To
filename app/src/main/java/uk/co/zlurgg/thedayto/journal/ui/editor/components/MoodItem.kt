@@ -130,12 +130,12 @@ fun MoodItem(
                     Text(
                         text = hint,
                         color = MaterialTheme.colorScheme.primary,
-                        fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium
                     )
                     Text(
                         text = "*",
                         color = MaterialTheme.colorScheme.error,
-                        fontSize = 12.sp
+                        style = MaterialTheme.typography.labelMedium
                     )
                 }
             },
