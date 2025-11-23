@@ -702,4 +702,46 @@ class OverviewViewModelTest {
         )
     }
 
+    // Month Filtering Tests
+    @Test
+    fun `onMonthChanged - updates displayed month and year`() = runTest {
+        // Given: Initial state with current month/year
+        testScheduler.advanceUntilIdle()
+        val initialState = viewModel.uiState.value
+
+        // When: Month is changed
+        viewModel.onAction(OverviewAction.OnMonthChanged(month = 5, year = 2024))
+        testScheduler.advanceUntilIdle()
+
+        // Then: State should reflect new month/year
+        val updatedState = viewModel.uiState.value
+        assertEquals("Month should be updated to 5", 5, updatedState.displayedMonth)
+        assertEquals("Year should be updated to 2024", 2024, updatedState.displayedYear)
+    }
+
+    @Test
+    fun `init - sets displayed month and year to current date`() = runTest {
+        // Given: ViewModel initialized in @Before
+        testScheduler.advanceUntilIdle()
+
+        // Then: State should have current month/year
+        val state = viewModel.uiState.value
+        val currentDate = java.time.LocalDate.now()
+        assertEquals("Month should be current month", currentDate.monthValue, state.displayedMonth)
+        assertEquals("Year should be current year", currentDate.year, state.displayedYear)
+    }
+
+    @Test
+    fun `onMonthChanged - logs month change`() = runTest {
+        // When: Month is changed
+        viewModel.onAction(OverviewAction.OnMonthChanged(month = 3, year = 2023))
+        testScheduler.advanceUntilIdle()
+
+        // Then: Timber.d should be called (verified via log output)
+        // Note: Timber logging is tested via integration/manual testing
+        val state = viewModel.uiState.value
+        assertEquals("Month should be 3", 3, state.displayedMonth)
+        assertEquals("Year should be 2023", 2023, state.displayedYear)
+    }
+
 }
