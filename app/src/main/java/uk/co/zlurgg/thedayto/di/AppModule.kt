@@ -24,6 +24,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
@@ -105,12 +106,14 @@ val appModule = module {
 
     // Shared Entry Use Cases (used by multiple features)
     single { GetEntriesUseCase(repository = get()) }
+    single { GetEntriesForMonthUseCase(repository = get()) }
     single { GetEntryByDateUseCase(repository = get()) }
     single { GetEntryUseCase(repository = get()) }
 
     single {
         OverviewUseCases(
             getEntries = get(),
+            getEntriesForMonth = get(),
             deleteEntry = DeleteEntryUseCase(repository = get()),
             restoreEntry = RestoreEntryUseCase(repository = get()),
             getEntryByDate = get(),
