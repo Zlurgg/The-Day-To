@@ -77,6 +77,9 @@
     <string name="entry_reminder_message">You haven\'t logged your mood for today yet. Would you like to create an entry?</string>
     <string name="create_entry">Create Entry</string>
     <string name="not_now">Not Now</string>
+    <string name="delete_entry">Delete entry</string>
+    <string name="entry_deleted">Entry deleted</string>
+    <string name="undo">Undo</string>
 
     <!-- Welcome Dialog -->
     <string name="welcome_dialog_title">Welcome to The Day To</string>
