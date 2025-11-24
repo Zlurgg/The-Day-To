@@ -109,14 +109,14 @@ fun OverviewScreenRoot(
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is OverviewUiEvent.ShowSnackbar -> {
-                    val result = snackbarHostState.showSnackbar(
-                        message = event.message,
-                        actionLabel = event.actionLabel,
-                        withDismissAction = false,
-                        duration = SnackbarDuration.Short
-                    )
                     // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
                     if (event.actionLabel == "Undo") {
+                        val result = snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            withDismissAction = false,
+                            duration = SnackbarDuration.Short
+                        )
                         when (result) {
                             SnackbarResult.ActionPerformed -> {
                                 viewModel.onAction(OverviewAction.RestoreEntry)
@@ -125,6 +125,14 @@ fun OverviewScreenRoot(
                                 viewModel.onAction(OverviewAction.ClearRecentlyDeleted)
                             }
                         }
+                    } else {
+                        // No action needed for non-undo snackbars
+                        snackbarHostState.showSnackbar(
+                            message = event.message,
+                            actionLabel = event.actionLabel,
+                            withDismissAction = false,
+                            duration = SnackbarDuration.Short
+                        )
                     }
                 }
                 is OverviewUiEvent.NavigateToSignIn -> {
