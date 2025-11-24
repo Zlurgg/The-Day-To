@@ -454,10 +454,21 @@ class OverviewViewModel(
     /**
      * Check if today's entry exists and update state.
      * Called whenever entries might have changed.
+     *
+     * If today's entry now exists, automatically dismisses the entry reminder dialog
+     * to prevent showing the reminder after the user has already created an entry.
      */
     private suspend fun updateHasTodayEntry() {
         val todayEpoch = DateUtils.getTodayStartEpoch()
         val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
-        _uiState.update { it.copy(hasTodayEntry = todayEntry != null) }
+        val hasTodayEntry = todayEntry != null
+
+        _uiState.update {
+            it.copy(
+                hasTodayEntry = hasTodayEntry,
+                // Dismiss reminder dialog if entry now exists
+                showEntryReminderDialog = if (hasTodayEntry) false else it.showEntryReminderDialog
+            )
+        }
     }
 }
