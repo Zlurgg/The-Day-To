@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -30,7 +29,9 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -109,15 +110,15 @@ fun OverviewScreenRoot(
                         message = event.message,
                         actionLabel = event.actionLabel,
                         withDismissAction = false,
-                        duration = androidx.compose.material3.SnackbarDuration.Short
+                        duration = SnackbarDuration.Short
                     )
                     // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
                     if (event.actionLabel == "Undo") {
                         when (result) {
-                            androidx.compose.material3.SnackbarResult.ActionPerformed -> {
+                            SnackbarResult.ActionPerformed -> {
                                 viewModel.onAction(OverviewAction.RestoreEntry)
                             }
-                            androidx.compose.material3.SnackbarResult.Dismissed -> {
+                            SnackbarResult.Dismissed -> {
                                 viewModel.onAction(OverviewAction.ClearRecentlyDeleted)
                             }
                         }
