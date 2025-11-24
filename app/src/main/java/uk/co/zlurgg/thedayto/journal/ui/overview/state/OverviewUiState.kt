@@ -17,6 +17,7 @@ data class OverviewUiState(
     val entryMade: Boolean = false,
     val recentlyDeletedEntry: EntryWithMoodColor? = null,
     val isLoading: Boolean = false,
+    val loadError: String? = null,
 
     // Calendar state - tracks currently displayed month/year
     val displayedMonth: Int = LocalDate.now().monthValue,
