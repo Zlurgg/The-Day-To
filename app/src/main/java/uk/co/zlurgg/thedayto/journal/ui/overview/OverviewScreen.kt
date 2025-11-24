@@ -354,6 +354,7 @@ private fun OverviewScreen(
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
                     onDeleteEntry = { entry -> onAction(OverviewAction.DeleteEntry(entry)) },
+                    isLoading = uiState.isLoading,
                     onCreateEntry = { onNavigateToEntry(null, null) },
                     modifier = Modifier.fillMaxWidth()
                 )
