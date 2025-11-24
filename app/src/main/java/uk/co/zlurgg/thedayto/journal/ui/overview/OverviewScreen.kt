@@ -41,7 +41,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -237,6 +239,7 @@ private fun OverviewScreen(
     modifier: Modifier = Modifier
 ) {
     val currentDate = LocalDate.now()
+    val haptic = LocalHapticFeedback.current
 
     Scaffold(
         snackbarHost = {
@@ -258,7 +261,10 @@ private fun OverviewScreen(
                 exit = scaleOut() + fadeOut()
             ) {
                 FloatingActionButton(
-                    onClick = { onAction(OverviewAction.CreateNewEntry) },
+                    onClick = {
+                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                        onAction(OverviewAction.CreateNewEntry)
+                    },
                     containerColor = MaterialTheme.colorScheme.primaryContainer
                 ) {
                     Icon(

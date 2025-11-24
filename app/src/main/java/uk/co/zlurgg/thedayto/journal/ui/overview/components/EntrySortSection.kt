@@ -11,6 +11,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
@@ -25,6 +27,8 @@ fun EntrySortSection(
     entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     onOrderChange: (EntryOrder) -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
@@ -33,13 +37,19 @@ fun EntrySortSection(
         // Sort by chips
         FilterChip(
             selected = entryOrder is EntryOrder.Date,
-            onClick = { onOrderChange(EntryOrder.Date(entryOrder.orderType)) },
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onOrderChange(EntryOrder.Date(entryOrder.orderType))
+            },
             label = { Text(stringResource(R.string.date)) }
         )
         Spacer(modifier = Modifier.width(paddingSmall))
         FilterChip(
             selected = entryOrder is EntryOrder.Mood,
-            onClick = { onOrderChange(EntryOrder.Mood(entryOrder.orderType)) },
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onOrderChange(EntryOrder.Mood(entryOrder.orderType))
+            },
             label = { Text(stringResource(R.string.mood)) }
         )
 
@@ -48,13 +58,19 @@ fun EntrySortSection(
         // Order chips
         FilterChip(
             selected = entryOrder.orderType is OrderType.Ascending,
-            onClick = { onOrderChange(entryOrder.copy(OrderType.Ascending)) },
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onOrderChange(entryOrder.copy(OrderType.Ascending))
+            },
             label = { Text(stringResource(R.string.ascending)) }
         )
         Spacer(modifier = Modifier.width(paddingSmall))
         FilterChip(
             selected = entryOrder.orderType is OrderType.Descending,
-            onClick = { onOrderChange(entryOrder.copy(OrderType.Descending)) },
+            onClick = {
+                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                onOrderChange(entryOrder.copy(OrderType.Descending))
+            },
             label = { Text(stringResource(R.string.descending)) }
         )
     }

@@ -21,6 +21,8 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -37,6 +39,7 @@ fun MonthYearPickerDialog(
     onDismiss: () -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    val haptic = LocalHapticFeedback.current
     var selectedYear by remember { mutableIntStateOf(currentDate.year) }
     var selectedMonth by remember { mutableIntStateOf(currentDate.monthValue) }
 
@@ -131,6 +134,7 @@ fun MonthYearPickerDialog(
         confirmButton = {
             TextButton(
                 onClick = {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     val newDate = LocalDate.of(selectedYear, selectedMonth, 1)
                     onDateSelected(newDate)
                     onDismiss()
