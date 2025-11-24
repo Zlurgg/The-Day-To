@@ -31,6 +31,14 @@ class AddEntryUseCase(
             is ValidationResult.Valid -> {} // Continue
         }
 
+        // Check for duplicate entry on the same date (only when creating new entry)
+        if (entry.id == null) {
+            val existingEntry = repository.getEntryByDate(entry.dateStamp)
+            if (existingEntry != null) {
+                throw InvalidEntryException("An entry already exists for this date")
+            }
+        }
+
         // Validate and sanitize content (notes)
         val sanitizedContent = when (val result = InputValidation.validateContent(entry.content)) {
             is ValidationResult.Invalid -> throw InvalidEntryException(result.message)

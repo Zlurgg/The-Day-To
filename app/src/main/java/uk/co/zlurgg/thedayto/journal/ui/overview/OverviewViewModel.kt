@@ -402,6 +402,7 @@ class OverviewViewModel(
      *
      * Filters entries at the database level for optimal performance.
      * Automatically updates when database changes (new/updated/deleted entries).
+     * Also updates hasTodayEntry state whenever entries change.
      */
     private fun getEntries(entryOrder: EntryOrder) {
         getEntriesJob?.cancel()
@@ -418,7 +419,19 @@ class OverviewViewModel(
                         entryOrder = entryOrder
                     )
                 }
+                // Re-check today's entry whenever entries change (in case user created/deleted today's entry)
+                updateHasTodayEntry()
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Check if today's entry exists and update state.
+     * Called whenever entries might have changed.
+     */
+    private suspend fun updateHasTodayEntry() {
+        val todayEpoch = DateUtils.getTodayStartEpoch()
+        val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+        _uiState.update { it.copy(hasTodayEntry = todayEntry != null) }
     }
 }
