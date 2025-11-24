@@ -13,6 +13,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -254,8 +256,9 @@ private fun OverviewScreen(
     val currentDate = LocalDate.now()
     val haptic = LocalHapticFeedback.current
 
-    Scaffold(
-        snackbarHost = {
+    Box(modifier = Modifier.fillMaxSize()) {
+        Scaffold(
+            snackbarHost = {
             CustomSnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(paddingMedium)
@@ -349,7 +352,21 @@ private fun OverviewScreen(
                 )
             }
         }
-    )
+        )
+
+        // Loading indicator overlay
+        AnimatedVisibility(
+            visible = uiState.isLoading,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.BottomCenter)
+        ) {
+            CircularProgressIndicator(
+                modifier = Modifier.padding(paddingMedium),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
+    }
 
     // Entry reminder dialog
     AnimatedVisibility(
