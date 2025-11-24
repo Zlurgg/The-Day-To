@@ -147,9 +147,11 @@ class AddEntryUseCaseTest {
         val moodColor = TestDataBuilders.createMoodColor(id = 1)
         fakeMoodColorRepository.insertMoodColor(moodColor)
 
-        // When: Adding multiple entries with same moodColorId
-        val entry1 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 1", id = null)
-        val entry2 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 2", id = null)
+        // When: Adding multiple entries with same moodColorId but different dates
+        val today = System.currentTimeMillis()
+        val yesterday = today - 86400000L // 1 day ago
+        val entry1 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 1", dateStamp = today, id = null)
+        val entry2 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 2", dateStamp = yesterday, id = null)
         addEntryUseCase(entry1)
         addEntryUseCase(entry2)
 
@@ -157,6 +159,43 @@ class AddEntryUseCaseTest {
         val entries = fakeEntryRepository.getEntriesSync()
         assertEquals("Should have 2 entries", 2, entries.size)
         assertTrue("Both should have same moodColorId", entries.all { it.moodColorId == 1 })
+    }
+
+    @Test(expected = InvalidEntryException::class)
+    fun `invoke - rejects duplicate entry for same date`() = runTest {
+        // Given: A valid mood color and an existing entry for today
+        val moodColor = TestDataBuilders.createMoodColor(id = 1)
+        fakeMoodColorRepository.insertMoodColor(moodColor)
+
+        val todayEpoch = TestDataBuilders.getTodayEpoch()
+        val entry1 = TestDataBuilders.createEntry(moodColorId = 1, content = "First entry", dateStamp = todayEpoch, id = null)
+        addEntryUseCase(entry1)
+
+        // When: Attempting to add another entry for the same date
+        val entry2 = TestDataBuilders.createEntry(moodColorId = 1, content = "Second entry", dateStamp = todayEpoch, id = null)
+
+        // Then: Should throw InvalidEntryException
+        addEntryUseCase(entry2)
+    }
+
+    @Test
+    fun `invoke - allows updating existing entry (same date, same id)`() = runTest {
+        // Given: A valid mood color and an existing entry
+        val moodColor = TestDataBuilders.createMoodColor(id = 1)
+        fakeMoodColorRepository.insertMoodColor(moodColor)
+
+        val todayEpoch = TestDataBuilders.getTodayEpoch()
+        val entry = TestDataBuilders.createEntry(moodColorId = 1, content = "Original content", dateStamp = todayEpoch, id = 1)
+        fakeEntryRepository.insertEntry(entry)
+
+        // When: Updating the same entry (same id, same date)
+        val updatedEntry = entry.copy(content = "Updated content")
+        addEntryUseCase(updatedEntry)
+
+        // Then: Entry should be updated, not duplicated
+        val entries = fakeEntryRepository.getEntriesSync()
+        assertEquals("Should still have 1 entry", 1, entries.size)
+        assertEquals("Content should be updated", "Updated content", entries[0].content)
     }
 
     @Test
