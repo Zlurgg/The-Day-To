@@ -1,6 +1,11 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.components
 
 import android.content.res.Configuration
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -155,7 +160,11 @@ private fun CalendarContent(
         )
 
         // Month/Year picker dialog
-        if (showMonthYearPicker) {
+        AnimatedVisibility(
+            visible = showMonthYearPicker,
+            enter = fadeIn() + scaleIn(),
+            exit = fadeOut() + scaleOut()
+        ) {
             MonthYearPickerDialog(
                 currentDate = date,
                 onDismiss = { showMonthYearPicker = false },
