@@ -30,12 +30,8 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.ui.unit.dp
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -52,6 +48,7 @@ import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
+import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
@@ -242,41 +239,10 @@ private fun OverviewScreen(
 
     Scaffold(
         snackbarHost = {
-            SnackbarHost(
+            CustomSnackbarHost(
                 hostState = snackbarHostState,
                 modifier = Modifier.padding(paddingMedium)
-            ) { data ->
-                Snackbar(
-                    modifier = Modifier
-                        .padding(horizontal = paddingSmall)
-                        .widthIn(max = 600.dp),
-                    action = {
-                        data.visuals.actionLabel?.let { actionLabel ->
-                            TextButton(
-                                onClick = { data.performAction() },
-                                modifier = Modifier.padding(horizontal = paddingSmall)
-                            ) {
-                                Text(
-                                    text = actionLabel,
-                                    style = MaterialTheme.typography.labelLarge,
-                                    color = MaterialTheme.colorScheme.inversePrimary
-                                )
-                            }
-                        }
-                    },
-                    dismissAction = null,
-                    actionOnNewLine = false,
-                    shape = MaterialTheme.shapes.large,
-                    containerColor = MaterialTheme.colorScheme.inverseSurface,
-                    contentColor = MaterialTheme.colorScheme.inverseOnSurface
-                ) {
-                    Text(
-                        text = data.visuals.message,
-                        style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.padding(vertical = 4.dp)
-                    )
-                }
-            }
+            )
         },
         floatingActionButton = {
             // Only show FAB when today's entry is missing with smooth animation
