@@ -163,7 +163,11 @@ fun OverviewScreenRoot(
     }
 
     // Show tutorial dialog for first-time users
-    if (uiState.showTutorialDialog) {
+    AnimatedVisibility(
+        visible = uiState.showTutorialDialog,
+        enter = fadeIn() + scaleIn(),
+        exit = fadeOut() + scaleOut()
+    ) {
         OverviewTutorialDialog(
             onDismiss = {
                 viewModel.onAction(OverviewAction.DismissTutorial)
@@ -340,7 +344,11 @@ private fun OverviewScreen(
     )
 
     // Entry reminder dialog
-    if (uiState.showEntryReminderDialog) {
+    AnimatedVisibility(
+        visible = uiState.showEntryReminderDialog,
+        enter = fadeIn() + scaleIn(),
+        exit = fadeOut() + scaleOut()
+    ) {
         CreateEntryReminderDialog(
             onDismiss = { onAction(OverviewAction.DismissEntryReminder) },
             onCreateEntry = { onAction(OverviewAction.CreateTodayEntry) }
