@@ -12,6 +12,7 @@ object CalendarConstants {
     const val INITIAL_PAGER_PAGE = 1_000_000_000
 
     // Sizing
+    val DEFAULT_DAY_SIZE_MIN: Dp = 48.dp  // WCAG 2.5.5 minimum touch target
     val DEFAULT_DAY_SIZE_MAX: Dp = 48.dp
     val CALENDAR_HORIZONTAL_PADDING: Dp = 16.dp
     val CALENDAR_DAY_SPACING: Dp = 8.dp

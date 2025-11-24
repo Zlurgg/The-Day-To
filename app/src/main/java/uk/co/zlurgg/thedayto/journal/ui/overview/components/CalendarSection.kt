@@ -88,12 +88,12 @@ fun CalendarSection(
         val buffer = CalendarConstants.BUFFER_SIZE
         val availableForDays = maxWidth - horizontalPadding - totalSpacing - buffer
         val calculatedDaySize = availableForDays / CalendarConstants.DAYS_IN_WEEK
-        // Ensure we never exceed maximum, but otherwise use calculated size
-        val daySize = if (calculatedDaySize > CalendarConstants.DEFAULT_DAY_SIZE_MAX) {
-            CalendarConstants.DEFAULT_DAY_SIZE_MAX
-        } else {
-            calculatedDaySize
-        }
+
+        // Enforce WCAG 2.5.5 minimum touch target (48dp) and maximum size
+        val daySize = calculatedDaySize.coerceIn(
+            minimumValue = CalendarConstants.DEFAULT_DAY_SIZE_MIN,
+            maximumValue = CalendarConstants.DEFAULT_DAY_SIZE_MAX
+        )
 
         CalendarContent(
             currentDate = currentDate,
