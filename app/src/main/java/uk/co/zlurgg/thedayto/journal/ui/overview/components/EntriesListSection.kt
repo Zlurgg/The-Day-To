@@ -38,6 +38,8 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
  * Section displaying the list of journal entries with sorting controls.
  * Shows empty state when no entries exist for the selected month.
  * Supports swipe-to-delete with undo functionality.
+ *
+ * @param isLoading Disables swipe gestures during delete/restore operations to prevent race conditions
  */
 @Composable
 fun EntriesListSection(
@@ -46,6 +48,7 @@ fun EntriesListSection(
     onOrderChange: (EntryOrder) -> Unit,
     onEntryClick: (entryId: Int?) -> Unit,
     onDeleteEntry: (EntryWithMoodColor) -> Unit,
+    isLoading: Boolean,
     modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
 ) {
@@ -101,7 +104,7 @@ fun EntriesListSection(
                             }
                         },
                         enableDismissFromStartToEnd = false,
-                        enableDismissFromEndToStart = true,
+                        enableDismissFromEndToStart = !isLoading,  // Disable swipe during operations
                         onDismiss = { dismissDirection ->
                             // Modern Material 3 API - called when swipe completes
                             if (dismissDirection == SwipeToDismissBoxValue.EndToStart) {
@@ -155,7 +158,8 @@ private fun EntriesListSectionPreview() {
             entryOrder = EntryOrder.Date(OrderType.Descending),
             onOrderChange = {},
             onEntryClick = {},
-            onDeleteEntry = {}
+            onDeleteEntry = {},
+            isLoading = false
         )
     }
 }
@@ -169,7 +173,8 @@ private fun EntriesListSectionEmptyPreview() {
             entryOrder = EntryOrder.Date(OrderType.Descending),
             onOrderChange = {},
             onEntryClick = {},
-            onDeleteEntry = {}
+            onDeleteEntry = {},
+            isLoading = false
         )
     }
 }

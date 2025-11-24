@@ -221,8 +221,11 @@ class OverviewViewModel(
                         // Show snackbar with undo option
                         _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted", actionLabel = "Undo"))
                     } catch (e: Exception) {
+                        Timber.e(e, "Failed to delete entry")
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
+                        // Refresh entries to restore the entry in UI (since delete failed)
+                        getEntries(_uiState.value.entryOrder)
                         _uiEvents.emit(
                             OverviewUiEvent.ShowSnackbar(
                                 message = "Failed to delete entry: ${e.message}"
@@ -250,8 +253,10 @@ class OverviewViewModel(
                         }
                         _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry restored"))
                     } catch (e: Exception) {
+                        Timber.e(e, "Failed to restore entry")
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
+                        // Keep recentlyDeletedEntry so user can try again
                         _uiEvents.emit(
                             OverviewUiEvent.ShowSnackbar(
                                 message = "Failed to restore entry: ${e.message}"
