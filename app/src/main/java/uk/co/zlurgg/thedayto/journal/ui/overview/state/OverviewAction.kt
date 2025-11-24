@@ -8,6 +8,8 @@ sealed interface OverviewAction {
     data class DeleteEntry(val entry: EntryWithMoodColor) : OverviewAction
     data object RestoreEntry : OverviewAction
     data object ClearRecentlyDeleted : OverviewAction
+    data object RetryLoadEntries : OverviewAction
+    data object DismissLoadError : OverviewAction
 
     // Calendar actions
     data class OnMonthChanged(val month: Int, val year: Int) : OverviewAction

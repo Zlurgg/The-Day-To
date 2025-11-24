@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -270,6 +271,17 @@ class OverviewViewModel(
                 _uiState.update { it.copy(recentlyDeletedEntry = null) }
             }
 
+            is OverviewAction.RetryLoadEntries -> {
+                Timber.d("Retrying to load entries")
+                _uiState.update { it.copy(loadError = null) }
+                getEntries(_uiState.value.entryOrder)
+            }
+
+            is OverviewAction.DismissLoadError -> {
+                Timber.d("Dismissing load error banner")
+                _uiState.update { it.copy(loadError = null) }
+            }
+
             is OverviewAction.RequestNotificationPermission -> {
                 viewModelScope.launch {
                     _uiEvents.emit(OverviewUiEvent.RequestNotificationPermission)
@@ -421,11 +433,20 @@ class OverviewViewModel(
                 _uiState.update {
                     it.copy(
                         entries = entries,
-                        entryOrder = entryOrder
+                        entryOrder = entryOrder,
+                        loadError = null  // Clear any previous errors
                     )
                 }
                 // Re-check today's entry whenever entries change (in case user created/deleted today's entry)
                 updateHasTodayEntry()
+            }
+            .catch { exception ->
+                Timber.e(exception, "Failed to load entries for month ${currentState.displayedMonth}/${currentState.displayedYear}")
+                _uiState.update {
+                    it.copy(
+                        loadError = exception.message ?: "Failed to load entries"
+                    )
+                }
             }
             .launchIn(viewModelScope)
     }
