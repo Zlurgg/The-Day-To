@@ -17,7 +17,7 @@ object GreetingConstants {
         "Morning",
         "Hello sunshine",
         "Fresh start today",
-        "New day, new possibilities"
+        "New possibilities"
     )
 
     /**
@@ -27,9 +27,9 @@ object GreetingConstants {
         "Good afternoon",
         "Hello there",
         "Afternoon",
-        "Hope your day's going well",
-        "Making progress today",
-        "Halfway through the day"
+        "Afternoon check-in",
+        "Keep going",
+        "Midday vibes"
     )
 
     /**
@@ -40,8 +40,8 @@ object GreetingConstants {
         "Evening",
         "How was your day",
         "Winding down",
-        "Almost done for today",
-        "Hope you had a good day"
+        "Evening wrap-up",
+        "Day's end"
     )
 
     /**
@@ -50,7 +50,7 @@ object GreetingConstants {
     val NIGHT_GREETINGS = listOf(
         "Good night",
         "Evening",
-        "Late night reflection",
+        "Late night vibes",
         "Time to unwind",
         "End of the day",
         "Rest well soon"
