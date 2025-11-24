@@ -24,6 +24,8 @@ import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
@@ -52,6 +54,8 @@ fun EntriesListSection(
     modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
 ) {
+    val haptic = LocalHapticFeedback.current
+
     Column(modifier = modifier) {
         // Entry sorting controls
         EntrySortSection(
@@ -120,6 +124,7 @@ fun EntriesListSection(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable {
+                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                     onEntryClick(entry.id)
                                 }
                         )
