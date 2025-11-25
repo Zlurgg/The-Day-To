@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
@@ -299,7 +298,7 @@ class EditorViewModel(
                             MoodColor(
                                 mood = action.mood.trim(),
                                 color = action.colorHex,
-                                dateStamp = DateUtils.getTodayStartEpoch(),
+                                dateStamp = System.currentTimeMillis() / 1000, // Use precise timestamp so user moods sort first
                                 id = null
                             )
                         )
