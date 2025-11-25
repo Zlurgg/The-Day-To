@@ -1,17 +1,8 @@
 package uk.co.zlurgg.thedayto.core.ui.components
 
 import android.content.res.Configuration
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -39,73 +30,52 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 fun AboutDialog(
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.about_dialog_title),
-                style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        },
-        text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_version_title),
-                    content = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME)
-                )
+    BaseInfoDialog(
+        title = stringResource(R.string.about_dialog_title),
+        buttonText = stringResource(R.string.about_dialog_button),
+        onDismiss = onDismiss,
+        scrollable = true
+    ) {
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_version_title),
+            content = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME)
+        )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+        Spacer(modifier = Modifier.height(paddingMedium))
 
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_description_title),
-                    content = stringResource(R.string.about_dialog_description_content)
-                )
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_description_title),
+            content = stringResource(R.string.about_dialog_description_content)
+        )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+        Spacer(modifier = Modifier.height(paddingMedium))
 
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_privacy_title),
-                    content = stringResource(R.string.about_dialog_privacy_content)
-                )
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_privacy_title),
+            content = stringResource(R.string.about_dialog_privacy_content)
+        )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+        Spacer(modifier = Modifier.height(paddingMedium))
 
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_open_source_title),
-                    content = stringResource(R.string.about_dialog_open_source_content)
-                )
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_open_source_title),
+            content = stringResource(R.string.about_dialog_open_source_content)
+        )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+        Spacer(modifier = Modifier.height(paddingMedium))
 
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_credits_title),
-                    content = stringResource(R.string.about_dialog_credits_content)
-                )
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_credits_title),
+            content = stringResource(R.string.about_dialog_credits_content)
+        )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+        Spacer(modifier = Modifier.height(paddingMedium))
 
-                DialogContentSection(
-                    title = stringResource(R.string.about_dialog_license_title),
-                    content = stringResource(R.string.about_dialog_license_content)
-                )
-            }
-        },
-        confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(
-                    text = stringResource(R.string.about_dialog_button),
-                    color = MaterialTheme.colorScheme.primary
-                )
-            }
-        },
-        containerColor = MaterialTheme.colorScheme.surface,
-        modifier = Modifier.padding(paddingMedium)
-    )
+        DialogContentSection(
+            title = stringResource(R.string.about_dialog_license_title),
+            content = stringResource(R.string.about_dialog_license_content)
+        )
+    }
 }
 
 @Preview(name = "About Dialog - Light", showBackground = true)
