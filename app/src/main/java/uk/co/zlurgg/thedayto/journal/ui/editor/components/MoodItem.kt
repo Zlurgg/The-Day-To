@@ -88,13 +88,18 @@ fun MoodItem(
     val selectedMoodColor = moodColors.find { it.id == selectedMoodColorId }
     val displayText = selectedMoodColor?.mood ?: ""
 
-    ExposedDropdownMenuBox(
-        expanded = mExpanded,
-        onExpandedChange = {
-            mExpanded = !mExpanded
-        },
-        modifier = modifier
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
+        ExposedDropdownMenuBox(
+            expanded = mExpanded,
+            onExpandedChange = {
+                mExpanded = !mExpanded
+            },
+            modifier = Modifier.weight(1f)
+        ) {
         OutlinedTextField(
             value = displayText,
             onValueChange = { /* Read-only, changes via dropdown */ },
@@ -294,6 +299,12 @@ fun MoodItem(
                 }
             )
         }
+    }
+
+        // Color wheel button - always visible for easy access to create new mood colors
+        ColorWheelAddButton(
+            onClick = onToggleMoodColorDialog
+        )
     }
 
     // Mood color picker dialog
