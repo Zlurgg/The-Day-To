@@ -131,7 +131,7 @@ fun TheDayToApp() {
                 // Sign Out Dialog (stateless)
                 if (showSignOutDialog) {
                     SignOutDialog(
-                        onDismiss = { },
+                        onDismiss = { showSignOutDialog = false },
                         onConfirm = {
                             scope.launch {
                                 signOutUseCase()
