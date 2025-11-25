@@ -3,12 +3,10 @@ package uk.co.zlurgg.thedayto.journal.ui.stats
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,12 +25,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.components.StateMessagePanel
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.journal.ui.stats.components.MonthlyBreakdownCard
@@ -75,7 +73,7 @@ private fun StatsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.stats_navigate_back)
                         )
                     }
                 }
@@ -85,8 +83,12 @@ private fun StatsScreen(
     ) { paddingValues ->
         when {
             uiState.error != null -> {
-                ErrorStatsState(
+                StateMessagePanel(
+                    icon = Icons.Default.Error,
+                    title = stringResource(R.string.stats_error_title),
                     message = uiState.error,
+                    iconTint = MaterialTheme.colorScheme.error,
+                    messageColor = MaterialTheme.colorScheme.error,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -103,7 +105,10 @@ private fun StatsScreen(
                 }
             }
             uiState.isEmpty -> {
-                EmptyStatsState(
+                StateMessagePanel(
+                    icon = Icons.Default.BarChart,
+                    title = stringResource(R.string.stats_empty_title),
+                    message = stringResource(R.string.stats_empty_message),
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -143,65 +148,6 @@ private fun StatsScreen(
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun ErrorStatsState(
-    message: String,
-    modifier: Modifier = Modifier
-) {
-    Column(
-        modifier = modifier.padding(StatsConstants.STATE_MESSAGE_PADDING),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.Error,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.error
-        )
-        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_ICON_SPACING))
-        Text(
-            text = "Error",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_TEXT_SPACING))
-        Text(
-            text = message,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.error
-        )
-    }
-}
-
-@Composable
-private fun EmptyStatsState(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(StatsConstants.STATE_MESSAGE_PADDING),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Icon(
-            imageVector = Icons.Default.BarChart,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_ICON_SPACING))
-        Text(
-            text = "No stats yet",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(Modifier.height(StatsConstants.STATE_MESSAGE_TEXT_SPACING))
-        Text(
-            text = "Start logging your mood to see your progress and insights!",
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
     }
 }
 

@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
-import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
@@ -29,7 +29,7 @@ fun CalendarDay(
     modifier: Modifier = Modifier,
     cornerRadius: Dp = 10.dp
 ) {
-    val color = getColor(entry.moodColor)
+    val color = getColorSafe(entry.moodColor)
     Box(
         modifier = modifier
     ) {
