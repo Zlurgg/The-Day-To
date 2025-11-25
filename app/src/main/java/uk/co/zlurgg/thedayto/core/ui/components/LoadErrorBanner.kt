@@ -21,6 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMediumSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 
 /**
  * Shared Load Error Banner Component
@@ -40,13 +42,13 @@ fun LoadErrorBanner(
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer,
-        shape = RoundedCornerShape(8.dp)
+        shape = RoundedCornerShape(paddingSmall)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+                .padding(paddingMediumSmall),
+            horizontalArrangement = Arrangement.spacedBy(paddingMediumSmall),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Error icon

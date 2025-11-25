@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraLarge
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 
 /**
  * Reusable panel for displaying state messages (empty, error, etc.)
@@ -30,9 +32,9 @@ import androidx.compose.ui.unit.dp
  * @param modifier Optional modifier
  * @param iconTint Color for the icon (defaults to onSurfaceVariant)
  * @param messageColor Color for the message text (defaults to onSurfaceVariant)
- * @param iconSize Size of the icon (defaults to 64.dp)
- * @param iconSpacing Space between icon and title (defaults to 16.dp)
- * @param textSpacing Space between title and message (defaults to 8.dp)
+ * @param iconSize Size of the icon (defaults to paddingExtraLarge/64dp)
+ * @param iconSpacing Space between icon and title (defaults to paddingMedium/16dp)
+ * @param textSpacing Space between title and message (defaults to paddingSmall/8dp)
  */
 @Composable
 fun StateMessagePanel(
@@ -42,12 +44,12 @@ fun StateMessagePanel(
     modifier: Modifier = Modifier,
     iconTint: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    iconSize: Dp = 64.dp,
-    iconSpacing: Dp = 16.dp,
-    textSpacing: Dp = 8.dp
+    iconSize: Dp = paddingExtraLarge,
+    iconSpacing: Dp = paddingMedium,
+    textSpacing: Dp = paddingSmall
 ) {
     Column(
-        modifier = modifier.padding(16.dp),
+        modifier = modifier.padding(paddingMedium),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {

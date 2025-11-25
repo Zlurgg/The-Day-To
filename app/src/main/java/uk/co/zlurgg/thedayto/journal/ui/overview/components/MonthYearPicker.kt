@@ -27,6 +27,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import java.time.LocalDate
 import java.time.Month
@@ -68,7 +69,7 @@ fun MonthYearPickerDialog(
                 Text(
                     text = stringResource(R.string.month_picker_year_label),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = paddingExtraSmall)
                 )
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
@@ -98,7 +99,7 @@ fun MonthYearPickerDialog(
                 Text(
                     text = stringResource(R.string.month_picker_month_label),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 4.dp)
+                    modifier = Modifier.padding(bottom = paddingExtraSmall)
                 )
 
                 // Filter out future months when current year is selected

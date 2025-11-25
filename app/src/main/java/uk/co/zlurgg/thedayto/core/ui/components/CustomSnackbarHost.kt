@@ -11,6 +11,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 
 /**
@@ -62,7 +63,7 @@ fun CustomSnackbarHost(
             Text(
                 text = data.visuals.message,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = 4.dp)
+                modifier = Modifier.padding(vertical = paddingExtraSmall)
             )
         }
     }

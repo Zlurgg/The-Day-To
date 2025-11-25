@@ -15,7 +15,7 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -25,8 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMediumSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 
 /**
  * Notification settings dialog with enable/disable toggle and time picker.
@@ -54,11 +56,17 @@ fun NotificationSettingsDialog(
     onSave: (enabled: Boolean, hour: Int, minute: Int) -> Unit
 ) {
     var isEnabled by remember { mutableStateOf(enabled) }
-    val timePickerState = rememberTimePickerState(
-        initialHour = hour,
-        initialMinute = minute,
-        is24Hour = true
-    )
+    // Track a key to force TimePickerState recreation when preset chips are clicked
+    var timePickerKey by remember { mutableStateOf(0) }
+    var selectedHour by remember { mutableStateOf(hour) }
+    var selectedMinute by remember { mutableStateOf(minute) }
+    val timePickerState = remember(timePickerKey) {
+        TimePickerState(
+            initialHour = selectedHour,
+            initialMinute = selectedMinute,
+            is24Hour = true
+        )
+    }
 
     // Auto-enable when permission is granted
     LaunchedEffect(hasPermission, enabled) {
@@ -100,14 +108,14 @@ fun NotificationSettingsDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(paddingMedium))
 
                 // Time Picker (only show when enabled)
                 if (isEnabled) {
                     Text(
                         text = stringResource(R.string.notification_time),
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
+                        modifier = Modifier.padding(bottom = paddingSmall)
                     )
 
                     // Quick time presets
@@ -118,8 +126,9 @@ fun NotificationSettingsDialog(
                         FilterChip(
                             selected = timePickerState.hour == 8 && timePickerState.minute == 0,
                             onClick = {
-                                timePickerState.hour = 8
-                                timePickerState.minute = 0
+                                selectedHour = 8
+                                selectedMinute = 0
+                                timePickerKey++
                             },
                             label = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -137,8 +146,9 @@ fun NotificationSettingsDialog(
                         FilterChip(
                             selected = timePickerState.hour == 12 && timePickerState.minute == 0,
                             onClick = {
-                                timePickerState.hour = 12
-                                timePickerState.minute = 0
+                                selectedHour = 12
+                                selectedMinute = 0
+                                timePickerKey++
                             },
                             label = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -156,8 +166,9 @@ fun NotificationSettingsDialog(
                         FilterChip(
                             selected = timePickerState.hour == 20 && timePickerState.minute == 0,
                             onClick = {
-                                timePickerState.hour = 20
-                                timePickerState.minute = 0
+                                selectedHour = 20
+                                selectedMinute = 0
+                                timePickerKey++
                             },
                             label = {
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -174,7 +185,7 @@ fun NotificationSettingsDialog(
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(12.dp))
+                    Spacer(modifier = Modifier.height(paddingMediumSmall))
 
                     TimePicker(
                         state = timePickerState,

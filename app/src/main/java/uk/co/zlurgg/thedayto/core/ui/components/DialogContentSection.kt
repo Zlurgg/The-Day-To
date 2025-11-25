@@ -7,7 +7,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 
 /**
  * Reusable dialog content section with consistent styling
@@ -31,7 +31,7 @@ fun DialogContentSection(
             style = MaterialTheme.typography.titleMedium,
             color = MaterialTheme.colorScheme.primary
         )
-        Spacer(modifier = Modifier.height(8.dp))
+        Spacer(modifier = Modifier.height(paddingSmall))
         Text(
             text = content,
             style = MaterialTheme.typography.bodyMedium,
