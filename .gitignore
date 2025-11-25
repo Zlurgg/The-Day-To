@@ -9,3 +9,8 @@
 .cxx
 local.properties
 /app/release/app-release.aab
+
+# Keystore credentials (never commit)
+keystore.properties
+*.keystore
+*.jks
