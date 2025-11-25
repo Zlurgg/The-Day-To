@@ -42,14 +42,6 @@ fun EmptyState(
             color = MaterialTheme.colorScheme.onSurface
         )
         Spacer(modifier = Modifier.height(UiConstants.EMPTY_STATE_SPACING))
-        Text(
-            text = stringResource(R.string.empty_state_description),
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(horizontal = UiConstants.EMPTY_STATE_PADDING_HORIZONTAL)
-        )
-        Spacer(modifier = Modifier.height(paddingMedium))
         Button(
             onClick = onCreateEntry
         ) {
