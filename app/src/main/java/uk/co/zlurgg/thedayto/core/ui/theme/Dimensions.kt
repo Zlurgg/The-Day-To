@@ -7,6 +7,7 @@ val default: Dp = 0.dp
 val paddingXXSmall: Dp = 2.dp
 val paddingExtraSmall: Dp = 4.dp
 val paddingSmall: Dp = 8.dp
+val paddingMediumSmall: Dp = 12.dp
 val paddingMedium: Dp = 16.dp
 val paddingLarge: Dp = 32.dp
 val paddingVeryLarge: Dp = 48.dp
