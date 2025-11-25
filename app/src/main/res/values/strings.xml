@@ -159,6 +159,22 @@
     <string name="stats_days_in_month_label">Days in Month</string>
     <string name="stats_card_description">View detailed statistics</string>
 
+    <!-- Stats Screen -->
+    <string name="stats_navigate_back">Navigate back</string>
+    <string name="stats_error_title">Error</string>
+    <string name="stats_empty_title">No stats yet</string>
+    <string name="stats_empty_message">Start logging your mood to see your progress and insights!</string>
+
+    <!-- Stats Cards -->
+    <string name="stats_all_time_title">All-Time Stats</string>
+    <string name="stats_total_entries_label">Total Entries</string>
+    <string name="stats_avg_per_month_label">Avg / Month</string>
+    <string name="stats_first_entry_format">First entry: %1$s</string>
+    <string name="stats_mood_distribution_title">Most Common Moods</string>
+    <string name="stats_no_mood_data">No mood data yet</string>
+    <string name="stats_monthly_breakdown_title">Monthly Breakdown</string>
+    <string name="stats_no_monthly_data">No monthly data yet</string>
+
     <!-- Settings Menu Icon Descriptions -->
     <string name="icon_description_statistics">View statistics</string>
     <string name="icon_description_notifications">Notification settings</string>

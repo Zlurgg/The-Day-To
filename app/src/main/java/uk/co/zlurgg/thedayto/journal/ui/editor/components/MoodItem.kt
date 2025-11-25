@@ -49,7 +49,7 @@ import androidx.compose.ui.unit.toSize
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 
 /**
  * Pure presenter component for mood selection with color picker.
@@ -148,7 +148,7 @@ fun MoodItem(
                     Box(
                         modifier = Modifier
                             .size(24.dp)
-                            .background(getColor(mood.color), CircleShape)
+                            .background(getColorSafe(mood.color), CircleShape)
                             .border(
                                 width = 1.dp,
                                 color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
@@ -188,7 +188,7 @@ fun MoodItem(
 
             // Existing mood colors
             moodColors.forEach { moodColor ->
-                val color = getColor(moodColor.color)
+                val color = getColorSafe(moodColor.color)
                 DropdownMenuItem(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -391,7 +391,7 @@ private fun DropdownWithMoodsPreview() {
 
             // Existing mood colors
             moodColors.forEach { moodColor ->
-                val color = getColor(moodColor.color)
+                val color = getColorSafe(moodColor.color)
                 DropdownMenuItem(
                     onClick = { },
                     text = {

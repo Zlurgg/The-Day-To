@@ -20,7 +20,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
-import uk.co.zlurgg.thedayto.journal.ui.util.getColor
+import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
 @Composable
@@ -28,7 +28,7 @@ fun EntryItem(
     entry: EntryWithMoodColor,
     modifier: Modifier = Modifier
 ) {
-    val moodColor = getColor(entry.moodColor)
+    val moodColor = getColorSafe(entry.moodColor)
     val textColor = moodColor.getContrastingTextColor()
 
     Card(

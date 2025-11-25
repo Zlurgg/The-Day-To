@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.journal.ui.util
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.core.graphics.toColorInt
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_light_onSurface
 import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_dark_onSurface
 
@@ -36,21 +37,33 @@ fun Color.getContrastingTextColor(): Color {
 }
 
 /**
- * Converts a hex color string to a Compose Color object.
+ * Safely converts a hex color string to a Compose Color object.
  *
- * Takes a hex color string (without the '#' prefix) and converts it to a
- * Compose Color. This is used throughout the app to convert stored hex
- * color values (e.g., from MoodColor entities) into renderable colors.
+ * Catches parsing errors and returns a fallback color instead of throwing.
+ * Logs warnings for invalid color strings via Timber.
  *
- * @param colorString Hex color string without '#' prefix (e.g., "FF5733", "4A148C")
- * @return Compose Color object ready for rendering
+ * Supports both formats:
+ * - With '#' prefix: "#FF5733"
+ * - Without '#' prefix: "FF5733"
+ *
+ * @param colorString Hex color string (with or without '#' prefix)
+ * @param fallback Color to return if parsing fails (defaults to Gray)
+ * @return Parsed Color or fallback if parsing fails
  *
  * Example:
  * ```
- * val color = getColor("FF5733")  // Returns Color(0xFFFF5733)
+ * val color = getColorSafe("#FF5733")      // Returns Color(0xFFFF5733)
+ * val color = getColorSafe("invalid")       // Returns Color.Gray, logs warning
+ * val color = getColorSafe("bad", Color.Red) // Returns Color.Red, logs warning
  * ```
  */
-fun getColor(colorString: String): Color {
-    return Color("#$colorString".toColorInt())
+fun getColorSafe(colorString: String, fallback: Color = Color.Gray): Color {
+    return try {
+        val normalizedString = if (colorString.startsWith("#")) colorString else "#$colorString"
+        Color(normalizedString.toColorInt())
+    } catch (e: IllegalArgumentException) {
+        Timber.w(e, "Invalid color format: $colorString, using fallback")
+        fallback
+    }
 }
 
