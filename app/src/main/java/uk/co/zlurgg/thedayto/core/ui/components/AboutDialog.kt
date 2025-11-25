@@ -16,7 +16,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
@@ -55,92 +54,44 @@ fun AboutDialog(
                     .fillMaxWidth()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Version
-                Text(
-                    text = stringResource(R.string.about_dialog_version_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_version_title),
+                    content = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Description
-                Text(
-                    text = stringResource(R.string.about_dialog_description_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_description_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_description_title),
+                    content = stringResource(R.string.about_dialog_description_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Privacy & Data
-                Text(
-                    text = stringResource(R.string.about_dialog_privacy_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_privacy_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_privacy_title),
+                    content = stringResource(R.string.about_dialog_privacy_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Open Source
-                Text(
-                    text = stringResource(R.string.about_dialog_open_source_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_open_source_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_open_source_title),
+                    content = stringResource(R.string.about_dialog_open_source_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Credits
-                Text(
-                    text = stringResource(R.string.about_dialog_credits_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_credits_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_credits_title),
+                    content = stringResource(R.string.about_dialog_credits_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // License
-                Text(
-                    text = stringResource(R.string.about_dialog_license_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Text(
-                    text = stringResource(R.string.about_dialog_license_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.about_dialog_license_title),
+                    content = stringResource(R.string.about_dialog_license_content)
                 )
             }
         },

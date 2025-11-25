@@ -12,8 +12,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.components.DialogContentSection
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 
 /**
@@ -44,53 +44,23 @@ fun EditorTutorialDialog(
             Column(
                 modifier = Modifier.fillMaxWidth()
             ) {
-                // Mood Colors
-                Text(
-                    text = stringResource(R.string.editor_tutorial_mood_colors_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(R.string.editor_tutorial_mood_colors_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.editor_tutorial_mood_colors_title),
+                    content = stringResource(R.string.editor_tutorial_mood_colors_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Adding Notes
-                Text(
-                    text = stringResource(R.string.editor_tutorial_notes_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(R.string.editor_tutorial_notes_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.editor_tutorial_notes_title),
+                    content = stringResource(R.string.editor_tutorial_notes_content)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Saving
-                Text(
-                    text = stringResource(R.string.editor_tutorial_saving_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(R.string.editor_tutorial_saving_content),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.editor_tutorial_saving_title),
+                    content = stringResource(R.string.editor_tutorial_saving_content)
                 )
             }
         },

@@ -12,7 +12,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 
@@ -53,36 +52,16 @@ fun WelcomeDialog(
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Features section
-                Text(
-                    text = stringResource(R.string.welcome_dialog_features_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(R.string.welcome_dialog_features_list),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.welcome_dialog_features_title),
+                    content = stringResource(R.string.welcome_dialog_features_list)
                 )
 
                 Spacer(modifier = Modifier.height(paddingMedium))
 
-                // Privacy section
-                Text(
-                    text = stringResource(R.string.welcome_dialog_privacy_title),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
-                )
-
-                Spacer(modifier = Modifier.height(8.dp))
-
-                Text(
-                    text = stringResource(R.string.welcome_dialog_privacy_info),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                DialogContentSection(
+                    title = stringResource(R.string.welcome_dialog_privacy_title),
+                    content = stringResource(R.string.welcome_dialog_privacy_info)
                 )
             }
         },
