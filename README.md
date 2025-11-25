@@ -1,62 +1,145 @@
-# The-Day-To
+# The Day To
 
-Journal App: Android    
+[![License: MIT](https://img.shields.io/badge/License-MIT-teal.svg)](https://opensource.org/licenses/MIT)
 
-Placeholder to capture notes/thoughts/evolve into a project brief  
-Variation around the theme of a daily journal app with a focus on mood/wellness  
+Your personal daily mood journal for Android. Track your emotional wellbeing with colors, visualize your month at a glance, and gain insights into your patterns over time.
 
-Some background research on existing apps:
+## Features
 
-- https://techcrunch.com/2023/01/13/5-best-journaling-apps-log-your-thoughts-and-experiences  
-- https://www.emizentech.com/blog/diary-journal-app-development.html  
-- https://www.makeuseof.com/best-micro-journaling-apps-write-a-diary  
-- https://friday.app/p/best-digital-journal-apps  
+📅 **Daily Mood Tracking**
+- Log one mood entry per day with optional notes
+- Color-coded calendar view showing your month at a glance
+- Swipe-to-delete entries with undo support
+- Navigate between months with the date picker
 
-Development Practice/Ideas/Approach  
-Aim to publish to Github as a release - using pages
+🎨 **Custom Mood Colors**
+- Create unlimited mood-color combinations
+- Rainbow color wheel picker for precise color selection
+- Edit or delete existing mood colors
+- Visual color indicators throughout the app
 
-General approach, built using small/testable ‘modules/components’  
+📊 **Statistics & Insights**
+- All-time stats: total entries, average per month, first entry date
+- Most common moods with frequency counts
+- Monthly breakdown showing entries and completion percentage
 
-## Features: 
-- Jetpack Compose  
-- Kotlin  
-- MVVM  
-- DI Koin
-- Retrofit  
-- Room  
-- Offline Capability
-- Work Manager (notifications - daily prompt)
-- Google Sign in (deprecated)
-- Modules  ( data -> domain <- presentation principle)
+🔔 **Daily Reminders**
+- Configurable notification time
+- Quick presets: Morning (8:00), Noon (12:00), Evening (20:00)
+- Smart reminder dialog when no entry exists for today
+- Auto-dismiss when entry is created
 
-## Release
-Internal testing on play store (20 testers)
+🔒 **Privacy-First**
+- All data stored locally on your device (Room database)
+- Google Sign-In for authentication only
+- No cloud sync, no data collection, no tracking
+- Your journal stays completely private
 
-## Screenshots showing use
+✨ **Modern UX**
+- Material Design 3 with dynamic theming
+- Light and dark mode support
+- Smooth animations and haptic feedback
+- Tutorial dialogs for first-time users
+- WCAG-compliant touch targets (48dp minimum)
 
-### Daily Entry Screen  
-Calendar (side scroll between months) days given colors by user created moods, daily entries listed below calendar.  
-Navigation by clicking on either calendar day or entry in list.  
+## Screenshots
 
-[![Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/hvh5t3hJ/Screenshot-2024-12-02-15-50-04-64-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/8fQHy4RD)  
+### Welcome & Sign-In
+| Welcome | Sign In |
+|---------|---------|
+| ![Welcome](docs/screenshots/welcome.png) | ![Sign In](docs/screenshots/signin.png) |
 
-[![Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/hj2Ygq4W/Screenshot-2024-12-02-15-50-18-85-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/8Jr4B9rt)  
+### Calendar Overview
+| Calendar with Entries | Month Navigation |
+|----------------------|------------------|
+| ![Calendar](docs/screenshots/calendar.png) | ![Month Picker](docs/screenshots/month-picker.png) |
 
-### Mood Color Screen  
-Following daily notification create a new entry for current day with a mood (with color) and a optional note - (can also create a new mood color relation).  
+### Entry Editor
+| Create Entry | Mood Selection | Color Picker |
+|--------------|----------------|--------------|
+| ![Editor](docs/screenshots/editor.png) | ![Mood Select](docs/screenshots/mood-select.png) | ![Color Picker](docs/screenshots/color-picker.png) |
 
-[![Screenshot-2024-12-02-15-49-19-53-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/TPqS7DZP/Screenshot-2024-12-02-15-49-19-53-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/zLv03VDm)  
+### Statistics
+| Stats Overview |
+|----------------|
+| ![Stats](docs/screenshots/stats.png) |
 
-[![Screenshot-2024-12-02-15-49-51-59-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/pTWSgdHJ/Screenshot-2024-12-02-15-49-51-59-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/WDySZTtd)  
+### Notifications
+| Notification Settings |
+|----------------------|
+| ![Notifications](docs/screenshots/notifications.png) |
 
-[![Screenshot-2024-12-02-16-05-41-20-9a482b403f0c7505d2f7b6ec2803966a.jpg](https://i.postimg.cc/h43Y5g3V/Screenshot-2024-12-02-16-05-41-20-9a482b403f0c7505d2f7b6ec2803966a.jpg)](https://postimg.cc/K4BQKXbY)  
+## Tech Stack
 
-### Google Sign In  
-Basic google sign in set up  
+| Category | Technology |
+|----------|------------|
+| **Language** | Kotlin 2.2.21 |
+| **UI** | Jetpack Compose + Material 3 |
+| **Architecture** | Clean Architecture (MVVM) |
+| **Database** | Room 2.8.3 |
+| **DI** | Koin 4.1.1 |
+| **Background Work** | WorkManager 2.11.0 |
+| **Auth** | Credential Manager API (Google Sign-In) |
+| **Navigation** | Jetpack Navigation Compose |
+| **Logging** | Timber |
 
-[![Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg](https://i.postimg.cc/x87FJyb6/Screenshot-2024-12-02-15-50-43-76-f7aa348215f5d566f9e4ca860f474209.jpg)](https://postimg.cc/tn3z86k6)  
+## Architecture
 
-### Notification
-Daily notification
+The app follows **Clean Architecture** with clear separation of concerns:
 
-[![Screenshot-2024-12-02-164416.png](https://i.postimg.cc/qMsxFbyX/Screenshot-2024-12-02-164416.png)](https://postimg.cc/0bNSMCtb)  
+```
+app/
+├── auth/           # Authentication (sign-in/out)
+├── journal/        # Core mood journaling feature
+│   ├── data/       # Room entities, DAOs, repositories
+│   ├── domain/     # Models, use cases, repository interfaces
+│   └── ui/         # Screens, ViewModels, components
+└── core/           # Shared utilities, theme, DI modules
+```
+
+**Key Patterns:**
+- Unidirectional Data Flow (StateFlow + SharedFlow)
+- Repository pattern with offline-first approach
+- Use cases for business logic
+- Root/Presenter pattern for Compose screens
+
+## Quality
+
+- **157 Tests** (137 unit + 20 instrumented)
+- ViewModels: 100% test coverage
+- Repository integration tests with real Room database
+- Turbine for Flow testing
+
+## Requirements
+
+- Android 8.1+ (API 27)
+- Google account for sign-in
+
+## Building
+
+```bash
+# Debug build
+./gradlew assembleDebug
+
+# Run tests
+./gradlew test
+
+# Full check (lint + tests)
+./gradlew check
+```
+
+## Download
+
+Get the latest APK from the [Releases](https://github.com/Zlurgg/The-Day-To/releases) page.
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Author
+
+Created by [Zlurgg](https://github.com/Zlurgg)
+
+---
+
+*Track your moods, understand your patterns, own your data.* 🌈
