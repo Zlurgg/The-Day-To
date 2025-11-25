@@ -44,30 +44,30 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 
 ## Screenshots
 
-### Welcome & Sign-In
-| Welcome | Sign In |
-|---------|---------|
-| ![Welcome](docs/screenshots/welcome.png) | ![Sign In](docs/screenshots/signin.png) |
+### Sign-In
+| Sign In | Google Auth |
+|---------|-------------|
+| ![Sign In](docs/screenshots/sign_in_screen_day.png) | ![Google Auth](docs/screenshots/sign_in_screen_googleauth_day.png) |
 
 ### Calendar Overview
-| Calendar with Entries | Month Navigation |
-|----------------------|------------------|
-| ![Calendar](docs/screenshots/calendar.png) | ![Month Picker](docs/screenshots/month-picker.png) |
+| Calendar | Menu |
+|----------|------|
+| ![Calendar](docs/screenshots/overview_screen_default_day.png) | ![Menu](docs/screenshots/overview_screen_menu_open_day.png) |
 
 ### Entry Editor
-| Create Entry | Mood Selection | Color Picker |
-|--------------|----------------|--------------|
-| ![Editor](docs/screenshots/editor.png) | ![Mood Select](docs/screenshots/mood-select.png) | ![Color Picker](docs/screenshots/color-picker.png) |
+| Editor | New Entry | Color Picker |
+|--------|-----------|--------------|
+| ![Editor](docs/screenshots/editor_screen_night.png) | ![New Entry](docs/screenshots/editor_screen_newentry_night.png) | ![Color Picker](docs/screenshots/editor_screen_create_mood_color_night.png) |
 
 ### Statistics
 | Stats Overview |
 |----------------|
-| ![Stats](docs/screenshots/stats.png) |
+| ![Stats](docs/screenshots/statistics_screen_day.png) |
 
-### Notifications
-| Notification Settings |
-|----------------------|
-| ![Notifications](docs/screenshots/notifications.png) |
+### Notifications & Reminders
+| Settings | Daily Reminder | Entry Prompt |
+|----------|----------------|--------------|
+| ![Settings](docs/screenshots/overview_screen_notification_setting_night.png) | ![Reminder](docs/screenshots/notification_daily_reminder.png) | ![Entry Prompt](docs/screenshots/todays_entry_popup.png) |
 
 ## Tech Stack
 
