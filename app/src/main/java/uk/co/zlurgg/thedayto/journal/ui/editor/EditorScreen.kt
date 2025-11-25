@@ -190,14 +190,13 @@ private fun EditorScreen(
         snackbarHost = {
             CustomSnackbarHost(hostState = snackbarHostState)
         },
-        modifier = modifier
+        modifier = modifier.imePadding()
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(paddingMedium)
-                .imePadding()
         ) {
             // Error banner (persistent for load failures) with slide-down animation
             AnimatedVisibility(
