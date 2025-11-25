@@ -65,7 +65,6 @@ import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDia
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
 import uk.co.zlurgg.thedayto.core.util.AndroidSystemUtils
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalendarSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
@@ -303,7 +302,7 @@ private fun OverviewScreen(
             ) {
                 Text(
                     text = uiState.greeting,
-                    style = MaterialTheme.typography.displaySmall,
+                    style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -324,7 +323,7 @@ private fun OverviewScreen(
                     .fillMaxSize()
                     .padding(padding)
                     .verticalScroll(rememberScrollState())
-                    .padding(paddingXXSmall)
+                    .padding(horizontal = paddingSmall)
             ) {
                 // Error banner (persistent for load failures) with slide-down animation
                 AnimatedVisibility(
