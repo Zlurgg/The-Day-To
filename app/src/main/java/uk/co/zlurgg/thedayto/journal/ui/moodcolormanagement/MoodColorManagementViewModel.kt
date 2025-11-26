@@ -61,16 +61,23 @@ class MoodColorManagementViewModel(
                 viewModelScope.launch {
                     try {
                         val moodColorId = action.moodColor.id
-                        if (moodColorId != null) {
-                            moodColorManagementUseCases.deleteMoodColor(moodColorId)
-                            _uiState.update { it.copy(recentlyDeletedMoodColor = action.moodColor) }
+                        if (moodColorId == null) {
+                            Timber.w("Cannot delete mood color with null ID: ${action.moodColor.mood}")
                             _uiEvents.emit(
                                 MoodColorManagementUiEvent.ShowSnackbar(
-                                    message = "\"${action.moodColor.mood}\" deleted",
-                                    actionLabel = "Undo"
+                                    message = "Cannot delete: mood color not saved"
                                 )
                             )
+                            return@launch
                         }
+                        moodColorManagementUseCases.deleteMoodColor(moodColorId)
+                        _uiState.update { it.copy(recentlyDeletedMoodColor = action.moodColor) }
+                        _uiEvents.emit(
+                            MoodColorManagementUiEvent.ShowSnackbar(
+                                message = "\"${action.moodColor.mood}\" deleted",
+                                actionLabel = "Undo"
+                            )
+                        )
                     } catch (e: Exception) {
                         Timber.e(e, "Failed to delete mood color")
                         _uiEvents.emit(
