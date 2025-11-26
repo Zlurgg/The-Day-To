@@ -84,4 +84,10 @@ class EntryRepositoryImpl(
     override suspend fun updateEntry(entry: Entry) {
         return dao.updateEntry(entry.toEntity())
     }
+
+    override fun getMoodColorEntryCounts(): Flow<Map<Int, Int>> {
+        return dao.getMoodColorEntryCounts().map { counts ->
+            counts.associate { it.moodColorId to it.entryCount }
+        }
+    }
 }

@@ -43,4 +43,11 @@ interface EntryRepository {
     suspend fun deleteEntry(entry: Entry)
     suspend fun updateEntry(entry: Entry)
 
+    /**
+     * Get the count of entries for each mood color.
+     * Used by the Mood Color Management screen to show usage statistics.
+     *
+     * @return Flow of map (moodColorId to entryCount)
+     */
+    fun getMoodColorEntryCounts(): Flow<Map<Int, Int>>
 }

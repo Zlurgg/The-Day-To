@@ -4,6 +4,7 @@ import androidx.lifecycle.SavedStateHandle
 import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModel
 import uk.co.zlurgg.thedayto.journal.ui.editor.EditorViewModel
+import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.MoodColorManagementViewModel
 import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewViewModel
 import uk.co.zlurgg.thedayto.journal.ui.stats.StatsViewModel
 import uk.co.zlurgg.thedayto.auth.ui.SignInViewModel
@@ -38,6 +39,14 @@ val statsModule = module {
         StatsViewModel(
             getEntriesUseCase = get(),
             statsUseCases = get()
+        )
+    }
+}
+
+val moodColorManagementModule = module {
+    viewModel {
+        MoodColorManagementViewModel(
+            moodColorManagementUseCases = get()
         )
     }
 }

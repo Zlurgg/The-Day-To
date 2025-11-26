@@ -22,3 +22,6 @@ data class EditorRoute(
 
 @Serializable
 data object StatsRoute
+
+@Serializable
+data object MoodColorManagementRoute
