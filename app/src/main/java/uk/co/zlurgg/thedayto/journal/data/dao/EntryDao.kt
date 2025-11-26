@@ -77,4 +77,25 @@ interface EntryDao {
 
     @Update
     suspend fun updateEntry(entry: EntryEntity)
+
+    /**
+     * Get the count of entries for each mood color.
+     * Used by the Mood Color Management screen to show usage statistics.
+     *
+     * @return Flow of pairs (moodColorId to entryCount)
+     */
+    @Query("""
+        SELECT moodColorId, COUNT(*) as entryCount
+        FROM entry
+        GROUP BY moodColorId
+    """)
+    fun getMoodColorEntryCounts(): Flow<List<MoodColorEntryCount>>
 }
+
+/**
+ * Data class for mood color entry count query results.
+ */
+data class MoodColorEntryCount(
+    val moodColorId: Int,
+    val entryCount: Int
+)

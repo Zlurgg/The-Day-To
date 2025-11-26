@@ -58,6 +58,7 @@ import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
@@ -237,6 +238,9 @@ fun OverviewScreenRoot(
         onNavigateToStats = {
             navController.navigate(StatsRoute)
         },
+        onNavigateToMoodColorManagement = {
+            navController.navigate(MoodColorManagementRoute)
+        },
         snackbarHostState = snackbarHostState
     )
 }
@@ -250,6 +254,7 @@ private fun OverviewScreen(
     onAction: (OverviewAction) -> Unit,
     onNavigateToEntry: (entryId: Int?, entryDate: Long?) -> Unit,
     onNavigateToStats: () -> Unit,
+    onNavigateToMoodColorManagement: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -313,6 +318,7 @@ private fun OverviewScreen(
                     onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
+                    onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
             }
@@ -427,6 +433,7 @@ private fun OverviewScreenPreview() {
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
+            onNavigateToMoodColorManagement = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -445,6 +452,7 @@ private fun OverviewScreenSingleEntryPreview() {
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
+            onNavigateToMoodColorManagement = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -463,6 +471,7 @@ private fun OverviewScreenEmptyPreview() {
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
+            onNavigateToMoodColorManagement = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

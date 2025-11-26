@@ -8,6 +8,7 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.di.editorModule
 import uk.co.zlurgg.thedayto.di.appModule
+import uk.co.zlurgg.thedayto.di.moodColorManagementModule
 import uk.co.zlurgg.thedayto.di.overviewModule
 import uk.co.zlurgg.thedayto.di.signInModule
 import uk.co.zlurgg.thedayto.di.statsModule
@@ -31,7 +32,8 @@ class TheDayToApplication : Application() {
                 editorModule,
                 overviewModule,
                 signInModule,
-                statsModule
+                statsModule,
+                moodColorManagementModule
             )
         }
     }

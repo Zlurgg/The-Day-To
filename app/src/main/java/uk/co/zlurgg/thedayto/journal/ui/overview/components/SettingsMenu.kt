@@ -9,6 +9,7 @@ import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -32,6 +33,7 @@ fun SettingsMenu(
     onShowHelp: () -> Unit,
     onShowAbout: () -> Unit,
     onNavigateToStats: () -> Unit,
+    onNavigateToMoodColorManagement: () -> Unit,
     onSignOut: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -60,6 +62,21 @@ fun SettingsMenu(
                     Icon(
                         imageVector = Icons.Default.BarChart,
                         contentDescription = stringResource(R.string.icon_description_statistics)
+                    )
+                }
+            )
+
+            // Mood Color Management
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.manage_mood_colors)) },
+                onClick = {
+                    expanded = false
+                    onNavigateToMoodColorManagement()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = stringResource(R.string.manage_mood_colors)
                     )
                 }
             )
@@ -134,6 +151,7 @@ private fun SettingsMenuPreview() {
             onShowHelp = {},
             onShowAbout = {},
             onNavigateToStats = {},
+            onNavigateToMoodColorManagement = {},
             onSignOut = {}
         )
     }

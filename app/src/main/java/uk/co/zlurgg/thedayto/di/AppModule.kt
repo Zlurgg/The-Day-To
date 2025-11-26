@@ -59,6 +59,8 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistribu
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEntryCountsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
 
 val appModule = module {
 
@@ -144,6 +146,20 @@ val appModule = module {
     single { UpdateMoodColorUseCase(repository = get()) }
     single { DeleteMoodColorUseCase(repository = get()) }
     single { SeedDefaultMoodColorsUseCase(moodColorRepository = get(), preferencesRepository = get()) }
+
+    // Entry count use case (used by MoodColorManagement)
+    single { GetMoodColorEntryCountsUseCase(repository = get()) }
+
+    // MoodColorManagement UseCases aggregator
+    single {
+        MoodColorManagementUseCases(
+            getMoodColors = get(),
+            addMoodColor = get(),
+            updateMoodColor = get(),
+            deleteMoodColor = get(),
+            getMoodColorEntryCounts = get()
+        )
+    }
 
     single {
         EditorUseCases(

@@ -140,6 +140,12 @@ class FakeEntryRepository(
         _entries.value = currentList
     }
 
+    override fun getMoodColorEntryCounts(): Flow<Map<Int, Int>> {
+        return _entries.map { entries ->
+            entries.groupingBy { it.moodColorId }.eachCount()
+        }
+    }
+
     /**
      * Helper method to reset the repository to its initial state.
      * Useful for cleaning up between tests.
