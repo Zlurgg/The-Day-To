@@ -65,7 +65,7 @@
     <string name="descending">Descending</string>
     <string name="empty_state_title">No entries yet</string>
     <string name="empty_state_description">Start tracking your daily moods by tapping on today\'s date in the calendar</string>
-    <string name="empty_state_create_button">Create Your First Entry</string>
+    <string name="empty_state_create_button">Create an Entry</string>
     <string name="enable_notifications">Enable Notifications</string>
     <string name="disable_notifications">Disable Notifications</string>
     <string name="notifications">Notifications</string>
