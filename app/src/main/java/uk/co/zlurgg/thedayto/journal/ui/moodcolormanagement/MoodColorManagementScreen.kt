@@ -26,6 +26,7 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
@@ -69,7 +71,6 @@ import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManag
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorWithCount
-import androidx.core.graphics.toColorInt
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -82,14 +83,13 @@ fun MoodColorManagementScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val undoLabel = stringResource(R.string.undo)
-
     // Handle one-time UI events
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is MoodColorManagementUiEvent.ShowSnackbar -> {
-                    if (event.actionLabel == undoLabel) {
+                    // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
+                    if (event.actionLabel == "Undo") {
                         val result = snackbarHostState.showSnackbar(
                             message = event.message,
                             actionLabel = event.actionLabel,
@@ -217,17 +217,27 @@ private fun MoodColorManagementScreen(
                 )
             }
 
-            // Sort section
-            MoodColorSortSection(
-                modifier = Modifier.padding(horizontal = paddingMedium, vertical = paddingSmall),
-                moodColorOrder = uiState.sortOrder,
-                onOrderChange = { order ->
-                    onAction(MoodColorManagementAction.ToggleSortOrder(order))
-                }
-            )
+            // Sort section (hide during loading)
+            if (!uiState.isLoading) {
+                MoodColorSortSection(
+                    modifier = Modifier.padding(horizontal = paddingMedium, vertical = paddingSmall),
+                    moodColorOrder = uiState.sortOrder,
+                    onOrderChange = { order ->
+                        onAction(MoodColorManagementAction.ToggleSortOrder(order))
+                    }
+                )
+            }
 
-            // Empty state
-            if (uiState.moodColorsWithCount.isEmpty() && !uiState.isLoading && uiState.loadError == null) {
+            // Loading state
+            if (uiState.isLoading) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            } else if (uiState.moodColorsWithCount.isEmpty() && uiState.loadError == null) {
+                // Empty state
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
