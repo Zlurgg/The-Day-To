@@ -64,6 +64,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodColorPickerDialog
+import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.MoodColorSortSection
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
@@ -215,6 +216,15 @@ private fun MoodColorManagementScreen(
                     onDismiss = { onAction(MoodColorManagementAction.DismissLoadError) }
                 )
             }
+
+            // Sort section
+            MoodColorSortSection(
+                modifier = Modifier.padding(horizontal = paddingMedium, vertical = paddingSmall),
+                moodColorOrder = uiState.sortOrder,
+                onOrderChange = { order ->
+                    onAction(MoodColorManagementAction.ToggleSortOrder(order))
+                }
+            )
 
             // Empty state
             if (uiState.moodColorsWithCount.isEmpty() && !uiState.isLoading && uiState.loadError == null) {
