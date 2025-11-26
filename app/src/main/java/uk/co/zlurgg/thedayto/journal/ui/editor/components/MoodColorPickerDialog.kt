@@ -86,9 +86,10 @@ fun MoodColorPickerDialog(
                         textStyle = MaterialTheme.typography.headlineSmall,
                         isError = errorMessage != null,
                         supportingText = {
-                            if (errorMessage != null) {
+                            val error = errorMessage
+                            if (error != null) {
                                 Text(
-                                    text = errorMessage!!,
+                                    text = error,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )

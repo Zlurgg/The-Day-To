@@ -58,7 +58,7 @@ class AddMoodColorUseCase(
                 repository.updateMoodColor(
                     existing.copy(color = moodColor.color, isDeleted = false)
                 )
-                existing.id!! // ID must exist for deleted mood
+                requireNotNull(existing.id) { "Restored mood color must have an ID" }
             }
             else -> {
                 // Active duplicate - throw error
