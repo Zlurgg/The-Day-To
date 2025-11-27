@@ -1,5 +1,5 @@
 # ProGuard/R8 Rules for The Day To
-# Modern Android best practices - minimal, targeted rules
+# Minimal rules - most libraries bundle their own consumer rules
 
 # ============================================================================
 # DEBUGGING - Keep line numbers for crash reports
@@ -8,50 +8,18 @@
 -renamesourcefileattribute SourceFile
 
 # ============================================================================
-# KOTLIN
+# KOTLIN SERIALIZATION (if using reflection)
 # ============================================================================
--dontwarn kotlin.**
--keep class kotlin.Metadata { *; }
-
-# ============================================================================
-# ROOM DATABASE
-# ============================================================================
--keep class * extends androidx.room.RoomDatabase
--keep @androidx.room.Entity class *
--dontwarn androidx.room.paging.**
-
-# ============================================================================
-# RETROFIT / OKHTTP
-# ============================================================================
--dontwarn okhttp3.**
--dontwarn okio.**
--keepattributes Signature
 -keepattributes *Annotation*
 
 # ============================================================================
-# FIREBASE
+# ROOM - Keep entities (accessed via reflection)
 # ============================================================================
--keep class com.google.firebase.** { *; }
--keep class com.google.android.gms.** { *; }
--dontwarn com.google.firebase.**
--dontwarn com.google.android.gms.**
+-keep @androidx.room.Entity class * { *; }
 
 # ============================================================================
-# KOIN
+# SUPPRESS WARNINGS - Libraries without full R8 support
 # ============================================================================
--keep class org.koin.** { *; }
--keepclassmembers class * {
-    public <init>(...);
-}
-
-# ============================================================================
-# OPENCSV
-# ============================================================================
--dontwarn com.opencsv.**
--keep class com.opencsv.** { *; }
-
-# ============================================================================
-# APP-SPECIFIC - Domain models used with Room
-# ============================================================================
--keep class uk.co.zlurgg.thedayto.**.model.** { *; }
--keep class uk.co.zlurgg.thedayto.**.data.model.** { *; }
+-dontwarn org.bouncycastle.**
+-dontwarn org.conscrypt.**
+-dontwarn org.openjsse.**
