@@ -1,21 +1,57 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.kts.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# ProGuard/R8 Rules for The Day To
+# Modern Android best practices - minimal, targeted rules
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ============================================================================
+# DEBUGGING - Keep line numbers for crash reports
+# ============================================================================
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# ============================================================================
+# KOTLIN
+# ============================================================================
+-dontwarn kotlin.**
+-keep class kotlin.Metadata { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# ============================================================================
+# ROOM DATABASE
+# ============================================================================
+-keep class * extends androidx.room.RoomDatabase
+-keep @androidx.room.Entity class *
+-dontwarn androidx.room.paging.**
+
+# ============================================================================
+# RETROFIT / OKHTTP
+# ============================================================================
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keepattributes Signature
+-keepattributes *Annotation*
+
+# ============================================================================
+# FIREBASE
+# ============================================================================
+-keep class com.google.firebase.** { *; }
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.firebase.**
+-dontwarn com.google.android.gms.**
+
+# ============================================================================
+# KOIN
+# ============================================================================
+-keep class org.koin.** { *; }
+-keepclassmembers class * {
+    public <init>(...);
+}
+
+# ============================================================================
+# OPENCSV
+# ============================================================================
+-dontwarn com.opencsv.**
+-keep class com.opencsv.** { *; }
+
+# ============================================================================
+# APP-SPECIFIC - Domain models used with Room
+# ============================================================================
+-keep class uk.co.zlurgg.thedayto.**.model.** { *; }
+-keep class uk.co.zlurgg.thedayto.**.data.model.** { *; }
