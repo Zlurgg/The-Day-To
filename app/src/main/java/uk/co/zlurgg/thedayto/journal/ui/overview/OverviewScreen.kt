@@ -76,6 +76,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
+import uk.co.zlurgg.thedayto.update.ui.components.UpdateDialog
 import java.time.LocalDate
 
 /**
@@ -315,6 +316,7 @@ private fun OverviewScreen(
                 )
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
+                    onCheckForUpdates = { onAction(OverviewAction.CheckForUpdates) },
                     onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
@@ -415,6 +417,15 @@ private fun OverviewScreen(
             onSave = { enabled, hour, minute ->
                 onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
             }
+        )
+    }
+
+    // Update available dialog
+    if (uiState.showUpdateDialog && uiState.availableUpdate != null) {
+        UpdateDialog(
+            updateInfo = uiState.availableUpdate,
+            onDownload = { onAction(OverviewAction.DownloadUpdate) },
+            onDismiss = { onAction(OverviewAction.DismissUpdate) }
         )
     }
 }

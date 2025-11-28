@@ -18,6 +18,11 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
+
+private const val DEFAULT_CURRENT_VERSION = "1.0.0"
 
 /**
  * Creates a fake OverviewUseCases instance for testing.
@@ -28,7 +33,9 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDate
 fun createFakeOverviewUseCases(
     preferencesRepository: FakePreferencesRepository,
     notificationRepository: FakeNotificationRepository,
-    entryRepository: EntryRepository = FakeEntryRepository()
+    entryRepository: EntryRepository = FakeEntryRepository(),
+    updateRepository: FakeUpdateRepository = FakeUpdateRepository(),
+    currentVersion: String = DEFAULT_CURRENT_VERSION
 ): OverviewUseCases {
 
     // Create real notification use cases with fake repositories
@@ -55,6 +62,15 @@ fun createFakeOverviewUseCases(
     val getEntryByDate = GetEntryByDateUseCase(entryRepository)
     val updateEntry = UpdateEntryUseCase(entryRepository)
 
+    // Create real update use cases with fake repository
+    val checkForUpdate = CheckForUpdateUseCase(
+        updateRepository = updateRepository,
+        preferencesRepository = preferencesRepository,
+        currentVersion = currentVersion
+    )
+    val dismissUpdate = DismissUpdateUseCase(preferencesRepository)
+    val downloadUpdate = DownloadUpdateUseCase(updateRepository)
+
     return OverviewUseCases(
         getEntries = getEntries,
         getEntriesForMonth = getEntriesForMonth,
@@ -71,6 +87,9 @@ fun createFakeOverviewUseCases(
         checkNotificationPermission = checkNotificationPermission,
         checkSystemNotificationsEnabled = checkSystemNotificationsEnabled,
         shouldShowPermissionRationale = shouldShowPermissionRationale,
-        setupDailyNotification = setupDailyNotification
+        setupDailyNotification = setupDailyNotification,
+        checkForUpdate = checkForUpdate,
+        dismissUpdate = dismissUpdate,
+        downloadUpdate = downloadUpdate
     )
 }
