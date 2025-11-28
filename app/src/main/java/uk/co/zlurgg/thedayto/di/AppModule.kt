@@ -76,8 +76,7 @@ import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
 
 private const val GITHUB_API_BASE_URL = "https://api.github.com/"
 private const val NETWORK_TIMEOUT_SECONDS = 30L
-// TODO: Revert after testing - should be BuildConfig.VERSION_NAME
-private const val CURRENT_VERSION = "1.0.0"  // Fake old version for testing update flow
+private const val CURRENT_VERSION = uk.co.zlurgg.thedayto.BuildConfig.VERSION_NAME
 
 val appModule = module {
 

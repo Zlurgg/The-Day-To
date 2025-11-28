@@ -7,7 +7,15 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+    <!--
+        REQUEST_INSTALL_PACKAGES: Required for in-app updates via GitHub Releases.
+        This app is distributed outside Play Store, so users can download and install
+        APK updates directly. The install is always user-initiated (user clicks "Download"
+        in update dialog, then confirms via Android's package installer).
+    -->
+    <uses-permission
+        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
+        tools:ignore="RequestInstallPackagesPermission,RequestInstallPackagesPolicy" />
 
     <application
         android:name=".app.TheDayToApplication"

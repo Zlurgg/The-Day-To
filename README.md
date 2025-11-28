@@ -35,6 +35,12 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 - No cloud sync, no data collection, no tracking
 - Your journal stays completely private
 
+🔄 **In-App Updates**
+- Automatic update checks on app launch
+- Download and install updates directly from within the app
+- Manual "Check for Updates" option in settings menu
+- Dismiss updates you don't want to install
+
 ✨ **Modern UX**
 - Material Design 3 with dynamic theming
 - Light and dark mode support
@@ -105,7 +111,7 @@ app/
 
 ## Quality
 
-- **157 Tests** (137 unit + 20 instrumented)
+- **182 Tests** (162 unit + 20 instrumented)
 - ViewModels: 100% test coverage
 - Repository integration tests with real Room database
 - Turbine for Flow testing
