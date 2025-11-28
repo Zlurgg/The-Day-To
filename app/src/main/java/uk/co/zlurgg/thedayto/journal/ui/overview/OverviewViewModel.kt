@@ -48,6 +48,8 @@ class OverviewViewModel(
         updateGreeting()
         checkTodayEntry()
         loadNotificationSettings()
+        // Fail-safe: ensure periodic notification is scheduled on app startup
+        overviewUseCases.setupDailyNotification()
     }
 
     /**

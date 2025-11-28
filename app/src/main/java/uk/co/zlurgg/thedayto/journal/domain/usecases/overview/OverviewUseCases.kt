@@ -4,6 +4,7 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificatio
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotificationSettingsUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SetupDailyNotificationUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermissionRationaleUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
@@ -24,5 +25,6 @@ data class OverviewUseCases(
     val saveNotificationSettings: SaveNotificationSettingsUseCase,
     val checkNotificationPermission: CheckNotificationPermissionUseCase,
     val checkSystemNotificationsEnabled: CheckSystemNotificationsEnabledUseCase,
-    val shouldShowPermissionRationale: ShouldShowPermissionRationaleUseCase
+    val shouldShowPermissionRationale: ShouldShowPermissionRationaleUseCase,
+    val setupDailyNotification: SetupDailyNotificationUseCase
 )

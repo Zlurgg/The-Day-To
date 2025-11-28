@@ -10,9 +10,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import androidx.work.Constraints
 import androidx.work.Data
-import androidx.work.ExistingWorkPolicy
+import androidx.work.ExistingPeriodicWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,14 +53,16 @@ class NotificationRepositoryImpl(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun setupDailyNotification() {
+        Timber.d("setupDailyNotification called - checking preferences")
         // Launch in repository scope to avoid blocking
         repositoryScope.launch {
             try {
                 // Check if notifications are enabled in preferences
                 val isEnabled = preferencesRepository.isNotificationEnabled()
+                Timber.d("Notifications enabled in preferences: $isEnabled")
 
                 if (!isEnabled) {
-                    Timber.d("Notifications disabled in preferences - skipping schedule")
+                    Timber.d("Notifications disabled - skipping schedule")
                     cancelNotifications()
                     return@launch
                 }
@@ -70,7 +72,6 @@ class NotificationRepositoryImpl(
                 val minute = preferencesRepository.getNotificationMinute()
 
                 scheduleNotification(hour, minute)
-                Timber.d("Notification scheduled for $hour:${minute.toString().padStart(2, '0')}")
             } catch (e: Exception) {
                 Timber.e(e, "Failed to setup daily notification")
             }
@@ -176,18 +177,21 @@ class NotificationRepositoryImpl(
     }
 
     /**
-     * Schedules a notification for the specified time tomorrow using WorkManager.
+     * Schedules a periodic daily notification using WorkManager.
      *
-     * - Uses REPLACE policy to prevent duplicate notifications
+     * Uses PeriodicWorkRequest with 24-hour interval for reliable daily notifications.
+     * - UPDATE policy: reschedules with new timing if settings change
      * - NO network constraint (notifications don't need internet)
-     * - Calculates delay until specified time tomorrow in system timezone
+     * - Initial delay calculated to first occurrence of specified time
      *
      * @param hour hour in 24-hour format (0-23)
      * @param minute minute (0-59)
      */
     private fun scheduleNotification(hour: Int, minute: Int) {
         try {
-            // Calculate delay until specified time tomorrow (system timezone)
+            Timber.d("Scheduling periodic notification for $hour:${minute.toString().padStart(2, '0')}")
+
+            // Calculate delay until first notification (system timezone)
             val systemZone = ZoneId.systemDefault()
             val now = LocalDateTime.now(systemZone)
 
@@ -205,7 +209,9 @@ class NotificationRepositoryImpl(
 
             val currentEpoch = now.atZone(systemZone).toEpochSecond()
             val nextEpoch = nextNotificationTime.atZone(systemZone).toEpochSecond()
-            val delay = nextEpoch - currentEpoch
+            val initialDelay = nextEpoch - currentEpoch
+
+            Timber.d("Initial delay: ${initialDelay}s (${initialDelay / 3600}h ${(initialDelay % 3600) / 60}m)")
 
             // Create input data for worker
             val data = Data.Builder()
@@ -217,23 +223,26 @@ class NotificationRepositoryImpl(
                 .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                 .build()
 
-            // Create one-time work request
-            val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
+            // Create periodic work request (24-hour interval)
+            val notificationWorker = PeriodicWorkRequest.Builder(
+                NotificationWorker::class.java,
+                24, TimeUnit.HOURS
+            )
                 .setInputData(data)
-                .setInitialDelay(delay, TimeUnit.SECONDS)
+                .setInitialDelay(initialDelay, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .build()
 
-            // Schedule work (REPLACE policy prevents duplicates)
-            WorkManager.getInstance(context).beginUniqueWork(
+            // Schedule periodic work (UPDATE policy reschedules with new timing)
+            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 NotificationWorker.NOTIFICATION_WORK,
-                ExistingWorkPolicy.REPLACE,
+                ExistingPeriodicWorkPolicy.UPDATE,
                 notificationWorker
-            ).enqueue()
+            )
 
-            Timber.i("Notification scheduled for ${delay}s from now at $hour:${minute.toString().padStart(2, '0')}")
+            Timber.i("Periodic notification scheduled: first in ${initialDelay}s, then every 24h at $hour:${minute.toString().padStart(2, '0')}")
         } catch (e: Exception) {
-            Timber.e(e, "Failed to schedule notification")
+            Timber.e(e, "Failed to schedule periodic notification")
         }
     }
 }

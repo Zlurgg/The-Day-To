@@ -4,6 +4,7 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificatio
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SaveNotificationSettingsUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.SetupDailyNotificationUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermissionRationaleUseCase
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
@@ -39,6 +40,7 @@ fun createFakeOverviewUseCases(
     val checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository)
     val checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationRepository)
     val shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(notificationRepository)
+    val setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository)
 
     val checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository)
     val markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository)
@@ -68,6 +70,7 @@ fun createFakeOverviewUseCases(
         saveNotificationSettings = saveNotificationSettings,
         checkNotificationPermission = checkNotificationPermission,
         checkSystemNotificationsEnabled = checkSystemNotificationsEnabled,
-        shouldShowPermissionRationale = shouldShowPermissionRationale
+        shouldShowPermissionRationale = shouldShowPermissionRationale,
+        setupDailyNotification = setupDailyNotification
     )
 }
