@@ -92,6 +92,31 @@ class OverviewViewModelTest {
     }
 
     @Test
+    fun `init - calls setupDailyNotification on startup as fail-safe`() = runTest {
+        // Given: Fresh notification repository
+        val freshNotificationRepo = FakeNotificationRepository()
+        assertFalse(
+            "setupDailyNotification should not be called yet",
+            freshNotificationRepo.setupDailyNotificationCalled
+        )
+
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationRepository = freshNotificationRepo
+        )
+
+        // When: ViewModel initializes
+        val testViewModel = OverviewViewModel(useCases)
+        testScheduler.advanceUntilIdle()
+
+        // Then: setupDailyNotification should be called as fail-safe
+        assertTrue(
+            "setupDailyNotification should be called on init",
+            freshNotificationRepo.setupDailyNotificationCalled
+        )
+    }
+
+    @Test
     fun `loadNotificationSettings - handles default values`() = runTest {
         // Given: Default preferences (notification disabled, 9:00 AM)
         // (FakePreferencesRepository initializes with defaults)
