@@ -6,6 +6,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Environment
 import timber.log.Timber
+import androidx.core.net.toUri
 
 /**
  * Service for downloading and installing APK files.
@@ -16,7 +17,7 @@ class ApkDownloadService(private val context: Context) {
     fun downloadApk(url: String, fileName: String): Long {
         Timber.d("Starting APK download: $fileName from $url")
 
-        val request = DownloadManager.Request(Uri.parse(url))
+        val request = DownloadManager.Request(url.toUri())
             .setTitle(DOWNLOAD_TITLE)
             .setDescription("Downloading $fileName")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)

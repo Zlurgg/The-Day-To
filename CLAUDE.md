@@ -18,6 +18,7 @@ This file provides guidance to Claude Code when working with code in this reposi
 - **Daily Notifications**: WorkManager-based reminders to log daily mood
 - **Google Sign-In**: User authentication via Google/Firebase
 - **Offline-First**: All data stored locally in Room database
+- **In-App Updates**: Automatic update checks via GitHub Releases API with direct APK download
 
 ### Development Standards
 This project follows **Google's official Modern Android Development (MAD)** recommendations:
@@ -40,14 +41,14 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 
 ### Testing
 ```bash
-./gradlew test                   # Run all unit tests (137 tests)
+./gradlew test                   # Run all unit tests (162 tests)
 ./gradlew connectedAndroidTest   # Run instrumented tests (20 tests)
 ./gradlew check                  # Run all checks (lint + tests)
 ```
 
-**Test Coverage**: ✅ 157 tests total (137 unit + 20 instrumented) - All passing
+**Test Coverage**: ✅ 182 tests total (162 unit + 20 instrumented) - All passing
 - ViewModels: 78 unit tests (100% coverage)
-- Use Cases: 59 unit tests
+- Use Cases: 84 unit tests (including update feature)
 - Repositories: 20 integration tests with real Room database
 
 ### Code Quality
@@ -94,6 +95,7 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 ### Key Libraries
 - **DI**: Koin 4.1.1 (constructor injection)
 - **Database**: Room 2.8.3 (offline-first)
+- **Networking**: Retrofit 2.11.0 + OkHttp (GitHub API for updates)
 - **Background Work**: WorkManager 2.11.0
 - **Auth**: Credential Manager API (androidx.credentials v1.5.0, GoogleID v1.1.1)
 - **Logging**: Timber 5.0.1
@@ -219,10 +221,10 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 
 ### ✅ Completed
 - Clean Architecture with proper data/domain separation
-- Modern package structure (journal/, auth/, core/)
+- Modern package structure (journal/, auth/, core/, update/)
 - All ViewModels follow StateFlow + SharedFlow pattern
 - Root/Presenter pattern for all screens
-- Comprehensive test coverage (157 tests, all passing)
+- Comprehensive test coverage (182 tests, all passing)
 - Timber logging throughout
 - Modern Google Sign-In (Credential Manager API)
 - Error handling with Resource wrapper
@@ -231,8 +233,8 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 - Portfolio-quality README with screenshots
 - MIT License
 - Release signing configuration
-- v1.0.2 released
 - R8 minification and resource shrinking enabled
+- In-app update checker via GitHub Releases API
 
 ### 📋 Future Enhancements
 - Resolve remaining TODOs in code
@@ -244,11 +246,12 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 
 ### Feature Module Structure
 ```
-[feature]/                        (e.g., journal/, auth/)
+[feature]/                        (e.g., journal/, auth/, update/)
 ├── data/
 │   ├── model/                    <- Room entities (@Entity)
 │   ├── mapper/                   <- Entity ↔ Domain conversion
 │   ├── dao/                      <- Room DAOs
+│   ├── remote/                   <- API services, DTOs (for network features)
 │   └── repository/               <- Repository implementations
 ├── domain/
 │   ├── model/                    <- Pure Kotlin models (no @Entity)
@@ -300,4 +303,4 @@ core/
 
 ---
 
-Last Updated: 2025-11-27
+Last Updated: 2025-11-28

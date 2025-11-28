@@ -199,7 +199,7 @@
     <string name="about_dialog_version_title">Version</string>
     <string name="about_dialog_version_info">The Day To v%1$s</string>
     <string name="about_dialog_description_title">Description</string>
-    <string name="about_dialog_description_content">The Day To is a minimalist mood tracking app designed to help you reflect on your daily emotional wellbeing. Track your moods with colors, add personal notes, and visualize your month at a glance.</string>
+    <string name="about_dialog_description_content">The Day To is a minimalist mood tracking app designed to help you reflect on your daily emotional wellbeing. Track your moods with colors, add personal notes, and visualize your month at a glance. The app checks for updates automatically and lets you download new versions directly from GitHub.</string>
     <string name="about_dialog_privacy_title">Privacy &amp; Data</string>
     <string name="about_dialog_privacy_content">Your journal entries are stored locally on your device. We use Google Sign-In for authentication only. Your personal data remains private and is never uploaded to external servers. You have complete control over your information.</string>
     <string name="about_dialog_open_source_title">Open Source</string>
