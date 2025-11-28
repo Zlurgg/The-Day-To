@@ -3,10 +3,9 @@ package uk.co.zlurgg.thedayto.update.data.service
 import android.app.DownloadManager
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Environment
-import timber.log.Timber
 import androidx.core.net.toUri
+import timber.log.Timber
 
 /**
  * Service for downloading and installing APK files.
