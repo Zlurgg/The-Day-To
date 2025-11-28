@@ -190,6 +190,9 @@
     <string name="icon_description_about">About The Day To</string>
     <string name="icon_description_sign_out">Sign out</string>
 
+    <!-- Update Checker -->
+    <string name="check_for_updates">Check for Updates</string>
+
     <!-- About Dialog -->
     <string name="about_dialog_title">About The Day To</string>
     <string name="about_dialog_button">Close</string>

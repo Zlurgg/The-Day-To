@@ -17,6 +17,7 @@ class FakePreferencesRepository : PreferencesRepository {
     private var notificationEnabled: Boolean = false
     private var notificationHour: Int = 9
     private var notificationMinute: Int = 0
+    private var dismissedVersion: String? = null
 
     override suspend fun hasShownEntryReminderToday(): Boolean {
         return entryReminderDate == LocalDate.now()
@@ -71,11 +72,26 @@ class FakePreferencesRepository : PreferencesRepository {
         notificationMinute = minute
     }
 
+    override suspend fun getDismissedVersion(): String? {
+        return dismissedVersion
+    }
+
+    override suspend fun setDismissedVersion(version: String) {
+        dismissedVersion = version
+    }
+
     /**
      * Helper method to set editor tutorial seen state for testing.
      */
     fun setEditorTutorialSeen(seen: Boolean) {
         editorTutorialSeen = seen
+    }
+
+    /**
+     * Helper method to set dismissed version for testing.
+     */
+    fun setDismissedVersionForTest(version: String?) {
+        dismissedVersion = version
     }
 
     /**
@@ -90,5 +106,6 @@ class FakePreferencesRepository : PreferencesRepository {
         notificationEnabled = false
         notificationHour = 9
         notificationMinute = 0
+        dismissedVersion = null
     }
 }

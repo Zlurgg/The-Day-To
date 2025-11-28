@@ -3,10 +3,15 @@ package uk.co.zlurgg.thedayto.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
+import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
+import uk.co.zlurgg.thedayto.update.data.remote.api.GitHubApiService
+import java.util.concurrent.TimeUnit
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.auth.data.repository.AuthRepositoryImpl
@@ -62,9 +67,21 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUs
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEntryCountsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
+import uk.co.zlurgg.thedayto.update.data.repository.UpdateRepositoryImpl
+import uk.co.zlurgg.thedayto.update.data.service.ApkDownloadService
+import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
+import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
+
+private const val GITHUB_API_BASE_URL = "https://api.github.com/"
+private const val NETWORK_TIMEOUT_SECONDS = 30L
+// TODO: Revert after testing - should be BuildConfig.VERSION_NAME
+private const val CURRENT_VERSION = "1.0.0"  // Fake old version for testing update flow
 
 val appModule = module {
 
+    // Database
     single {
         Room.databaseBuilder(
             androidApplication(),
@@ -79,6 +96,40 @@ val appModule = module {
                 }
             })
             .build()
+    }
+
+    // Network - OkHttpClient
+    single {
+        OkHttpClient.Builder()
+            .connectTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .writeTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .build()
+    }
+
+    // Network - Retrofit
+    single {
+        Retrofit.Builder()
+            .baseUrl(GITHUB_API_BASE_URL)
+            .client(get<OkHttpClient>())
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+    }
+
+    // GitHub API Service
+    single<GitHubApiService> {
+        get<Retrofit>().create(GitHubApiService::class.java)
+    }
+
+    // Update Feature - APK Download Service
+    single { ApkDownloadService(androidContext()) }
+
+    // Update Feature - Repository
+    single<UpdateRepository> {
+        UpdateRepositoryImpl(
+            gitHubApiService = get(),
+            apkDownloadService = get()
+        )
     }
 
     // Auth Repository (wraps GoogleAuthUiClient)
@@ -135,7 +186,14 @@ val appModule = module {
             checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository = get()),
             checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationRepository = get()),
             shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(notificationRepository = get()),
-            setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository = get())
+            setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository = get()),
+            checkForUpdate = CheckForUpdateUseCase(
+                updateRepository = get(),
+                preferencesRepository = get(),
+                currentVersion = CURRENT_VERSION
+            ),
+            dismissUpdate = DismissUpdateUseCase(preferencesRepository = get()),
+            downloadUpdate = DownloadUpdateUseCase(updateRepository = get())
         )
     }
 

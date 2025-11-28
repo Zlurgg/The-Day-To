@@ -162,6 +162,26 @@ class PreferencesRepositoryImpl(
         }
     }
 
+    /**
+     * Get the version the user has dismissed (opted out of updating to).
+     *
+     * @return version string that was dismissed, or null if none
+     */
+    override suspend fun getDismissedVersion(): String? {
+        return prefs.getString(KEY_DISMISSED_VERSION, null)
+    }
+
+    /**
+     * Set the version the user has dismissed.
+     *
+     * Stores the version so the user won't be prompted about this update again.
+     *
+     * @param version the version string to mark as dismissed
+     */
+    override suspend fun setDismissedVersion(version: String) {
+        prefs.edit { putString(KEY_DISMISSED_VERSION, version) }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
@@ -171,6 +191,7 @@ class PreferencesRepositoryImpl(
         private const val KEY_NOTIFICATION_ENABLED = "notification_enabled"
         private const val KEY_NOTIFICATION_HOUR = "notification_hour"
         private const val KEY_NOTIFICATION_MINUTE = "notification_minute"
+        private const val KEY_DISMISSED_VERSION = "dismissed_update_version"
 
         private const val DEFAULT_NOTIFICATION_HOUR = 9  // 9 AM
         private const val DEFAULT_NOTIFICATION_MINUTE = 0
