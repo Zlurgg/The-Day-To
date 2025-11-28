@@ -141,13 +141,8 @@ class NotificationRepositoryImpl(
 
     override fun areSystemNotificationsEnabled(): Boolean {
         return try {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                notificationManager.areNotificationsEnabled()
-            } else {
-                // Pre-API 24: Use NotificationManagerCompat
-                NotificationManagerCompat.from(context).areNotificationsEnabled()
-            }
+            val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            notificationManager.areNotificationsEnabled()
         } catch (e: Exception) {
             Timber.e(e, "Error checking system notification status")
             // Fail-safe: assume enabled if we can't determine
