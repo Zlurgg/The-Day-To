@@ -204,8 +204,8 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 
 ## Release Status
 
-**Current Version:** v1.0.2
-**Release Date:** 2025-11-27
+**Current Version:** v1.0.3
+**Release Date:** 2025-11-28
 **Status:** ✅ Released on GitHub
 
 ### Release Configuration
