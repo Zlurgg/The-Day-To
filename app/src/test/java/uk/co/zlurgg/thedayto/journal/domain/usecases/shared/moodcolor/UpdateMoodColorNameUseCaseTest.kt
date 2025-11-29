@@ -2,7 +2,6 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
