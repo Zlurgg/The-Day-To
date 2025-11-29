@@ -92,7 +92,7 @@ fun EditMoodColorDialog(
                         supportingText = {
                             when {
                                 moodError != null -> Text(
-                                    text = moodError!!,
+                                    text = moodError ?: "",
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )
