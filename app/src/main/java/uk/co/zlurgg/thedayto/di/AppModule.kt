@@ -233,6 +233,7 @@ val appModule = module {
             addMoodColorUseCase = get(),
             getMoodColorUseCase = get(),
             updateMoodColorUseCase = get(),
+            updateMoodColorNameUseCase = get(),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(preferencesRepository = get())
         )

@@ -374,8 +374,19 @@ class EditorViewModel(
             is EditorAction.UpdateMoodColor -> {
                 viewModelScope.launch {
                     try {
-                        Timber.d("Updating mood color: id=${action.moodColorId}, newColor=${action.newColorHex}")
+                        val originalMood = _uiState.value.editingMoodColor
+                        Timber.d("Updating mood color: id=${action.moodColorId}, newMood=${action.newMood}, newColor=${action.newColorHex}")
 
+                        // Update name if changed
+                        if (originalMood != null && originalMood.mood != action.newMood) {
+                            Timber.d("Updating mood name: ${originalMood.mood} -> ${action.newMood}")
+                            editorUseCases.updateMoodColorNameUseCase(
+                                id = action.moodColorId,
+                                newMood = action.newMood
+                            )
+                        }
+
+                        // Update color
                         editorUseCases.updateMoodColorUseCase(
                             id = action.moodColorId,
                             newColor = action.newColorHex
@@ -389,15 +400,22 @@ class EditorViewModel(
                             )
                         }
 
-                        Timber.d("Successfully updated mood color")
+                        Timber.i("Successfully updated mood color: ${action.newMood}")
                         _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar("Mood color updated")
+                            EditorUiEvent.ShowSnackbar("\"${action.newMood}\" updated")
                         )
                     } catch (e: InvalidMoodColorException) {
+                        Timber.w(e, "Invalid mood color update")
+                        _uiEvents.emit(
+                            EditorUiEvent.ShowSnackbar(
+                                message = e.message ?: "Invalid mood"
+                            )
+                        )
+                    } catch (e: Exception) {
                         Timber.e(e, "Failed to update mood color")
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
-                                message = e.message ?: "Couldn't update mood color"
+                                message = "Failed to update: ${e.message}"
                             )
                         )
                     }

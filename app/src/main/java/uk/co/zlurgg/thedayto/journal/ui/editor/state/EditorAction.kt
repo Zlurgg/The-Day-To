@@ -12,7 +12,11 @@ sealed interface EditorAction {
     data class SaveMoodColor(val mood: String, val colorHex: String) : EditorAction
     data class DeleteMoodColor(val moodColor: MoodColor) : EditorAction
     data class EditMoodColor(val moodColor: MoodColor) : EditorAction
-    data class UpdateMoodColor(val moodColorId: Int, val newColorHex: String) : EditorAction
+    data class UpdateMoodColor(
+        val moodColorId: Int,
+        val newMood: String,
+        val newColorHex: String
+    ) : EditorAction
     data object CloseEditMoodColorDialog : EditorAction
     data object DismissEditorTutorial : EditorAction
     data object ToggleDatePicker : EditorAction
