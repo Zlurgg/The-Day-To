@@ -30,17 +30,17 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 import androidx.core.graphics.toColorInt
 
 /**
- * Material3 dialog for editing the color of an existing mood.
- * Mood name is displayed but disabled (not editable) to prevent confusion.
- * Only the color can be changed.
+ * Material3 dialog for editing an existing mood color.
+ * Both the mood name and color can be changed.
  *
  * @param moodColor The mood color to edit
  * @param showDialog Controls dialog visibility
  * @param onDismiss Callback when dialog is dismissed without saving
- * @param onSave Callback when user saves with new color hex
+ * @param onSave Callback when user saves with new mood name and color hex
  * @param modifier Optional modifier for the dialog
  */
 @Composable
@@ -48,11 +48,13 @@ fun EditMoodColorDialog(
     moodColor: MoodColor,
     showDialog: Boolean,
     onDismiss: () -> Unit,
-    onSave: (newColorHex: String) -> Unit,
+    onSave: (newMood: String, newColorHex: String) -> Unit,
     modifier: Modifier = Modifier
 ) {
     if (showDialog) {
-        // Local state - starts with current color
+        // Local state - starts with current values
+        var editedMood by remember(moodColor) { mutableStateOf(moodColor.mood) }
+        var moodError by remember { mutableStateOf<String?>(null) }
         var selectedColor by remember(moodColor) { mutableStateOf(moodColor.color) }
 
         AlertDialog(
@@ -67,10 +69,15 @@ fun EditMoodColorDialog(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    // Mood name field - READ ONLY (grayed out)
+                    // Mood name field - EDITABLE
                     OutlinedTextField(
-                        value = moodColor.mood,
-                        onValueChange = { /* no-op - field is disabled */ },
+                        value = editedMood,
+                        onValueChange = { newValue ->
+                            if (newValue.length <= InputValidation.MAX_MOOD_LENGTH) {
+                                editedMood = newValue
+                                moodError = null
+                            }
+                        },
                         label = {
                             Text(
                                 text = stringResource(R.string.mood),
@@ -78,15 +85,23 @@ fun EditMoodColorDialog(
                             )
                         },
                         singleLine = true,
-                        enabled = false,  // Grayed out, not editable
+                        enabled = true,
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.headlineSmall,
+                        isError = moodError != null,
                         supportingText = {
-                            Text(
-                                text = stringResource(R.string.mood_name_cannot_be_changed),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
+                            when {
+                                moodError != null -> Text(
+                                    text = moodError!!,
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.error
+                                )
+                                else -> Text(
+                                    text = "${editedMood.length}/${InputValidation.MAX_MOOD_LENGTH}",
+                                    style = MaterialTheme.typography.bodySmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
                         }
                     )
 
@@ -122,7 +137,12 @@ fun EditMoodColorDialog(
             confirmButton = {
                 IconButton(
                     onClick = {
-                        onSave(selectedColor)
+                        val trimmedMood = editedMood.trim()
+                        if (trimmedMood.isBlank()) {
+                            moodError = "Mood name cannot be empty"
+                        } else {
+                            onSave(trimmedMood, selectedColor)
+                        }
                     }
                 ) {
                     Icon(

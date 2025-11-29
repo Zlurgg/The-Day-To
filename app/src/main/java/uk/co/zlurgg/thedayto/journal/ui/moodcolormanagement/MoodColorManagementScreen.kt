@@ -132,9 +132,15 @@ fun MoodColorManagementScreenRoot(
             moodColor = moodColor,
             showDialog = true,
             onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissEditMoodColorDialog) },
-            onSave = { newColorHex ->
+            onSave = { newMood, newColorHex ->
                 moodColor.id?.let { id ->
-                    viewModel.onAction(MoodColorManagementAction.SaveEditedMoodColor(id, newColorHex))
+                    viewModel.onAction(
+                        MoodColorManagementAction.SaveEditedMoodColor(
+                            moodColorId = id,
+                            newMood = newMood,
+                            newColorHex = newColorHex
+                        )
+                    )
                 }
             }
         )

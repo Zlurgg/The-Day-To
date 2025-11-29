@@ -302,8 +302,9 @@ private fun EditorScreen(
                 onDismiss = {
                     onAction(EditorAction.CloseEditMoodColorDialog)
                 },
-                onSave = { newColorHex ->
+                onSave = { newMood, newColorHex ->
                     editingMood.id?.let { id ->
+                        // Editor only updates color, name is preserved
                         onAction(EditorAction.UpdateMoodColor(id, newColorHex))
                     }
                 }

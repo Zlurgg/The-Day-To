@@ -4,6 +4,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEn
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 
 /**
@@ -14,6 +15,7 @@ data class MoodColorManagementUseCases(
     val getMoodColors: GetMoodColorsUseCase,
     val addMoodColor: AddMoodColorUseCase,
     val updateMoodColor: UpdateMoodColorUseCase,
+    val updateMoodColorName: UpdateMoodColorNameUseCase,
     val deleteMoodColor: DeleteMoodColorUseCase,
     val getMoodColorEntryCounts: GetMoodColorEntryCountsUseCase
 )

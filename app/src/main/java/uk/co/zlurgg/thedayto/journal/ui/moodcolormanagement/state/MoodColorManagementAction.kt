@@ -24,7 +24,11 @@ sealed interface MoodColorManagementAction {
     // Edit dialog actions
     data class ShowEditMoodColorDialog(val moodColor: MoodColor) : MoodColorManagementAction
     data object DismissEditMoodColorDialog : MoodColorManagementAction
-    data class SaveEditedMoodColor(val moodColorId: Int, val newColorHex: String) : MoodColorManagementAction
+    data class SaveEditedMoodColor(
+        val moodColorId: Int,
+        val newMood: String,
+        val newColorHex: String
+    ) : MoodColorManagementAction
 
     // Error handling
     data object RetryLoadMoodColors : MoodColorManagementAction
