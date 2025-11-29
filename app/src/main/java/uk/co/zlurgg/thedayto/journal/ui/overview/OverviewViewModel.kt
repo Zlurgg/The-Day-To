@@ -167,6 +167,16 @@ class OverviewViewModel(
     }
 
     /**
+     * Called when the screen resumes.
+     *
+     * Refreshes the greeting in case the time period has changed
+     * (e.g., morning to afternoon) while the user was away.
+     */
+    fun onScreenResumed() {
+        updateGreeting()
+    }
+
+    /**
      * Called when notification permission is granted.
      *
      * Updates permission status and keeps settings dialog open so user can
