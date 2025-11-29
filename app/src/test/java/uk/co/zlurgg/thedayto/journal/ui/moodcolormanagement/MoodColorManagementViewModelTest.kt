@@ -23,6 +23,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEn
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
@@ -69,6 +70,7 @@ class MoodColorManagementViewModelTest {
             getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
             addMoodColor = AddMoodColorUseCase(fakeMoodColorRepository),
             updateMoodColor = UpdateMoodColorUseCase(fakeMoodColorRepository),
+            updateMoodColorName = UpdateMoodColorNameUseCase(fakeMoodColorRepository),
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             getMoodColorEntryCounts = GetMoodColorEntryCountsUseCase(fakeEntryRepository)
         )
@@ -405,8 +407,14 @@ class MoodColorManagementViewModelTest {
 
         // Collect events
         viewModel.uiEvents.test {
-            // When: Saving edited color
-            viewModel.onAction(MoodColorManagementAction.SaveEditedMoodColor(1, "FF5722"))
+            // When: Saving edited color (keeping same name)
+            viewModel.onAction(
+                MoodColorManagementAction.SaveEditedMoodColor(
+                    moodColorId = 1,
+                    newMood = "Happy",
+                    newColorHex = "FF5722"
+                )
+            )
 
             // Then: Should emit snackbar
             val event = awaitItem()
@@ -424,6 +432,108 @@ class MoodColorManagementViewModelTest {
         val state = viewModel.uiState.value
         val updatedMood = state.moodColorsWithCount.find { it.moodColor.mood == "Happy" }
         assertEquals("Color should be updated", "FF5722", updatedMood?.moodColor?.color)
+    }
+
+    @Test
+    fun `saveEditedMoodColor - updates mood name and color`() = runTest {
+        // Given: ViewModel with mood color
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
+        fakeMoodColorRepository.insertMoodColor(mood1)
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
+
+        // Collect events
+        viewModel.uiEvents.test {
+            // When: Saving with new name and color
+            viewModel.onAction(
+                MoodColorManagementAction.SaveEditedMoodColor(
+                    moodColorId = 1,
+                    newMood = "Joyful",
+                    newColorHex = "FF5722"
+                )
+            )
+
+            // Then: Should emit snackbar with new name
+            val event = awaitItem()
+            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
+            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
+            assertTrue("Message should contain new name", snackbarEvent.message.contains("Joyful"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // Then: Name and color should be updated in list
+        val state = viewModel.uiState.value
+        val updatedMood = state.moodColorsWithCount.find { it.moodColor.id == 1 }
+        assertEquals("Name should be updated", "Joyful", updatedMood?.moodColor?.mood)
+        assertEquals("Color should be updated", "FF5722", updatedMood?.moodColor?.color)
+    }
+
+    @Test
+    fun `saveEditedMoodColor - shows error for duplicate name`() = runTest {
+        // Given: ViewModel with two mood colors
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
+        val mood2 = TestDataBuilders.createMoodColor(mood = "Sad", color = "2196F3", id = 2)
+        fakeMoodColorRepository.insertMoodColor(mood1)
+        fakeMoodColorRepository.insertMoodColor(mood2)
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood2))
+
+        // Collect events
+        viewModel.uiEvents.test {
+            // When: Trying to rename Sad to Happy (duplicate)
+            viewModel.onAction(
+                MoodColorManagementAction.SaveEditedMoodColor(
+                    moodColorId = 2,
+                    newMood = "Happy",
+                    newColorHex = "2196F3"
+                )
+            )
+
+            // Then: Should emit error snackbar
+            val event = awaitItem()
+            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
+            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
+            assertTrue("Message should mention exists", snackbarEvent.message.contains("exists"))
+
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Original name should be preserved
+        val sadMood = fakeMoodColorRepository.getMoodColorById(2)
+        assertEquals("Name should be unchanged", "Sad", sadMood?.mood)
+    }
+
+    @Test
+    fun `saveEditedMoodColor - shows error for blank name`() = runTest {
+        // Given: ViewModel with mood color
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
+        fakeMoodColorRepository.insertMoodColor(mood1)
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
+
+        // Collect events
+        viewModel.uiEvents.test {
+            // When: Trying to save with blank name
+            viewModel.onAction(
+                MoodColorManagementAction.SaveEditedMoodColor(
+                    moodColorId = 1,
+                    newMood = "   ",
+                    newColorHex = "4CAF50"
+                )
+            )
+
+            // Then: Should emit error snackbar
+            val event = awaitItem()
+            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
+            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
+            assertTrue(
+                "Message should mention empty or invalid",
+                snackbarEvent.message.contains("empty") || snackbarEvent.message.contains("Invalid")
+            )
+
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 
     // ============================================================

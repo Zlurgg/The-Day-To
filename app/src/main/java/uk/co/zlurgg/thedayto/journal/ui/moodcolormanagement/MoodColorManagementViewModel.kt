@@ -168,12 +168,32 @@ class MoodColorManagementViewModel(
             is MoodColorManagementAction.SaveEditedMoodColor -> {
                 viewModelScope.launch {
                     try {
+                        val originalMood = _uiState.value.editingMoodColor
+
+                        // Update name if changed
+                        if (originalMood != null && originalMood.mood != action.newMood) {
+                            Timber.d("Updating mood name: ${originalMood.mood} -> ${action.newMood}")
+                            moodColorManagementUseCases.updateMoodColorName(
+                                action.moodColorId,
+                                action.newMood
+                            )
+                        }
+
+                        // Update color
                         moodColorManagementUseCases.updateMoodColor(action.moodColorId, action.newColorHex)
-                        val moodName = _uiState.value.editingMoodColor?.mood ?: "Mood"
+
                         _uiState.update { it.copy(editingMoodColor = null) }
                         _uiEvents.emit(
                             MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "\"$moodName\" updated"
+                                message = "\"${action.newMood}\" updated"
+                            )
+                        )
+                        Timber.i("Successfully updated mood color: ${action.newMood}")
+                    } catch (e: InvalidMoodColorException) {
+                        Timber.w(e, "Invalid mood color update")
+                        _uiEvents.emit(
+                            MoodColorManagementUiEvent.ShowSnackbar(
+                                message = e.message ?: "Invalid mood"
                             )
                         )
                     } catch (e: Exception) {

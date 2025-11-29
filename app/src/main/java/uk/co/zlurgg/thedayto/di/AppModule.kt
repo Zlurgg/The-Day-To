@@ -39,6 +39,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
@@ -203,6 +204,7 @@ val appModule = module {
     single { GetMoodColorUseCase(repository = get()) }
     single { AddMoodColorUseCase(repository = get()) }
     single { UpdateMoodColorUseCase(repository = get()) }
+    single { UpdateMoodColorNameUseCase(repository = get()) }
     single { DeleteMoodColorUseCase(repository = get()) }
     single { SeedDefaultMoodColorsUseCase(moodColorRepository = get(), preferencesRepository = get()) }
 
@@ -215,6 +217,7 @@ val appModule = module {
             getMoodColors = get(),
             addMoodColor = get(),
             updateMoodColor = get(),
+            updateMoodColorName = get(),
             deleteMoodColor = get(),
             getMoodColorEntryCounts = get()
         )
