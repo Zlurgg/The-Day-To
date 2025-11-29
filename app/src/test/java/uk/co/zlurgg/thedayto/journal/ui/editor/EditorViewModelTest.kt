@@ -31,6 +31,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -90,6 +91,7 @@ class EditorViewModelTest {
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
             updateMoodColorUseCase = UpdateMoodColorUseCase(fakeMoodColorRepository),
+            updateMoodColorNameUseCase = UpdateMoodColorNameUseCase(fakeMoodColorRepository),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository)
         )
@@ -789,13 +791,14 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.UpdateMoodColor(
                 moodColorId = originalMood.id!!,
+                newMood = originalMood.mood, // Keep same name
                 newColorHex = newColor
             ))
 
             // Then: Success event should be emitted
             val event = awaitItem()
             assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertEquals("Should show success message", "Mood color updated", (event as EditorUiEvent.ShowSnackbar).message)
+            assertTrue("Should show success message", (event as EditorUiEvent.ShowSnackbar).message.contains("updated"))
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -813,6 +816,38 @@ class EditorViewModelTest {
     }
 
     @Test
+    fun `UpdateMoodColor action updates mood name and color`() = runTest {
+        viewModel = createViewModel()
+
+        // Given: A mood color to update with edit dialog open
+        val originalMood = fakeMoodColorRepository.getMoodColorById(1)!!
+        viewModel.onAction(EditorAction.EditMoodColor(originalMood))
+
+        val newMood = "Joyful"
+        val newColor = "00FF00"
+
+        // When: Mood name and color are updated
+        viewModel.uiEvents.test {
+            viewModel.onAction(EditorAction.UpdateMoodColor(
+                moodColorId = originalMood.id!!,
+                newMood = newMood,
+                newColorHex = newColor
+            ))
+
+            // Then: Success event should be emitted with new name
+            val event = awaitItem()
+            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
+            assertTrue("Should contain new name", (event as EditorUiEvent.ShowSnackbar).message.contains(newMood))
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Both name and color should be updated in repository
+        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!)!!
+        assertEquals("Name should be updated", newMood, updated.mood)
+        assertEquals("Color should be updated", newColor, updated.color)
+    }
+
+    @Test
     fun `UpdateMoodColor action emits error for invalid mood color`() = runTest {
         viewModel = createViewModel()
 
@@ -820,6 +855,7 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.UpdateMoodColor(
                 moodColorId = 999, // Non-existent
+                newMood = "Test",
                 newColorHex = "FF0000"
             ))
 

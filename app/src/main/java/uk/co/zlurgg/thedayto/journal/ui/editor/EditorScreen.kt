@@ -304,8 +304,13 @@ private fun EditorScreen(
                 },
                 onSave = { newMood, newColorHex ->
                     editingMood.id?.let { id ->
-                        // Editor only updates color, name is preserved
-                        onAction(EditorAction.UpdateMoodColor(id, newColorHex))
+                        onAction(
+                            EditorAction.UpdateMoodColor(
+                                moodColorId = id,
+                                newMood = newMood,
+                                newColorHex = newColorHex
+                            )
+                        )
                     }
                 }
             )
