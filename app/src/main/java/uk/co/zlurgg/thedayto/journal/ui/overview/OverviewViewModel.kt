@@ -74,9 +74,15 @@ class OverviewViewModel(
                 }
             } else {
                 Timber.d("No update available or update dismissed")
-                // For manual check, show message if no update
+                // For manual check, show "Up to Date" dialog with current version info
                 if (forceCheck) {
-                    _uiEvents.emit(OverviewUiEvent.ShowSnackbar("You're on the latest version"))
+                    val currentVersionInfo = overviewUseCases.getCurrentVersionInfo()
+                    _uiState.update {
+                        it.copy(
+                            currentVersionInfo = currentVersionInfo,
+                            showUpToDateDialog = true
+                        )
+                    }
                 }
             }
         }
@@ -246,71 +252,54 @@ class OverviewViewModel(
                 getEntries(_uiState.value.entryOrder)
             }
 
-            is OverviewAction.DeleteEntry -> {
+            is OverviewAction.RequestDeleteEntry -> {
+                Timber.d("Delete requested for entry: ${action.entry.id}")
+                _uiState.update {
+                    it.copy(
+                        showDeleteConfirmDialog = true,
+                        entryToDelete = action.entry
+                    )
+                }
+            }
+
+            is OverviewAction.ConfirmDeleteEntry -> {
                 viewModelScope.launch {
+                    val entry = _uiState.value.entryToDelete ?: return@launch
+                    Timber.d("Confirming delete for entry: ${entry.id}")
+
+                    // Close dialog first
+                    _uiState.update {
+                        it.copy(showDeleteConfirmDialog = false, entryToDelete = null)
+                    }
+
                     val loadingJob = launchDebouncedLoading { isLoading ->
                         _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
                     try {
-                        overviewUseCases.deleteEntry(action.entry.toEntry())
-                        loadingJob.cancel()
-                        _uiState.update {
-                            it.copy(
-                                recentlyDeletedEntry = action.entry,
-                                isLoading = false
-                            )
-                        }
-                        // Show snackbar with undo option
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted", actionLabel = "Undo"))
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to delete entry")
+                        overviewUseCases.deleteEntry(entry.toEntry())
                         loadingJob.cancel()
                         _uiState.update { it.copy(isLoading = false) }
-                        // Refresh entries to restore the entry in UI (since delete failed)
-                        getEntries(_uiState.value.entryOrder)
+                        Timber.i("Entry deleted successfully: ${entry.id}")
+                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
+                    } catch (e: Exception) {
+                        Timber.e(e, "Failed to delete entry: ${entry.id}")
+                        loadingJob.cancel()
+                        _uiState.update { it.copy(isLoading = false) }
                         _uiEvents.emit(
                             OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to delete entry: ${e.message}"
+                                message = "Failed to delete: ${e.message}"
                             )
                         )
                     }
                 }
             }
 
-            is OverviewAction.RestoreEntry -> {
-                viewModelScope.launch {
-                    val deletedEntry = _uiState.value.recentlyDeletedEntry ?: return@launch
-                    val loadingJob = launchDebouncedLoading { isLoading ->
-                        _uiState.update { it.copy(isLoading = isLoading) }
-                    }
-
-                    try {
-                        overviewUseCases.restoreEntry(deletedEntry.toEntry())
-                        loadingJob.cancel()
-                        _uiState.update {
-                            it.copy(
-                                recentlyDeletedEntry = null,
-                                isLoading = false
-                            )
-                        }
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry restored"))
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to restore entry")
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        // Keep recentlyDeletedEntry so user can try again
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to restore entry: ${e.message}"
-                            )
-                        )
-                    }
+            is OverviewAction.CancelDeleteEntry -> {
+                Timber.d("Delete cancelled by user")
+                _uiState.update {
+                    it.copy(showDeleteConfirmDialog = false, entryToDelete = null)
                 }
-            }
-
-            is OverviewAction.ClearRecentlyDeleted -> {
-                _uiState.update { it.copy(recentlyDeletedEntry = null) }
             }
 
             is OverviewAction.RetryLoadEntries -> {
@@ -493,6 +482,15 @@ class OverviewViewModel(
                             availableUpdate = null
                         )
                     }
+                }
+            }
+
+            is OverviewAction.DismissUpToDate -> {
+                _uiState.update {
+                    it.copy(
+                        showUpToDateDialog = false,
+                        currentVersionInfo = null
+                    )
                 }
             }
         }

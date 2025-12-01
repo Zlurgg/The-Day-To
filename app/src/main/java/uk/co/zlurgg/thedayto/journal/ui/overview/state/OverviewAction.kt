@@ -5,9 +5,12 @@ import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 
 sealed interface OverviewAction {
     data class Order(val entryOrder: EntryOrder) : OverviewAction
-    data class DeleteEntry(val entry: EntryWithMoodColor) : OverviewAction
-    data object RestoreEntry : OverviewAction
-    data object ClearRecentlyDeleted : OverviewAction
+
+    // Delete entry actions (confirmation dialog flow)
+    data class RequestDeleteEntry(val entry: EntryWithMoodColor) : OverviewAction
+    data object ConfirmDeleteEntry : OverviewAction
+    data object CancelDeleteEntry : OverviewAction
+
     data object RetryLoadEntries : OverviewAction
     data object DismissLoadError : OverviewAction
 
@@ -34,4 +37,5 @@ sealed interface OverviewAction {
     data object CheckForUpdates : OverviewAction
     data object DownloadUpdate : OverviewAction
     data object DismissUpdate : OverviewAction
+    data object DismissUpToDate : OverviewAction
 }

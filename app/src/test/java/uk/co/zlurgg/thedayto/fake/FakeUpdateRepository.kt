@@ -10,6 +10,7 @@ import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 class FakeUpdateRepository : UpdateRepository {
 
     private var latestReleaseResult: Result<UpdateInfo>? = null
+    private var releaseByVersionResults = mutableMapOf<String, Result<UpdateInfo>>()
     private var downloadedApks = mutableListOf<Pair<String, String>>()
     private var installedDownloadIds = mutableListOf<Long>()
     private var nextDownloadId = 1L
@@ -29,6 +30,20 @@ class FakeUpdateRepository : UpdateRepository {
     }
 
     /**
+     * Sets the result to return from getReleaseByVersion() for a specific version.
+     */
+    fun setReleaseByVersion(version: String, result: Result<UpdateInfo>) {
+        releaseByVersionResults[version] = result
+    }
+
+    /**
+     * Helper to set a successful release response for a specific version.
+     */
+    fun setReleaseInfo(version: String, updateInfo: UpdateInfo) {
+        releaseByVersionResults[version] = Result.success(updateInfo)
+    }
+
+    /**
      * Helper to simulate network error.
      */
     fun setNetworkError(exception: Exception = Exception("Network error")) {
@@ -37,6 +52,15 @@ class FakeUpdateRepository : UpdateRepository {
 
     override suspend fun getLatestRelease(): Result<UpdateInfo> {
         return latestReleaseResult ?: Result.failure(Exception("No result set"))
+    }
+
+    override suspend fun getReleaseByVersion(version: String): Result<UpdateInfo> {
+        // Check both with and without "v" prefix
+        val normalizedVersion = version.removePrefix("v")
+        return releaseByVersionResults[version]
+            ?: releaseByVersionResults["v$normalizedVersion"]
+            ?: releaseByVersionResults[normalizedVersion]
+            ?: Result.failure(Exception("No release found for version $version"))
     }
 
     override fun downloadApk(url: String, fileName: String): Long {
@@ -63,6 +87,7 @@ class FakeUpdateRepository : UpdateRepository {
      */
     fun reset() {
         latestReleaseResult = null
+        releaseByVersionResults.clear()
         downloadedApks.clear()
         installedDownloadIds.clear()
         nextDownloadId = 1L

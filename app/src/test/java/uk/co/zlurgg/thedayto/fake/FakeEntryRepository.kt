@@ -24,6 +24,9 @@ class FakeEntryRepository(
     private val _entries = MutableStateFlow<List<Entry>>(emptyList())
     private var nextId = 1
 
+    /** Set to true to make deleteEntry throw an exception (for error handling tests) */
+    var shouldThrowOnDelete = false
+
     override fun getEntries(): Flow<List<Entry>> = _entries
 
     override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> {
@@ -128,6 +131,9 @@ class FakeEntryRepository(
     }
 
     override suspend fun deleteEntry(entry: Entry) {
+        if (shouldThrowOnDelete) {
+            throw RuntimeException("Test: simulated delete failure")
+        }
         val currentList = _entries.value.toMutableList()
         currentList.removeIf { it.id == entry.id }
         _entries.value = currentList
@@ -153,6 +159,7 @@ class FakeEntryRepository(
     fun reset() {
         _entries.value = emptyList()
         nextId = 1
+        shouldThrowOnDelete = false
     }
 
     /**
