@@ -14,6 +14,7 @@ import kotlinx.coroutines.test.setMain
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
@@ -848,21 +849,22 @@ class EditorViewModelTest {
     }
 
     @Test
-    fun `UpdateMoodColor action emits error for invalid mood color`() = runTest {
+    fun `UpdateMoodColor action sets inline error for invalid mood color`() = runTest {
         viewModel = createViewModel()
 
-        // When: Updating with invalid ID (collect events first)
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.UpdateMoodColor(
-                moodColorId = 999, // Non-existent
-                newMood = "Test",
-                newColorHex = "FF0000"
-            ))
+        // When: Updating with invalid ID
+        viewModel.onAction(EditorAction.UpdateMoodColor(
+            moodColorId = 999, // Non-existent
+            newMood = "Test",
+            newColorHex = "FF0000"
+        ))
 
-            // Then: Error event should be emitted
-            val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertTrue("Should contain error message", (event as EditorUiEvent.ShowSnackbar).message.isNotEmpty())
+        // Then: Error should be set in state (inline error display)
+        testScheduler.advanceUntilIdle()
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertNotNull("editMoodColorError should be set", state.editMoodColorError)
+            assertTrue("Error message should not be empty", state.editMoodColorError!!.isNotEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }

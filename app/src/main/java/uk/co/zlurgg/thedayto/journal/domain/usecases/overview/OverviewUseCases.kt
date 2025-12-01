@@ -12,6 +12,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDate
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
 
 data class OverviewUseCases(
     val getEntries: GetEntriesUseCase,
@@ -32,5 +33,6 @@ data class OverviewUseCases(
     val setupDailyNotification: SetupDailyNotificationUseCase,
     val checkForUpdate: CheckForUpdateUseCase,
     val dismissUpdate: DismissUpdateUseCase,
-    val downloadUpdate: DownloadUpdateUseCase
+    val downloadUpdate: DownloadUpdateUseCase,
+    val getCurrentVersionInfo: GetCurrentVersionInfoUseCase
 )

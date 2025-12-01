@@ -18,6 +18,7 @@ sealed interface EditorAction {
         val newColorHex: String
     ) : EditorAction
     data object CloseEditMoodColorDialog : EditorAction
+    data object ClearEditMoodColorError : EditorAction
     data object DismissEditorTutorial : EditorAction
     data object ToggleDatePicker : EditorAction
     data object SaveEntry : EditorAction

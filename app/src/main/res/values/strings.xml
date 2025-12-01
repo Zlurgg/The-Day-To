@@ -194,6 +194,15 @@
 
     <!-- Update Checker -->
     <string name="check_for_updates">Check for Updates</string>
+    <string name="update_available_title">Update Available</string>
+    <string name="update_version_label">Version</string>
+    <string name="update_whats_new_label">What\'s New</string>
+    <string name="update_download_button">Download</string>
+    <string name="update_not_now_button">Not Now</string>
+    <string name="update_up_to_date_title">You\'re Up to Date</string>
+    <string name="update_current_version_label">Current Version</string>
+    <string name="update_in_this_version_label">In This Version</string>
+    <string name="update_ok_button">OK</string>
 
     <!-- About Dialog -->
     <string name="about_dialog_title">About The Day To</string>

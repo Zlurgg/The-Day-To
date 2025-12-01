@@ -74,9 +74,15 @@ class OverviewViewModel(
                 }
             } else {
                 Timber.d("No update available or update dismissed")
-                // For manual check, show message if no update
+                // For manual check, show "Up to Date" dialog with current version info
                 if (forceCheck) {
-                    _uiEvents.emit(OverviewUiEvent.ShowSnackbar("You're on the latest version"))
+                    val currentVersionInfo = overviewUseCases.getCurrentVersionInfo()
+                    _uiState.update {
+                        it.copy(
+                            currentVersionInfo = currentVersionInfo,
+                            showUpToDateDialog = true
+                        )
+                    }
                 }
             }
         }
@@ -493,6 +499,15 @@ class OverviewViewModel(
                             availableUpdate = null
                         )
                     }
+                }
+            }
+
+            is OverviewAction.DismissUpToDate -> {
+                _uiState.update {
+                    it.copy(
+                        showUpToDateDialog = false,
+                        currentVersionInfo = null
+                    )
                 }
             }
         }

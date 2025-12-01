@@ -21,6 +21,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDate
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
 
 private const val DEFAULT_CURRENT_VERSION = "1.0.0"
 
@@ -70,6 +71,10 @@ fun createFakeOverviewUseCases(
     )
     val dismissUpdate = DismissUpdateUseCase(preferencesRepository)
     val downloadUpdate = DownloadUpdateUseCase(updateRepository)
+    val getCurrentVersionInfo = GetCurrentVersionInfoUseCase(
+        updateRepository = updateRepository,
+        currentVersion = currentVersion
+    )
 
     return OverviewUseCases(
         getEntries = getEntries,
@@ -90,6 +95,7 @@ fun createFakeOverviewUseCases(
         setupDailyNotification = setupDailyNotification,
         checkForUpdate = checkForUpdate,
         dismissUpdate = dismissUpdate,
-        downloadUpdate = downloadUpdate
+        downloadUpdate = downloadUpdate,
+        getCurrentVersionInfo = getCurrentVersionInfo
     )
 }
