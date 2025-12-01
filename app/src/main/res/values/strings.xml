@@ -25,6 +25,7 @@
     <string name="create_new_mood_color">Create new mood color</string>
     <string name="edit_mood_color">Edit Mood Color</string>
     <string name="edit_mood_color_button">Edit mood color</string>
+    <string name="mood_name_cannot_be_empty">Mood name cannot be empty</string>
     <string name="mood_color_updated">Mood color updated</string>
     <string name="cancel_mood_color_creation">Cancel mood color creation</string>
     <string name="empty_mood_list_message">No mood colors yet. Tap the + button to create one!</string>
