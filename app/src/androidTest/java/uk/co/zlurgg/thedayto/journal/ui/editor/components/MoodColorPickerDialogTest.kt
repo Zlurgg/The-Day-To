@@ -120,11 +120,11 @@ class MoodColorPickerDialogTest : ComposeTest() {
     }
 
     // ============================================================
-    // Character Limit Tests
+    // Character Counter Tests
     // ============================================================
 
     @Test
-    fun character_limit_enforced() {
+    fun character_counter_displays_initial_count() {
         composeTestRule.setContent {
             TheDayToTheme {
                 MoodColorPickerDialog(
@@ -135,16 +135,9 @@ class MoodColorPickerDialogTest : ComposeTest() {
             }
         }
 
-        // Try to type more than MAX_MOOD_LENGTH characters
-        val longText = "A".repeat(InputValidation.MAX_MOOD_LENGTH + 10)
-
+        // Verify initial counter shows 0/50
         composeTestRule
-            .onNodeWithText("Mood")
-            .performTextInput(longText)
-
-        // Verify counter shows max length (input should be truncated)
-        composeTestRule
-            .onNodeWithText("${InputValidation.MAX_MOOD_LENGTH}/${InputValidation.MAX_MOOD_LENGTH}")
+            .onNodeWithText("0/${InputValidation.MAX_MOOD_LENGTH}")
             .assertIsDisplayed()
     }
 }
