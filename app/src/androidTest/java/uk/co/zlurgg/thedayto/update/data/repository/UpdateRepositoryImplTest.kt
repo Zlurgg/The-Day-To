@@ -2,7 +2,6 @@ package uk.co.zlurgg.thedayto.update.data.repository
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.mockk.coEvery
-import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
