@@ -362,6 +362,7 @@ private fun OverviewScreen(
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
                     onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
                     isLoading = uiState.isLoading,
+                    entryPendingDelete = uiState.entryToDelete,
                     onCreateEntry = { onNavigateToEntry(null, null) },
                     modifier = Modifier.fillMaxWidth()
                 )

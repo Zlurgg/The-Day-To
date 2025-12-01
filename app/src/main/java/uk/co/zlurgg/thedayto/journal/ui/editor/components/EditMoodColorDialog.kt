@@ -53,10 +53,10 @@ fun EditMoodColorDialog(
     moodColor: MoodColor,
     showDialog: Boolean,
     onDismiss: () -> Unit,
+    modifier: Modifier = Modifier,
     onSave: (newMood: String, newColorHex: String) -> Unit,
     externalError: String? = null,
     onErrorCleared: () -> Unit = {},
-    modifier: Modifier = Modifier
 ) {
     if (showDialog) {
         // Local state - starts with current values

@@ -51,6 +51,7 @@ fun EntriesListSection(
     onEntryClick: (entryId: Int?) -> Unit,
     onDeleteEntry: (EntryWithMoodColor) -> Unit,
     isLoading: Boolean,
+    entryPendingDelete: EntryWithMoodColor?,
     modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
 ) {
@@ -84,18 +85,23 @@ fun EntriesListSection(
             // Render entries with swipe-to-delete (confirmation dialog)
             localEntries.forEach { entry ->
                 key(entry.id) {
-                    val dismissState = rememberSwipeToDismissBoxState(
-                        confirmValueChange = { dismissValue ->
-                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
-                                // Trigger confirmation dialog instead of immediate deletion
-                                onDeleteEntry(entry)
-                                // Return false to snap back - entry stays visible until confirmed
-                                false
-                            } else {
-                                true
-                            }
+                    val dismissState = rememberSwipeToDismissBoxState()
+
+                    // Trigger delete dialog when swipe completes
+                    LaunchedEffect(dismissState.currentValue) {
+                        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                            onDeleteEntry(entry)
                         }
-                    )
+                    }
+
+                    // Reset swipe position when user cancels the delete dialog
+                    LaunchedEffect(entryPendingDelete) {
+                        if (entryPendingDelete == null &&
+                            dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
+                        ) {
+                            dismissState.reset()
+                        }
+                    }
 
                     SwipeToDismissBox(
                         state = dismissState,
@@ -166,7 +172,8 @@ private fun EntriesListSectionPreview() {
             onOrderChange = {},
             onEntryClick = {},
             onDeleteEntry = {},
-            isLoading = false
+            isLoading = false,
+            entryPendingDelete = null
         )
     }
 }
@@ -181,7 +188,8 @@ private fun EntriesListSectionEmptyPreview() {
             onOrderChange = {},
             onEntryClick = {},
             onDeleteEntry = {},
-            isLoading = false
+            isLoading = false,
+            entryPendingDelete = null
         )
     }
 }
