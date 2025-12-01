@@ -57,6 +57,9 @@ fun EditMoodColorDialog(
         var moodError by remember { mutableStateOf<String?>(null) }
         var selectedColor by remember(moodColor) { mutableStateOf(moodColor.color) }
 
+        // Capture string resource for use in onClick callback
+        val emptyMoodError = stringResource(R.string.mood_name_cannot_be_empty)
+
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
@@ -139,7 +142,7 @@ fun EditMoodColorDialog(
                     onClick = {
                         val trimmedMood = editedMood.trim()
                         if (trimmedMood.isBlank()) {
-                            moodError = "Mood name cannot be empty"
+                            moodError = emptyMoodError
                         } else {
                             onSave(trimmedMood, selectedColor)
                         }
