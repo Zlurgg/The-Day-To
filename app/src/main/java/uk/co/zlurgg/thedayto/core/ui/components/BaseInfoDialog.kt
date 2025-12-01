@@ -13,6 +13,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Reusable base dialog for informational content
@@ -68,4 +71,22 @@ fun BaseInfoDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         modifier = modifier.padding(paddingMedium)
     )
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun BaseInfoDialogPreview() {
+    TheDayToTheme {
+        BaseInfoDialog(
+            title = "Sample Dialog",
+            buttonText = "Got It",
+            onDismiss = {}
+        ) {
+            Text(
+                text = "This is sample content for the dialog preview.",
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+    }
 }

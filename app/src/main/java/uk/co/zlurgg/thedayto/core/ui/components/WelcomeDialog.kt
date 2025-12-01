@@ -9,6 +9,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Welcome dialog for first-time users
@@ -49,6 +52,17 @@ fun WelcomeDialog(
         DialogContentSection(
             title = stringResource(R.string.welcome_dialog_privacy_title),
             content = stringResource(R.string.welcome_dialog_privacy_info)
+        )
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun WelcomeDialogPreview() {
+    TheDayToTheme {
+        WelcomeDialog(
+            onDismiss = {}
         )
     }
 }

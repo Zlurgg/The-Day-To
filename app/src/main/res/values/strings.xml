@@ -166,6 +166,8 @@
     <string name="stats_days_logged_label">Days Logged</string>
     <string name="stats_days_in_month_label">Days in Month</string>
     <string name="stats_card_description">View detailed statistics</string>
+    <string name="stats_card_header_icon">Statistics category icon</string>
+    <string name="view_more_stats">View more statistics</string>
 
     <!-- Stats Screen -->
     <string name="stats_navigate_back">Navigate back</string>

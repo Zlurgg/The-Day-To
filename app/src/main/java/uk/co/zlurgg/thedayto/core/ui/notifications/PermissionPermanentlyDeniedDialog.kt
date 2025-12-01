@@ -6,6 +6,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import uk.co.zlurgg.thedayto.R
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Dialog shown when notification permission is permanently denied.
@@ -38,4 +41,16 @@ fun PermissionPermanentlyDeniedDialog(
             }
         }
     )
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun PermissionPermanentlyDeniedDialogPreview() {
+    TheDayToTheme {
+        PermissionPermanentlyDeniedDialog(
+            onDismiss = {},
+            onOpenSettings = {}
+        )
+    }
 }
