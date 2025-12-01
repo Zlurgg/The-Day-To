@@ -23,7 +23,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -72,14 +72,9 @@ fun EntriesListSection(
             EmptyState(onCreateEntry = onCreateEntry)
         } else {
             // Create local mutable state list from Flow entries
+            // Recreated when entries change (remember key)
             val localEntries = remember(entries) {
                 entries.toMutableStateList()
-            }
-
-            // Sync local list with Flow updates
-            LaunchedEffect(entries) {
-                localEntries.clear()
-                localEntries.addAll(entries)
             }
 
             // Render entries with swipe-to-delete (confirmation dialog)
@@ -112,14 +107,14 @@ fun EntriesListSection(
                                 Box(
                                     modifier = Modifier
                                         .fillMaxSize()
-                                        .background(Color(0xFFD32F2F))  // Material Red 700
+                                        .background(MaterialTheme.colorScheme.error)
                                         .padding(horizontal = paddingMedium),
                                     contentAlignment = Alignment.CenterEnd
                                 ) {
                                     Icon(
                                         imageVector = Icons.Default.Delete,
                                         contentDescription = stringResource(R.string.delete_entry),
-                                        tint = Color.White
+                                        tint = MaterialTheme.colorScheme.onError
                                     )
                                 }
                             }

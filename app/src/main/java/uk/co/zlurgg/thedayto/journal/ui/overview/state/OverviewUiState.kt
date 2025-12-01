@@ -15,7 +15,6 @@ data class OverviewUiState(
     // Contains entries for the currently displayed month (filtered at database level)
     val entries: List<EntryWithMoodColor> = emptyList(),
     val entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
-    val entryMade: Boolean = false,
     val isLoading: Boolean = false,
     val loadError: String? = null,
 
