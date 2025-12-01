@@ -9,6 +9,9 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.BaseInfoDialog
 import uk.co.zlurgg.thedayto.core.ui.components.DialogContentSection
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Editor tutorial dialog for first-time entry creation
@@ -47,6 +50,17 @@ fun EditorTutorialDialog(
         DialogContentSection(
             title = stringResource(R.string.editor_tutorial_saving_title),
             content = stringResource(R.string.editor_tutorial_saving_content)
+        )
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EditorTutorialDialogPreview() {
+    TheDayToTheme {
+        EditorTutorialDialog(
+            onDismiss = {}
         )
     }
 }

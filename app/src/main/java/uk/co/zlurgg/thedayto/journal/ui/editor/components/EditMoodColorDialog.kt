@@ -32,6 +32,9 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 import androidx.core.graphics.toColorInt
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Material3 dialog for editing an existing mood color.
@@ -163,6 +166,25 @@ fun EditMoodColorDialog(
                 }
             },
             modifier = modifier
+        )
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EditMoodColorDialogPreview() {
+    TheDayToTheme {
+        EditMoodColorDialog(
+            moodColor = MoodColor(
+                id = 1,
+                mood = "Happy",
+                color = "4CAF50",
+                dateStamp = System.currentTimeMillis()
+            ),
+            showDialog = true,
+            onDismiss = {},
+            onSave = { _, _ -> }
         )
     }
 }

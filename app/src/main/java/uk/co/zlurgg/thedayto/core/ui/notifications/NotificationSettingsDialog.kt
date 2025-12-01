@@ -29,6 +29,9 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMediumSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Notification settings dialog with enable/disable toggle and time picker.
@@ -209,4 +212,37 @@ fun NotificationSettingsDialog(
             }
         }
     )
+}
+
+@Preview(name = "Enabled - Light Mode", showBackground = true)
+@Preview(name = "Enabled - Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun NotificationSettingsDialogEnabledPreview() {
+    TheDayToTheme {
+        NotificationSettingsDialog(
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            hasPermission = true,
+            onDismiss = {},
+            onRequestPermission = {},
+            onSave = { _, _, _ -> }
+        )
+    }
+}
+
+@Preview(name = "Disabled", showBackground = true)
+@Composable
+private fun NotificationSettingsDialogDisabledPreview() {
+    TheDayToTheme {
+        NotificationSettingsDialog(
+            enabled = false,
+            hour = 9,
+            minute = 0,
+            hasPermission = false,
+            onDismiss = {},
+            onRequestPermission = {},
+            onSave = { _, _, _ -> }
+        )
+    }
 }

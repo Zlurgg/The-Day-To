@@ -29,6 +29,9 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Material3 dialog for creating custom mood-color combinations.
@@ -145,6 +148,19 @@ fun MoodColorPickerDialog(
                 }
             },
             modifier = modifier
+        )
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun MoodColorPickerDialogPreview() {
+    TheDayToTheme {
+        MoodColorPickerDialog(
+            showDialog = true,
+            onDismiss = {},
+            onSave = { _, _ -> }
         )
     }
 }

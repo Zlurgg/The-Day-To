@@ -12,6 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
+import uk.co.zlurgg.thedayto.R
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.DateRange
 
 /**
  * Reusable header for stats cards
@@ -35,7 +42,7 @@ fun StatsCardHeader(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
+            contentDescription = stringResource(R.string.stats_card_header_icon),
             tint = MaterialTheme.colorScheme.primary
         )
         Spacer(Modifier.width(8.dp))
@@ -43,6 +50,18 @@ fun StatsCardHeader(
             text = title,
             style = MaterialTheme.typography.titleLarge,
             fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun StatsCardHeaderPreview() {
+    TheDayToTheme {
+        StatsCardHeader(
+            icon = Icons.Default.DateRange,
+            title = "Monthly Stats"
         )
     }
 }

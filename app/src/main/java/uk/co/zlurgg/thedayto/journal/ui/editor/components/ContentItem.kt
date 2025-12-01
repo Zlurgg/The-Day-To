@@ -6,6 +6,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Pure presenter component for content entry field.
@@ -44,4 +47,33 @@ fun ContentItem(
         modifier = modifier
             .fillMaxWidth()
     )
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun ContentItemPreview() {
+    TheDayToTheme {
+        ContentItem(
+            content = "Had a wonderful day today!",
+            hint = "How was your day?",
+            isHintVisible = false,
+            onContentChange = {},
+            onFocusChange = {}
+        )
+    }
+}
+
+@Preview(name = "Empty with Hint", showBackground = true)
+@Composable
+private fun ContentItemEmptyPreview() {
+    TheDayToTheme {
+        ContentItem(
+            content = "",
+            hint = "How was your day?",
+            isHintVisible = true,
+            onContentChange = {},
+            onFocusChange = {}
+        )
+    }
 }

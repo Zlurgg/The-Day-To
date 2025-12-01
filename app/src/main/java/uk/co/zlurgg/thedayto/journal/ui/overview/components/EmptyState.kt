@@ -17,6 +17,9 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
+import android.content.res.Configuration
+import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 @Composable
 fun EmptyState(
@@ -46,5 +49,16 @@ fun EmptyState(
         ) {
             Text(stringResource(R.string.empty_state_create_button))
         }
+    }
+}
+
+@Preview(name = "Light Mode", showBackground = true)
+@Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+private fun EmptyStatePreview() {
+    TheDayToTheme {
+        EmptyState(
+            onCreateEntry = {}
+        )
     }
 }
