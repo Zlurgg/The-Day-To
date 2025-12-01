@@ -44,6 +44,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
  * @param showDialog Controls dialog visibility
  * @param onDismiss Callback when dialog is dismissed without saving
  * @param onSave Callback when user saves with new mood name and color hex
+ * @param externalError External validation error (e.g., duplicate name) to display
+ * @param onErrorCleared Callback when error should be cleared (user starts typing)
  * @param modifier Optional modifier for the dialog
  */
 @Composable
@@ -52,6 +54,8 @@ fun EditMoodColorDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onSave: (newMood: String, newColorHex: String) -> Unit,
+    externalError: String? = null,
+    onErrorCleared: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     if (showDialog) {
@@ -75,6 +79,9 @@ fun EditMoodColorDialog(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                 ) {
+                    // Combined error: external (duplicate name) takes priority over local (empty)
+                    val displayError = externalError ?: moodError
+
                     // Mood name field - EDITABLE
                     OutlinedTextField(
                         value = editedMood,
@@ -82,6 +89,10 @@ fun EditMoodColorDialog(
                             if (newValue.length <= InputValidation.MAX_MOOD_LENGTH) {
                                 editedMood = newValue
                                 moodError = null
+                                // Clear external error when user starts typing
+                                if (externalError != null) {
+                                    onErrorCleared()
+                                }
                             }
                         },
                         label = {
@@ -94,11 +105,11 @@ fun EditMoodColorDialog(
                         enabled = true,
                         modifier = Modifier.fillMaxWidth(),
                         textStyle = MaterialTheme.typography.headlineSmall,
-                        isError = moodError != null,
+                        isError = displayError != null,
                         supportingText = {
                             when {
-                                moodError != null -> Text(
-                                    text = moodError ?: "",
+                                displayError != null -> Text(
+                                    text = displayError,
                                     style = MaterialTheme.typography.bodySmall,
                                     color = MaterialTheme.colorScheme.error
                                 )

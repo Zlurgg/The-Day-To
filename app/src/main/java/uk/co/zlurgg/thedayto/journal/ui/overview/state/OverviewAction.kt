@@ -34,4 +34,5 @@ sealed interface OverviewAction {
     data object CheckForUpdates : OverviewAction
     data object DownloadUpdate : OverviewAction
     data object DismissUpdate : OverviewAction
+    data object DismissUpToDate : OverviewAction
 }

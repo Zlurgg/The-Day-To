@@ -312,6 +312,10 @@ private fun EditorScreen(
                             )
                         )
                     }
+                },
+                externalError = uiState.editMoodColorError,
+                onErrorCleared = {
+                    onAction(EditorAction.ClearEditMoodColorError)
                 }
             )
         }

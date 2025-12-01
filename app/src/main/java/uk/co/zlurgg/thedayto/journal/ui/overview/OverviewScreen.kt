@@ -78,7 +78,9 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
+import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.update.ui.components.UpdateDialog
+import uk.co.zlurgg.thedayto.update.ui.components.UpToDateDialog
 import java.time.LocalDate
 
 /**
@@ -433,6 +435,15 @@ private fun OverviewScreen(
             updateInfo = uiState.availableUpdate,
             onDownload = { onAction(OverviewAction.DownloadUpdate) },
             onDismiss = { onAction(OverviewAction.DismissUpdate) }
+        )
+    }
+
+    // Up to date dialog (shown when user manually checks and is on latest version)
+    if (uiState.showUpToDateDialog) {
+        UpToDateDialog(
+            currentVersionInfo = uiState.currentVersionInfo,
+            currentVersionName = BuildConfig.VERSION_NAME,
+            onDismiss = { onAction(OverviewAction.DismissUpToDate) }
         )
     }
 }

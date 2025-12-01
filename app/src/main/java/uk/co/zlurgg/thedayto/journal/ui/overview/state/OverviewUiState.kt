@@ -41,5 +41,7 @@ data class OverviewUiState(
 
     // Update checker state
     val availableUpdate: UpdateInfo? = null,
-    val showUpdateDialog: Boolean = false
+    val showUpdateDialog: Boolean = false,
+    val currentVersionInfo: UpdateInfo? = null,
+    val showUpToDateDialog: Boolean = false
 )

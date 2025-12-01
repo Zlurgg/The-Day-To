@@ -74,6 +74,7 @@ import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
+import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
 
 private const val GITHUB_API_BASE_URL = "https://api.github.com/"
 private const val NETWORK_TIMEOUT_SECONDS = 30L
@@ -193,7 +194,11 @@ val appModule = module {
                 currentVersion = CURRENT_VERSION
             ),
             dismissUpdate = DismissUpdateUseCase(preferencesRepository = get()),
-            downloadUpdate = DownloadUpdateUseCase(updateRepository = get())
+            downloadUpdate = DownloadUpdateUseCase(updateRepository = get()),
+            getCurrentVersionInfo = GetCurrentVersionInfoUseCase(
+                updateRepository = get(),
+                currentVersion = CURRENT_VERSION
+            )
         )
     }
 

@@ -392,11 +392,12 @@ class EditorViewModel(
                             newColor = action.newColorHex
                         )
 
-                        // Close dialog
+                        // Close dialog and clear any errors
                         _uiState.update {
                             it.copy(
                                 showEditMoodColorDialog = false,
-                                editingMoodColor = null
+                                editingMoodColor = null,
+                                editMoodColorError = null
                             )
                         }
 
@@ -406,11 +407,10 @@ class EditorViewModel(
                         )
                     } catch (e: InvalidMoodColorException) {
                         Timber.w(e, "Invalid mood color update")
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = e.message ?: "Invalid mood"
-                            )
-                        )
+                        // Show inline error in dialog instead of snackbar
+                        _uiState.update {
+                            it.copy(editMoodColorError = e.message ?: "Invalid mood")
+                        }
                     } catch (e: Exception) {
                         Timber.e(e, "Failed to update mood color")
                         _uiEvents.emit(
@@ -427,8 +427,15 @@ class EditorViewModel(
                 _uiState.update {
                     it.copy(
                         showEditMoodColorDialog = false,
-                        editingMoodColor = null
+                        editingMoodColor = null,
+                        editMoodColorError = null
                     )
+                }
+            }
+
+            is EditorAction.ClearEditMoodColorError -> {
+                _uiState.update {
+                    it.copy(editMoodColorError = null)
                 }
             }
 
