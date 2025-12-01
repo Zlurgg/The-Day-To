@@ -91,7 +91,7 @@
     <string name="undo">Undo</string>
 
     <!-- Delete Entry Confirmation Dialog -->
-    <string name="delete_entry_dialog_title">Delete Entry?</string>
+    <string name="delete_entry_dialog_title">Delete Entry</string>
     <string name="delete_entry_dialog_message">Delete your %1$s entry from %2$s?</string>
     <string name="delete_confirm_button">Delete</string>
 
