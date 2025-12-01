@@ -16,9 +16,12 @@ data class OverviewUiState(
     val entries: List<EntryWithMoodColor> = emptyList(),
     val entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     val entryMade: Boolean = false,
-    val recentlyDeletedEntry: EntryWithMoodColor? = null,
     val isLoading: Boolean = false,
     val loadError: String? = null,
+
+    // Delete confirmation dialog state
+    val showDeleteConfirmDialog: Boolean = false,
+    val entryToDelete: EntryWithMoodColor? = null,
 
     // Calendar state - tracks currently displayed month/year
     val displayedMonth: Int = LocalDate.now().monthValue,
@@ -41,5 +44,7 @@ data class OverviewUiState(
 
     // Update checker state
     val availableUpdate: UpdateInfo? = null,
-    val showUpdateDialog: Boolean = false
+    val showUpdateDialog: Boolean = false,
+    val currentVersionInfo: UpdateInfo? = null,
+    val showUpToDateDialog: Boolean = false
 )

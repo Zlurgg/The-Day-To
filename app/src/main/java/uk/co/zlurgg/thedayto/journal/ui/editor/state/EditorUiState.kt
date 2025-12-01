@@ -24,6 +24,7 @@ data class EditorUiState(
     // Edit mood color dialog state
     val showEditMoodColorDialog: Boolean = false,
     val editingMoodColor: MoodColor? = null,
+    val editMoodColorError: String? = null,
 
     // Unsaved changes dialog
     val showUnsavedChangesDialog: Boolean = false,

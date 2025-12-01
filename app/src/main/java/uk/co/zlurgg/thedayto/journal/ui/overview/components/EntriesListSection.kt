@@ -39,9 +39,9 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 /**
  * Section displaying the list of journal entries with sorting controls.
  * Shows empty state when no entries exist for the selected month.
- * Supports swipe-to-delete with undo functionality.
+ * Supports swipe-to-delete with confirmation dialog.
  *
- * @param isLoading Disables swipe gestures during delete/restore operations to prevent race conditions
+ * @param isLoading Disables swipe gestures during delete operations to prevent race conditions
  */
 @Composable
 fun EntriesListSection(
@@ -81,10 +81,21 @@ fun EntriesListSection(
                 localEntries.addAll(entries)
             }
 
-            // Render entries with swipe-to-delete
+            // Render entries with swipe-to-delete (confirmation dialog)
             localEntries.forEach { entry ->
                 key(entry.id) {
-                    val dismissState = rememberSwipeToDismissBoxState()
+                    val dismissState = rememberSwipeToDismissBoxState(
+                        confirmValueChange = { dismissValue ->
+                            if (dismissValue == SwipeToDismissBoxValue.EndToStart) {
+                                // Trigger confirmation dialog instead of immediate deletion
+                                onDeleteEntry(entry)
+                                // Return false to snap back - entry stays visible until confirmed
+                                false
+                            } else {
+                                true
+                            }
+                        }
+                    )
 
                     SwipeToDismissBox(
                         state = dismissState,
@@ -108,16 +119,7 @@ fun EntriesListSection(
                             }
                         },
                         enableDismissFromStartToEnd = false,
-                        enableDismissFromEndToStart = !isLoading,  // Disable swipe during operations
-                        onDismiss = { dismissDirection ->
-                            // Modern Material 3 API - called when swipe completes
-                            if (dismissDirection == SwipeToDismissBoxValue.EndToStart) {
-                                // Remove from local list immediately (instant UI update)
-                                localEntries.remove(entry)
-                                // Trigger database deletion in background
-                                onDeleteEntry(entry)
-                            }
-                        }
+                        enableDismissFromEndToStart = !isLoading  // Disable swipe during operations
                     ) {
                         EntryItem(
                             entry = entry,

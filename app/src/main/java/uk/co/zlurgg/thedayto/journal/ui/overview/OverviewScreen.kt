@@ -33,7 +33,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -71,6 +70,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.util.AndroidSystemUtils
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CalendarSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.CreateEntryReminderDialog
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.DeleteEntryConfirmDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.EntriesListSection
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.OverviewTutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.overview.components.SettingsMenu
@@ -78,7 +78,9 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
+import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.update.ui.components.UpdateDialog
+import uk.co.zlurgg.thedayto.update.ui.components.UpToDateDialog
 import java.time.LocalDate
 
 /**
@@ -115,31 +117,12 @@ fun OverviewScreenRoot(
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is OverviewUiEvent.ShowSnackbar -> {
-                    // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
-                    if (event.actionLabel == "Undo") {
-                        val result = snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.actionLabel,
-                            withDismissAction = false,
-                            duration = SnackbarDuration.Short
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                viewModel.onAction(OverviewAction.RestoreEntry)
-                            }
-                            SnackbarResult.Dismissed -> {
-                                viewModel.onAction(OverviewAction.ClearRecentlyDeleted)
-                            }
-                        }
-                    } else {
-                        // No action needed for non-undo snackbars
-                        snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.actionLabel,
-                            withDismissAction = false,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                    snackbarHostState.showSnackbar(
+                        message = event.message,
+                        actionLabel = event.actionLabel,
+                        withDismissAction = false,
+                        duration = SnackbarDuration.Short
+                    )
                 }
                 is OverviewUiEvent.NavigateToSignIn -> {
                     onNavigateToSignIn()
@@ -377,7 +360,7 @@ private fun OverviewScreen(
                     entryOrder = uiState.entryOrder,
                     onOrderChange = { onAction(OverviewAction.Order(it)) },
                     onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
-                    onDeleteEntry = { entry -> onAction(OverviewAction.DeleteEntry(entry)) },
+                    onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
                     isLoading = uiState.isLoading,
                     onCreateEntry = { onNavigateToEntry(null, null) },
                     modifier = Modifier.fillMaxWidth()
@@ -433,6 +416,24 @@ private fun OverviewScreen(
             updateInfo = uiState.availableUpdate,
             onDownload = { onAction(OverviewAction.DownloadUpdate) },
             onDismiss = { onAction(OverviewAction.DismissUpdate) }
+        )
+    }
+
+    // Up to date dialog (shown when user manually checks and is on latest version)
+    if (uiState.showUpToDateDialog) {
+        UpToDateDialog(
+            currentVersionInfo = uiState.currentVersionInfo,
+            currentVersionName = BuildConfig.VERSION_NAME,
+            onDismiss = { onAction(OverviewAction.DismissUpToDate) }
+        )
+    }
+
+    // Delete entry confirmation dialog
+    if (uiState.showDeleteConfirmDialog && uiState.entryToDelete != null) {
+        DeleteEntryConfirmDialog(
+            entry = uiState.entryToDelete,
+            onConfirm = { onAction(OverviewAction.ConfirmDeleteEntry) },
+            onDismiss = { onAction(OverviewAction.CancelDeleteEntry) }
         )
     }
 }

@@ -397,8 +397,33 @@ class OverviewViewModelTest {
         assertEquals("Order should not change", initialOrder, viewModel.uiState.value.entryOrder)
     }
 
+    // ============================================================
+    // Delete Entry Confirmation Dialog Tests
+    // ============================================================
+
     @Test
-    fun `DeleteEntry action - successfully deletes entry`() = runTest {
+    fun `RequestDeleteEntry action - shows confirmation dialog`() = runTest {
+        // Given: Initial state with no dialog
+        testScheduler.advanceUntilIdle()
+        assertFalse(
+            "Dialog should not be shown initially",
+            viewModel.uiState.value.showDeleteConfirmDialog
+        )
+
+        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
+
+        // When: User swipes to delete (triggers RequestDeleteEntry)
+        viewModel.onAction(OverviewAction.RequestDeleteEntry(entry))
+        testScheduler.advanceUntilIdle()
+
+        // Then: Dialog should be shown with the entry
+        val state = viewModel.uiState.value
+        assertTrue("Dialog should be shown", state.showDeleteConfirmDialog)
+        assertEquals("Entry to delete should be stored", entry, state.entryToDelete)
+    }
+
+    @Test
+    fun `ConfirmDeleteEntry action - deletes entry and shows snackbar`() = runTest {
         // Given: An entry repository with fake data
         val fakeEntryRepo = FakeEntryRepository()
         val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
@@ -412,13 +437,30 @@ class OverviewViewModelTest {
         val testViewModel = OverviewViewModel(useCases)
         testScheduler.advanceUntilIdle()
 
-        // When: User deletes the entry
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
+        // Show confirmation dialog first
+        testViewModel.onAction(OverviewAction.RequestDeleteEntry(entry))
         testScheduler.advanceUntilIdle()
+        assertTrue("Dialog should be shown", testViewModel.uiState.value.showDeleteConfirmDialog)
 
-        // Then: Entry should be stored for undo
+        // When: User confirms deletion
+        testViewModel.uiEvents.test {
+            testViewModel.onAction(OverviewAction.ConfirmDeleteEntry)
+            testScheduler.advanceUntilIdle()
+
+            // Then: Snackbar event should be emitted
+            val event = awaitItem()
+            assertTrue(
+                "Should show snackbar",
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+            )
+            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+            assertEquals("Message should be 'Entry deleted'", "Entry deleted", snackbarEvent.message)
+        }
+
+        // And: Dialog should be dismissed
         val state = testViewModel.uiState.value
-        assertEquals("Recently deleted entry should be stored", entry, state.recentlyDeletedEntry)
+        assertFalse("Dialog should be dismissed", state.showDeleteConfirmDialog)
+        assertEquals("Entry to delete should be cleared", null, state.entryToDelete)
 
         // And: Entry should be removed from repository
         val remainingEntries = fakeEntryRepo.getEntriesSync()
@@ -426,332 +468,97 @@ class OverviewViewModelTest {
     }
 
     @Test
-    fun `DeleteEntry action - shows error on failure`() = runTest {
-        // Given: Entry that doesn't exist in repository
-        // Note: FakeEntryRepository handles gracefully, real scenario would throw
+    fun `ConfirmDeleteEntry action - handles error gracefully`() = runTest {
+        // Given: Entry repository with failing delete
+        val fakeEntryRepo = FakeEntryRepository()
+        fakeEntryRepo.shouldThrowOnDelete = true
 
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 999)
+        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
+        fakeEntryRepo.insertEntry(entry.toEntry())
 
-        // When: User tries to delete non-existent entry
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationRepository = fakeNotificationRepository,
+            entryRepository = fakeEntryRepo
+        )
+        val testViewModel = OverviewViewModel(useCases)
+        testScheduler.advanceUntilIdle()
+
+        // Show confirmation dialog first
+        testViewModel.onAction(OverviewAction.RequestDeleteEntry(entry))
+        testScheduler.advanceUntilIdle()
+
+        // When: User confirms deletion (but it fails)
+        testViewModel.uiEvents.test {
+            testViewModel.onAction(OverviewAction.ConfirmDeleteEntry)
+            testScheduler.advanceUntilIdle()
+
+            // Then: Error snackbar should be shown
+            val event = awaitItem()
+            assertTrue(
+                "Should show snackbar",
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+            )
+            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+            assertTrue(
+                "Message should contain 'Failed'",
+                snackbarEvent.message.contains("Failed")
+            )
+        }
+
+        // And: Dialog should be dismissed even on error
+        assertFalse("Dialog should be dismissed", testViewModel.uiState.value.showDeleteConfirmDialog)
+    }
+
+    @Test
+    fun `CancelDeleteEntry action - dismisses dialog without deleting`() = runTest {
+        // Given: Entry repository with fake data
+        val fakeEntryRepo = FakeEntryRepository()
+        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
+        fakeEntryRepo.insertEntry(entry.toEntry())
+
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationRepository = fakeNotificationRepository,
+            entryRepository = fakeEntryRepo
+        )
+        val testViewModel = OverviewViewModel(useCases)
+        testScheduler.advanceUntilIdle()
+
+        // Show confirmation dialog first
+        testViewModel.onAction(OverviewAction.RequestDeleteEntry(entry))
+        testScheduler.advanceUntilIdle()
+        assertTrue("Dialog should be shown", testViewModel.uiState.value.showDeleteConfirmDialog)
+
+        // When: User cancels deletion
+        testViewModel.onAction(OverviewAction.CancelDeleteEntry)
+        testScheduler.advanceUntilIdle()
+
+        // Then: Dialog should be dismissed
+        val state = testViewModel.uiState.value
+        assertFalse("Dialog should be dismissed", state.showDeleteConfirmDialog)
+        assertEquals("Entry to delete should be cleared", null, state.entryToDelete)
+
+        // And: Entry should still be in repository
+        val remainingEntries = fakeEntryRepo.getEntriesSync()
+        assertEquals("Entry should still exist", 1, remainingEntries.size)
+        assertEquals("Entry ID should match", entry.id, remainingEntries.first().id)
+    }
+
+    @Test
+    fun `ConfirmDeleteEntry without entry - returns early safely`() = runTest {
+        // Given: No entry to delete (edge case)
+        testScheduler.advanceUntilIdle()
+        assertEquals("Entry to delete should be null", null, viewModel.uiState.value.entryToDelete)
+
+        // When: ConfirmDeleteEntry is called without RequestDeleteEntry
         viewModel.uiEvents.test {
-            viewModel.onAction(OverviewAction.DeleteEntry(entry))
+            viewModel.onAction(OverviewAction.ConfirmDeleteEntry)
             testScheduler.advanceUntilIdle()
 
-            // Then: ViewModel handles gracefully and shows success snackbar
-            // (FakeEntryRepository doesn't throw, so delete "succeeds")
-            val event = awaitItem()
-            assertTrue(
-                "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            )
-            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            assertEquals("Message should be 'Entry deleted'", "Entry deleted", snackbarEvent.message)
+            // Then: No events should be emitted (early return)
+            expectNoEvents()
         }
-    }
-
-    @Test
-    fun `RestoreEntry action - successfully restores deleted entry`() = runTest {
-        // Given: Entry repository and a deleted entry
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // Delete entry first
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-
-        // When: User restores the entry
-        testViewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Recently deleted entry should be cleared
-        val state = testViewModel.uiState.value
-        assertEquals("Recently deleted should be null after restore", null, state.recentlyDeletedEntry)
-
-        // And: Entry should be back in repository
-        val restoredEntries = fakeEntryRepo.getEntriesSync()
-        assertEquals("Entry should be restored", 1, restoredEntries.size)
-    }
-
-    @Test
-    fun `RestoreEntry action - requires recently deleted entry`() = runTest {
-        // Given: No recently deleted entry
-        val initialState = viewModel.uiState.value
-        assertEquals("Should have no recently deleted entry", null, initialState.recentlyDeletedEntry)
-
-        // When: User tries to restore without deleting first
-        viewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Nothing happens (early return in ViewModel)
-        val state = viewModel.uiState.value
-        assertEquals("State unchanged", null, state.recentlyDeletedEntry)
-    }
-
-    // ============================================================
-    // Delete/Restore Undo Tests (Swipe-to-Delete with Snackbar)
-    // ============================================================
-
-    @Test
-    fun `DeleteEntry action - shows snackbar with Undo action`() = runTest {
-        // Given: An entry repository with fake data
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User deletes the entry
-        testViewModel.uiEvents.test {
-            testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-            testScheduler.advanceUntilIdle()
-
-            // Then: Should emit ShowSnackbar with "Undo" action
-            val event = awaitItem()
-            assertTrue(
-                "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            )
-            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            assertEquals("Message should be 'Entry deleted'", "Entry deleted", snackbarEvent.message)
-            assertEquals("Action label should be 'Undo'", "Undo", snackbarEvent.actionLabel)
-        }
-
-        // And: Entry should be stored for undo
-        val state = testViewModel.uiState.value
-        assertEquals("Recently deleted entry should be stored", entry, state.recentlyDeletedEntry)
-    }
-
-    @Test
-    fun `RestoreEntry action - shows success snackbar without action`() = runTest {
-        // Given: Entry repository and a deleted entry
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // Delete entry first
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-
-        // When: User restores the entry
-        testViewModel.uiEvents.test {
-            testViewModel.onAction(OverviewAction.RestoreEntry)
-            testScheduler.advanceUntilIdle()
-
-            // Then: Should emit ShowSnackbar without action label
-            val event = awaitItem()
-            assertTrue(
-                "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            )
-            val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
-            assertEquals("Message should be 'Entry restored'", "Entry restored", snackbarEvent.message)
-            assertEquals("Action label should be null", null, snackbarEvent.actionLabel)
-        }
-
-        // And: Recently deleted entry should be cleared
-        val state = testViewModel.uiState.value
-        assertEquals("Recently deleted should be null after restore", null, state.recentlyDeletedEntry)
-    }
-
-    @Test
-    fun `ClearRecentlyDeleted action - clears recently deleted entry`() = runTest {
-        // Given: Entry repository and a deleted entry
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // Delete entry first
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-
-        val stateAfterDelete = testViewModel.uiState.value
-        assertEquals("Recently deleted should be set", entry, stateAfterDelete.recentlyDeletedEntry)
-
-        // When: Snackbar times out (user doesn't click Undo)
-        testViewModel.onAction(OverviewAction.ClearRecentlyDeleted)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Recently deleted entry should be cleared
-        val state = testViewModel.uiState.value
-        assertEquals("Recently deleted should be null", null, state.recentlyDeletedEntry)
-    }
-
-    @Test
-    fun `DeleteEntry then RestoreEntry - entry is back in repository`() = runTest {
-        // Given: Entry repository with an entry
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User deletes then restores
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-
-        val deletedEntries = fakeEntryRepo.getEntriesSync()
-        assertTrue("Entry should be deleted", deletedEntries.isEmpty())
-
-        testViewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Entry should be back in repository
-        val restoredEntries = fakeEntryRepo.getEntriesSync()
-        assertEquals("Entry should be restored", 1, restoredEntries.size)
-        assertEquals("Entry ID should match", entry.id, restoredEntries.first().id)
-    }
-
-    @Test
-    fun `Multiple rapid deletes - only last one can be restored`() = runTest {
-        // Given: Entry repository with multiple entries
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry1 = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        val entry2 = TestDataBuilders.createEntryWithMoodColor(id = 2)
-        val entry3 = TestDataBuilders.createEntryWithMoodColor(id = 3)
-        fakeEntryRepo.insertEntry(entry1.toEntry())
-        fakeEntryRepo.insertEntry(entry2.toEntry())
-        fakeEntryRepo.insertEntry(entry3.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User rapidly deletes multiple entries
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry1))
-        testScheduler.advanceUntilIdle()
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry2))
-        testScheduler.advanceUntilIdle()
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry3))
-        testScheduler.advanceUntilIdle()
-
-        // Then: Only the last deleted entry should be stored
-        val state = testViewModel.uiState.value
-        assertEquals("Recently deleted should be last entry", entry3, state.recentlyDeletedEntry)
-
-        // When: User restores
-        testViewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-
-        // Then: Only entry3 should be restored (entry1 and entry2 remain deleted)
-        val restoredEntries = fakeEntryRepo.getEntriesSync()
-        assertEquals("Should have 1 entry restored", 1, restoredEntries.size)
-        assertEquals("Restored entry should be entry3", entry3.id, restoredEntries.first().id)
-    }
-
-    @Test
-    fun `Delete then undo then delete again - works correctly`() = runTest {
-        // Given: Entry repository with an entry
-        val fakeEntryRepo = FakeEntryRepository()
-        val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
-        fakeEntryRepo.insertEntry(entry.toEntry())
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User deletes, restores, then deletes again
-        // First delete
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-        assertEquals("Entry should be in recently deleted", entry, testViewModel.uiState.value.recentlyDeletedEntry)
-
-        // Restore
-        testViewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-        assertEquals("Recently deleted should be cleared", null, testViewModel.uiState.value.recentlyDeletedEntry)
-
-        // Second delete
-        testViewModel.onAction(OverviewAction.DeleteEntry(entry))
-        testScheduler.advanceUntilIdle()
-
-        // Then: Entry should be deletable again
-        assertEquals("Entry should be in recently deleted again", entry, testViewModel.uiState.value.recentlyDeletedEntry)
-        val deletedEntries = fakeEntryRepo.getEntriesSync()
-        assertTrue("Entry should be deleted from repository", deletedEntries.isEmpty())
-    }
-
-    @Test
-    fun `RestoreEntry failure - shows error snackbar`() = runTest {
-        // Given: Entry repository that will fail on insert (simulated by trying to restore non-existent entry)
-        val fakeEntryRepo = FakeEntryRepository()
-
-        val useCases = createFakeOverviewUseCases(
-            preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository,
-            entryRepository = fakeEntryRepo
-        )
-        val testViewModel = OverviewViewModel(useCases)
-        testScheduler.advanceUntilIdle()
-
-        // When: User tries to restore when nothing was deleted (edge case)
-        testViewModel.onAction(OverviewAction.RestoreEntry)
-        testScheduler.advanceUntilIdle()
-
-        // Then: ViewModel handles gracefully (early return, no error)
-        testViewModel.uiEvents.test {
-            expectNoEvents()  // No error event emitted for early return case
-        }
-    }
-
-    @Test
-    fun `ClearRecentlyDeleted - safe to call when nothing deleted`() = runTest {
-        // Given: No recently deleted entry
-        val initialState = viewModel.uiState.value
-        assertEquals("Should have no recently deleted entry", null, initialState.recentlyDeletedEntry)
-
-        // When: User calls ClearRecentlyDeleted (e.g., snackbar timeout)
-        viewModel.onAction(OverviewAction.ClearRecentlyDeleted)
-        testScheduler.advanceUntilIdle()
-
-        // Then: State should remain unchanged (no crash)
-        val state = viewModel.uiState.value
-        assertEquals("State should be unchanged", null, state.recentlyDeletedEntry)
-        assertFalse("Should not be loading", state.isLoading)
     }
 
     // ============================================================

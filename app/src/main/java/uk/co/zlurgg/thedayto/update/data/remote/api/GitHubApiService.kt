@@ -15,6 +15,13 @@ interface GitHubApiService {
         @Path("repo") repo: String
     ): GitHubReleaseDto
 
+    @GET("repos/{owner}/{repo}/releases/tags/{tag}")
+    suspend fun getReleaseByTag(
+        @Path("owner") owner: String,
+        @Path("repo") repo: String,
+        @Path("tag") tag: String
+    ): GitHubReleaseDto
+
     companion object {
         const val GITHUB_OWNER = "Zlurgg"
         const val GITHUB_REPO = "The-Day-To"
