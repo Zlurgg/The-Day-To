@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.update.domain.usecases
 
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 
@@ -9,7 +10,8 @@ import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
  * Returns the download ID for tracking progress.
  */
 class DownloadUpdateUseCase(
-    private val updateRepository: UpdateRepository
+    private val updateRepository: UpdateRepository,
+    private val config: UpdateConfig
 ) {
     operator fun invoke(updateInfo: UpdateInfo): Long? {
         val downloadUrl = updateInfo.apkDownloadUrl ?: run {
@@ -17,7 +19,7 @@ class DownloadUpdateUseCase(
             return null
         }
 
-        val fileName = "the-day-to-${updateInfo.versionName}.apk"
+        val fileName = "${config.appName}-${updateInfo.versionName}.apk"
         Timber.i("Starting download: $fileName")
 
         return updateRepository.downloadApk(downloadUrl, fileName)

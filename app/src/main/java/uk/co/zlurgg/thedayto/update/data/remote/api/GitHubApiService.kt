@@ -6,6 +6,7 @@ import uk.co.zlurgg.thedayto.update.data.remote.dto.GitHubReleaseDto
 
 /**
  * Retrofit interface for GitHub Releases API.
+ * Repository owner and name are injected via UpdateConfig.
  */
 interface GitHubApiService {
 
@@ -21,9 +22,4 @@ interface GitHubApiService {
         @Path("repo") repo: String,
         @Path("tag") tag: String
     ): GitHubReleaseDto
-
-    companion object {
-        const val GITHUB_OWNER = "Zlurgg"
-        const val GITHUB_REPO = "The-Day-To"
-    }
 }

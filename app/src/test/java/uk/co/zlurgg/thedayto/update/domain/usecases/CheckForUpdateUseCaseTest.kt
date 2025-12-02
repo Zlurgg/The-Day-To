@@ -37,7 +37,7 @@ class CheckForUpdateUseCaseTest {
         fakePreferencesRepository = FakePreferencesRepository()
         checkForUpdateUseCase = CheckForUpdateUseCase(
             updateRepository = fakeUpdateRepository,
-            preferencesRepository = fakePreferencesRepository,
+            updatePreferencesRepository = fakePreferencesRepository,
             currentVersion = currentVersion
         )
     }

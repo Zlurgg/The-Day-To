@@ -1,8 +1,8 @@
 package uk.co.zlurgg.thedayto.update.domain.usecases
 
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
+import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 
 /**
@@ -12,7 +12,7 @@ import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
  */
 class CheckForUpdateUseCase(
     private val updateRepository: UpdateRepository,
-    private val preferencesRepository: PreferencesRepository,
+    private val updatePreferencesRepository: UpdatePreferencesRepository,
     private val currentVersion: String
 ) {
     suspend operator fun invoke(forceCheck: Boolean = false): UpdateInfo? {
@@ -33,7 +33,7 @@ class CheckForUpdateUseCase(
 
             // Check if user dismissed this version (skip if force check)
             if (!forceCheck) {
-                val dismissedVersion = preferencesRepository.getDismissedVersion()
+                val dismissedVersion = updatePreferencesRepository.getDismissedVersion()
                 if (dismissedVersion == updateInfo.versionName) {
                     Timber.d("User dismissed version ${updateInfo.versionName}")
                     return null

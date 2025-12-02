@@ -6,6 +6,7 @@ import org.junit.Assert.assertNull
 import org.junit.Before
 import org.junit.Test
 import uk.co.zlurgg.thedayto.fake.FakeUpdateRepository
+import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 
 /**
@@ -20,11 +21,20 @@ class DownloadUpdateUseCaseTest {
 
     private lateinit var fakeUpdateRepository: FakeUpdateRepository
     private lateinit var downloadUpdateUseCase: DownloadUpdateUseCase
+    private lateinit var testConfig: UpdateConfig
 
     @Before
     fun setup() {
         fakeUpdateRepository = FakeUpdateRepository()
-        downloadUpdateUseCase = DownloadUpdateUseCase(fakeUpdateRepository)
+        testConfig = UpdateConfig(
+            gitHubOwner = "TestOwner",
+            gitHubRepo = "TestRepo",
+            appName = "test-app"
+        )
+        downloadUpdateUseCase = DownloadUpdateUseCase(
+            updateRepository = fakeUpdateRepository,
+            config = testConfig
+        )
     }
 
     @Test
@@ -76,7 +86,7 @@ class DownloadUpdateUseCaseTest {
         )
         assertEquals(
             "Filename should be formatted correctly",
-            "the-day-to-1.0.4.apk",
+            "test-app-1.0.4.apk",
             downloads[0].second
         )
     }
@@ -97,7 +107,7 @@ class DownloadUpdateUseCaseTest {
 
         // Then: Filename should include v prefix as-is
         val downloads = fakeUpdateRepository.getDownloadedApks()
-        assertEquals("the-day-to-v1.0.4.apk", downloads[0].second)
+        assertEquals("test-app-v1.0.4.apk", downloads[0].second)
     }
 
     @Test
