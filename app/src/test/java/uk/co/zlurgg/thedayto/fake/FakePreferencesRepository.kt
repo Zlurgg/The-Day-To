@@ -1,13 +1,17 @@
 package uk.co.zlurgg.thedayto.fake
 
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**
  * Fake implementation of PreferencesRepository for testing.
  * Stores data in memory instead of SharedPreferences.
+ *
+ * Also implements UpdatePreferencesRepository to match the real implementation
+ * and allow testing update-related use cases.
  */
-class FakePreferencesRepository : PreferencesRepository {
+class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesRepository {
 
     // In-memory storage for testing
     private var entryReminderDate: LocalDate? = null

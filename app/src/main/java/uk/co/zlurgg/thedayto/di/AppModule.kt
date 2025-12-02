@@ -70,6 +70,8 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEn
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
 import uk.co.zlurgg.thedayto.update.data.repository.UpdateRepositoryImpl
 import uk.co.zlurgg.thedayto.update.data.service.ApkDownloadService
+import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
+import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
@@ -79,6 +81,11 @@ import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
 private const val GITHUB_API_BASE_URL = "https://api.github.com/"
 private const val NETWORK_TIMEOUT_SECONDS = 30L
 private const val CURRENT_VERSION = uk.co.zlurgg.thedayto.BuildConfig.VERSION_NAME
+
+// Update feature configuration - change these values when using in another project
+private const val GITHUB_OWNER = "Zlurgg"
+private const val GITHUB_REPO = "The-Day-To"
+private const val APP_NAME = "the-day-to"
 
 val appModule = module {
 
@@ -122,16 +129,35 @@ val appModule = module {
         get<Retrofit>().create(GitHubApiService::class.java)
     }
 
+    // Update Feature - Configuration
+    single {
+        UpdateConfig(
+            gitHubOwner = GITHUB_OWNER,
+            gitHubRepo = GITHUB_REPO,
+            appName = APP_NAME
+        )
+    }
+
     // Update Feature - APK Download Service
-    single { ApkDownloadService(androidContext()) }
+    single {
+        val config = get<UpdateConfig>()
+        ApkDownloadService(
+            context = androidContext(),
+            downloadTitle = config.downloadTitle
+        )
+    }
 
     // Update Feature - Repository
     single<UpdateRepository> {
         UpdateRepositoryImpl(
             gitHubApiService = get(),
-            apkDownloadService = get()
+            apkDownloadService = get(),
+            config = get()
         )
     }
+
+    // Update Feature - Preferences Repository binding
+    single<UpdatePreferencesRepository> { get<PreferencesRepositoryImpl>() }
 
     // Auth Repository (wraps GoogleAuthUiClient)
     single<AuthRepository> {
@@ -157,9 +183,9 @@ val appModule = module {
     // Journal-specific repositories
     single<EntryRepository> { EntryRepositoryImpl(get<TheDayToDatabase>().entryDao) }
 
-    single<PreferencesRepository> {
-        PreferencesRepositoryImpl(androidContext())
-    }
+    // Preferences - single implementation bound to both interfaces
+    single { PreferencesRepositoryImpl(androidContext()) }
+    single<PreferencesRepository> { get<PreferencesRepositoryImpl>() }
 
     // Shared Entry Use Cases (used by multiple features)
     single { GetEntriesUseCase(repository = get()) }
@@ -190,11 +216,14 @@ val appModule = module {
             setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository = get()),
             checkForUpdate = CheckForUpdateUseCase(
                 updateRepository = get(),
-                preferencesRepository = get(),
+                updatePreferencesRepository = get(),
                 currentVersion = CURRENT_VERSION
             ),
-            dismissUpdate = DismissUpdateUseCase(preferencesRepository = get()),
-            downloadUpdate = DownloadUpdateUseCase(updateRepository = get()),
+            dismissUpdate = DismissUpdateUseCase(updatePreferencesRepository = get()),
+            downloadUpdate = DownloadUpdateUseCase(
+                updateRepository = get(),
+                config = get()
+            ),
             getCurrentVersionInfo = GetCurrentVersionInfoUseCase(
                 updateRepository = get(),
                 currentVersion = CURRENT_VERSION

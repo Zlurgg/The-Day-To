@@ -10,14 +10,20 @@ import timber.log.Timber
 /**
  * Service for downloading and installing APK files.
  * Uses Android's DownloadManager for background downloads.
+ *
+ * @param context Android context for system services
+ * @param downloadTitle Notification title shown during download
  */
-class ApkDownloadService(private val context: Context) {
+class ApkDownloadService(
+    private val context: Context,
+    private val downloadTitle: String = DEFAULT_DOWNLOAD_TITLE
+) {
 
     fun downloadApk(url: String, fileName: String): Long {
         Timber.d("Starting APK download: $fileName from $url")
 
         val request = DownloadManager.Request(url.toUri())
-            .setTitle(DOWNLOAD_TITLE)
+            .setTitle(downloadTitle)
             .setDescription("Downloading $fileName")
             .setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             .setDestinationInExternalFilesDir(context, Environment.DIRECTORY_DOWNLOADS, fileName)
@@ -50,6 +56,6 @@ class ApkDownloadService(private val context: Context) {
 
     companion object {
         private const val APK_MIME_TYPE = "application/vnd.android.package-archive"
-        private const val DOWNLOAD_TITLE = "Downloading Update"
+        private const val DEFAULT_DOWNLOAD_TITLE = "Downloading Update"
     }
 }

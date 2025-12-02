@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.core.data.repository
 import android.content.Context
 import androidx.core.content.edit
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**
@@ -15,12 +16,16 @@ import java.time.LocalDate
  * - Journal: entry reminders, first launch setup
  * - Notifications: notification settings (enabled, time)
  * - Auth: welcome dialog tracking
+ * - Update: dismissed version tracking
+ *
+ * Also implements UpdatePreferencesRepository to allow the update package
+ * to be used independently without depending on the full PreferencesRepository.
  *
  * @param context Application context for accessing SharedPreferences
  */
 class PreferencesRepositoryImpl(
     context: Context
-) : PreferencesRepository {
+) : PreferencesRepository, UpdatePreferencesRepository {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 

@@ -19,7 +19,7 @@ class DismissUpdateUseCaseTest {
     @Before
     fun setup() {
         fakePreferencesRepository = FakePreferencesRepository()
-        dismissUpdateUseCase = DismissUpdateUseCase(fakePreferencesRepository)
+        dismissUpdateUseCase = DismissUpdateUseCase(updatePreferencesRepository = fakePreferencesRepository)
     }
 
     @Test
