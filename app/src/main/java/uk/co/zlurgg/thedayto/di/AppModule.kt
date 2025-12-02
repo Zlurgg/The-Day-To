@@ -3,12 +3,18 @@ package uk.co.zlurgg.thedayto.di
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
-import okhttp3.OkHttpClient
+import io.ktor.client.HttpClient
+import io.ktor.client.engine.okhttp.OkHttp
+import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import retrofit2.Retrofit
-import retrofit2.converter.gson.GsonConverterFactory
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.update.data.remote.api.GitHubApiService
 import java.util.concurrent.TimeUnit
@@ -78,7 +84,7 @@ import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
 
-private const val GITHUB_API_BASE_URL = "https://api.github.com/"
+private const val GITHUB_API_BASE_URL = "https://api.github.com"
 private const val NETWORK_TIMEOUT_SECONDS = 30L
 private const val CURRENT_VERSION = uk.co.zlurgg.thedayto.BuildConfig.VERSION_NAME
 
@@ -106,27 +112,39 @@ val appModule = module {
             .build()
     }
 
-    // Network - OkHttpClient
+    // Network - Ktor HttpClient
     single {
-        OkHttpClient.Builder()
-            .connectTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .writeTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .build()
-    }
-
-    // Network - Retrofit
-    single {
-        Retrofit.Builder()
-            .baseUrl(GITHUB_API_BASE_URL)
-            .client(get<OkHttpClient>())
-            .addConverterFactory(GsonConverterFactory.create())
-            .build()
+        HttpClient(OkHttp) {
+            engine {
+                config {
+                    connectTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    readTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                    writeTimeout(NETWORK_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+                }
+            }
+            install(ContentNegotiation) {
+                json(Json {
+                    ignoreUnknownKeys = true
+                    isLenient = true
+                })
+            }
+            install(Logging) {
+                logger = object : Logger {
+                    override fun log(message: String) {
+                        Timber.d(message)
+                    }
+                }
+                level = LogLevel.INFO
+            }
+        }
     }
 
     // GitHub API Service
-    single<GitHubApiService> {
-        get<Retrofit>().create(GitHubApiService::class.java)
+    single {
+        GitHubApiService(
+            httpClient = get(),
+            baseUrl = GITHUB_API_BASE_URL
+        )
     }
 
     // Update Feature - Configuration
