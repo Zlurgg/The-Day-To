@@ -95,7 +95,7 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 ### Key Libraries
 - **DI**: Koin 4.1.1 (constructor injection)
 - **Database**: Room 2.8.3 (offline-first)
-- **Networking**: Retrofit 2.11.0 + OkHttp (GitHub API for updates)
+- **Networking**: Ktor 3.1.3 + OkHttp engine (GitHub API for updates)
 - **Background Work**: WorkManager 2.11.0
 - **Auth**: Credential Manager API (androidx.credentials v1.5.0, GoogleID v1.1.1)
 - **Logging**: Timber 5.0.1

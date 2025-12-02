@@ -149,8 +149,8 @@ dependencies {
     // Navigation
     implementation(libs.androidx.navigation.compose)
 
-    // Retrofit
-    implementation(libs.bundles.retrofit)
+    // Ktor (HTTP client)
+    implementation(libs.bundles.ktor)
 
     // Location Services
     implementation(libs.play.services.location)

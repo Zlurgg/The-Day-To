@@ -1,25 +1,24 @@
 package uk.co.zlurgg.thedayto.update.data.remote.api
 
-import retrofit2.http.GET
-import retrofit2.http.Path
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
 import uk.co.zlurgg.thedayto.update.data.remote.dto.GitHubReleaseDto
 
 /**
- * Retrofit interface for GitHub Releases API.
- * Repository owner and name are injected via UpdateConfig.
+ * Ktor-based client for GitHub Releases API.
+ * Repository owner and name are passed as parameters to each method.
  */
-interface GitHubApiService {
+class GitHubApiService(
+    private val httpClient: HttpClient,
+    private val baseUrl: String = "https://api.github.com"
+) {
 
-    @GET("repos/{owner}/{repo}/releases/latest")
-    suspend fun getLatestRelease(
-        @Path("owner") owner: String,
-        @Path("repo") repo: String
-    ): GitHubReleaseDto
+    suspend fun getLatestRelease(owner: String, repo: String): GitHubReleaseDto {
+        return httpClient.get("$baseUrl/repos/$owner/$repo/releases/latest").body()
+    }
 
-    @GET("repos/{owner}/{repo}/releases/tags/{tag}")
-    suspend fun getReleaseByTag(
-        @Path("owner") owner: String,
-        @Path("repo") repo: String,
-        @Path("tag") tag: String
-    ): GitHubReleaseDto
+    suspend fun getReleaseByTag(owner: String, repo: String, tag: String): GitHubReleaseDto {
+        return httpClient.get("$baseUrl/repos/$owner/$repo/releases/tags/$tag").body()
+    }
 }
