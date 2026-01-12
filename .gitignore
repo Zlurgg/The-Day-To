@@ -17,3 +17,6 @@ keystore.properties
 
 # Firebase config (contains API keys)
 google-services.json
+
+# Claude Code temp files
+tmpclaude-*
