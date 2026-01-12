@@ -174,7 +174,6 @@ dependencies {
 
     // Firebase
     implementation(libs.firebase.auth)
-    implementation(libs.play.services.auth)
 
     // Shared Preferences
     implementation(libs.androidx.preference.ktx)
