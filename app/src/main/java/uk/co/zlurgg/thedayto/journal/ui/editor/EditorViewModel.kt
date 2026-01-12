@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
@@ -117,18 +118,18 @@ class EditorViewModel(
             }
 
             try {
-                val entry = editorUseCases.getEntryUseCase(entryId)
+                val entry = editorUseCases.getEntryUseCase(entryId).getOrNull()
                 entry?.let {
                     loadingJob.cancel() // Cancel if finished quickly
                     Timber.d("Successfully loaded entry with ID: ${it.id}")
                     loadEntryIntoState(it)
-                    _uiState.update { it.copy(isLoading = false, loadError = null) }
+                    _uiState.update { state -> state.copy(isLoading = false, loadError = null) }
                 } ?: run {
                     // Entry not found - show persistent error
                     loadingJob.cancel()
                     Timber.w("Entry not found with ID: $entryId")
-                    _uiState.update {
-                        it.copy(
+                    _uiState.update { state ->
+                        state.copy(
                             isLoading = false,
                             loadError = "Entry not found. It may have been deleted."
                         )
@@ -137,8 +138,8 @@ class EditorViewModel(
             } catch (e: Exception) {
                 loadingJob.cancel()
                 Timber.e(e, "Failed to load entry with ID: $entryId")
-                _uiState.update {
-                    it.copy(
+                _uiState.update { state ->
+                    state.copy(
                         isLoading = false,
                         loadError = "Failed to load entry: ${e.message ?: "Unknown error"}"
                     )
@@ -237,7 +238,7 @@ class EditorViewModel(
 
                     try {
                         // Check if entry exists for this date
-                        val existingEntry = editorUseCases.getEntryByDateUseCase(action.date)
+                        val existingEntry = editorUseCases.getEntryByDateUseCase(action.date).getOrNull()
 
                         if (existingEntry != null) {
                             // Load existing entry for this date

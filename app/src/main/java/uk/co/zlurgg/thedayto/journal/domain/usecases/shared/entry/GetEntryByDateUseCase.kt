@@ -1,5 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 
@@ -23,9 +25,9 @@ class GetEntryByDateUseCase(
      * Get entry for a specific date
      *
      * @param datestamp Unix timestamp (seconds) at start of day
-     * @return Entry if exists for that date, null otherwise
+     * @return Result containing Entry if exists for that date, null otherwise
      */
-    suspend operator fun invoke(datestamp: Long): Entry? {
+    suspend operator fun invoke(datestamp: Long): Result<Entry?, DataError.Local> {
         return repository.getEntryByDate(datestamp)
     }
 }

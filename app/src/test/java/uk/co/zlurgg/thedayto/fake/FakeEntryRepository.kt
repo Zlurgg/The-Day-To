@@ -3,6 +3,9 @@ package uk.co.zlurgg.thedayto.fake
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
@@ -84,41 +87,47 @@ class FakeEntryRepository(
         return Pair(startOfMonth, startOfNextMonth)
     }
 
-    override suspend fun getEntryById(id: Int): Entry? {
-        return _entries.value.find { it.id == id }
+    override suspend fun getEntryById(id: Int): Result<Entry?, DataError.Local> {
+        return Result.Success(_entries.value.find { it.id == id })
     }
 
-    override suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor? {
-        val entry = _entries.value.find { it.id == id } ?: return null
+    override suspend fun getEntryWithMoodColorById(id: Int): Result<EntryWithMoodColor?, DataError.Local> {
+        val entry = _entries.value.find { it.id == id }
+            ?: return Result.Success(null)
         val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
-        return EntryWithMoodColor(
-            id = entry.id,
-            moodColorId = entry.moodColorId,
-            moodName = moodColor?.mood ?: "Test Mood",
-            moodColor = moodColor?.color ?: "4CAF50",
-            content = entry.content,
-            dateStamp = entry.dateStamp
+        return Result.Success(
+            EntryWithMoodColor(
+                id = entry.id,
+                moodColorId = entry.moodColorId,
+                moodName = moodColor?.mood ?: "Test Mood",
+                moodColor = moodColor?.color ?: "4CAF50",
+                content = entry.content,
+                dateStamp = entry.dateStamp
+            )
         )
     }
 
-    override suspend fun getEntryByDate(date: Long): Entry? {
-        return _entries.value.find { it.dateStamp == date }
+    override suspend fun getEntryByDate(date: Long): Result<Entry?, DataError.Local> {
+        return Result.Success(_entries.value.find { it.dateStamp == date })
     }
 
-    override suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor? {
-        val entry = _entries.value.find { it.dateStamp == date } ?: return null
+    override suspend fun getEntryWithMoodColorByDate(date: Long): Result<EntryWithMoodColor?, DataError.Local> {
+        val entry = _entries.value.find { it.dateStamp == date }
+            ?: return Result.Success(null)
         val moodColor = moodColorRepository?.getMoodColorByIdSync(entry.moodColorId)
-        return EntryWithMoodColor(
-            id = entry.id,
-            moodColorId = entry.moodColorId,
-            moodName = moodColor?.mood ?: "Test Mood",
-            moodColor = moodColor?.color ?: "4CAF50",
-            content = entry.content,
-            dateStamp = entry.dateStamp
+        return Result.Success(
+            EntryWithMoodColor(
+                id = entry.id,
+                moodColorId = entry.moodColorId,
+                moodName = moodColor?.mood ?: "Test Mood",
+                moodColor = moodColor?.color ?: "4CAF50",
+                content = entry.content,
+                dateStamp = entry.dateStamp
+            )
         )
     }
 
-    override suspend fun insertEntry(entry: Entry) {
+    override suspend fun insertEntry(entry: Entry): EmptyResult<DataError.Local> {
         val entryWithId = if (entry.id == null) {
             entry.copy(id = nextId++)
         } else {
@@ -128,22 +137,25 @@ class FakeEntryRepository(
         currentList.removeIf { it.id == entryWithId.id }
         currentList.add(entryWithId)
         _entries.value = currentList
+        return Result.Success(Unit)
     }
 
-    override suspend fun deleteEntry(entry: Entry) {
+    override suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local> {
         if (shouldThrowOnDelete) {
-            throw RuntimeException("Test: simulated delete failure")
+            return Result.Error(DataError.Local.DATABASE_ERROR)
         }
         val currentList = _entries.value.toMutableList()
         currentList.removeIf { it.id == entry.id }
         _entries.value = currentList
+        return Result.Success(Unit)
     }
 
-    override suspend fun updateEntry(entry: Entry) {
+    override suspend fun updateEntry(entry: Entry): EmptyResult<DataError.Local> {
         val currentList = _entries.value.toMutableList()
         currentList.removeIf { it.id == entry.id }
         currentList.add(entry)
         _entries.value = currentList
+        return Result.Success(Unit)
     }
 
     override fun getMoodColorEntryCounts(): Flow<Map<Int, Int>> {

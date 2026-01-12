@@ -1,7 +1,9 @@
 package uk.co.zlurgg.thedayto.auth.domain.repository
 
-import uk.co.zlurgg.thedayto.auth.domain.model.SignInResult
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 
 /**
  * Repository interface for authentication operations.
@@ -18,15 +20,15 @@ interface AuthRepository {
     /**
      * Initiates the sign-in flow.
      *
-     * @return SignInResult containing user data on success or error message on failure
+     * @return Result containing UserData on success or DataError.Auth on failure
      */
-    suspend fun signIn(): SignInResult
+    suspend fun signIn(): Result<UserData, DataError.Auth>
 
     /**
      * Signs out the current user.
      * Clears authentication state from the provider.
      */
-    suspend fun signOut()
+    suspend fun signOut(): EmptyResult<DataError.Auth>
 
     /**
      * Gets the currently signed-in user.

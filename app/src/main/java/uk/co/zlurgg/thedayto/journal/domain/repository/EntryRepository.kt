@@ -1,6 +1,9 @@
 package uk.co.zlurgg.thedayto.journal.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 
@@ -35,13 +38,13 @@ interface EntryRepository {
      */
     fun getEntriesForMonth(month: Int, year: Int): Flow<List<EntryWithMoodColor>>
 
-    suspend fun getEntryById(id: Int): Entry?
-    suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor?
-    suspend fun getEntryByDate(date: Long): Entry?
-    suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor?
-    suspend fun insertEntry(entry: Entry)
-    suspend fun deleteEntry(entry: Entry)
-    suspend fun updateEntry(entry: Entry)
+    suspend fun getEntryById(id: Int): Result<Entry?, DataError.Local>
+    suspend fun getEntryWithMoodColorById(id: Int): Result<EntryWithMoodColor?, DataError.Local>
+    suspend fun getEntryByDate(date: Long): Result<Entry?, DataError.Local>
+    suspend fun getEntryWithMoodColorByDate(date: Long): Result<EntryWithMoodColor?, DataError.Local>
+    suspend fun insertEntry(entry: Entry): EmptyResult<DataError.Local>
+    suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local>
+    suspend fun updateEntry(entry: Entry): EmptyResult<DataError.Local>
 
     /**
      * Get the count of entries for each mood color.

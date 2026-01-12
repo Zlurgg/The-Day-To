@@ -1,5 +1,7 @@
 package uk.co.zlurgg.thedayto.fake
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 
@@ -9,8 +11,8 @@ import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
  */
 class FakeUpdateRepository : UpdateRepository {
 
-    private var latestReleaseResult: Result<UpdateInfo>? = null
-    private var releaseByVersionResults = mutableMapOf<String, Result<UpdateInfo>>()
+    private var latestReleaseResult: Result<UpdateInfo, DataError.Remote>? = null
+    private var releaseByVersionResults = mutableMapOf<String, Result<UpdateInfo, DataError.Remote>>()
     private var downloadedApks = mutableListOf<Pair<String, String>>()
     private var installedDownloadIds = mutableListOf<Long>()
     private var nextDownloadId = 1L
@@ -18,7 +20,7 @@ class FakeUpdateRepository : UpdateRepository {
     /**
      * Sets the result to return from getLatestRelease().
      */
-    fun setLatestReleaseResult(result: Result<UpdateInfo>) {
+    fun setLatestReleaseResult(result: Result<UpdateInfo, DataError.Remote>) {
         latestReleaseResult = result
     }
 
@@ -26,13 +28,13 @@ class FakeUpdateRepository : UpdateRepository {
      * Helper to set a successful release response.
      */
     fun setLatestRelease(updateInfo: UpdateInfo) {
-        latestReleaseResult = Result.success(updateInfo)
+        latestReleaseResult = Result.Success(updateInfo)
     }
 
     /**
      * Sets the result to return from getReleaseByVersion() for a specific version.
      */
-    fun setReleaseByVersion(version: String, result: Result<UpdateInfo>) {
+    fun setReleaseByVersion(version: String, result: Result<UpdateInfo, DataError.Remote>) {
         releaseByVersionResults[version] = result
     }
 
@@ -40,27 +42,27 @@ class FakeUpdateRepository : UpdateRepository {
      * Helper to set a successful release response for a specific version.
      */
     fun setReleaseInfo(version: String, updateInfo: UpdateInfo) {
-        releaseByVersionResults[version] = Result.success(updateInfo)
+        releaseByVersionResults[version] = Result.Success(updateInfo)
     }
 
     /**
      * Helper to simulate network error.
      */
-    fun setNetworkError(exception: Exception = Exception("Network error")) {
-        latestReleaseResult = Result.failure(exception)
+    fun setNetworkError(error: DataError.Remote = DataError.Remote.NO_INTERNET) {
+        latestReleaseResult = Result.Error(error)
     }
 
-    override suspend fun getLatestRelease(): Result<UpdateInfo> {
-        return latestReleaseResult ?: Result.failure(Exception("No result set"))
+    override suspend fun getLatestRelease(): Result<UpdateInfo, DataError.Remote> {
+        return latestReleaseResult ?: Result.Error(DataError.Remote.UNKNOWN)
     }
 
-    override suspend fun getReleaseByVersion(version: String): Result<UpdateInfo> {
+    override suspend fun getReleaseByVersion(version: String): Result<UpdateInfo, DataError.Remote> {
         // Check both with and without "v" prefix
         val normalizedVersion = version.removePrefix("v")
         return releaseByVersionResults[version]
             ?: releaseByVersionResults["v$normalizedVersion"]
             ?: releaseByVersionResults[normalizedVersion]
-            ?: Result.failure(Exception("No release found for version $version"))
+            ?: Result.Error(DataError.Remote.NOT_FOUND)
     }
 
     override fun downloadApk(url: String, fileName: String): Long {

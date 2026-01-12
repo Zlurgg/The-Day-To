@@ -3,6 +3,9 @@ package uk.co.zlurgg.thedayto.fake
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
@@ -17,7 +20,7 @@ class FakeMoodColorRepository : MoodColorRepository {
     private val _moodColors = MutableStateFlow<List<MoodColor>>(emptyList())
     private var nextId = 1
 
-    override suspend fun insertMoodColor(moodColor: MoodColor): Long {
+    override suspend fun insertMoodColor(moodColor: MoodColor): Result<Long, DataError.Local> {
         val moodColorWithId = if (moodColor.id == null) {
             moodColor.copy(id = nextId++)
         } else {
@@ -27,10 +30,10 @@ class FakeMoodColorRepository : MoodColorRepository {
         currentList.removeIf { it.id == moodColorWithId.id }
         currentList.add(moodColorWithId)
         _moodColors.value = currentList
-        return moodColorWithId.id!!.toLong()
+        return Result.Success(moodColorWithId.id!!.toLong())
     }
 
-    override suspend fun deleteMoodColor(id: Int) {
+    override suspend fun deleteMoodColor(id: Int): EmptyResult<DataError.Local> {
         // Soft delete - set isDeleted flag
         val moodColor = _moodColors.value.find { it.id == id }
         if (moodColor != null) {
@@ -39,15 +42,18 @@ class FakeMoodColorRepository : MoodColorRepository {
             currentList.add(moodColor.copy(isDeleted = true))
             _moodColors.value = currentList
         }
+        return Result.Success(Unit)
     }
 
-    override suspend fun getMoodColorById(id: Int): MoodColor? {
-        return _moodColors.value.find { it.id == id }
+    override suspend fun getMoodColorById(id: Int): Result<MoodColor?, DataError.Local> {
+        return Result.Success(_moodColors.value.find { it.id == id })
     }
 
-    override suspend fun getMoodColorByName(mood: String): MoodColor? {
+    override suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local> {
         // Case-insensitive lookup (matches production behavior)
-        return _moodColors.value.find { it.mood.trim().lowercase() == mood.trim().lowercase() }
+        return Result.Success(
+            _moodColors.value.find { it.mood.trim().lowercase() == mood.trim().lowercase() }
+        )
     }
 
     override fun getMoodColors(): Flow<List<MoodColor>> {
@@ -56,11 +62,12 @@ class FakeMoodColorRepository : MoodColorRepository {
         return _moodColors.map { list -> list.filter { !it.isDeleted } }
     }
 
-    override suspend fun updateMoodColor(moodColor: MoodColor) {
+    override suspend fun updateMoodColor(moodColor: MoodColor): EmptyResult<DataError.Local> {
         val currentList = _moodColors.value.toMutableList()
         currentList.removeIf { it.id == moodColor.id }
         currentList.add(moodColor)
         _moodColors.value = currentList
+        return Result.Success(Unit)
     }
 
     /**

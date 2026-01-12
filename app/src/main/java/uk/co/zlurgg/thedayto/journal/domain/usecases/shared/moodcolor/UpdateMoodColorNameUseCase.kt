@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
@@ -30,7 +31,7 @@ class UpdateMoodColorNameUseCase(
     suspend operator fun invoke(id: Int, newMood: String) {
         Timber.d("Attempting to update mood name for ID: $id to: $newMood")
 
-        val moodColor = repository.getMoodColorById(id)
+        val moodColor = repository.getMoodColorById(id).getOrNull()
             ?: run {
                 Timber.w("Mood color not found for ID: $id")
                 throw InvalidMoodColorException("Mood not found")
@@ -56,7 +57,7 @@ class UpdateMoodColorNameUseCase(
             Timber.d("Updating mood name case: ${moodColor.mood} -> $sanitizedMood")
         } else {
             // Different name - check for duplicates
-            val existingMood = repository.getMoodColorByName(sanitizedMood)
+            val existingMood = repository.getMoodColorByName(sanitizedMood).getOrNull()
             if (existingMood != null && existingMood.id != id) {
                 val isDeleted = existingMood.isDeleted
                 val message = if (isDeleted) {
