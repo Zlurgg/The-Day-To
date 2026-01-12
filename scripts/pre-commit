@@ -1,0 +1,28 @@
+#!/bin/bash
+# Pre-commit hook for The-Day-To
+# Runs detekt on staged Kotlin files
+
+echo "Running detekt on staged files..."
+
+# Get list of staged Kotlin files
+STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACM | grep '\.kt$')
+
+if [ -z "$STAGED_FILES" ]; then
+    echo "No Kotlin files staged, skipping detekt."
+    exit 0
+fi
+
+# Run detekt
+./gradlew detekt --daemon
+
+RESULT=$?
+
+if [ $RESULT -ne 0 ]; then
+    echo ""
+    echo "Detekt found issues. Please fix them before committing."
+    echo "You can run './gradlew detekt' to see all issues."
+    exit 1
+fi
+
+echo "Detekt passed!"
+exit 0
