@@ -13,6 +13,9 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
+import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
@@ -130,7 +133,7 @@ class OverviewViewModel(
     private fun checkTodayEntry() {
         viewModelScope.launch {
             val todayEpoch = DateUtils.getTodayStartEpoch()
-            val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+            val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
 
             val hasTodayEntry = todayEntry != null
             _uiState.update { it.copy(hasTodayEntry = hasTodayEntry) }
@@ -276,21 +279,22 @@ class OverviewViewModel(
                         _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
-                    try {
-                        overviewUseCases.deleteEntry(entry.toEntry())
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        Timber.i("Entry deleted successfully: ${entry.id}")
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to delete entry: ${entry.id}")
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to delete: ${e.message}"
+                    when (val result = overviewUseCases.deleteEntry(entry.toEntry())) {
+                        is Result.Success -> {
+                            loadingJob.cancel()
+                            _uiState.update { it.copy(isLoading = false) }
+                            Timber.i("Entry deleted successfully: ${entry.id}")
+                            _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
+                        }
+                        is Result.Error -> {
+                            Timber.e("Failed to delete entry: ${entry.id}")
+                            loadingJob.cancel()
+                            _uiState.update { it.copy(isLoading = false) }
+                            val errorMessage = ErrorFormatter.format(result.error, "delete entry")
+                            _uiEvents.emit(
+                                OverviewUiEvent.ShowSnackbar(message = errorMessage)
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -542,7 +546,7 @@ class OverviewViewModel(
      */
     private suspend fun updateHasTodayEntry() {
         val todayEpoch = DateUtils.getTodayStartEpoch()
-        val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+        val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
         val hasTodayEntry = todayEntry != null
 
         _uiState.update {

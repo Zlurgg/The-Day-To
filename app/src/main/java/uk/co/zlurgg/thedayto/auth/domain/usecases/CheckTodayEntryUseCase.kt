@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.domain.usecases
 
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -15,7 +16,7 @@ class CheckTodayEntryUseCase(
 ) {
     suspend operator fun invoke(): Long? {
         val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
-        val entry = entryRepository.getEntryByDate(todayStart)
+        val entry = entryRepository.getEntryByDate(todayStart).getOrNull()
         return if (entry != null) todayStart else null
     }
 }

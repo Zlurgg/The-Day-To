@@ -19,6 +19,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
@@ -343,7 +344,7 @@ class EditorViewModelTest {
         // Select Happy
         viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
 
-        val sadMood = fakeMoodColorRepository.getMoodColorById(2)!!
+        val sadMood = fakeMoodColorRepository.getMoodColorById(2).getOrNull()!!
 
         // Delete a different mood color (Sad)
         viewModel.onAction(EditorAction.DeleteMoodColor(sadMood))
@@ -371,7 +372,7 @@ class EditorViewModelTest {
         // Select Happy
         viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
 
-        val happyMood = fakeMoodColorRepository.getMoodColorById(1)!!
+        val happyMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
 
         // Delete the currently selected mood
         viewModel.onAction(EditorAction.DeleteMoodColor(happyMood))
@@ -462,7 +463,7 @@ class EditorViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        val updatedEntry = fakeEntryRepository.getEntryById(1)!!
+        val updatedEntry = fakeEntryRepository.getEntryById(1).getOrNull()!!
         assertEquals("Content should be updated", "Updated content", updatedEntry.content)
     }
 
@@ -765,7 +766,7 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // Given: Edit dialog is open with a mood color
-        val moodColor = fakeMoodColorRepository.getMoodColorById(1)!!
+        val moodColor = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
         viewModel.onAction(EditorAction.EditMoodColor(moodColor))
 
         // When: Dialog is closed
@@ -785,7 +786,7 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // Given: A mood color to update
-        val originalMood = fakeMoodColorRepository.getMoodColorById(1)!!
+        val originalMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
         val newColor = "00FF00" // Green
 
         // When: Mood color is updated (collect events first)
@@ -812,7 +813,7 @@ class EditorViewModelTest {
         }
 
         // And: Mood color should be updated in repository
-        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!)!!
+        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!).getOrNull()!!
         assertEquals("Color should be updated", newColor, updated.color)
     }
 
@@ -821,7 +822,7 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // Given: A mood color to update with edit dialog open
-        val originalMood = fakeMoodColorRepository.getMoodColorById(1)!!
+        val originalMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
         viewModel.onAction(EditorAction.EditMoodColor(originalMood))
 
         val newMood = "Joyful"
@@ -843,7 +844,7 @@ class EditorViewModelTest {
         }
 
         // And: Both name and color should be updated in repository
-        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!)!!
+        val updated = fakeMoodColorRepository.getMoodColorById(originalMood.id!!).getOrNull()!!
         assertEquals("Name should be updated", newMood, updated.mood)
         assertEquals("Color should be updated", newColor, updated.color)
     }

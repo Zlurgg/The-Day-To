@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -48,7 +49,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Joyful")
 
         // Then: Name should be updated
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Name should be updated", "Joyful", updatedMood?.mood)
         assertEquals("Color should remain same", "4CAF50", updatedMood?.color)
         assertEquals("ID should remain same", 1, updatedMood?.id)
@@ -70,7 +71,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 5, newMood = "Peaceful")
 
         // Then: Only name should change, everything else preserved
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(5)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(5).getOrNull()
         assertEquals("Name should be updated", "Peaceful", updatedMood?.mood)
         assertEquals("Color should be preserved", "9C27B0", updatedMood?.color)
         assertEquals("isDeleted should be preserved", false, updatedMood?.isDeleted)
@@ -92,7 +93,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Happy")
 
         // Then: Case should be updated
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Name case should be updated", "Happy", updatedMood?.mood)
     }
 
@@ -110,7 +111,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Happy")
 
         // Then: Should succeed without error, name unchanged
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Name should remain same", "Happy", updatedMood?.mood)
     }
 
@@ -128,7 +129,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "  Joyful  ")
 
         // Then: Name should be trimmed
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Name should be trimmed", "Joyful", updatedMood?.mood)
     }
 
@@ -141,9 +142,9 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 2, newMood = "Melancholy")
 
         // Then: Only mood 2 should be updated
-        val mood1 = fakeMoodColorRepository.getMoodColorById(1)
-        val mood2 = fakeMoodColorRepository.getMoodColorById(2)
-        val mood3 = fakeMoodColorRepository.getMoodColorById(3)
+        val mood1 = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
+        val mood2 = fakeMoodColorRepository.getMoodColorById(2).getOrNull()
+        val mood3 = fakeMoodColorRepository.getMoodColorById(3).getOrNull()
 
         assertEquals("Mood 1 should keep original name", "Happy", mood1?.mood)
         assertEquals("Mood 2 should have new name", "Melancholy", mood2?.mood)
@@ -212,7 +213,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = maxLengthName)
 
         // Then: Should succeed
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Should accept max length name", maxLengthName, updatedMood?.mood)
     }
 
@@ -271,7 +272,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Ecstatic")
 
         // Then: Should succeed
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Should allow unique name", "Ecstatic", updatedMood?.mood)
     }
 
@@ -289,7 +290,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Joy\nful\tMood")
 
         // Then: Control characters should be removed
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Should sanitize control chars", "JoyfulMood", updatedMood?.mood)
     }
 
@@ -307,7 +308,7 @@ class UpdateMoodColorNameUseCaseTest {
         updateMoodColorNameUseCase(id = 1, newMood = "Joyful")
 
         // Then: Name should be updated, still deleted
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Name should be updated", "Joyful", updatedMood?.mood)
         assertEquals("Should still be deleted", true, updatedMood?.isDeleted)
     }

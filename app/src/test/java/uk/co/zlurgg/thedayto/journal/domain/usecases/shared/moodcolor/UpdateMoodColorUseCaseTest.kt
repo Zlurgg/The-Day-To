@@ -4,6 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -46,7 +47,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 1, newColor = "FF5722")  // New orange color
 
         // Then: Color should be updated
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Color should be updated", "FF5722", updatedMood?.color)
         assertEquals("Mood name should remain same", "Happy", updatedMood?.mood)
         assertEquals("ID should remain same", 1, updatedMood?.id)
@@ -68,7 +69,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 5, newColor = "00BCD4")
 
         // Then: Only color should change, everything else preserved
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(5)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(5).getOrNull()
         assertEquals("Color should be updated", "00BCD4", updatedMood?.color)
         assertEquals("Mood name should be preserved", "Calm", updatedMood?.mood)
         assertEquals("isDeleted should be preserved", false, updatedMood?.isDeleted)
@@ -90,7 +91,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 1, newColor = "4CAF50")
 
         // Then: Should succeed without error
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Color should still be the same", "4CAF50", updatedMood?.color)
     }
 
@@ -103,9 +104,9 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 2, newColor = "NEWCOLOR")
 
         // Then: Only mood 2 should be updated
-        val mood1 = fakeMoodColorRepository.getMoodColorById(1)
-        val mood2 = fakeMoodColorRepository.getMoodColorById(2)
-        val mood3 = fakeMoodColorRepository.getMoodColorById(3)
+        val mood1 = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
+        val mood2 = fakeMoodColorRepository.getMoodColorById(2).getOrNull()
+        val mood3 = fakeMoodColorRepository.getMoodColorById(3).getOrNull()
 
         assertEquals("Mood 1 should keep original color", "4CAF50", mood1?.color)
         assertEquals("Mood 2 should have new color", "NEWCOLOR", mood2?.color)
@@ -170,7 +171,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 1, newColor = "FF5722")
 
         // Then: Color should be updated (even though deleted)
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Color should be updated", "FF5722", updatedMood?.color)
         assertEquals("Should still be deleted", true, updatedMood?.isDeleted)
     }
@@ -186,7 +187,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 1, newColor = longColor)
 
         // Then: Should accept it (no format validation, only blank check)
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Should accept long color", longColor, updatedMood?.color)
     }
 
@@ -201,7 +202,7 @@ class UpdateMoodColorUseCaseTest {
         updateMoodColorUseCase(id = 1, newColor = invalidHex)
 
         // Then: Should accept it (no format validation in use case)
-        val updatedMood = fakeMoodColorRepository.getMoodColorById(1)
+        val updatedMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()
         assertEquals("Should accept any non-blank string", invalidHex, updatedMood?.color)
     }
 }
