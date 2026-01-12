@@ -1,9 +1,11 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.state
 
+import androidx.compose.runtime.Stable
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import java.time.LocalDate
 import java.time.ZoneOffset
 
+@Stable
 data class EditorUiState(
     // Entry data
     val entryDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),

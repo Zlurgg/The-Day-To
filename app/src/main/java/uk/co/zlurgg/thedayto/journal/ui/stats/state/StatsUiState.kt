@@ -1,10 +1,14 @@
 package uk.co.zlurgg.thedayto.journal.ui.stats.state
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import java.time.LocalDate
 
 /**
- * Immutable UI state for the Stats screen
+ * UI state for the Stats screen.
+ * Marked @Stable because it contains List collections.
  */
+@Stable
 data class StatsUiState(
     // All-time stats
     val totalEntries: Int = 0,
@@ -25,6 +29,7 @@ data class StatsUiState(
     /**
      * Mood count with color for display
      */
+    @Immutable
     data class MoodCount(
         val mood: String,
         val color: String,
@@ -34,6 +39,7 @@ data class StatsUiState(
     /**
      * Stats for a specific month
      */
+    @Immutable
     data class MonthStats(
         val month: String,      // "October 2024"
         val year: Int,
