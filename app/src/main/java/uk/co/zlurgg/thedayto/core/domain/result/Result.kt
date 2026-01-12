@@ -79,6 +79,19 @@ inline fun <T, E : Error> Result<T, E>.getOrElse(onError: (E) -> T): T {
 }
 
 /**
+ * Transforms both success and error cases into a single type.
+ */
+inline fun <T, E : Error, R> Result<T, E>.fold(
+    onSuccess: (T) -> R,
+    onError: (E) -> R
+): R {
+    return when (this) {
+        is Result.Success -> onSuccess(data)
+        is Result.Error -> onError(error)
+    }
+}
+
+/**
  * Type alias for Result with Unit success (used for operations with no return value).
  */
 typealias EmptyResult<E> = Result<Unit, E>
