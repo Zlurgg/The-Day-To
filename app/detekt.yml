@@ -1,0 +1,99 @@
+# Detekt Configuration for The-Day-To
+# https://detekt.dev/docs/rules/
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+# Formatting rules (from detekt-formatting module / ktlint)
+# Most config is in .editorconfig, but we can disable categories here
+formatting:
+  active: true
+
+complexity:
+  LongMethod:
+    threshold: 100
+    excludes: ['**/ui/**']
+  LongParameterList:
+    functionThreshold: 10
+    constructorThreshold: 15
+    excludes: ['**/ui/**']
+  LargeClass:
+    threshold: 500
+    excludes: ['**/test/**', '**/androidTest/**']
+  ComplexCondition:
+    threshold: 5
+  CyclomaticComplexMethod:
+    threshold: 20
+    # ViewModels have large onAction when blocks by design
+    excludes: ['**/ui/**']
+  TooManyFunctions:
+    thresholdInFiles: 25
+    thresholdInClasses: 25
+    thresholdInInterfaces: 25
+    thresholdInObjects: 20
+    thresholdInEnums: 15
+
+coroutines:
+  active: true
+  GlobalCoroutineUsage:
+    active: true
+
+empty-blocks:
+  active: true
+  EmptyCatchBlock:
+    allowedExceptionNameRegex: "_|(ignore|expected).*"
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    # Repositories, services, usecases, ViewModels, and utilities catch generic exceptions as error boundaries
+    excludes: ['**/test/**', '**/androidTest/**', '**/data/**', '**/service/**', '**/usecases/**', '**/ui/**', '**/util/**']
+  TooGenericExceptionThrown:
+    excludes: ['**/test/**', '**/androidTest/**']
+  InstanceOfCheckForException:
+    # GoogleAuthUiClient uses this pattern for Credential Manager exceptions
+    excludes: ['**/service/**']
+
+naming:
+  active: true
+  FunctionNaming:
+    # Handled by ktlint via .editorconfig (ignore @Composable, @Test)
+    active: false
+  PackageNaming:
+    # Project uses underscores in some packages
+    active: false
+
+performance:
+  active: true
+  SpreadOperator:
+    excludes: ['**/test/**', '**/androidTest/**']
+
+potential-bugs:
+  active: true
+
+style:
+  active: true
+  MagicNumber:
+    excludes: ['**/test/**', '**/androidTest/**', '**/ui/**']
+    ignorePropertyDeclaration: true
+    ignoreLocalVariableDeclaration: true
+    ignoreConstantDeclaration: true
+    ignoreCompanionObjectPropertyDeclaration: true
+    ignoreAnnotation: true
+    ignoreNamedArgument: true
+    ignoreEnums: true
+  MaxLineLength:
+    excludes: ['**/test/**', '**/androidTest/**']
+    maxLineLength: 120
+  ReturnCount:
+    max: 4
+    excludeGuardClauses: true
+  UnusedPrivateMember:
+    allowedNames: "(_|ignored|expected|serialVersionUID|.*Preview)"
+  WildcardImport:
+    excludes: ['**/test/**', '**/androidTest/**']

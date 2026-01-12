@@ -41,6 +41,9 @@ googleid = "1.1.1"
 kotlinxSerialization = "1.9.0"
 ktor = "3.3.3"
 
+# Static Analysis
+detekt = "1.23.7"
+
 # Testing
 mockk = "1.14.7"
 turbine = "1.2.1"
@@ -135,6 +138,8 @@ androidx-room-testing = { group = "androidx.room", name = "room-testing", versio
 koin-test = { group = "io.insert-koin", name = "koin-test", version.ref = "koinTest" }
 koin-test-junit4 = { group = "io.insert-koin", name = "koin-test-junit4", version.ref = "koinTest" }
 
+# Static Analysis
+detekt-formatting = { group = "io.gitlab.arturbosch.detekt", name = "detekt-formatting", version.ref = "detekt" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
@@ -145,6 +150,7 @@ hiltPlugin = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid
 google-services = { id = "com.google.gms.google-services", version.ref = "google-services" }
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinPlugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
 
 [bundles]
 compose = [
