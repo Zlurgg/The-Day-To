@@ -53,9 +53,12 @@ class UpdateDialogTest : ComposeTest() {
             .onNodeWithText("Update Available")
             .assertIsDisplayed()
 
-        // Verify version is displayed
+        // Verify version label and number are displayed
         composeTestRule
-            .onNodeWithText("Version 1.0.5")
+            .onNodeWithText("Version")
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("1.0.5")
             .assertIsDisplayed()
     }
 
@@ -71,14 +74,17 @@ class UpdateDialogTest : ComposeTest() {
             }
         }
 
-        // Verify "What's new" section header
+        // Verify "What's new" section header (note: actual string is "What's New" without colon)
         composeTestRule
-            .onNodeWithText("What's new:")
+            .onNodeWithText("What's New")
             .assertIsDisplayed()
 
-        // Verify changelog content is displayed
+        // Verify changelog content is displayed (formatted with bullets)
         composeTestRule
-            .onNodeWithText("- Bug fixes\n- Performance improvements")
+            .onNodeWithText("Bug fixes", substring = true)
+            .assertIsDisplayed()
+        composeTestRule
+            .onNodeWithText("Performance improvements", substring = true)
             .assertIsDisplayed()
     }
 
