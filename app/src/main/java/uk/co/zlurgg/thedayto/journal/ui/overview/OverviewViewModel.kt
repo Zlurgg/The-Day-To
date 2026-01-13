@@ -13,13 +13,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
+import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
+import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
-import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
@@ -130,7 +134,7 @@ class OverviewViewModel(
     private fun checkTodayEntry() {
         viewModelScope.launch {
             val todayEpoch = DateUtils.getTodayStartEpoch()
-            val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+            val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
 
             val hasTodayEntry = todayEntry != null
             _uiState.update { it.copy(hasTodayEntry = hasTodayEntry) }
@@ -276,21 +280,22 @@ class OverviewViewModel(
                         _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
-                    try {
-                        overviewUseCases.deleteEntry(entry.toEntry())
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        Timber.i("Entry deleted successfully: ${entry.id}")
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to delete entry: ${entry.id}")
-                        loadingJob.cancel()
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to delete: ${e.message}"
+                    when (val result = overviewUseCases.deleteEntry(entry.toEntry())) {
+                        is Result.Success -> {
+                            loadingJob.cancel()
+                            _uiState.update { it.copy(isLoading = false) }
+                            Timber.i("Entry deleted successfully: ${entry.id}")
+                            _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
+                        }
+                        is Result.Error -> {
+                            Timber.e("Failed to delete entry: ${entry.id}")
+                            loadingJob.cancel()
+                            _uiState.update { it.copy(isLoading = false) }
+                            val errorMessage = ErrorFormatter.format(result.error, "delete entry")
+                            _uiEvents.emit(
+                                OverviewUiEvent.ShowSnackbar(message = errorMessage)
                             )
-                        )
+                        }
                     }
                 }
             }
@@ -420,7 +425,7 @@ class OverviewViewModel(
                     // After tutorial is dismissed, check if entry reminder should be shown
                     // This creates the flow: Tutorial → Entry Reminder → Create Entry
                     val todayEpoch = DateUtils.getTodayStartEpoch()
-                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
 
                     if (todayEntry == null && !overviewUseCases.checkEntryReminderShownToday()) {
                         Timber.d("Tutorial dismissed, showing entry reminder")
@@ -438,9 +443,7 @@ class OverviewViewModel(
 
             is OverviewAction.CreateTodayEntry,
             is OverviewAction.CreateNewEntry -> {
-                viewModelScope.launch {
-                    _uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
-                }
+                _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
             }
 
             is OverviewAction.CheckForUpdates -> {
@@ -497,6 +500,13 @@ class OverviewViewModel(
     }
 
     /**
+     * Called after navigation has been handled by the UI
+     */
+    fun onNavigationHandled() {
+        _uiState.update { it.copy(navigationTarget = null) }
+    }
+
+    /**
      * Get entries for the currently displayed month.
      *
      * Filters entries at the database level for optimal performance.
@@ -542,7 +552,7 @@ class OverviewViewModel(
      */
     private suspend fun updateHasTodayEntry() {
         val todayEpoch = DateUtils.getTodayStartEpoch()
-        val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+        val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
         val hasTodayEntry = todayEntry != null
 
         _uiState.update {

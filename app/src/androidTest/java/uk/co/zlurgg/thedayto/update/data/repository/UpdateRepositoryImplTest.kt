@@ -12,10 +12,13 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.data.remote.api.GitHubApiService
 import uk.co.zlurgg.thedayto.update.data.remote.dto.AssetDto
 import uk.co.zlurgg.thedayto.update.data.remote.dto.GitHubReleaseDto
 import uk.co.zlurgg.thedayto.update.data.service.ApkDownloadService
+import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
 import java.io.IOException
 
 /**
@@ -32,11 +35,16 @@ class UpdateRepositoryImplTest {
 
     private val mockGitHubApi = mockk<GitHubApiService>()
     private val mockApkService = mockk<ApkDownloadService>(relaxed = true)
+    private val config = UpdateConfig(
+        gitHubOwner = "Zlurgg",
+        gitHubRepo = "The-Day-To",
+        appName = "the-day-to"
+    )
     private lateinit var repository: UpdateRepositoryImpl
 
     @Before
     fun setup() {
-        repository = UpdateRepositoryImpl(mockGitHubApi, mockApkService)
+        repository = UpdateRepositoryImpl(mockGitHubApi, mockApkService, config)
     }
 
     // ============================================================
@@ -68,8 +76,8 @@ class UpdateRepositoryImplTest {
         val result = repository.getLatestRelease()
 
         // Then: Should return success with correctly mapped domain model
-        assertTrue("Result should be success", result.isSuccess)
-        val updateInfo = result.getOrNull()!!
+        assertTrue("Result should be success", result is Result.Success)
+        val updateInfo = (result as Result.Success).data
 
         assertEquals("1.0.5", updateInfo.versionName) // 'v' prefix removed
         assertEquals("https://github.com/Zlurgg/The-Day-To/releases/tag/v1.0.5", updateInfo.releaseUrl)
@@ -88,14 +96,12 @@ class UpdateRepositoryImplTest {
         // When: Fetching latest release
         val result = repository.getLatestRelease()
 
-        // Then: Should return failure
-        assertTrue("Result should be failure", result.isFailure)
-        val exception = result.exceptionOrNull()
-        // Exception may be wrapped, so check the message contains our error
+        // Then: Should return error
+        assertTrue("Result should be error", result is Result.Error)
+        val error = (result as Result.Error).error
         assertTrue(
-            "Exception message should contain 'Network error'",
-            exception?.message?.contains("Network error") == true ||
-            exception?.cause?.message?.contains("Network error") == true
+            "Error should be a Remote error",
+            error is DataError.Remote
         )
     }
 
@@ -118,8 +124,8 @@ class UpdateRepositoryImplTest {
         val result = repository.getLatestRelease()
 
         // Then: Should return success but with null APK fields
-        assertTrue("Result should be success", result.isSuccess)
-        val updateInfo = result.getOrNull()!!
+        assertTrue("Result should be success", result is Result.Success)
+        val updateInfo = (result as Result.Success).data
 
         assertEquals("1.0.5", updateInfo.versionName)
         assertNull("APK download URL should be null", updateInfo.apkDownloadUrl)

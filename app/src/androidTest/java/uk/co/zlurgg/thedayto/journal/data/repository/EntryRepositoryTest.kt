@@ -1,16 +1,17 @@
 package uk.co.zlurgg.thedayto.journal.data.repository
 
-import android.database.sqlite.SQLiteConstraintException
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import app.cash.turbine.test
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertNull
+import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.zlurgg.thedayto.base.DatabaseTest
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -99,7 +100,7 @@ class EntryRepositoryTest : DatabaseTest() {
         entryDao.insertEntry(entry.toEntity())
 
         // When: Getting entry by ID with mood color
-        val entryWithMoodColor = repository.getEntryWithMoodColorById(5)
+        val entryWithMoodColor = repository.getEntryWithMoodColorById(5).getOrNull()
 
         // Then: Should return entry with mood color data
         assertNotNull("Entry should exist", entryWithMoodColor)
@@ -124,7 +125,7 @@ class EntryRepositoryTest : DatabaseTest() {
         entryDao.insertEntry(entry.toEntity())
 
         // When: Getting entry by date with mood color
-        val entryWithMoodColor = repository.getEntryWithMoodColorByDate(specificDate)
+        val entryWithMoodColor = repository.getEntryWithMoodColorByDate(specificDate).getOrNull()
 
         // Then: Should find entry with mood color data
         assertNotNull("Entry should exist", entryWithMoodColor)
@@ -152,15 +153,16 @@ class EntryRepositoryTest : DatabaseTest() {
         assertEquals("MoodColorId should match", 1, retrievedEntry!!.moodColorId)
     }
 
-    @Test(expected = SQLiteConstraintException::class)
+    @Test
     fun insertEntry_fails_when_moodColorId_does_not_exist() = runTest {
         // Given: Empty mood color table (no moods exist)
 
         // When: Trying to insert entry with non-existent moodColorId
         val entry = TestDataBuilders.createEntry(moodColorId = 999, content = "Test", id = 1)
+        val result = repository.insertEntry(entry)
 
-        // Then: Should throw SQLiteConstraintException (foreign key violation)
-        repository.insertEntry(entry)
+        // Then: Should return error (foreign key violation)
+        assertTrue("Result should be error", result is uk.co.zlurgg.thedayto.core.domain.result.Result.Error)
     }
 
     @Test
@@ -173,14 +175,14 @@ class EntryRepositoryTest : DatabaseTest() {
         repository.insertEntry(entry)
 
         // Verify entry exists
-        val beforeDelete = repository.getEntryById(1)
+        val beforeDelete = repository.getEntryById(1).getOrNull()
         assertNotNull("Entry should exist before delete", beforeDelete)
 
         // When: Deleting the entry
         repository.deleteEntry(entry)
 
         // Then: Entry should be removed
-        val afterDelete = repository.getEntryById(1)
+        val afterDelete = repository.getEntryById(1).getOrNull()
         assertNull("Entry should not exist after delete", afterDelete)
     }
 
@@ -198,7 +200,7 @@ class EntryRepositoryTest : DatabaseTest() {
         repository.updateEntry(updatedEntry)
 
         // Then: Entry should be updated
-        val retrieved = repository.getEntryById(1)
+        val retrieved = repository.getEntryById(1).getOrNull()
         assertNotNull("Entry should exist", retrieved)
         assertEquals("Content should be updated", "Updated content", retrieved!!.content)
     }

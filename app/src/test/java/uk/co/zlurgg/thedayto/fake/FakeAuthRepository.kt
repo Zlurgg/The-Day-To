@@ -1,8 +1,10 @@
 package uk.co.zlurgg.thedayto.fake
 
-import uk.co.zlurgg.thedayto.auth.domain.model.SignInResult
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 
 /**
  * Fake implementation of AuthRepository for testing.
@@ -15,11 +17,11 @@ class FakeAuthRepository : AuthRepository {
 
     // Control sign-in behavior for testing
     var shouldReturnError = false
-    var errorMessage = "Sign-in failed"
+    var authError: DataError.Auth = DataError.Auth.FAILED
 
-    override suspend fun signIn(): SignInResult {
+    override suspend fun signIn(): Result<UserData, DataError.Auth> {
         return if (shouldReturnError) {
-            SignInResult(data = null, errorMessage = errorMessage)
+            Result.Error(authError)
         } else {
             val userData = UserData(
                 userId = "test_user_123",
@@ -27,12 +29,13 @@ class FakeAuthRepository : AuthRepository {
                 profilePictureUrl = "https://example.com/profile.jpg"
             )
             currentUser = userData
-            SignInResult(data = userData, errorMessage = null)
+            Result.Success(userData)
         }
     }
 
-    override suspend fun signOut() {
+    override suspend fun signOut(): EmptyResult<DataError.Auth> {
         currentUser = null
+        return Result.Success(Unit)
     }
 
     override fun getSignedInUser(): UserData? {
@@ -53,6 +56,6 @@ class FakeAuthRepository : AuthRepository {
     fun reset() {
         currentUser = null
         shouldReturnError = false
-        errorMessage = "Sign-in failed"
+        authError = DataError.Auth.FAILED
     }
 }

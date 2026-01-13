@@ -1,8 +1,9 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
-import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
+import androidx.compose.runtime.Stable
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
+import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 import java.time.LocalDate
 
@@ -10,6 +11,7 @@ import java.time.LocalDate
  * UI state for the Overview screen following Google's MAD single ViewModel per screen pattern.
  * Notification settings state is included here as it's managed via dialogs on this screen.
  */
+@Stable
 data class OverviewUiState(
     // Entry-related state
     // Contains entries for the currently displayed month (filtered at database level)
@@ -45,5 +47,13 @@ data class OverviewUiState(
     val availableUpdate: UpdateInfo? = null,
     val showUpdateDialog: Boolean = false,
     val currentVersionInfo: UpdateInfo? = null,
-    val showUpToDateDialog: Boolean = false
+    val showUpToDateDialog: Boolean = false,
+
+    // Navigation state
+    val navigationTarget: OverviewNavigationTarget? = null
 )
+
+sealed interface OverviewNavigationTarget {
+    data class ToEditor(val entryId: Int?) : OverviewNavigationTarget
+    data object ToSignIn : OverviewNavigationTarget
+}

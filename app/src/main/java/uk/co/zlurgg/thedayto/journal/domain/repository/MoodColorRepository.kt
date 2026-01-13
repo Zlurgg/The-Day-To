@@ -1,6 +1,9 @@
 package uk.co.zlurgg.thedayto.journal.domain.repository
 
 import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 
 /**
@@ -18,10 +21,10 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
  *   `insertMoodColor` returns the auto-generated ID of the newly inserted mood color.
  */
 interface MoodColorRepository {
-    suspend fun insertMoodColor(moodColor: MoodColor): Long
-    suspend fun deleteMoodColor(id: Int)
-    suspend fun getMoodColorById(id: Int): MoodColor?
-    suspend fun getMoodColorByName(mood: String): MoodColor?
+    suspend fun insertMoodColor(moodColor: MoodColor): Result<Long, DataError.Local>
+    suspend fun deleteMoodColor(id: Int): EmptyResult<DataError.Local>
+    suspend fun getMoodColorById(id: Int): Result<MoodColor?, DataError.Local>
+    suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local>
     fun getMoodColors(): Flow<List<MoodColor>>
-    suspend fun updateMoodColor(moodColor: MoodColor)
+    suspend fun updateMoodColor(moodColor: MoodColor): EmptyResult<DataError.Local>
 }

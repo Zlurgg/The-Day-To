@@ -8,9 +8,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
-import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 
 class SignInViewModel(
     private val signInUseCases: SignInUseCases
@@ -54,22 +57,23 @@ class SignInViewModel(
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
             // Sign in via UseCase (no Context parameter needed)
-            val result = signInUseCases.signIn()
+            when (val result = signInUseCases.signIn()) {
+                is Result.Success -> {
+                    // Sign-in successful
+                    _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
 
-            if (result.data != null) {
-                // Sign-in successful
-                _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
+                    // Seed default mood colors on first launch
+                    signInUseCases.seedDefaultMoodColors()
 
-                // Seed default mood colors on first launch
-                signInUseCases.seedDefaultMoodColors()
-
-                // Always navigate to Overview
-                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
-            } else {
-                // Sign-in failed
-                val errorMessage = result.errorMessage ?: "Unknown sign-in error"
-                _state.update { it.copy(isSignInSuccessful = false, signInError = errorMessage) }
-                _uiEvents.emit(SignInUiEvent.ShowSnackbar(errorMessage))
+                    // Always navigate to Overview
+                    _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
+                }
+                is Result.Error -> {
+                    // Sign-in failed
+                    val errorMessage = ErrorFormatter.format(result.error, "sign in")
+                    _state.update { it.copy(isSignInSuccessful = false, signInError = errorMessage) }
+                    _uiEvents.emit(SignInUiEvent.ShowSnackbar(errorMessage))
+                }
             }
         }
     }
@@ -83,8 +87,15 @@ class SignInViewModel(
             // Check sign-in status via UseCase
             if (signInUseCases.checkSignInStatus()) {
                 // Always navigate to Overview
-                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
             }
         }
+    }
+
+    /**
+     * Called after navigation has been handled by the UI
+     */
+    fun onNavigationHandled() {
+        _state.update { it.copy(navigationTarget = null) }
     }
 }

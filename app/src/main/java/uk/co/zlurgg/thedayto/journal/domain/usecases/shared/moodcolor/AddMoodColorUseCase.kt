@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
@@ -44,13 +45,14 @@ class AddMoodColorUseCase(
 
         // Check if mood exists (deleted or active) - case-insensitive lookup
         // Note: Repository handles normalization internally
-        val existing = repository.getMoodColorByName(sanitizedMood)
+        val existing = repository.getMoodColorByName(sanitizedMood).getOrNull()
 
         return when {
             existing == null -> {
                 // Create new mood - return auto-generated ID
                 val sanitizedMoodColor = moodColor.copy(mood = sanitizedMood)
-                val newId = repository.insertMoodColor(sanitizedMoodColor)
+                val newId = repository.insertMoodColor(sanitizedMoodColor).getOrNull()
+                    ?: throw InvalidMoodColorException("Failed to save mood color")
                 newId.toInt() // Room returns Long, convert to Int for consistency
             }
             existing.isDeleted -> {

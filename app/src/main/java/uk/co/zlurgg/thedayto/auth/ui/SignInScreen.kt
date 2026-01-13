@@ -25,6 +25,7 @@ import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
 import uk.co.zlurgg.thedayto.auth.ui.components.WelcomeHeader
+import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.WelcomeDialog
@@ -42,15 +43,22 @@ fun SignInScreenRoot(
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Handle one-time UI events
+    // Handle navigation state
+    LaunchedEffect(state.navigationTarget) {
+        state.navigationTarget?.let { target ->
+            when (target) {
+                SignInNavigationTarget.ToOverview -> onNavigateToOverview()
+            }
+            viewModel.onNavigationHandled()
+        }
+    }
+
+    // Handle one-time UI events (snackbars)
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collect { event ->
             when (event) {
                 is SignInUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
-                }
-                is SignInUiEvent.NavigateToOverview -> {
-                    onNavigateToOverview()
                 }
             }
         }

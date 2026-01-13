@@ -15,6 +15,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
@@ -500,7 +501,7 @@ class MoodColorManagementViewModelTest {
         }
 
         // And: Original name should be preserved
-        val sadMood = fakeMoodColorRepository.getMoodColorById(2)
+        val sadMood = fakeMoodColorRepository.getMoodColorById(2).getOrNull()
         assertEquals("Name should be unchanged", "Sad", sadMood?.mood)
     }
 

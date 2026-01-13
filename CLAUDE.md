@@ -41,20 +41,29 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 
 ### Testing
 ```bash
-./gradlew test                   # Run all unit tests (162 tests)
-./gradlew connectedAndroidTest   # Run instrumented tests (20 tests)
+./gradlew test                   # Run all unit tests (246 tests)
+./gradlew connectedAndroidTest   # Run instrumented tests (49 tests)
 ./gradlew check                  # Run all checks (lint + tests)
 ```
 
-**Test Coverage**: ✅ 182 tests total (162 unit + 20 instrumented) - All passing
-- ViewModels: 78 unit tests (100% coverage)
-- Use Cases: 84 unit tests (including update feature)
-- Repositories: 20 integration tests with real Room database
+**Test Coverage**: ✅ 295 tests total (246 unit + 49 instrumented) - All passing
+- ViewModels: 100+ unit tests
+- Use Cases: 80+ unit tests
+- Repositories: 49 integration tests with real Room database
 
 ### Code Quality
 ```bash
 ./gradlew lint                   # Run lint checks
 ./gradlew lintFix                # Auto-fix lint issues
+./gradlew detekt                 # Run Detekt static analysis
+./gradlew detektBaseline         # Generate baseline for existing issues
+```
+
+### Pre-commit Hooks
+To install pre-commit hooks that run Detekt before each commit:
+```bash
+./scripts/install-hooks.sh       # Unix/Mac
+# Or manually copy scripts/pre-commit to .git/hooks/
 ```
 
 ---
@@ -185,6 +194,71 @@ This project follows **Google's official Modern Android Development (MAD)** reco
 
 ---
 
+## Error Handling with Result Type
+
+This project uses a typed `Result<T, E>` pattern for error handling instead of exceptions.
+
+### Result Type Structure
+```kotlin
+sealed interface Result<out D, out E> {
+    data class Success<out D>(val data: D) : Result<D, Nothing>
+    data class Error<out E>(val error: E) : Result<Nothing, E>
+}
+
+typealias EmptyResult<E> = Result<Unit, E>
+```
+
+### DataError Types
+```kotlin
+sealed interface DataError {
+    enum class Local : DataError { DATABASE_ERROR, NOT_FOUND, DUPLICATE_ENTRY, UNKNOWN }
+    enum class Remote : DataError { REQUEST_TIMEOUT, NO_INTERNET, SERVER_ERROR, NOT_FOUND, UNKNOWN }
+    enum class Validation : DataError { EMPTY_MOOD, EMPTY_COLOR, CONTENT_TOO_LONG, ... }
+    enum class Auth : DataError { CANCELLED, NO_CREDENTIAL, FAILED, NETWORK_ERROR }
+}
+```
+
+### Usage in Repositories
+```kotlin
+override suspend fun getEntryById(id: Int): Result<Entry?, DataError.Local> {
+    return ErrorMapper.safeSuspendCall(TAG) {
+        dao.getEntryById(id)?.toDomain()
+    }
+}
+```
+
+### Usage in UseCases
+```kotlin
+// Pass through Result
+suspend operator fun invoke(id: Int): Result<Entry?, DataError.Local> {
+    return repository.getEntryById(id)
+}
+
+// Unwrap for internal logic
+val entry = repository.getEntryById(id).getOrNull()
+```
+
+### Usage in ViewModels
+```kotlin
+when (val result = useCases.signIn()) {
+    is Result.Success -> {
+        _state.update { it.copy(isSignInSuccessful = true) }
+    }
+    is Result.Error -> {
+        val message = ErrorFormatter.format(result.error, "sign in")
+        _uiEvents.emit(UiEvent.ShowSnackbar(message))
+    }
+}
+```
+
+### Extension Functions
+- `getOrNull()` - Returns data or null
+- `onSuccess { }` - Execute block on success
+- `onError { }` - Execute block on error
+- `fold(onSuccess, onError)` - Transform both cases
+
+---
+
 ## Testing Philosophy
 
 Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable unit tests.
@@ -224,10 +298,12 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 - Modern package structure (journal/, auth/, core/, update/)
 - All ViewModels follow StateFlow + SharedFlow pattern
 - Root/Presenter pattern for all screens
-- Comprehensive test coverage (182 tests, all passing)
+- Comprehensive test coverage (295 tests, all passing)
+- Typed Result<T, E> error handling pattern
+- Detekt static analysis with pre-commit hooks
+- @Stable/@Immutable Compose annotations
 - Timber logging throughout
 - Modern Google Sign-In (Credential Manager API)
-- Error handling with Resource wrapper
 - Magic numbers extracted to constants
 - Standardized padding values (Dimensions.kt + UiConstants)
 - Portfolio-quality README with screenshots
@@ -237,7 +313,7 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 - In-app update checker via GitHub Releases API
 
 ### 📋 Future Enhancements
-- Resolve remaining TODOs in code
+- Accessibility audit (content descriptions, touch targets)
 - UI component tests
 
 ---
@@ -303,4 +379,4 @@ core/
 
 ---
 
-Last Updated: 2025-11-28
+Last Updated: 2026-01-13

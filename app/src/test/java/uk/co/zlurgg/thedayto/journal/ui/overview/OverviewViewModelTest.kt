@@ -690,37 +690,33 @@ class OverviewViewModelTest {
     @Test
     fun `CreateTodayEntry action - navigates to editor with null entryId`() = runTest {
         // When: User creates today's entry
-        viewModel.uiEvents.test {
-            viewModel.onAction(OverviewAction.CreateTodayEntry)
-            testScheduler.advanceUntilIdle()
+        viewModel.onAction(OverviewAction.CreateTodayEntry)
+        testScheduler.advanceUntilIdle()
 
-            // Then: Should navigate to editor
-            val event = awaitItem()
-            assertTrue(
-                "Should navigate to editor",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToEditor
-            )
-            val navEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToEditor
-            assertEquals("Entry ID should be null for new entry", null, navEvent.entryId)
-        }
+        // Then: Should have navigation target to editor
+        val state = viewModel.uiState.value
+        assertTrue(
+            "Should have navigation target to editor",
+            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        )
+        val navTarget = state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        assertEquals("Entry ID should be null for new entry", null, navTarget.entryId)
     }
 
     @Test
     fun `CreateNewEntry action - navigates to editor with null entryId`() = runTest {
         // When: User creates new entry
-        viewModel.uiEvents.test {
-            viewModel.onAction(OverviewAction.CreateNewEntry)
-            testScheduler.advanceUntilIdle()
+        viewModel.onAction(OverviewAction.CreateNewEntry)
+        testScheduler.advanceUntilIdle()
 
-            // Then: Should navigate to editor
-            val event = awaitItem()
-            assertTrue(
-                "Should navigate to editor",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToEditor
-            )
-            val navEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.NavigateToEditor
-            assertEquals("Entry ID should be null for new entry", null, navEvent.entryId)
-        }
+        // Then: Should have navigation target to editor
+        val state = viewModel.uiState.value
+        assertTrue(
+            "Should have navigation target to editor",
+            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        )
+        val navTarget = state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        assertEquals("Entry ID should be null for new entry", null, navTarget.entryId)
     }
 
     @Test

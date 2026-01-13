@@ -1,5 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state
 
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
@@ -8,6 +10,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
  * UI state for the Mood Color Management screen.
  * Follows Google's MAD single ViewModel per screen pattern.
  */
+@Stable
 data class MoodColorManagementUiState(
     val moodColorsWithCount: List<MoodColorWithCount> = emptyList(),
     val sortOrder: MoodColorOrder = MoodColorOrder.Date(OrderType.Descending),
@@ -23,6 +26,7 @@ data class MoodColorManagementUiState(
 /**
  * Wrapper for MoodColor with the count of entries using this mood.
  */
+@Immutable
 data class MoodColorWithCount(
     val moodColor: MoodColor,
     val entryCount: Int

@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Soft purple-blue gradient background for launcher icon -->
-    <color name="ic_launcher_background">#C5CAE9</color>
+    <color name="ic_launcher_background">#FFFFFF</color>
 </resources>

@@ -13,10 +13,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.clipPath
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
@@ -30,8 +34,14 @@ fun CalendarDay(
     cornerRadius: Dp = 10.dp
 ) {
     val color = getColorSafe(entry.moodColor)
+    val dayNumber = datestampToDay(entry.dateStamp)
+    val dayDescription = stringResource(
+        R.string.calendar_day_with_entry,
+        dayNumber,
+        entry.moodName
+    )
     Box(
-        modifier = modifier
+        modifier = modifier.semantics { contentDescription = dayDescription }
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {
@@ -50,11 +60,11 @@ fun CalendarDay(
             }
         }
         Box(
-            modifier = modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center
         ) {
             Text(
-                text = datestampToDay(entry.dateStamp).toString(),
+                text = dayNumber.toString(),
                 style = MaterialTheme.typography.headlineSmall,
                 color = color.getContrastingTextColor(),
                 overflow = TextOverflow.Ellipsis,

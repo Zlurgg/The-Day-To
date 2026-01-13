@@ -1,0 +1,48 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+indent_size = 4
+max_line_length = 120
+
+# Trailing commas - allow but don't enforce
+ij_kotlin_allow_trailing_comma = true
+ij_kotlin_allow_trailing_comma_on_call_site = true
+
+# Skip function naming for Compose and Test (NowInAndroid approach)
+ktlint_function_naming_ignore_when_annotated_with = Composable, Test
+
+# Disabled rules (following NowInAndroid)
+ktlint_standard_filename = disabled
+ktlint_standard_function-signature = disabled
+ktlint_standard_class-signature = disabled
+ktlint_standard_function-expression-body = disabled
+ktlint_standard_binary-expression-wrapping = disabled
+ktlint_standard_chain-method-continuation = disabled
+ktlint_standard_condition-wrapping = disabled
+ktlint_standard_multiline-loop = disabled
+ktlint_standard_backing-property-naming = disabled
+ktlint_standard_function-literal = disabled
+ktlint_standard_function-type-modifier-spacing = disabled
+# Don't enforce trailing commas (allow them, but don't add them)
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+# Don't enforce comment placement
+ktlint_standard_comment-wrapping = disabled
+# Don't enforce import ordering (detekt/ktlint conflict with IDE formatting)
+ktlint_standard_import-ordering = disabled
+
+[*.xml]
+indent_size = 4
+
+[*.{json,yml,yaml}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

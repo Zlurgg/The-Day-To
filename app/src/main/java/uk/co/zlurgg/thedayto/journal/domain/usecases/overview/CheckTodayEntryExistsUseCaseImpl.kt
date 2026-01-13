@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
@@ -33,7 +34,7 @@ class CheckTodayEntryExistsUseCaseImpl(
      */
     override suspend fun invoke(): Boolean {
         val todayEpoch = DateUtils.getTodayStartEpoch()
-        val entry = repository.getEntryByDate(todayEpoch)
+        val entry = repository.getEntryByDate(todayEpoch).getOrNull()
         return entry != null
     }
 }

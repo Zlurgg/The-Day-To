@@ -13,8 +13,10 @@ import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.auth.domain.model.SignInResult
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import java.util.concurrent.CancellationException
 
 /**
@@ -33,9 +35,9 @@ class GoogleAuthUiClient(
      * Initiates Google Sign-In flow using Credential Manager
      *
      * @param activityContext The activity context (required for credential UI)
-     * @return SignInResult with user data or error message
+     * @return Result with UserData on success or DataError.Auth on failure
      */
-    suspend fun signIn(activityContext: Context): SignInResult {
+    suspend fun signIn(activityContext: Context): Result<UserData, DataError.Auth> {
         return try {
             // Build Google ID option
             val googleIdOption = GetGoogleIdOption.Builder()
@@ -61,85 +63,78 @@ class GoogleAuthUiClient(
             Timber.e(e, "Error during Google sign-in")
             if (e is CancellationException) throw e
 
-            // Provide more helpful error messages for common issues
-            val errorMessage = when {
+            // Map exception to typed error
+            val error = when {
                 e.message?.contains("No credentials available", ignoreCase = true) == true ->
-                    "No Google account found. Please add a Google account in Settings → Accounts."
+                    DataError.Auth.NO_CREDENTIAL
                 e.message?.contains("16", ignoreCase = true) == true ->
-                    "Configuration error. Please contact support."
+                    DataError.Auth.FAILED
                 e.message?.contains("network", ignoreCase = true) == true ->
-                    "Network error. Please check your connection and try again."
-                else -> e.message ?: "Sign-in failed. Please try again."
+                    DataError.Auth.NETWORK_ERROR
+                e.message?.contains("cancel", ignoreCase = true) == true ->
+                    DataError.Auth.CANCELLED
+                else -> DataError.Auth.FAILED
             }
 
-            SignInResult(
-                data = null,
-                errorMessage = errorMessage
-            )
+            Result.Error(error)
         }
     }
 
     /**
      * Handles the credential response from Credential Manager
      */
-    private suspend fun handleSignInResult(result: GetCredentialResponse): SignInResult {
+    private suspend fun handleSignInResult(result: GetCredentialResponse): Result<UserData, DataError.Auth> {
         return try {
             when (val credential = result.credential) {
-                is CustomCredential -> {
-                    if (credential.type == GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                        // Extract Google ID Token
-                        val googleIdTokenCredential = GoogleIdTokenCredential.Companion
-                            .createFrom(credential.data)
-
-                        // Sign in to Firebase with the ID token
-                        val googleCredentials = GoogleAuthProvider.getCredential(
-                            googleIdTokenCredential.idToken,
-                            null
-                        )
-
-                        val user = auth.signInWithCredential(googleCredentials).await().user
-
-                        SignInResult(
-                            data = user?.run {
-                                UserData(
-                                    userId = uid,
-                                    username = displayName,
-                                    profilePictureUrl = photoUrl?.toString()
-                                )
-                            },
-                            errorMessage = null
-                        )
-                    } else {
-                        Timber.e("Unexpected credential type: ${credential.type}")
-                        SignInResult(
-                            data = null,
-                            errorMessage = "Sign-in error. Please try again."
-                        )
-                    }
-                }
+                is CustomCredential -> handleCustomCredential(credential)
                 else -> {
                     Timber.e("Unexpected credential class: ${credential::class.java.name}")
-                    SignInResult(
-                        data = null,
-                        errorMessage = "Sign-in error. Please try again."
-                    )
+                    Result.Error(DataError.Auth.FAILED)
                 }
             }
         } catch (e: Exception) {
             Timber.e(e, "Error handling sign-in result")
             if (e is CancellationException) throw e
-            SignInResult(
-                data = null,
-                errorMessage = e.message ?: "Failed to process sign-in. Please try again."
-            )
+            Result.Error(DataError.Auth.FAILED)
         }
+    }
+
+    /**
+     * Handles Google ID Token credential and signs in to Firebase
+     */
+    private suspend fun handleCustomCredential(credential: CustomCredential): Result<UserData, DataError.Auth> {
+        if (credential.type != GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            Timber.e("Unexpected credential type: ${credential.type}")
+            return Result.Error(DataError.Auth.FAILED)
+        }
+
+        // Extract Google ID Token
+        val googleIdTokenCredential = GoogleIdTokenCredential.Companion
+            .createFrom(credential.data)
+
+        // Sign in to Firebase with the ID token
+        val googleCredentials = GoogleAuthProvider.getCredential(
+            googleIdTokenCredential.idToken,
+            null
+        )
+
+        val user = auth.signInWithCredential(googleCredentials).await().user
+            ?: return Result.Error(DataError.Auth.FAILED)
+
+        return Result.Success(
+            UserData(
+                userId = user.uid,
+                username = user.displayName,
+                profilePictureUrl = user.photoUrl?.toString()
+            )
+        )
     }
 
     /**
      * Signs out the current user from both Firebase and Google
      */
-    suspend fun signOut() {
-        try {
+    suspend fun signOut(): EmptyResult<DataError.Auth> {
+        return try {
             // Clear credential state
             credentialManager.clearCredentialState(
                 ClearCredentialStateRequest()
@@ -147,9 +142,11 @@ class GoogleAuthUiClient(
             // Sign out from Firebase
             auth.signOut()
             Timber.d("User signed out successfully")
+            Result.Success(Unit)
         } catch (e: Exception) {
             Timber.e(e, "Error signing out")
             if (e is CancellationException) throw e
+            Result.Error(DataError.Auth.FAILED)
         }
     }
 

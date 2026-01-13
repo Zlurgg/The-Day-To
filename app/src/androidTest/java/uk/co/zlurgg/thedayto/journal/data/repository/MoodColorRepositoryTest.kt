@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.zlurgg.thedayto.base.DatabaseTest
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 
@@ -89,7 +90,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
         moodColorDao.insertMoodColor(moodColor.toEntity())
 
         // When: Getting mood color by ID
-        val retrieved = repository.getMoodColorById(5)
+        val retrieved = repository.getMoodColorById(5).getOrNull()
 
         // Then: Should return the mood color
         assertNotNull("Mood color should exist", retrieved)
@@ -110,7 +111,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
         moodColorDao.insertMoodColor(deletedMood.toEntity())
 
         // When: Getting deleted mood by ID
-        val retrieved = repository.getMoodColorById(1)
+        val retrieved = repository.getMoodColorById(1).getOrNull()
 
         // Then: Should still be retrievable (important for joins!)
         assertNotNull("Deleted mood should still be retrievable by ID", retrieved)
@@ -125,9 +126,9 @@ class MoodColorRepositoryTest : DatabaseTest() {
         moodColorDao.insertMoodColor(moodColor.toEntity())
 
         // When: Looking up with different casing
-        val upperCase = repository.getMoodColorByName("HAPPY")
-        val lowerCase = repository.getMoodColorByName("happy")
-        val mixedCase = repository.getMoodColorByName("HaPpY")
+        val upperCase = repository.getMoodColorByName("HAPPY").getOrNull()
+        val lowerCase = repository.getMoodColorByName("happy").getOrNull()
+        val mixedCase = repository.getMoodColorByName("HaPpY").getOrNull()
 
         // Then: All should find the mood (case-insensitive)
         assertNotNull("Upper case should find mood", upperCase)
@@ -150,7 +151,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
         moodColorDao.insertMoodColor(moodColor.toEntity())
 
         // Verify it's not deleted initially
-        val beforeDelete = repository.getMoodColorById(1)
+        val beforeDelete = repository.getMoodColorById(1).getOrNull()
         assertNotNull("Mood should exist", beforeDelete)
         assertFalse("Should not be deleted initially", beforeDelete!!.isDeleted)
 
@@ -158,7 +159,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
         repository.deleteMoodColor(1)
 
         // Then: Should still exist but with isDeleted = true
-        val afterDelete = repository.getMoodColorById(1)
+        val afterDelete = repository.getMoodColorById(1).getOrNull()
         assertNotNull("Mood should still exist in database", afterDelete)
         assertTrue("Should be marked as deleted", afterDelete!!.isDeleted)
     }
@@ -220,7 +221,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
         repository.updateMoodColor(updatedMood)
 
         // Then: Mood should be updated
-        val retrieved = repository.getMoodColorById(1)
+        val retrieved = repository.getMoodColorById(1).getOrNull()
         assertNotNull("Mood should exist", retrieved)
         assertEquals("Mood name should be updated", "Joyful", retrieved!!.mood)
         assertEquals("Color should be updated", "00FF00", retrieved.color)

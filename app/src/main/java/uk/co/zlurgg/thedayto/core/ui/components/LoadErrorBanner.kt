@@ -75,11 +75,8 @@ fun LoadErrorBanner(
                 )
             }
 
-            // Dismiss button
-            IconButton(
-                onClick = onDismiss,
-                modifier = Modifier.size(24.dp)
-            ) {
+            // Dismiss button (IconButton has default 48dp touch target)
+            IconButton(onClick = onDismiss) {
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.dismiss_error),

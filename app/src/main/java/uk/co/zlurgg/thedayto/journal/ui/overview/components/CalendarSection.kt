@@ -47,6 +47,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -379,9 +381,17 @@ private fun CalendarMonthGrid(
                                     val isToday = CalendarUtils.isToday(entryDate, currentDate)
                                     val isPast = CalendarUtils.isPast(entryDate, currentDate)
 
+                                    // Accessibility description for empty days
+                                    val emptyDayDescription = when {
+                                        isToday -> stringResource(R.string.calendar_day_today_no_entry, dayNumber)
+                                        isPast -> stringResource(R.string.calendar_day_past_no_entry, dayNumber)
+                                        else -> stringResource(R.string.calendar_day_future, dayNumber)
+                                    }
+
                                     Box(
                                         modifier = Modifier
                                             .size(daySize)
+                                            .semantics { contentDescription = emptyDayDescription }
                                             .then(
                                                 when {
                                                     isToday -> Modifier

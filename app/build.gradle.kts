@@ -10,6 +10,7 @@ plugins {
     alias(libs.plugins.kotlin.parcelize)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.google.services)
+    alias(libs.plugins.detekt)
 }
 
 // Load keystore properties
@@ -174,7 +175,6 @@ dependencies {
 
     // Firebase
     implementation(libs.firebase.auth)
-    implementation(libs.play.services.auth)
 
     // Shared Preferences
     implementation(libs.androidx.preference.ktx)
@@ -195,4 +195,14 @@ dependencies {
 
     // Kotlin Serialization (Type-safe Navigation)
     implementation(libs.kotlinx.serialization.json)
+
+    // Static Analysis
+    detektPlugins(libs.detekt.formatting)
+}
+
+detekt {
+    config.setFrom("$projectDir/detekt.yml")
+    baseline = file("$projectDir/detekt-baseline.xml")
+    buildUponDefaultConfig = true
+    allRules = false
 }

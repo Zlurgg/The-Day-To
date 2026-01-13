@@ -2,6 +2,10 @@ package uk.co.zlurgg.thedayto.journal.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.error.ErrorMapper
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
@@ -57,32 +61,50 @@ class EntryRepositoryImpl(
         return Pair(startOfMonth, startOfNextMonth)
     }
 
-    override suspend fun getEntryById(id: Int): Entry? {
-        return dao.getEntryById(id)?.toDomain()
+    override suspend fun getEntryById(id: Int): Result<Entry?, DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getEntryById(id)?.toDomain()
+        }
     }
 
-    override suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColor? {
-        return dao.getEntryWithMoodColorById(id)?.toDomain()
+    override suspend fun getEntryWithMoodColorById(id: Int): Result<EntryWithMoodColor?, DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getEntryWithMoodColorById(id)?.toDomain()
+        }
     }
 
-    override suspend fun getEntryByDate(date: Long): Entry? {
-        return dao.getEntryByDate(date)?.toDomain()
+    override suspend fun getEntryByDate(date: Long): Result<Entry?, DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getEntryByDate(date)?.toDomain()
+        }
     }
 
-    override suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColor? {
-        return dao.getEntryWithMoodColorByDate(date)?.toDomain()
+    override suspend fun getEntryWithMoodColorByDate(date: Long): Result<EntryWithMoodColor?, DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getEntryWithMoodColorByDate(date)?.toDomain()
+        }
     }
 
-    override suspend fun insertEntry(entry: Entry) {
-        return dao.insertEntry(entry.toEntity())
+    override suspend fun insertEntry(entry: Entry): EmptyResult<DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.insertEntry(entry.toEntity())
+        }
     }
 
-    override suspend fun deleteEntry(entry: Entry) {
-        return dao.deleteEntry(entry.toEntity())
+    override suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.deleteEntry(entry.toEntity())
+        }
     }
 
-    override suspend fun updateEntry(entry: Entry) {
-        return dao.updateEntry(entry.toEntity())
+    override suspend fun updateEntry(entry: Entry): EmptyResult<DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.updateEntry(entry.toEntity())
+        }
+    }
+
+    companion object {
+        private const val TAG = "EntryRepository"
     }
 
     override fun getMoodColorEntryCounts(): Flow<Map<Int, Int>> {

@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.update.domain.usecases
 
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
 

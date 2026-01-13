@@ -1,5 +1,7 @@
 package uk.co.zlurgg.thedayto.update.domain.repository
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 
 /**
@@ -7,8 +9,8 @@ import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
  * Domain layer - no framework dependencies.
  */
 interface UpdateRepository {
-    suspend fun getLatestRelease(): Result<UpdateInfo>
-    suspend fun getReleaseByVersion(version: String): Result<UpdateInfo>
+    suspend fun getLatestRelease(): Result<UpdateInfo, DataError.Remote>
+    suspend fun getReleaseByVersion(version: String): Result<UpdateInfo, DataError.Remote>
     fun downloadApk(url: String, fileName: String): Long
     fun installApk(downloadId: Long)
 }

@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 
+import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
@@ -33,7 +34,7 @@ class AddEntryUseCase(
 
         // Check for duplicate entry on the same date (only when creating new entry)
         if (entry.id == null) {
-            val existingEntry = repository.getEntryByDate(entry.dateStamp)
+            val existingEntry = repository.getEntryByDate(entry.dateStamp).getOrNull()
             if (existingEntry != null) {
                 throw InvalidEntryException("An entry already exists for this date")
             }
@@ -46,7 +47,7 @@ class AddEntryUseCase(
         }
 
         // Validate that moodColorId exists and is not deleted
-        val moodColor = moodColorRepository.getMoodColorById(entry.moodColorId)
+        val moodColor = moodColorRepository.getMoodColorById(entry.moodColorId).getOrNull()
             ?: throw InvalidEntryException("Selected mood no longer exists")
 
         if (moodColor.isDeleted) {
