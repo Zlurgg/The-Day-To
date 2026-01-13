@@ -209,6 +209,12 @@
     <string name="update_in_this_version_label">In This Version</string>
     <string name="update_ok_button">OK</string>
 
+    <!-- Calendar Accessibility Descriptions -->
+    <string name="calendar_day_with_entry">Day %1$d, %2$s mood, tap to view entry</string>
+    <string name="calendar_day_today_no_entry">Today, day %1$d, tap to create entry</string>
+    <string name="calendar_day_past_no_entry">Day %1$d, no entry, tap to create</string>
+    <string name="calendar_day_future">Day %1$d, future date</string>
+
     <!-- About Dialog -->
     <string name="about_dialog_title">About The Day To</string>
     <string name="about_dialog_button">Close</string>
