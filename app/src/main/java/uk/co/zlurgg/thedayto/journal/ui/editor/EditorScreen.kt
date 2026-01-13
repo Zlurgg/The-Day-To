@@ -82,20 +82,20 @@ fun EditorScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Handle one-time UI events
+    // Handle navigation state
+    LaunchedEffect(uiState.shouldNavigateBack) {
+        if (uiState.shouldNavigateBack) {
+            navController.navigateUp()
+            viewModel.onNavigationHandled()
+        }
+    }
+
+    // Handle one-time UI events (snackbars)
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { event ->
             when (event) {
                 is EditorUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
-                }
-                is EditorUiEvent.SaveEntry -> {
-                    // Pop back stack to trigger exit animation
-                    navController.navigateUp()
-                }
-                is EditorUiEvent.NavigateBack -> {
-                    // Pop back stack to trigger exit animation
-                    navController.navigateUp()
                 }
             }
         }

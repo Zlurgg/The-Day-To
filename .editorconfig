@@ -35,6 +35,8 @@ ktlint_standard_trailing-comma-on-call-site = disabled
 ktlint_standard_trailing-comma-on-declaration-site = disabled
 # Don't enforce comment placement
 ktlint_standard_comment-wrapping = disabled
+# Don't enforce import ordering (detekt/ktlint conflict with IDE formatting)
+ktlint_standard_import-ordering = disabled
 
 [*.xml]
 indent_size = 4

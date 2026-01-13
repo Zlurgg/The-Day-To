@@ -23,6 +23,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
@@ -424,7 +425,7 @@ class OverviewViewModel(
                     // After tutorial is dismissed, check if entry reminder should be shown
                     // This creates the flow: Tutorial → Entry Reminder → Create Entry
                     val todayEpoch = DateUtils.getTodayStartEpoch()
-                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch)
+                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
 
                     if (todayEntry == null && !overviewUseCases.checkEntryReminderShownToday()) {
                         Timber.d("Tutorial dismissed, showing entry reminder")
@@ -442,9 +443,7 @@ class OverviewViewModel(
 
             is OverviewAction.CreateTodayEntry,
             is OverviewAction.CreateNewEntry -> {
-                viewModelScope.launch {
-                    _uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
-                }
+                _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
             }
 
             is OverviewAction.CheckForUpdates -> {
@@ -498,6 +497,13 @@ class OverviewViewModel(
                 }
             }
         }
+    }
+
+    /**
+     * Called after navigation has been handled by the UI
+     */
+    fun onNavigationHandled() {
+        _uiState.update { it.copy(navigationTarget = null) }
     }
 
     /**

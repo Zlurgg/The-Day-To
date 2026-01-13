@@ -20,6 +20,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
@@ -149,21 +150,18 @@ class SignInViewModelTest {
         fakeAuthRepository.shouldReturnError = false
         viewModel = createViewModel()
 
-        // When: User signs in (collect events first, then trigger action)
-        viewModel.uiEvents.test {
-            viewModel.signIn()
+        // When: User signs in
+        viewModel.signIn()
 
-            // Then: Should emit navigate to overview event
-            val event = awaitItem()
-            assertTrue("Should navigate to overview", event is SignInUiEvent.NavigateToOverview)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // And: State should reflect successful sign-in
+        // Then: State should reflect successful sign-in and navigation target
         viewModel.state.test {
             val state = awaitItem()
             assertTrue("Sign-in should be successful", state.isSignInSuccessful)
             assertEquals("Error should be null", null, state.signInError)
+            assertTrue(
+                "Should have navigation target to overview",
+                state.navigationTarget is SignInNavigationTarget.ToOverview
+            )
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -256,13 +254,16 @@ class SignInViewModelTest {
         fakeAuthStateRepository.setSignedInState(true)
         viewModel = createViewModel()
 
-        // When: Checking sign-in status (collect events first, then trigger action)
-        viewModel.uiEvents.test {
-            viewModel.checkSignInStatus()
+        // When: Checking sign-in status
+        viewModel.checkSignInStatus()
 
-            // Then: Should emit navigate to overview event
-            val event = awaitItem()
-            assertTrue("Should navigate to overview", event is SignInUiEvent.NavigateToOverview)
+        // Then: Should have navigation target to overview
+        viewModel.state.test {
+            val state = awaitItem()
+            assertTrue(
+                "Should have navigation target to overview",
+                state.navigationTarget is SignInNavigationTarget.ToOverview
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -277,9 +278,11 @@ class SignInViewModelTest {
         // When: Checking sign-in status
         viewModel.checkSignInStatus()
 
-        // Then: Should NOT emit any events
-        viewModel.uiEvents.test {
-            expectNoEvents()
+        // Then: Should NOT have navigation target
+        viewModel.state.test {
+            val state = awaitItem()
+            assertEquals("Should not have navigation target", null, state.navigationTarget)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
@@ -293,9 +296,11 @@ class SignInViewModelTest {
         // When: Checking sign-in status
         viewModel.checkSignInStatus()
 
-        // Then: Should NOT navigate (both conditions must be true)
-        viewModel.uiEvents.test {
-            expectNoEvents()
+        // Then: Should NOT have navigation target (both conditions must be true)
+        viewModel.state.test {
+            val state = awaitItem()
+            assertEquals("Should not have navigation target", null, state.navigationTarget)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 }

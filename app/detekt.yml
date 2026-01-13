@@ -13,6 +13,9 @@ config:
 # Most config is in .editorconfig, but we can disable categories here
 formatting:
   active: true
+  ImportOrdering:
+    # IDE/ktlint import ordering conflicts - manual ordering is fine
+    active: false
 
 complexity:
   LongMethod:

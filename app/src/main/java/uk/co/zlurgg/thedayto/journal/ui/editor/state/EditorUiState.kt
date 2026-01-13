@@ -42,7 +42,10 @@ data class EditorUiState(
     val loadError: String? = null,
 
     // Loading state
-    val isLoading: Boolean = false
+    val isLoading: Boolean = false,
+
+    // Navigation state
+    val shouldNavigateBack: Boolean = false
 ) {
     /**
      * Indicates whether the entry can be saved.

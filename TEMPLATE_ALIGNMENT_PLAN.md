@@ -16,7 +16,7 @@ This document tracks the alignment of The-Day-To with the shared project templat
 | Phase 2: Compose Optimizations | **COMPLETE** | @Stable and @Immutable annotations |
 | Phase 3: Accessibility | **COMPLETE** | Calendar days, touch targets |
 | Phase 4: Error Handling | **COMPLETE** | Result types fully migrated |
-| Phase 5: State-Based Navigation | **SKIPPED** | Current SharedFlow pattern works well |
+| Phase 5: State-Based Navigation | **COMPLETE** | Migrated all 3 ViewModels to state-based navigation |
 | Phase 6: Documentation | **COMPLETE** | CLAUDE.md updated |
 
 ---
@@ -218,9 +218,48 @@ This document tracks the alignment of The-Day-To with the shared project templat
 
 ---
 
-## Phase 5: State-Based Navigation - SKIPPED
+## Phase 5: State-Based Navigation - COMPLETE
 
-Decided to skip this phase. The current `SharedFlow<UiEvent>` pattern works well and is a common pattern in production apps. The state-based navigation pattern has benefits but would require significant refactoring with minimal practical benefit for this project.
+Migrated from SharedFlow<UiEvent> navigation events to state-based navigation pattern.
+
+### 5.1 EditorViewModel Migration - COMPLETE
+- [x] Add `shouldNavigateBack: Boolean` to `EditorUiState`
+- [x] Replace `_uiEvents.emit(EditorUiEvent.SaveEntry)` with state update
+- [x] Replace `_uiEvents.emit(EditorUiEvent.NavigateBack)` with state update
+- [x] Add `onNavigationHandled()` function
+- [x] Remove `SaveEntry` and `NavigateBack` from `EditorUiEvent`
+- [x] Update `EditorScreen` to observe state-based navigation
+
+### 5.2 SignInViewModel Migration - COMPLETE
+- [x] Add `navigationTarget: SignInNavigationTarget?` to `SignInState`
+- [x] Create `SignInNavigationTarget` sealed interface
+- [x] Replace `_uiEvents.emit(SignInUiEvent.NavigateToOverview)` with state update
+- [x] Add `onNavigationHandled()` function
+- [x] Remove `NavigateToOverview` from `SignInUiEvent`
+- [x] Update `SignInScreen` to observe state-based navigation
+
+### 5.3 OverviewViewModel Migration - COMPLETE
+- [x] Add `navigationTarget: OverviewNavigationTarget?` to `OverviewUiState`
+- [x] Create `OverviewNavigationTarget` sealed interface (ToEditor, ToSignIn)
+- [x] Replace `_uiEvents.emit(OverviewUiEvent.NavigateToEditor)` with state update
+- [x] Add `onNavigationHandled()` function
+- [x] Remove `NavigateToEditor` and `NavigateToSignIn` from `OverviewUiEvent`
+- [x] Update `OverviewScreen` to observe state-based navigation
+
+### 5.4 Test Updates - COMPLETE
+- [x] Update `SignInViewModelTest` to verify state changes instead of events
+- [x] Update `EditorViewModelTest` to verify state changes instead of events
+- [x] Update `OverviewViewModelTest` to verify state changes instead of events
+
+### 5.5 Bug Fixes
+- [x] Fix `OverviewViewModel.kt:428` - Add `.getOrNull()` to `getEntryByDate()` Result
+- [x] Disable `ImportOrdering` rule in `detekt.yml` (IDE/ktlint conflicts)
+
+**Benefits:**
+- Navigation state survives configuration changes (rotation)
+- Navigation intent directly observable in tests
+- Consistent pattern across all ViewModels
+- Aligns with Google's 2025 recommended architecture
 
 ---
 
@@ -244,7 +283,7 @@ After completing all phases:
 - [x] `./gradlew test` - All 246 unit tests pass
 - [x] `./gradlew connectedAndroidTest` - All 49 instrumented tests pass
 - [x] `./gradlew detekt` - Passes with no issues
-- [x] Manual test on device - App functions correctly
+- [x] Manual test on device - State-based navigation verified
 - [ ] TalkBack test - Skipped for now
 
 ---
@@ -272,6 +311,55 @@ After completing all phases:
 | `7e884ce` | `docs: Update CLAUDE.md with Result types and test counts` |
 | `44a4774` | `a11y: Add accessibility improvements for calendar and touch targets` |
 | `1714039` | `style: Fix detekt warnings for code quality compliance` |
+| TBD | `refactor(navigation): Migrate to state-based navigation pattern` |
+
+---
+
+## State-Based Navigation Pattern Reference
+
+### Navigation Target in State
+```kotlin
+@Stable
+data class OverviewUiState(
+    // ... other fields
+    val navigationTarget: OverviewNavigationTarget? = null
+)
+
+sealed interface OverviewNavigationTarget {
+    data class ToEditor(val entryId: Int?) : OverviewNavigationTarget
+    data object ToSignIn : OverviewNavigationTarget
+}
+```
+
+### ViewModel Navigation Trigger
+```kotlin
+// Old (SharedFlow event):
+_uiEvents.emit(OverviewUiEvent.NavigateToEditor(entryId = null))
+
+// New (state-based):
+_uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
+
+// Reset after handling:
+fun onNavigationHandled() {
+    _uiState.update { it.copy(navigationTarget = null) }
+}
+```
+
+### Screen Navigation Observer
+```kotlin
+// Handle navigation state
+LaunchedEffect(uiState.navigationTarget) {
+    uiState.navigationTarget?.let { target ->
+        when (target) {
+            is OverviewNavigationTarget.ToEditor -> {
+                navController.navigate(EditorRoute(entryId = target.entryId, showBackButton = true))
+            }
+            OverviewNavigationTarget.ToSignIn -> onNavigateToSignIn()
+        }
+        viewModel.onNavigationHandled()
+    }
+}
+```
 
 ---
 

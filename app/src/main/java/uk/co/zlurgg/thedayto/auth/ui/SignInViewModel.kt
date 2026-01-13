@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
@@ -65,7 +66,7 @@ class SignInViewModel(
                     signInUseCases.seedDefaultMoodColors()
 
                     // Always navigate to Overview
-                    _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                    _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
                 }
                 is Result.Error -> {
                     // Sign-in failed
@@ -86,8 +87,15 @@ class SignInViewModel(
             // Check sign-in status via UseCase
             if (signInUseCases.checkSignInStatus()) {
                 // Always navigate to Overview
-                _uiEvents.emit(SignInUiEvent.NavigateToOverview)
+                _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
             }
         }
+    }
+
+    /**
+     * Called after navigation has been handled by the UI
+     */
+    fun onNavigationHandled() {
+        _state.update { it.copy(navigationTarget = null) }
     }
 }

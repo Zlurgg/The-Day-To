@@ -482,8 +482,7 @@ class EditorViewModel(
                         )
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully saved entry")
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(EditorUiEvent.SaveEntry)
+                        _uiState.update { it.copy(isLoading = false, shouldNavigateBack = true) }
                     } catch (e: InvalidEntryException) {
                         loadingJob.cancel()
                         Timber.e(e, "Failed to save entry")
@@ -506,18 +505,13 @@ class EditorViewModel(
                 } else {
                     // No unsaved changes, navigate back immediately
                     Timber.d("No unsaved changes, navigating back")
-                    viewModelScope.launch {
-                        _uiEvents.emit(EditorUiEvent.NavigateBack)
-                    }
+                    _uiState.update { it.copy(shouldNavigateBack = true) }
                 }
             }
 
             is EditorAction.ConfirmDiscardChanges -> {
                 Timber.d("User confirmed discard changes")
-                _uiState.update { it.copy(showUnsavedChangesDialog = false) }
-                viewModelScope.launch {
-                    _uiEvents.emit(EditorUiEvent.NavigateBack)
-                }
+                _uiState.update { it.copy(showUnsavedChangesDialog = false, shouldNavigateBack = true) }
             }
 
             is EditorAction.DismissUnsavedChangesDialog -> {
@@ -541,6 +535,13 @@ class EditorViewModel(
                 _uiState.update { it.copy(loadError = null) }
             }
         }
+    }
+
+    /**
+     * Called after navigation has been handled by the UI
+     */
+    fun onNavigationHandled() {
+        _uiState.update { it.copy(shouldNavigateBack = false) }
     }
 
     private fun loadMoodColors() {

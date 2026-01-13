@@ -427,13 +427,13 @@ class EditorViewModelTest {
         viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
         viewModel.onAction(EditorAction.EnteredContent("My first entry"))
 
-        // When: Entry is saved (collect events first)
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.SaveEntry)
+        // When: Entry is saved
+        viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: SaveEntry event should be emitted
-            val event = awaitItem()
-            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
+        // Then: Navigation state should be set
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Should navigate back after save", state.shouldNavigateBack)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -453,13 +453,13 @@ class EditorViewModelTest {
         viewModel = createViewModel()
         viewModel.onAction(EditorAction.EnteredContent("Updated content"))
 
-        // When: Entry is saved (collect events first)
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.SaveEntry)
+        // When: Entry is saved
+        viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: SaveEntry event should be emitted
-            val event = awaitItem()
-            assertTrue("Should be SaveEntry event", event is EditorUiEvent.SaveEntry)
+        // Then: Navigation state should be set
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Should navigate back after save", state.shouldNavigateBack)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -916,17 +916,12 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // When: Request navigate back with no changes
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.RequestNavigateBack)
+        viewModel.onAction(EditorAction.RequestNavigateBack)
 
-            // Then: Should emit NavigateBack event (no dialog)
-            val event = awaitItem()
-            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
-        }
-
-        // And: Dialog should not be shown
+        // Then: Should set navigation state (no dialog)
         viewModel.uiState.test {
             val state = awaitItem()
+            assertTrue("Should navigate back", state.shouldNavigateBack)
             assertFalse("Dialog should not be shown", state.showUnsavedChangesDialog)
             cancelAndIgnoreRemainingEvents()
         }
@@ -996,17 +991,12 @@ class EditorViewModelTest {
         viewModel.onAction(EditorAction.RequestNavigateBack)
 
         // When: User confirms discard
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.ConfirmDiscardChanges)
+        viewModel.onAction(EditorAction.ConfirmDiscardChanges)
 
-            // Then: Should emit NavigateBack event
-            val event = awaitItem()
-            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
-        }
-
-        // And: Dialog should be closed
+        // Then: Should set navigation state and close dialog
         viewModel.uiState.test {
             val state = awaitItem()
+            assertTrue("Should navigate back", state.shouldNavigateBack)
             assertFalse("Dialog should be closed", state.showUnsavedChangesDialog)
             cancelAndIgnoreRemainingEvents()
         }
@@ -1050,12 +1040,14 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // When: Request navigate back without making changes
-        viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.RequestNavigateBack)
+        viewModel.onAction(EditorAction.RequestNavigateBack)
 
-            // Then: Should navigate immediately (no dialog)
-            val event = awaitItem()
-            assertTrue("Should emit NavigateBack event", event is EditorUiEvent.NavigateBack)
+        // Then: Should navigate immediately (no dialog)
+        viewModel.uiState.test {
+            val state = awaitItem()
+            assertTrue("Should navigate back", state.shouldNavigateBack)
+            assertFalse("Dialog should not be shown", state.showUnsavedChangesDialog)
+            cancelAndIgnoreRemainingEvents()
         }
     }
 

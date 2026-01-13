@@ -47,5 +47,13 @@ data class OverviewUiState(
     val availableUpdate: UpdateInfo? = null,
     val showUpdateDialog: Boolean = false,
     val currentVersionInfo: UpdateInfo? = null,
-    val showUpToDateDialog: Boolean = false
+    val showUpToDateDialog: Boolean = false,
+
+    // Navigation state
+    val navigationTarget: OverviewNavigationTarget? = null
 )
+
+sealed interface OverviewNavigationTarget {
+    data class ToEditor(val entryId: Int?) : OverviewNavigationTarget
+    data object ToSignIn : OverviewNavigationTarget
+}
