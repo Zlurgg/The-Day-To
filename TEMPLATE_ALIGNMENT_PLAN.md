@@ -4,7 +4,7 @@ This document tracks the alignment of The-Day-To with the shared project templat
 
 **Branch**: `feature/template-alignment`
 **Created**: 2026-01-12
-**Last Updated**: 2026-01-12
+**Last Updated**: 2026-01-13
 
 ---
 
@@ -174,6 +174,8 @@ This document tracks the alignment of The-Day-To with the shared project templat
 ---
 
 ### 4.5 Test Updates - COMPLETE
+
+**Unit Tests (246 passing):**
 - [x] Update fake repositories to return Result types
 - [x] Fix `SignInViewModelTest.kt`
 - [x] Fix `UpdateMoodColorNameUseCaseTest.kt`
@@ -182,9 +184,17 @@ This document tracks the alignment of The-Day-To with the shared project templat
 - [x] Fix `MoodColorManagementViewModelTest.kt`
 - [x] Fix `OverviewViewModelTest.kt`
 
-**All 246+ tests pass!**
+**Instrumented Tests (49 passing):**
+- [x] Fix `EntryRepositoryTest.kt` - Add `.getOrNull()` to repository calls
+- [x] Fix `MoodColorRepositoryTest.kt` - Add `.getOrNull()` to repository calls
+- [x] Fix `UpdateRepositoryImplTest.kt` - Update for custom Result type
+- [x] Fix `UpdateDialogTest.kt` - Fix assertions to match actual UI text
 
-**Commit**: `f8c09d2` - `fix: Complete Result type migration and fix tests`
+**Total: 295 tests passing (246 unit + 49 instrumented)**
+
+**Commits**:
+- `f8c09d2` - `fix: Complete Result type migration and fix tests`
+- `840acaf` - `fix: Update instrumented tests for Result type migration`
 
 ---
 
@@ -209,8 +219,8 @@ Decided to skip this phase. The current `SharedFlow<UiEvent>` pattern works well
 After completing all phases:
 
 - [x] `./gradlew assembleDebug` - Builds successfully
-- [x] `./gradlew test` - All 246+ unit tests pass
-- [ ] `./gradlew connectedAndroidTest` - Instrumented tests (not run yet)
+- [x] `./gradlew test` - All 246 unit tests pass
+- [x] `./gradlew connectedAndroidTest` - All 49 instrumented tests pass
 - [x] `./gradlew detekt` - Passes with warnings only
 - [ ] Manual test on device - App functions correctly
 - [ ] TalkBack test - Accessibility works correctly
@@ -219,10 +229,9 @@ After completing all phases:
 
 ## Next Steps
 
-1. **Run instrumented tests** to verify the Result type migration didn't break anything
-2. **Manual testing** on device to verify app functionality
-3. **Phase 3: Accessibility** - Content descriptions and touch targets
-4. **Phase 6: Documentation** - Update CLAUDE.md
+1. **Manual testing** on device to verify app functionality
+2. **Phase 3: Accessibility** - Content descriptions and touch targets
+3. **Phase 6: Documentation** - Update CLAUDE.md with Result type patterns and test counts
 
 ---
 
@@ -235,6 +244,8 @@ After completing all phases:
 | `6f51f50` | `feat(core): Add fold extension to Result type` |
 | `4e6e9ce` | `refactor(core): Migrate to typed Result pattern across all layers` |
 | `f8c09d2` | `fix: Complete Result type migration and fix tests` |
+| `3c50a94` | `docs: Update template alignment plan with completion status` |
+| `840acaf` | `fix: Update instrumented tests for Result type migration` |
 
 ---
 
