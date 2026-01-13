@@ -311,7 +311,7 @@ After completing all phases:
 | `7e884ce` | `docs: Update CLAUDE.md with Result types and test counts` |
 | `44a4774` | `a11y: Add accessibility improvements for calendar and touch targets` |
 | `1714039` | `style: Fix detekt warnings for code quality compliance` |
-| TBD | `refactor(navigation): Migrate to state-based navigation pattern` |
+| `dc13ebc` | `refactor(navigation): Migrate to state-based navigation pattern` |
 
 ---
 
