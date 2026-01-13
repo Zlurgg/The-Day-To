@@ -6,12 +6,11 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.BuildConfig
-import uk.co.zlurgg.thedayto.di.editorModule
-import uk.co.zlurgg.thedayto.di.appModule
-import uk.co.zlurgg.thedayto.di.moodColorManagementModule
-import uk.co.zlurgg.thedayto.di.overviewModule
-import uk.co.zlurgg.thedayto.di.signInModule
-import uk.co.zlurgg.thedayto.di.statsModule
+import uk.co.zlurgg.thedayto.auth.di.authModule
+import uk.co.zlurgg.thedayto.core.di.coreModule
+import uk.co.zlurgg.thedayto.journal.di.journalModule
+import uk.co.zlurgg.thedayto.journal.di.journalViewModelModule
+import uk.co.zlurgg.thedayto.update.di.updateModule
 
 class TheDayToApplication : Application() {
     override fun onCreate() {
@@ -28,12 +27,11 @@ class TheDayToApplication : Application() {
             androidLogger()
 
             modules(
-                appModule,
-                editorModule,
-                overviewModule,
-                signInModule,
-                statsModule,
-                moodColorManagementModule
+                coreModule,
+                updateModule,
+                authModule,
+                journalModule,
+                journalViewModelModule
             )
         }
     }

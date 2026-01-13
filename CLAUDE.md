@@ -66,6 +66,10 @@ To install pre-commit hooks that run Detekt before each commit:
 # Or manually copy scripts/pre-commit to .git/hooks/
 ```
 
+### Git Commits
+- Do NOT add Co-Authored-By lines to commits
+- Use conventional commit format: `type(scope): description`
+
 ---
 
 ## Architecture & Design Principles

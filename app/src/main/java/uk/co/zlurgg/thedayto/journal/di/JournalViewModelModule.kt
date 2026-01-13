@@ -1,49 +1,39 @@
-package uk.co.zlurgg.thedayto.di
+package uk.co.zlurgg.thedayto.journal.di
 
 import androidx.lifecycle.SavedStateHandle
-import org.koin.dsl.module
 import org.koin.core.module.dsl.viewModel
+import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.journal.ui.editor.EditorViewModel
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.MoodColorManagementViewModel
 import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewViewModel
 import uk.co.zlurgg.thedayto.journal.ui.stats.StatsViewModel
-import uk.co.zlurgg.thedayto.auth.ui.SignInViewModel
 
-val editorModule = module {
+val journalViewModelModule = module {
+
+    // Editor ViewModel - requires SavedStateHandle for navigation arguments
     viewModel { (savedStateHandle: SavedStateHandle) ->
         EditorViewModel(
             editorUseCases = get(),
             savedStateHandle = savedStateHandle
         )
     }
-}
 
-val overviewModule = module {
+    // Overview ViewModel
     viewModel {
         OverviewViewModel(
             overviewUseCases = get()
         )
     }
-}
 
-val signInModule = module {
-    viewModel {
-        SignInViewModel(
-            signInUseCases = get()
-        )
-    }
-}
-
-val statsModule = module {
+    // Stats ViewModel
     viewModel {
         StatsViewModel(
             getEntriesUseCase = get(),
             statsUseCases = get()
         )
     }
-}
 
-val moodColorManagementModule = module {
+    // MoodColorManagement ViewModel
     viewModel {
         MoodColorManagementViewModel(
             moodColorManagementUseCases = get()
