@@ -49,7 +49,15 @@ This document tracks the alignment of The-Day-To with the shared project templat
 - [x] Apply Detekt plugin in root `build.gradle.kts`
 - [x] Configure Detekt in `app/build.gradle.kts`
 - [x] Create `app/detekt.yml` configuration
-- [x] Run `./gradlew detekt` - passes with warnings only
+- [x] Run `./gradlew detekt` - passes with no issues
+
+### 1.3.1 Detekt Issue Fixes - COMPLETE
+- [x] Add newlines at EOF (`DataError.kt`, `ErrorMapper.kt`, `Result.kt`, `ErrorFormatter.kt`)
+- [x] Refactor `ErrorFormatter.format()` to reduce cyclomatic complexity (extract 4 helper functions)
+- [x] Extract `handleCustomCredential()` in `GoogleAuthUiClient.kt` to reduce nesting depth
+- [x] Reorder imports in `OverviewViewModel.kt` for lexicographic ordering
+
+**Commit**: `1714039` - `style: Fix detekt warnings for code quality compliance`
 
 ---
 
@@ -235,7 +243,7 @@ After completing all phases:
 - [x] `./gradlew assembleDebug` - Builds successfully
 - [x] `./gradlew test` - All 246 unit tests pass
 - [x] `./gradlew connectedAndroidTest` - All 49 instrumented tests pass
-- [x] `./gradlew detekt` - Passes with warnings only
+- [x] `./gradlew detekt` - Passes with no issues
 - [ ] Manual test on device - App functions correctly
 - [ ] TalkBack test - Accessibility works correctly
 
@@ -262,6 +270,8 @@ After completing all phases:
 | `840acaf` | `fix: Update instrumented tests for Result type migration` |
 | `4994c83` | `docs: Update plan - all 295 tests passing` |
 | `7e884ce` | `docs: Update CLAUDE.md with Result types and test counts` |
+| `44a4774` | `a11y: Add accessibility improvements for calendar and touch targets` |
+| `1714039` | `style: Fix detekt warnings for code quality compliance` |
 
 ---
 
