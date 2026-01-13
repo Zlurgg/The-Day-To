@@ -86,36 +86,7 @@ class GoogleAuthUiClient(
     private suspend fun handleSignInResult(result: GetCredentialResponse): Result<UserData, DataError.Auth> {
         return try {
             when (val credential = result.credential) {
-                is CustomCredential -> {
-                    if (credential.type == GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
-                        // Extract Google ID Token
-                        val googleIdTokenCredential = GoogleIdTokenCredential.Companion
-                            .createFrom(credential.data)
-
-                        // Sign in to Firebase with the ID token
-                        val googleCredentials = GoogleAuthProvider.getCredential(
-                            googleIdTokenCredential.idToken,
-                            null
-                        )
-
-                        val user = auth.signInWithCredential(googleCredentials).await().user
-
-                        if (user != null) {
-                            Result.Success(
-                                UserData(
-                                    userId = user.uid,
-                                    username = user.displayName,
-                                    profilePictureUrl = user.photoUrl?.toString()
-                                )
-                            )
-                        } else {
-                            Result.Error(DataError.Auth.FAILED)
-                        }
-                    } else {
-                        Timber.e("Unexpected credential type: ${credential.type}")
-                        Result.Error(DataError.Auth.FAILED)
-                    }
-                }
+                is CustomCredential -> handleCustomCredential(credential)
                 else -> {
                     Timber.e("Unexpected credential class: ${credential::class.java.name}")
                     Result.Error(DataError.Auth.FAILED)
@@ -126,6 +97,37 @@ class GoogleAuthUiClient(
             if (e is CancellationException) throw e
             Result.Error(DataError.Auth.FAILED)
         }
+    }
+
+    /**
+     * Handles Google ID Token credential and signs in to Firebase
+     */
+    private suspend fun handleCustomCredential(credential: CustomCredential): Result<UserData, DataError.Auth> {
+        if (credential.type != GoogleIdTokenCredential.Companion.TYPE_GOOGLE_ID_TOKEN_CREDENTIAL) {
+            Timber.e("Unexpected credential type: ${credential.type}")
+            return Result.Error(DataError.Auth.FAILED)
+        }
+
+        // Extract Google ID Token
+        val googleIdTokenCredential = GoogleIdTokenCredential.Companion
+            .createFrom(credential.data)
+
+        // Sign in to Firebase with the ID token
+        val googleCredentials = GoogleAuthProvider.getCredential(
+            googleIdTokenCredential.idToken,
+            null
+        )
+
+        val user = auth.signInWithCredential(googleCredentials).await().user
+            ?: return Result.Error(DataError.Auth.FAILED)
+
+        return Result.Success(
+            UserData(
+                userId = user.uid,
+                username = user.displayName,
+                profilePictureUrl = user.photoUrl?.toString()
+            )
+        )
     }
 
     /**

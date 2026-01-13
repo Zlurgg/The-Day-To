@@ -19,9 +19,9 @@ import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
+import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
-import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
