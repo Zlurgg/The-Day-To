@@ -120,4 +120,4 @@ app/src/
 
 - 306 tests (257 unit + 49 integration)
 - All tests passing
-- Current version: v1.0.8
+- Current version: v1.0.9
