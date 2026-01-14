@@ -315,6 +315,7 @@ Following Google's 2025 Android Testing Guidelines - prioritize fast, reliable u
 - Release signing configuration
 - R8 minification and resource shrinking enabled
 - In-app update checker via GitHub Releases API
+- Debug/Release source sets for Firebase emulator authentication
 
 ### 📋 Future Enhancements
 - Accessibility audit (content descriptions, touch targets)
@@ -353,6 +354,86 @@ core/
 
 ---
 
+## Debug/Release Source Sets
+
+The project uses Android source sets to provide different authentication implementations for debug and release builds.
+
+### Purpose
+- **Debug builds**: Connect to Firebase Auth Emulator for local development
+- **Release builds**: Use production Google Sign-In (no emulator code)
+
+### Directory Structure
+```
+app/src/
+├── main/java/uk/co/zlurgg/thedayto/
+│   └── auth/domain/
+│       ├── service/DevAuthService.kt        <- Interface (shared)
+│       └── usecases/DevSignInUseCase.kt     <- UseCase (shared)
+│
+├── debug/java/uk/co/zlurgg/thedayto/
+│   ├── auth/
+│   │   ├── data/service/FirebaseEmulatorAuthService.kt
+│   │   └── ui/components/DevSignInButton.kt
+│   └── di/DebugModule.kt
+│
+└── release/java/uk/co/zlurgg/thedayto/
+    ├── auth/
+    │   ├── data/service/NoOpDevAuthService.kt
+    │   └── ui/components/DevSignInButton.kt  <- Empty composable
+    └── di/DebugModule.kt                     <- Empty module list
+```
+
+### How It Works
+1. `DevAuthService` interface defined in `main/` with two implementations
+2. `DebugModule` provides Koin bindings - populated in debug, empty in release
+3. `DevSignInButton` renders UI in debug, renders nothing in release
+4. `SignInUseCases.devSignIn` is nullable - injected via `getOrNull()` in Koin
+5. `SignInViewModel` checks `devSignIn?.isAvailable()` to show/hide button
+
+### Using Firebase Emulator (Debug Builds)
+
+**Prerequisites:**
+```bash
+npm install -g firebase-tools
+firebase init emulators  # Select Auth emulator on port 9099
+```
+
+**Start Emulator:**
+```bash
+firebase emulators:start
+# Emulator UI available at http://localhost:4000
+```
+
+**Create Test User:**
+1. Open http://localhost:4000/auth
+2. Add user: `test@example.com` / `password123`
+
+**Run Debug Build:**
+1. Build: `./gradlew assembleDebug`
+2. Install on Android emulator (uses `10.0.2.2` to reach host localhost)
+3. "Dev Sign-In (Emulator)" button appears below Google Sign-In
+4. Click to authenticate with test credentials
+
+### Key Files
+| File | Purpose |
+|------|---------|
+| `auth/domain/service/DevAuthService.kt` | Interface for dev authentication |
+| `auth/domain/usecases/DevSignInUseCase.kt` | UseCase wrapping dev auth |
+| `debug/.../FirebaseEmulatorAuthService.kt` | Connects to emulator at 10.0.2.2:9099 |
+| `debug/.../DevSignInButton.kt` | Visible button with credential hints |
+| `debug/di/DebugModule.kt` | Koin module with debug bindings |
+| `release/.../NoOpDevAuthService.kt` | Returns failure, `isAvailable() = false` |
+| `release/.../DevSignInButton.kt` | Empty composable (renders nothing) |
+| `release/di/DebugModule.kt` | `val debugModules = emptyList()` |
+
+### Pattern Benefits
+- No emulator code in release APK (R8 removes unused classes)
+- Same `DevSignInButton` import works in both build types
+- Nullable `devSignIn` use case - gracefully absent in release
+- Test credentials hardcoded for convenience (debug only)
+
+---
+
 ## Anti-Patterns to Avoid
 
 ❌ Don't use !! operator
@@ -383,4 +464,4 @@ core/
 
 ---
 
-Last Updated: 2026-01-13
+Last Updated: 2026-01-14
