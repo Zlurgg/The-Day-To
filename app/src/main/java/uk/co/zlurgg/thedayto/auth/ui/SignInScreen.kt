@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
 import uk.co.zlurgg.thedayto.auth.ui.components.WelcomeHeader
@@ -74,6 +75,8 @@ fun SignInScreenRoot(
         showWelcomeDialog = state.showWelcomeDialog,
         onDismissWelcomeDialog = { viewModel.dismissWelcomeDialog() },
         onSignInClick = { viewModel.signIn() },
+        onDevSignInClick = { viewModel.devSignIn() },
+        isDevSignInAvailable = state.isDevSignInAvailable,
         snackbarHostState = snackbarHostState
     )
 }
@@ -86,6 +89,8 @@ private fun SignInScreen(
     showWelcomeDialog: Boolean,
     onDismissWelcomeDialog: () -> Unit,
     onSignInClick: () -> Unit,
+    onDevSignInClick: () -> Unit,
+    isDevSignInAvailable: Boolean,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -100,6 +105,8 @@ private fun SignInScreen(
     ) { innerPadding ->
         SignInScreenContent(
             onSignInClick = onSignInClick,
+            onDevSignInClick = onDevSignInClick,
+            isDevSignInAvailable = isDevSignInAvailable,
             modifier = Modifier
                 .padding(innerPadding)
                 .fillMaxSize()
@@ -110,6 +117,8 @@ private fun SignInScreen(
 @Composable
 private fun SignInScreenContent(
     onSignInClick: () -> Unit,
+    onDevSignInClick: () -> Unit,
+    isDevSignInAvailable: Boolean,
     modifier: Modifier = Modifier
 ) {
     // Animation states for staggered entrance
@@ -155,6 +164,13 @@ private fun SignInScreenContent(
                     showButton = showButton
                 )
 
+                if (isDevSignInAvailable) {
+                    DevSignInButton(
+                        onClick = onDevSignInClick,
+                        showButton = showButton
+                    )
+                }
+
                 SignInFooter(
                     showButton = showButton
                 )
@@ -168,7 +184,9 @@ private fun SignInScreenContent(
 private fun SignInScreenContentPreview() {
     TheDayToTheme {
         SignInScreenContent(
-            onSignInClick = { }
+            onSignInClick = { },
+            onDevSignInClick = { },
+            isDevSignInAvailable = true
         )
     }
 }
@@ -184,7 +202,9 @@ private fun SignInScreenContentPreview() {
 private fun SignInScreenContentDarkPreview() {
     TheDayToTheme(useDarkTheme = true) {
         SignInScreenContent(
-            onSignInClick = { }
+            onSignInClick = { },
+            onDevSignInClick = { },
+            isDevSignInAvailable = true
         )
     }
 }

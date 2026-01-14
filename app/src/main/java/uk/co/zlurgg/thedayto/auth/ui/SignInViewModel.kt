@@ -20,7 +20,11 @@ class SignInViewModel(
 ) : ViewModel() {
 
     // UI State
-    private val _state = MutableStateFlow(SignInState())
+    private val _state = MutableStateFlow(
+        SignInState(
+            isDevSignInAvailable = signInUseCases.devSignIn?.isAvailable() == true
+        )
+    )
     val state = _state.asStateFlow()
 
     // One-time UI events
@@ -79,6 +83,31 @@ class SignInViewModel(
     }
 
     /**
+     * Initiates dev sign-in via Firebase Auth Emulator
+     * Uses predefined test credentials
+     */
+    fun devSignIn() {
+        val devSignInUseCase = signInUseCases.devSignIn ?: return
+
+        viewModelScope.launch {
+            _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
+
+            when (val result = devSignInUseCase(DEV_TEST_EMAIL, DEV_TEST_PASSWORD)) {
+                is Result.Success -> {
+                    _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
+                    signInUseCases.seedDefaultMoodColors()
+                    _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
+                }
+                is Result.Error -> {
+                    val errorMessage = ErrorFormatter.format(result.error, "dev sign in")
+                    _state.update { it.copy(isSignInSuccessful = false, signInError = errorMessage) }
+                    _uiEvents.emit(SignInUiEvent.ShowSnackbar(errorMessage))
+                }
+            }
+        }
+    }
+
+    /**
      * Check if user is already signed in
      * Called on app start to determine initial navigation
      */
@@ -97,5 +126,10 @@ class SignInViewModel(
      */
     fun onNavigationHandled() {
         _state.update { it.copy(navigationTarget = null) }
+    }
+
+    companion object {
+        private const val DEV_TEST_EMAIL = "test@example.com"
+        private const val DEV_TEST_PASSWORD = "password123"
     }
 }

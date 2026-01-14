@@ -46,7 +46,8 @@ val authModule = module {
             ),
             markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(
                 preferencesRepository = get()
-            )
+            ),
+            devSignIn = getOrNull()
         )
     }
 
