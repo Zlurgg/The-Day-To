@@ -11,7 +11,7 @@ Version number: $ARGUMENTS (e.g., "1.0.3")
 
 2. **Update version numbers**:
    - `app/build.gradle.kts`: Increment `versionCode` by 1, set `versionName` to the new version
-   - `CLAUDE.md`: Update "Current Version" and "Release Date" (use today's date)
+   - `ARCHITECTURE.md`: Update "Current version" in the Metrics section
 
 3. **Build release APK**:
    - Run `./gradlew assembleRelease`
