@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
@@ -24,6 +25,7 @@ import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
+import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
@@ -53,6 +55,7 @@ class SignInViewModelTest {
     private lateinit var fakePreferencesRepository: FakePreferencesRepository
     private lateinit var fakeEntryRepository: FakeEntryRepository
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
+    private lateinit var fakeDevAuthService: FakeDevAuthService
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -66,6 +69,7 @@ class SignInViewModelTest {
         fakePreferencesRepository = FakePreferencesRepository()
         fakeEntryRepository = FakeEntryRepository()
         fakeMoodColorRepository = FakeMoodColorRepository()
+        fakeDevAuthService = FakeDevAuthService()
     }
 
     @After
@@ -73,14 +77,21 @@ class SignInViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private fun createViewModel(): SignInViewModel {
+    private fun createViewModel(includeDevSignIn: Boolean = false): SignInViewModel {
+        val devSignInUseCase = if (includeDevSignIn) {
+            DevSignInUseCase(fakeDevAuthService, fakeAuthStateRepository)
+        } else {
+            null
+        }
+
         val signInUseCases = SignInUseCases(
             signIn = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkSignInStatus = CheckSignInStatusUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkTodayEntry = CheckTodayEntryUseCase(fakeEntryRepository),
             seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(fakeMoodColorRepository, fakePreferencesRepository),
             checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(fakePreferencesRepository),
-            markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(fakePreferencesRepository)
+            markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(fakePreferencesRepository),
+            devSignIn = devSignInUseCase
         )
         return SignInViewModel(signInUseCases)
     }
@@ -302,5 +313,125 @@ class SignInViewModelTest {
             assertEquals("Should not have navigation target", null, state.navigationTarget)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // ============================================================
+    // Dev Sign-In Tests
+    // ============================================================
+
+    @Test
+    fun `isDevSignInAvailable is false when devSignIn is null`() = runTest {
+        // Given: ViewModel without devSignIn
+        viewModel = createViewModel(includeDevSignIn = false)
+
+        // Then: Dev sign-in should not be available
+        viewModel.state.test {
+            val state = awaitItem()
+            assertFalse("Dev sign-in should not be available", state.isDevSignInAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `isDevSignInAvailable is true when devSignIn is available`() = runTest {
+        // Given: ViewModel with devSignIn and service available
+        fakeDevAuthService.isDevAvailable = true
+        viewModel = createViewModel(includeDevSignIn = true)
+
+        // Then: Dev sign-in should be available
+        viewModel.state.test {
+            val state = awaitItem()
+            assertTrue("Dev sign-in should be available", state.isDevSignInAvailable)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `devSignIn successful updates state and navigates to overview`() = runTest {
+        // Given: ViewModel with devSignIn and service configured for success
+        fakeDevAuthService.shouldReturnError = false
+        viewModel = createViewModel(includeDevSignIn = true)
+
+        // When: User dev signs in
+        viewModel.devSignIn()
+
+        // Then: State should reflect successful sign-in and navigation target
+        viewModel.state.test {
+            val state = awaitItem()
+            assertTrue("Sign-in should be successful", state.isSignInSuccessful)
+            assertEquals("Error should be null", null, state.signInError)
+            assertTrue(
+                "Should have navigation target to overview",
+                state.navigationTarget is SignInNavigationTarget.ToOverview
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Auth state should be updated
+        assertTrue("Auth state should be signed in", fakeAuthStateRepository.getSignedInState())
+    }
+
+    @Test
+    fun `devSignIn failure updates state with error and shows snackbar`() = runTest {
+        // Given: ViewModel with devSignIn and service configured for failure
+        fakeDevAuthService.shouldReturnError = true
+        viewModel = createViewModel(includeDevSignIn = true)
+
+        // When: User dev signs in (collect events first, then trigger action)
+        viewModel.uiEvents.test {
+            viewModel.devSignIn()
+
+            // Then: Should emit snackbar event
+            val event = awaitItem()
+            assertTrue("Should show error snackbar", event is SignInUiEvent.ShowSnackbar)
+            assertTrue(
+                "Snackbar message should contain error text",
+                (event as SignInUiEvent.ShowSnackbar).message.isNotEmpty()
+            )
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: State should reflect failed sign-in
+        viewModel.state.test {
+            val state = awaitItem()
+            assertFalse("Sign-in should not be successful", state.isSignInSuccessful)
+            assertTrue("Error message should be set", state.signInError != null)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `devSignIn does nothing when devSignIn is null`() = runTest {
+        // Given: ViewModel without devSignIn
+        viewModel = createViewModel(includeDevSignIn = false)
+
+        // When: Calling devSignIn (should be a no-op)
+        viewModel.devSignIn()
+
+        // Then: State should be unchanged (no sign-in, no error, no navigation)
+        viewModel.state.test {
+            val state = awaitItem()
+            assertFalse("Sign-in should not be successful", state.isSignInSuccessful)
+            assertEquals("Error should be null", null, state.signInError)
+            assertEquals("Should not have navigation target", null, state.navigationTarget)
+            cancelAndIgnoreRemainingEvents()
+        }
+
+        // And: Auth state should NOT be updated
+        assertFalse("Auth state should not be signed in", fakeAuthStateRepository.getSignedInState())
+    }
+
+    @Test
+    fun `devSignIn successful seeds default mood colors`() = runTest {
+        // Given: ViewModel with devSignIn and successful auth
+        fakeDevAuthService.shouldReturnError = false
+        viewModel = createViewModel(includeDevSignIn = true)
+
+        // When: User dev signs in
+        viewModel.devSignIn()
+
+        // Then: Default mood colors should be seeded
+        val moodColors = fakeMoodColorRepository.getMoodColorsSync()
+        assertEquals("Should have 7 default mood colors", 7, moodColors.size)
     }
 }
