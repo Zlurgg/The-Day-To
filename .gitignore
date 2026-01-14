@@ -20,3 +20,7 @@ google-services.json
 
 # Claude Code temp files
 tmpclaude-*
+
+# Firebase emulator logs
+firebase-debug.log
+ui-debug.log
