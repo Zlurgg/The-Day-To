@@ -13,8 +13,8 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckTodayEntryExistsUseCaseImpl
-import io.github.zlurgg.update.domain.model.UpdateConfig
-import io.github.zlurgg.update.domain.repository.UpdatePreferencesRepository
+import io.github.zlurgg.githubreleaseupdater.domain.model.UpdateConfig
+import io.github.zlurgg.githubreleaseupdater.domain.repository.UpdatePreferencesRepository
 
 val coreModule = module {
 

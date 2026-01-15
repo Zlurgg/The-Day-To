@@ -80,10 +80,10 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
-import io.github.zlurgg.update.ui.components.UpdateDialog
-import io.github.zlurgg.update.ui.components.UpToDateDialog
-import io.github.zlurgg.update.ui.strings.UpdateDialogStrings
-import io.github.zlurgg.update.ui.strings.UpToDateDialogStrings
+import io.github.zlurgg.githubreleaseupdater.ui.components.UpdateDialog
+import io.github.zlurgg.githubreleaseupdater.ui.components.UpToDateDialog
+import io.github.zlurgg.githubreleaseupdater.ui.strings.UpdateDialogStrings
+import io.github.zlurgg.githubreleaseupdater.ui.strings.UpToDateDialogStrings
 import java.time.LocalDate
 
 /**

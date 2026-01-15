@@ -9,10 +9,10 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.ShouldShowPermis
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
-import io.github.zlurgg.update.domain.usecases.CheckForUpdateUseCase
-import io.github.zlurgg.update.domain.usecases.DismissUpdateUseCase
-import io.github.zlurgg.update.domain.usecases.DownloadUpdateUseCase
-import io.github.zlurgg.update.domain.usecases.GetCurrentVersionInfoUseCase
+import io.github.zlurgg.githubreleaseupdater.domain.usecases.CheckForUpdateUseCase
+import io.github.zlurgg.githubreleaseupdater.domain.usecases.DismissUpdateUseCase
+import io.github.zlurgg.githubreleaseupdater.domain.usecases.DownloadUpdateUseCase
+import io.github.zlurgg.githubreleaseupdater.domain.usecases.GetCurrentVersionInfoUseCase
 
 data class OverviewUseCases(
     val getEntries: GetEntriesUseCase,

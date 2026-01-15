@@ -83,7 +83,7 @@ android {
 
 dependencies {
     implementation(libs.zlurgg.core)
-    implementation(project(":update"))
+    implementation(libs.zlurgg.github.release.updater)
     implementation(libs.androidx.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.ktx)

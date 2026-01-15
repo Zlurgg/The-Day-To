@@ -4,7 +4,7 @@ import androidx.compose.runtime.Stable
 import io.github.zlurgg.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
-import io.github.zlurgg.update.domain.model.UpdateInfo
+import io.github.zlurgg.githubreleaseupdater.domain.model.UpdateInfo
 import java.time.LocalDate
 
 /**

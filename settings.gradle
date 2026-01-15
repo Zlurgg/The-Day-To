@@ -11,8 +11,16 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         maven {
-            name = "GitHubPackages"
+            name = "GitHubPackagesCore"
             url = uri("https://maven.pkg.github.com/Zlurgg/core")
+            credentials {
+                username = providers.gradleProperty("gpr.user").orNull
+                password = providers.gradleProperty("gpr.key").orNull
+            }
+        }
+        maven {
+            name = "GitHubPackagesUpdater"
+            url = uri("https://maven.pkg.github.com/Zlurgg/github-release-updater")
             credentials {
                 username = providers.gradleProperty("gpr.user").orNull
                 password = providers.gradleProperty("gpr.key").orNull
@@ -22,4 +30,3 @@ dependencyResolutionManagement {
 }
 rootProject.name = "The Day To"
 include ':app'
-include ':update'
