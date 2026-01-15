@@ -2,9 +2,9 @@ package uk.co.zlurgg.thedayto.fake
 
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.EmptyResult
+import io.github.zlurgg.core.domain.result.Result
 
 /**
  * Fake implementation of AuthRepository for testing.

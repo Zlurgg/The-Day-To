@@ -1,9 +1,9 @@
 package uk.co.zlurgg.thedayto.journal.domain.repository
 
 import kotlinx.coroutines.flow.Flow
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.EmptyResult
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 
 /**

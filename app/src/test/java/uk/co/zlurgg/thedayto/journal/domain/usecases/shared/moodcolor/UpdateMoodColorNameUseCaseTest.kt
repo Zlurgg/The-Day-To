@@ -4,7 +4,7 @@ import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders

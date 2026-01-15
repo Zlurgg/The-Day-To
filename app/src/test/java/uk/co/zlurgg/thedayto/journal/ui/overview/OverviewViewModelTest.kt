@@ -361,7 +361,7 @@ class OverviewViewModelTest {
         val initialState = viewModel.uiState.value
         assertEquals(
             "Should start with Date Descending",
-            uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending,
+            io.github.zlurgg.core.domain.util.OrderType.Descending,
             initialState.entryOrder.orderType
         )
 
@@ -369,7 +369,7 @@ class OverviewViewModelTest {
         viewModel.onAction(
             OverviewAction.Order(
                 uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder.Date(
-                    uk.co.zlurgg.thedayto.core.domain.util.OrderType.Ascending
+                    io.github.zlurgg.core.domain.util.OrderType.Ascending
                 )
             )
         )
@@ -379,7 +379,7 @@ class OverviewViewModelTest {
         val newState = viewModel.uiState.value
         assertEquals(
             "Should change to Date Ascending",
-            uk.co.zlurgg.thedayto.core.domain.util.OrderType.Ascending,
+            io.github.zlurgg.core.domain.util.OrderType.Ascending,
             newState.entryOrder.orderType
         )
     }

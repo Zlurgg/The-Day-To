@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.domain.usecases
 
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import java.time.LocalDate
 import java.time.ZoneOffset

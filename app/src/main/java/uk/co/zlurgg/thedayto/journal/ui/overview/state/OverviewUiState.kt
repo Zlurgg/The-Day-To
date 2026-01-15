@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
 import androidx.compose.runtime.Stable
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import io.github.zlurgg.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo

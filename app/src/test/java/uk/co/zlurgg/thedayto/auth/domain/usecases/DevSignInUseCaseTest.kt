@@ -6,8 +6,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
 import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
 

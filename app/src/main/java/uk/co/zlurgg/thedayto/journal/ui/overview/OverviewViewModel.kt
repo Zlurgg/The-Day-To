@@ -13,11 +13,11 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
-import uk.co.zlurgg.thedayto.core.domain.result.Result
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import io.github.zlurgg.core.domain.error.ErrorFormatter
+import io.github.zlurgg.core.domain.result.Result
+import io.github.zlurgg.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.util.DateUtils
+import io.github.zlurgg.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases

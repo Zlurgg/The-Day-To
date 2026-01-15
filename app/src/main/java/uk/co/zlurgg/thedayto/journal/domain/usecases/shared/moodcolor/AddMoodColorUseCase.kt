@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository

@@ -15,8 +15,8 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import io.github.zlurgg.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases

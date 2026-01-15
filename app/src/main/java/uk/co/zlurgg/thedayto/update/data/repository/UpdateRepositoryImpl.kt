@@ -4,8 +4,8 @@ import io.ktor.util.network.UnresolvedAddressException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.update.data.remote.api.GitHubApiService
 import uk.co.zlurgg.thedayto.update.data.service.ApkDownloadService

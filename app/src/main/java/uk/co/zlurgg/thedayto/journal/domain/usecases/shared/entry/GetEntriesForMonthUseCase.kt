@@ -2,7 +2,7 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import io.github.zlurgg.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder

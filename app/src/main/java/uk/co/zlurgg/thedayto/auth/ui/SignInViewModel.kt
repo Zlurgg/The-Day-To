@@ -12,8 +12,8 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
-import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.ErrorFormatter
+import io.github.zlurgg.core.domain.result.Result
 
 class SignInViewModel(
     private val signInUseCases: SignInUseCases

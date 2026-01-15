@@ -14,9 +14,9 @@ import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.EmptyResult
+import io.github.zlurgg.core.domain.result.Result
 import java.util.concurrent.CancellationException
 
 /**

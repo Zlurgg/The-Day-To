@@ -12,8 +12,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.data.remote.api.GitHubApiService
 import uk.co.zlurgg.thedayto.update.data.remote.dto.AssetDto
 import uk.co.zlurgg.thedayto.update.data.remote.dto.GitHubReleaseDto

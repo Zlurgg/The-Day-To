@@ -2,10 +2,10 @@ package uk.co.zlurgg.thedayto.journal.data.repository
 
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.error.ErrorMapper
-import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.error.ErrorMapper
+import io.github.zlurgg.core.domain.result.EmptyResult
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity

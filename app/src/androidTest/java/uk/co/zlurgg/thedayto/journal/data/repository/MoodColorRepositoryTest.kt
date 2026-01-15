@@ -11,7 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.zlurgg.thedayto.base.DatabaseTest
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import io.github.zlurgg.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 

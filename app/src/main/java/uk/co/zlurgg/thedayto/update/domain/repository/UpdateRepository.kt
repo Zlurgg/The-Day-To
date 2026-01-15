@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.update.domain.repository
 
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import io.github.zlurgg.core.domain.error.DataError
+import io.github.zlurgg.core.domain.result.Result
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 
 /**
