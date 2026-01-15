@@ -83,6 +83,7 @@ android {
 
 dependencies {
     implementation(project(":core"))
+    implementation(project(":update"))
     implementation(libs.androidx.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.activity.ktx)

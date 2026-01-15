@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.fake
 
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
+import io.github.zlurgg.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**

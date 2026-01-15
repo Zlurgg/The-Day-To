@@ -3,7 +3,7 @@ package uk.co.zlurgg.thedayto.core.data.repository
 import android.content.Context
 import androidx.core.content.edit
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
+import io.github.zlurgg.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**

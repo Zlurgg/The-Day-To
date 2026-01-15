@@ -80,8 +80,10 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
-import uk.co.zlurgg.thedayto.update.ui.components.UpdateDialog
-import uk.co.zlurgg.thedayto.update.ui.components.UpToDateDialog
+import io.github.zlurgg.update.ui.components.UpdateDialog
+import io.github.zlurgg.update.ui.components.UpToDateDialog
+import io.github.zlurgg.update.ui.strings.UpdateDialogStrings
+import io.github.zlurgg.update.ui.strings.UpToDateDialogStrings
 import java.time.LocalDate
 
 /**
@@ -426,7 +428,14 @@ private fun OverviewScreen(
         UpdateDialog(
             updateInfo = uiState.availableUpdate,
             onDownload = { onAction(OverviewAction.DownloadUpdate) },
-            onDismiss = { onAction(OverviewAction.DismissUpdate) }
+            onDismiss = { onAction(OverviewAction.DismissUpdate) },
+            strings = UpdateDialogStrings(
+                title = stringResource(R.string.update_available_title),
+                versionLabel = stringResource(R.string.update_version_label),
+                whatsNewLabel = stringResource(R.string.update_whats_new_label),
+                downloadButton = stringResource(R.string.update_download_button),
+                notNowButton = stringResource(R.string.update_not_now_button)
+            )
         )
     }
 
@@ -435,7 +444,13 @@ private fun OverviewScreen(
         UpToDateDialog(
             currentVersionInfo = uiState.currentVersionInfo,
             currentVersionName = BuildConfig.VERSION_NAME,
-            onDismiss = { onAction(OverviewAction.DismissUpToDate) }
+            onDismiss = { onAction(OverviewAction.DismissUpToDate) },
+            strings = UpToDateDialogStrings(
+                title = stringResource(R.string.update_up_to_date_title),
+                currentVersionLabel = stringResource(R.string.update_current_version_label),
+                inThisVersionLabel = stringResource(R.string.update_in_this_version_label),
+                okButton = stringResource(R.string.update_ok_button)
+            )
         )
     }
 

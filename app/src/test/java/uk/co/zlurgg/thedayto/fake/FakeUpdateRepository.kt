@@ -2,8 +2,8 @@ package uk.co.zlurgg.thedayto.fake
 
 import io.github.zlurgg.core.domain.error.DataError
 import io.github.zlurgg.core.domain.result.Result
-import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
-import uk.co.zlurgg.thedayto.update.domain.repository.UpdateRepository
+import io.github.zlurgg.update.domain.model.UpdateInfo
+import io.github.zlurgg.update.domain.repository.UpdateRepository
 
 /**
  * Fake implementation of UpdateRepository for testing.

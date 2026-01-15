@@ -5,7 +5,7 @@ import uk.co.zlurgg.thedayto.core.di.coreModule
 import uk.co.zlurgg.thedayto.di.debugModules
 import uk.co.zlurgg.thedayto.journal.di.journalModule
 import uk.co.zlurgg.thedayto.journal.di.journalViewModelModule
-import uk.co.zlurgg.thedayto.update.di.updateModule
+import io.github.zlurgg.update.di.updateModule
 
 val appModule = listOf(
     coreModule,
