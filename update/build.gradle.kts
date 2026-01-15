@@ -33,7 +33,7 @@ android {
 
 dependencies {
     // Core module (from GitHub Packages)
-    implementation("io.github.zlurgg:core:1.0.0")
+    implementation(libs.zlurgg.core)
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
