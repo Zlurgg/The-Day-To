@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 rootProject.name = "The Day To"
 include ':app'
 include ':core'
+include ':update'
