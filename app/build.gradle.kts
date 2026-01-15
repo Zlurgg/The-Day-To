@@ -82,7 +82,7 @@ android {
 }
 
 dependencies {
-    implementation(project(":core"))
+    implementation("io.github.zlurgg:core:1.0.0")
     implementation(project(":update"))
     implementation(libs.androidx.ktx)
     implementation(libs.androidx.appcompat)

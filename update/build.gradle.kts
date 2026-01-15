@@ -32,8 +32,8 @@ android {
 }
 
 dependencies {
-    // Core module
-    implementation(project(":core"))
+    // Core module (from GitHub Packages)
+    implementation("io.github.zlurgg:core:1.0.0")
 
     // Coroutines
     implementation(libs.kotlinx.coroutines.core)
