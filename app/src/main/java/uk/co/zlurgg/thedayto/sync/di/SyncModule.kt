@@ -1,8 +1,10 @@
 package uk.co.zlurgg.thedayto.sync.di
 
 import com.google.firebase.firestore.FirebaseFirestore
+import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.sync.data.repository.SyncRepositoryImpl
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 import uk.co.zlurgg.thedayto.sync.domain.usecase.CheckSyncEnabledUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.DisableSyncUseCase
@@ -78,4 +80,7 @@ val syncModule = module {
             getLastSyncTimestamp = get()
         )
     }
+
+    // Background sync scheduler
+    single { SyncScheduler(androidContext()) }
 }

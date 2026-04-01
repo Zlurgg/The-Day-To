@@ -47,11 +47,17 @@ val journalModule = module {
     // ========== Repositories ==========
 
     single<EntryRepository> {
-        EntryRepositoryImpl(get<TheDayToDatabase>().entryDao)
+        EntryRepositoryImpl(
+            dao = get<TheDayToDatabase>().entryDao,
+            preferencesRepository = get()
+        )
     }
 
     single<MoodColorRepository> {
-        MoodColorRepositoryImpl(get<TheDayToDatabase>().moodColorDao)
+        MoodColorRepositoryImpl(
+            dao = get<TheDayToDatabase>().moodColorDao,
+            preferencesRepository = get()
+        )
     }
 
     // ========== Shared Entry Use Cases ==========
