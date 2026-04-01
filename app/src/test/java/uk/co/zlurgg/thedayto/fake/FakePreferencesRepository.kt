@@ -22,6 +22,8 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
     private var notificationHour: Int = 9
     private var notificationMinute: Int = 0
     private var dismissedVersion: String? = null
+    private var syncEnabled: Boolean = false
+    private var lastSyncTimestamp: Long? = null
 
     override suspend fun hasShownEntryReminderToday(): Boolean {
         return entryReminderDate == LocalDate.now()
@@ -84,6 +86,24 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         dismissedVersion = version
     }
 
+    // ==================== Cloud Sync ====================
+
+    override suspend fun isSyncEnabled(): Boolean {
+        return syncEnabled
+    }
+
+    override suspend fun setSyncEnabled(enabled: Boolean) {
+        syncEnabled = enabled
+    }
+
+    override suspend fun getLastSyncTimestamp(): Long? {
+        return lastSyncTimestamp
+    }
+
+    override suspend fun setLastSyncTimestamp(timestamp: Long) {
+        lastSyncTimestamp = timestamp
+    }
+
     /**
      * Helper method to set editor tutorial seen state for testing.
      */
@@ -111,5 +131,7 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         notificationHour = 9
         notificationMinute = 0
         dismissedVersion = null
+        syncEnabled = false
+        lastSyncTimestamp = null
     }
 }

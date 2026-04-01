@@ -187,6 +187,45 @@ class PreferencesRepositoryImpl(
         prefs.edit { putString(KEY_DISMISSED_VERSION, version) }
     }
 
+    // ==================== Cloud Sync ====================
+
+    /**
+     * Check if cloud sync is enabled.
+     *
+     * @return true if sync is enabled, false otherwise (default: false)
+     */
+    override suspend fun isSyncEnabled(): Boolean {
+        return prefs.getBoolean(KEY_SYNC_ENABLED, false)
+    }
+
+    /**
+     * Enable or disable cloud sync.
+     *
+     * @param enabled true to enable sync, false to disable
+     */
+    override suspend fun setSyncEnabled(enabled: Boolean) {
+        prefs.edit { putBoolean(KEY_SYNC_ENABLED, enabled) }
+    }
+
+    /**
+     * Get the timestamp of the last successful sync.
+     *
+     * @return epoch millis of last sync, or null if never synced
+     */
+    override suspend fun getLastSyncTimestamp(): Long? {
+        val timestamp = prefs.getLong(KEY_LAST_SYNC_TIMESTAMP, -1L)
+        return if (timestamp == -1L) null else timestamp
+    }
+
+    /**
+     * Set the timestamp of the last successful sync.
+     *
+     * @param timestamp epoch millis of the sync completion
+     */
+    override suspend fun setLastSyncTimestamp(timestamp: Long) {
+        prefs.edit { putLong(KEY_LAST_SYNC_TIMESTAMP, timestamp) }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"
@@ -197,6 +236,8 @@ class PreferencesRepositoryImpl(
         private const val KEY_NOTIFICATION_HOUR = "notification_hour"
         private const val KEY_NOTIFICATION_MINUTE = "notification_minute"
         private const val KEY_DISMISSED_VERSION = "dismissed_update_version"
+        private const val KEY_SYNC_ENABLED = "sync_enabled"
+        private const val KEY_LAST_SYNC_TIMESTAMP = "last_sync_timestamp"
 
         private const val DEFAULT_NOTIFICATION_HOUR = 9  // 9 AM
         private const val DEFAULT_NOTIFICATION_MINUTE = 0

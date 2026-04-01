@@ -136,4 +136,42 @@ interface PreferencesRepository {
      * @param version the version string to mark as dismissed
      */
     suspend fun setDismissedVersion(version: String)
+
+    // ==================== Cloud Sync ====================
+
+    /**
+     * Check if cloud sync is enabled.
+     *
+     * When enabled, local data is synced to Firestore for cross-device access.
+     *
+     * @return true if sync is enabled, false otherwise (default: false)
+     */
+    suspend fun isSyncEnabled(): Boolean
+
+    /**
+     * Enable or disable cloud sync.
+     *
+     * When disabled, data remains local only. When enabled, triggers initial sync.
+     *
+     * @param enabled true to enable sync, false to disable
+     */
+    suspend fun setSyncEnabled(enabled: Boolean)
+
+    /**
+     * Get the timestamp of the last successful sync.
+     *
+     * Used to track sync freshness and detect stale data.
+     *
+     * @return epoch millis of last sync, or null if never synced
+     */
+    suspend fun getLastSyncTimestamp(): Long?
+
+    /**
+     * Set the timestamp of the last successful sync.
+     *
+     * Called after a successful sync operation completes.
+     *
+     * @param timestamp epoch millis of the sync completion
+     */
+    suspend fun setLastSyncTimestamp(timestamp: Long)
 }
