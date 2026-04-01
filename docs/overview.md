@@ -1,4 +1,4 @@
-# Architecture
+# Project Overview
 
 The Day To is a daily mood logging Android application built with Kotlin and Jetpack Compose.
 
@@ -9,12 +9,11 @@ The Day To is a daily mood logging Android application built with Kotlin and Jet
 ./gradlew assembleDebug
 
 # Run tests
-./gradlew test                   # 257 unit tests
-./gradlew connectedAndroidTest   # 49 integration tests
+./gradlew test                   # Unit tests
+./gradlew connectedAndroidTest   # Integration tests
 
 # Code quality
 ./gradlew detekt                 # Static analysis
-./gradlew lint                   # Android lint
 
 # Release
 ./gradlew assembleRelease
@@ -32,24 +31,23 @@ firebase emulators:start
 # Create test user: test@example.com / password123
 ```
 
-- Debug builds connect to `10.0.2.2` (Android emulator's localhost alias)
-- Release builds use production Google Sign-In
+### Emulator Host Configuration
 
-## Architecture
+The emulator host is configured in `local.properties` (not checked into git):
 
-### Clean Architecture Layers
+```properties
+# For Android Emulator (default)
+firebase.emulator.host=10.0.2.2
 
-```
-Presentation (ViewModels, Compose UI)
-        ↓
-    Domain (UseCases, Models, Repository Interfaces)
-        ↓
-    Data (Room, Ktor, Repository Implementations)
+# For physical device (use your machine's IP)
+firebase.emulator.host=192.168.1.x
 ```
 
-**Key principle**: ViewModels depend only on UseCases, never repositories.
+- **Android Emulator**: Uses `10.0.2.2` (localhost alias) - this is the default
+- **Physical Device**: Must use your machine's actual IP address, and phone must be on same network
+- **Release builds**: Use production Google Sign-In (emulator not used)
 
-### Package Structure
+## Package Structure
 
 ```
 uk.co.zlurgg.thedayto/
@@ -61,29 +59,11 @@ uk.co.zlurgg.thedayto/
 │   ├── service/           # Notifications, background work
 │   └── ui/                # Theme, shared UI components
 ├── auth/                   # Authentication feature
-├── update/                 # In-app update feature
 └── journal/               # Main journal feature
     ├── data/              # Room entities, repositories
     ├── domain/            # Entry/MoodColor models, UseCases
     └── ui/                # Screens, ViewModels, components
 ```
-
-### Key Patterns
-
-- **Repository Pattern**: Interfaces in domain, implementations in data
-- **UseCase Pattern**: Single-responsibility business logic classes
-- **Result Pattern**: `Result<T, DataError>` for error handling
-- **State Management**: ViewModel + StateFlow, unidirectional data flow
-- **Mapper Pattern**: Entities ↔ Domain models
-
-### Dependency Injection (Koin)
-
-Feature-scoped modules:
-- `CoreModule` - Infrastructure (database, preferences)
-- `AuthModule` - Authentication
-- `UpdateModule` - In-app updates
-- `JournalModule` - Main feature
-- `DebugModule` - Debug-only bindings (empty in release)
 
 ## Tech Stack
 
@@ -91,10 +71,9 @@ Feature-scoped modules:
 |-----------|------------|
 | UI | Jetpack Compose, Material 3 |
 | Architecture | MVVM, Clean Architecture |
-| DI | Koin 4.1.1 |
-| Database | Room 2.8.3 |
-| Network | Ktor 3.1.3 |
-| Background Work | WorkManager 2.11.0 |
+| DI | Koin |
+| Database | Room |
+| Background Work | WorkManager |
 | Auth | Firebase Auth, Credential Manager API |
 | Logging | Timber |
 | Testing | JUnit 4, MockK, Turbine |
@@ -102,12 +81,12 @@ Feature-scoped modules:
 
 ## Build Configuration
 
-- Android SDK: Target 35, Min 28
-- Kotlin: 2.2.21
+- Target SDK: 36
+- Min SDK: 27
+- Java: 11
 - R8/ProGuard enabled for release
-- Room schema version: 2
 
-## Debug/Release Source Sets
+## Source Sets
 
 ```
 app/src/
@@ -116,8 +95,18 @@ app/src/
 └── release/  # No-op stubs (empty DevSignInButton)
 ```
 
-## Metrics
+## Koin Modules
 
-- 306 tests (257 unit + 49 integration)
-- All tests passing
-- Current version: v1.0.9
+- `CoreModule` - Infrastructure (database, preferences)
+- `AuthModule` - Authentication
+- `JournalModule` - Main feature
+- `DebugModule` - Debug-only bindings (empty in release)
+
+## Documentation
+
+| Document | Purpose |
+|----------|---------|
+| `docs/specs/constitution.md` | Architectural principles |
+| `docs/specs/style/code-style.md` | Naming conventions, testing |
+| `docs/specs/patterns/` | Implementation patterns |
+| `CLAUDE.local.md` | AI assistant guidance |
