@@ -5,7 +5,7 @@ Non-negotiable architectural principles for The Day To. These rules MUST be foll
 ## Core Principles
 
 - **Local-first**: Room database is the primary data store; works without internet
-- **Privacy-focused**: All journal data stored locally, no cloud sync of entries
+- **Privacy-focused**: Journal data stored locally by default; cloud sync is OPT-IN only
 - **Optional auth**: Firebase Auth for future features, not required for core functionality
 
 ## Clean Architecture
