@@ -18,6 +18,13 @@ if (keystorePropertiesFile.exists()) {
     keystoreProperties.load(FileInputStream(keystorePropertiesFile))
 }
 
+// Load local properties for debug config
+val localPropertiesFile = rootProject.file("local.properties")
+val localProperties = Properties()
+if (localPropertiesFile.exists()) {
+    localProperties.load(FileInputStream(localPropertiesFile))
+}
+
 android {
     namespace = "uk.co.zlurgg.thedayto"
     compileSdk = 36
@@ -47,6 +54,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Firebase emulator host - defaults to Android Emulator's localhost alias
+            // Override in local.properties: firebase.emulator.host=192.168.1.x
+            val emulatorHost = localProperties.getProperty("firebase.emulator.host", "10.0.2.2")
+            buildConfigField("String", "FIREBASE_EMULATOR_HOST", "\"$emulatorHost\"")
+        }
         release {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true

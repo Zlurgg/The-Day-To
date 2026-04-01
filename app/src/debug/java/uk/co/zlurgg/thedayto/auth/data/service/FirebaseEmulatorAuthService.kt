@@ -3,6 +3,7 @@ package uk.co.zlurgg.thedayto.auth.data.service
 import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.service.DevAuthService
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
@@ -70,7 +71,9 @@ class FirebaseEmulatorAuthService : DevAuthService {
     override fun isAvailable(): Boolean = true
 
     companion object {
-        private const val EMULATOR_HOST = "10.0.2.2"
+        // Configured via local.properties: firebase.emulator.host=192.168.x.x
+        // Defaults to 10.0.2.2 (Android Emulator's localhost alias)
+        private val EMULATOR_HOST = BuildConfig.FIREBASE_EMULATOR_HOST
         private const val EMULATOR_PORT = 9099
         private const val DEV_USER_DISPLAY_NAME = "Dev User"
     }
