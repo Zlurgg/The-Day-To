@@ -181,6 +181,7 @@ dependencies {
 
     // Firebase
     implementation(libs.firebase.auth)
+    implementation(libs.firebase.firestore)
 
     // Shared Preferences
     implementation(libs.androidx.preference.ktx)

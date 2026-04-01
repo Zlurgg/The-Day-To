@@ -90,6 +90,36 @@ interface EntryDao {
         GROUP BY moodColorId
     """)
     fun getMoodColorEntryCounts(): Flow<List<MoodColorEntryCount>>
+
+    // ==================== Sync Queries ====================
+
+    /**
+     * Get all entries that need to be synced (PENDING_SYNC or PENDING_DELETE).
+     */
+    @Query("SELECT * FROM entry WHERE syncStatus IN ('PENDING_SYNC', 'PENDING_DELETE')")
+    suspend fun getEntriesPendingSync(): List<EntryEntity>
+
+    /**
+     * Get entry by syncId for conflict resolution.
+     */
+    @Query("SELECT * FROM entry WHERE syncId = :syncId")
+    suspend fun getEntryBySyncId(syncId: String): EntryEntity?
+
+    /**
+     * Update sync status for an entry.
+     */
+    @Query("UPDATE entry SET syncStatus = :status WHERE id = :id")
+    suspend fun updateSyncStatus(id: Int, status: String)
+
+    /**
+     * Update sync fields after successful upload.
+     */
+    @Query("""
+        UPDATE entry
+        SET syncId = :syncId, userId = :userId, updatedAt = :updatedAt, syncStatus = :syncStatus
+        WHERE id = :id
+    """)
+    suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
 }
 
 /**

@@ -27,4 +27,42 @@ interface MoodColorDao {
 
     @Update
     suspend fun updateMoodColor(moodColor: MoodColorEntity)
+
+    // ==================== Sync Queries ====================
+
+    /**
+     * Get all mood colors that need to be synced (PENDING_SYNC or PENDING_DELETE).
+     */
+    @Query("SELECT * FROM mood_color WHERE syncStatus IN ('PENDING_SYNC', 'PENDING_DELETE')")
+    suspend fun getMoodColorsPendingSync(): List<MoodColorEntity>
+
+    /**
+     * Get all mood colors (including deleted) for sync operations.
+     */
+    @Query("SELECT * FROM mood_color")
+    suspend fun getAllMoodColorsForSync(): List<MoodColorEntity>
+
+    /**
+     * Get mood color by syncId for conflict resolution.
+     */
+    @Query("SELECT * FROM mood_color WHERE syncId = :syncId")
+    suspend fun getMoodColorBySyncId(syncId: String): MoodColorEntity?
+
+    /**
+     * Update sync status for a mood color.
+     */
+    @Query("UPDATE mood_color SET syncStatus = :status WHERE id = :id")
+    suspend fun updateSyncStatus(id: Int, status: String)
+
+    /**
+     * Update sync fields after successful upload.
+     */
+    @Query(
+        """
+        UPDATE mood_color
+        SET syncId = :syncId, userId = :userId, updatedAt = :updatedAt, syncStatus = :syncStatus
+        WHERE id = :id
+        """
+    )
+    suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
 }
