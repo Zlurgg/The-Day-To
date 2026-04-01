@@ -33,10 +33,12 @@ import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.SignInRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.SyncSettingsRoute
 import uk.co.zlurgg.thedayto.journal.ui.editor.EditorScreenRoot
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.MoodColorManagementScreenRoot
 import uk.co.zlurgg.thedayto.journal.ui.overview.OverviewScreenRoot
 import uk.co.zlurgg.thedayto.journal.ui.stats.StatsScreenRoot
+import uk.co.zlurgg.thedayto.sync.ui.SyncSettingsScreenRoot
 
 /**
  * Main navigation graph for The Day To app
@@ -159,6 +161,15 @@ fun TheDayToApp() {
             // Mood Color Management Screen
             composable<MoodColorManagementRoute> {
                 MoodColorManagementScreenRoot(
+                    onNavigateBack = {
+                        navController.navigateUp()
+                    }
+                )
+            }
+
+            // Sync Settings Screen
+            composable<SyncSettingsRoute> {
+                SyncSettingsScreenRoot(
                     onNavigateBack = {
                         navController.navigateUp()
                     }

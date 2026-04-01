@@ -62,6 +62,7 @@ import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.SyncSettingsRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
@@ -242,6 +243,9 @@ fun OverviewScreenRoot(
         onNavigateToMoodColorManagement = {
             navController.navigate(MoodColorManagementRoute)
         },
+        onNavigateToSyncSettings = {
+            navController.navigate(SyncSettingsRoute)
+        },
         snackbarHostState = snackbarHostState
     )
 }
@@ -256,6 +260,7 @@ private fun OverviewScreen(
     onNavigateToEntry: (entryId: Int?, entryDate: Long?) -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
+    onNavigateToSyncSettings: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -321,6 +326,7 @@ private fun OverviewScreen(
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
                     onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
+                    onNavigateToSyncSettings = onNavigateToSyncSettings,
                     onSignOut = { onAction(OverviewAction.RequestSignOut) }
                 )
             }
@@ -464,6 +470,7 @@ private fun OverviewScreenPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
+            onNavigateToSyncSettings = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -483,6 +490,7 @@ private fun OverviewScreenSingleEntryPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
+            onNavigateToSyncSettings = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -502,6 +510,7 @@ private fun OverviewScreenEmptyPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
+            onNavigateToSyncSettings = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

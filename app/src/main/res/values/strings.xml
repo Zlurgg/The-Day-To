@@ -231,4 +231,22 @@
     <string name="about_dialog_license_title">License</string>
     <string name="about_dialog_license_content">This application is licensed under the MIT License. See the LICENSE file in the project repository for full details.</string>
     <string name="about">About</string>
+
+    <!-- Sync Settings -->
+    <string name="sync_settings_title">Cloud Sync</string>
+    <string name="sync_navigate_back">Navigate back</string>
+    <string name="sync_sign_in_required_title">Sign In Required</string>
+    <string name="sync_sign_in_required_message">Please sign in to enable cloud sync across your devices.</string>
+    <string name="sync_enable_label">Cloud Sync</string>
+    <string name="sync_enable_description">Sync your entries across devices</string>
+    <string name="sync_status_title">Sync Status</string>
+    <string name="sync_status_idle">Ready to sync</string>
+    <string name="sync_status_syncing">Syncing…</string>
+    <string name="sync_status_success">Synced: %1$d uploaded, %2$d downloaded</string>
+    <string name="sync_status_error">Sync failed</string>
+    <string name="sync_last_sync_format">Last synced: %1$s</string>
+    <string name="sync_now_button">Sync Now</string>
+    <string name="sync_info_title">About Cloud Sync</string>
+    <string name="sync_info_content">Your journal entries are synced securely to Google Cloud. Data is encrypted in transit and at rest. Sync happens automatically in the background when enabled.</string>
+    <string name="icon_description_sync">Cloud sync settings</string>
 </resources>

@@ -25,3 +25,6 @@ data object StatsRoute
 
 @Serializable
 data object MoodColorManagementRoute
+
+@Serializable
+data object SyncSettingsRoute

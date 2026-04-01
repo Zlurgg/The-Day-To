@@ -6,6 +6,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
@@ -36,6 +37,7 @@ fun SettingsMenu(
     onShowAbout: () -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
+    onNavigateToSyncSettings: () -> Unit,
     onSignOut: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -94,6 +96,21 @@ fun SettingsMenu(
                     Icon(
                         imageVector = Icons.Default.Notifications,
                         contentDescription = stringResource(R.string.icon_description_notifications)
+                    )
+                }
+            )
+
+            // Cloud Sync Settings
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.sync_settings_title)) },
+                onClick = {
+                    expanded = false
+                    onNavigateToSyncSettings()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.CloudSync,
+                        contentDescription = stringResource(R.string.icon_description_sync)
                     )
                 }
             )
@@ -170,6 +187,7 @@ private fun SettingsMenuPreview() {
             onShowAbout = {},
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
+            onNavigateToSyncSettings = {},
             onSignOut = {}
         )
     }
