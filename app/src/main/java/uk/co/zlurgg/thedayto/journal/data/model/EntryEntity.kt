@@ -15,11 +15,20 @@ import androidx.room.PrimaryKey
             onDelete = ForeignKey.NO_ACTION
         )
     ],
-    indices = [Index(value = ["moodColorId"])]
+    indices = [
+        Index(value = ["moodColorId"]),
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["userId"]),
+        Index(value = ["syncStatus"])
+    ]
 )
 data class EntryEntity(
     val moodColorId: Int,
     val content: String,
     val dateStamp: Long,
-    @PrimaryKey val id: Int? = null
+    @PrimaryKey val id: Int? = null,
+    val syncId: String? = null,
+    val userId: String? = null,
+    val updatedAt: Long? = null,
+    val syncStatus: String = "LOCAL_ONLY"
 )

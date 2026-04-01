@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.data.mapper
 
 import uk.co.zlurgg.thedayto.journal.data.model.MoodColorEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 
 fun MoodColorEntity.toDomain(): MoodColor {
     return MoodColor(
@@ -9,7 +10,11 @@ fun MoodColorEntity.toDomain(): MoodColor {
         color = color,
         isDeleted = isDeleted,
         dateStamp = dateStamp,
-        id = id
+        id = id,
+        syncId = syncId,
+        userId = userId,
+        updatedAt = updatedAt,
+        syncStatus = SyncStatus.valueOf(syncStatus)
     )
 }
 
@@ -20,6 +25,10 @@ fun MoodColor.toEntity(): MoodColorEntity {
         color = color,
         isDeleted = isDeleted,
         dateStamp = dateStamp,
-        id = id
+        id = id,
+        syncId = syncId,
+        userId = userId,
+        updatedAt = updatedAt,
+        syncStatus = syncStatus.name
     )
 }

@@ -8,7 +8,10 @@ import androidx.room.PrimaryKey
     tableName = "mood_color",
     indices = [
         Index(value = ["mood"]),  // Regular index for display queries
-        Index(value = ["moodNormalized"], unique = true)  // Enforce case-insensitive uniqueness
+        Index(value = ["moodNormalized"], unique = true),  // Enforce case-insensitive uniqueness
+        Index(value = ["syncId"], unique = true),
+        Index(value = ["userId"]),
+        Index(value = ["syncStatus"])
     ]
 )
 data class MoodColorEntity(
@@ -17,5 +20,9 @@ data class MoodColorEntity(
     val color: String,
     val isDeleted: Boolean = false,
     val dateStamp: Long,
-    @PrimaryKey(autoGenerate = true) val id: Int? = null
+    @PrimaryKey(autoGenerate = true) val id: Int? = null,
+    val syncId: String? = null,
+    val userId: String? = null,
+    val updatedAt: Long? = null,
+    val syncStatus: String = "LOCAL_ONLY"
 )

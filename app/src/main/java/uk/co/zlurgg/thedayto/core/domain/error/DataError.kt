@@ -49,4 +49,17 @@ sealed interface DataError : Error {
         FAILED,
         NETWORK_ERROR
     }
+
+    /**
+     * Cloud sync errors (Firestore).
+     */
+    enum class Sync : DataError {
+        NOT_AUTHENTICATED,
+        SYNC_DISABLED,
+        NETWORK_ERROR,
+        QUOTA_EXCEEDED,
+        PERMISSION_DENIED,
+        CONFLICT,
+        UNKNOWN
+    }
 }

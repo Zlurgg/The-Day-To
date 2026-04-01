@@ -4,13 +4,18 @@ import uk.co.zlurgg.thedayto.journal.data.model.EntryEntity
 import uk.co.zlurgg.thedayto.journal.data.model.EntryWithMoodColorEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
+import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 
 fun EntryEntity.toDomain(): Entry {
     return Entry(
         moodColorId = moodColorId,
         content = content,
         dateStamp = dateStamp,
-        id = id
+        id = id,
+        syncId = syncId,
+        userId = userId,
+        updatedAt = updatedAt,
+        syncStatus = SyncStatus.valueOf(syncStatus)
     )
 }
 
@@ -19,7 +24,11 @@ fun Entry.toEntity(): EntryEntity {
         moodColorId = moodColorId,
         content = content,
         dateStamp = dateStamp,
-        id = id
+        id = id,
+        syncId = syncId,
+        userId = userId,
+        updatedAt = updatedAt,
+        syncStatus = syncStatus.name
     )
 }
 

@@ -18,6 +18,7 @@ object ErrorFormatter {
             is DataError.Local -> formatLocalError(error)
             is DataError.Validation -> formatValidationError(error)
             is DataError.Auth -> formatAuthError(error)
+            is DataError.Sync -> formatSyncError(error)
         }
 
         return if (operation.isNotBlank()) {
@@ -57,5 +58,15 @@ object ErrorFormatter {
         DataError.Auth.NO_CREDENTIAL -> "No Google account found on device."
         DataError.Auth.FAILED -> "Sign-in failed. Please try again."
         DataError.Auth.NETWORK_ERROR -> "Network error during sign-in."
+    }
+
+    private fun formatSyncError(error: DataError.Sync): String = when (error) {
+        DataError.Sync.NOT_AUTHENTICATED -> "Please sign in to sync."
+        DataError.Sync.SYNC_DISABLED -> "Cloud sync is disabled."
+        DataError.Sync.NETWORK_ERROR -> "Network error during sync."
+        DataError.Sync.QUOTA_EXCEEDED -> "Cloud storage quota exceeded. Try again later."
+        DataError.Sync.PERMISSION_DENIED -> "Permission denied. Please sign in again."
+        DataError.Sync.CONFLICT -> "Sync conflict detected."
+        DataError.Sync.UNKNOWN -> "Sync error occurred."
     }
 }
