@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.fake
 
+import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
@@ -19,7 +20,10 @@ class FakeAuthRepository : AuthRepository {
     var shouldReturnError = false
     var authError: DataError.Auth = DataError.Auth.FAILED
 
-    override suspend fun signIn(): Result<UserData, DataError.Auth> {
+    override suspend fun signIn(
+        credentialProvider: CredentialProvider
+    ): Result<UserData, DataError.Auth> {
+        // In tests, we ignore the credentialProvider and use our configured behavior
         return if (shouldReturnError) {
             Result.Error(authError)
         } else {

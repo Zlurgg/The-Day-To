@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
@@ -53,15 +54,18 @@ class SignInViewModel(
     }
 
     /**
-     * Initiates Google Sign-In flow
-     * Context is handled at the data layer via repository
+     * Initiates Google Sign-In flow.
+     *
+     * The credentialProvider is created by the UI layer with Activity context,
+     * allowing this ViewModel to remain Activity-independent (testable, no memory leaks).
+     *
+     * @param credentialProvider Suspend lambda that fetches Google credentials
      */
-    fun signIn() {
+    fun signIn(credentialProvider: CredentialProvider) {
         viewModelScope.launch {
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
-            // Sign in via UseCase (no Context parameter needed)
-            when (val result = signInUseCases.signIn()) {
+            when (val result = signInUseCases.signIn(credentialProvider)) {
                 is Result.Success -> {
                     // Sign-in successful
                     _state.update { it.copy(isSignInSuccessful = true, signInError = null) }

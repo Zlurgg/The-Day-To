@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.auth.data.repository
 
 import android.content.Context
 import uk.co.zlurgg.thedayto.auth.data.service.GoogleAuthUiClient
+import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
@@ -12,22 +13,29 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
  * Implementation of AuthRepository using GoogleAuthUiClient.
  *
  * This adapter:
- * - Handles Android Context dependencies at the data layer
- * - Wraps GoogleAuthUiClient to implement domain interface
+ * - Receives credentials via callback (no Activity dependency)
+ * - Delegates Firebase sign-in to GoogleAuthUiClient
  * - Keeps domain layer clean and framework-independent
  *
- * @param context Application context for authentication operations
+ * @param context Application context for GoogleAuthUiClient
  */
 class AuthRepositoryImpl(
-    private val context: Context
+    context: Context
 ) : AuthRepository {
 
     private val googleAuthUiClient = GoogleAuthUiClient(context)
 
-    override suspend fun signIn(): Result<UserData, DataError.Auth> {
-        // Use application context for credential UI
-        // In Android, the Credential Manager needs a Context to display the sign-in UI
-        return googleAuthUiClient.signIn(context)
+    override suspend fun signIn(
+        credentialProvider: CredentialProvider
+    ): Result<UserData, DataError.Auth> {
+        return when (val credentialResult = credentialProvider()) {
+            is Result.Success -> {
+                googleAuthUiClient.signInWithCredential(credentialResult.data.idToken)
+            }
+            is Result.Error -> {
+                Result.Error(credentialResult.error)
+            }
+        }
     }
 
     override suspend fun signOut(): EmptyResult<DataError.Auth> {

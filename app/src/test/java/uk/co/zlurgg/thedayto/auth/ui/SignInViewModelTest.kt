@@ -13,8 +13,11 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
+import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
@@ -58,6 +61,11 @@ class SignInViewModelTest {
     private lateinit var fakeDevAuthService: FakeDevAuthService
 
     private val testDispatcher = UnconfinedTestDispatcher()
+
+    // Mock credential provider for tests - the actual credentials are ignored by FakeAuthRepository
+    private val mockCredentialProvider: CredentialProvider = {
+        Result.Success(GoogleCredential("mock_id_token"))
+    }
 
     @Before
     fun setup() {
@@ -162,7 +170,7 @@ class SignInViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn()
+        viewModel.signIn(mockCredentialProvider)
 
         // Then: State should reflect successful sign-in and navigation target
         viewModel.state.test {
@@ -187,7 +195,7 @@ class SignInViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn()
+        viewModel.signIn(mockCredentialProvider)
 
         // Then: Default mood colors should be seeded
         val moodColors = fakeMoodColorRepository.getMoodColorsSync()
@@ -205,7 +213,7 @@ class SignInViewModelTest {
 
         // When: User signs in (collect events first, then trigger action)
         viewModel.uiEvents.test {
-            viewModel.signIn()
+            viewModel.signIn(mockCredentialProvider)
 
             // Then: Should emit snackbar event
             val event = awaitItem()
@@ -234,11 +242,11 @@ class SignInViewModelTest {
         // Given: ViewModel with previous error state
         fakeAuthRepository.shouldReturnError = true
         viewModel = createViewModel()
-        viewModel.signIn()
+        viewModel.signIn(mockCredentialProvider)
 
         // When: User attempts sign-in again (this time successfully)
         fakeAuthRepository.shouldReturnError = false
-        viewModel.signIn()
+        viewModel.signIn(mockCredentialProvider)
 
         // Then: Error should be cleared
         viewModel.state.test {

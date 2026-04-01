@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.ui
 
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,10 +19,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.data.service.CredentialManagerUtil
 import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
@@ -43,6 +47,10 @@ fun SignInScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Get Activity for credential manager
+    val activity = LocalActivity.current
+    val serverClientId = stringResource(R.string.web_client_id)
 
     // Handle navigation state
     LaunchedEffect(state.navigationTarget) {
@@ -74,7 +82,16 @@ fun SignInScreenRoot(
     SignInScreen(
         showWelcomeDialog = state.showWelcomeDialog,
         onDismissWelcomeDialog = { viewModel.dismissWelcomeDialog() },
-        onSignInClick = { viewModel.signIn() },
+        onSignInClick = {
+            activity?.let { act ->
+                viewModel.signIn {
+                    CredentialManagerUtil.getGoogleCredential(
+                        activity = act,
+                        serverClientId = serverClientId
+                    )
+                }
+            }
+        },
         onDevSignInClick = { viewModel.devSignIn() },
         isDevSignInAvailable = state.isDevSignInAvailable,
         snackbarHostState = snackbarHostState
