@@ -7,11 +7,11 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.GoogleAuthProvider
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.auth.data.error.AuthErrorMapper
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
 import uk.co.zlurgg.thedayto.core.domain.result.Result
-import java.util.concurrent.CancellationException
 
 /**
  * Google Auth client for Firebase authentication.
@@ -40,28 +40,16 @@ class GoogleAuthUiClient(
      * @return Result with UserData on success or DataError.Auth on failure
      */
     suspend fun signInWithCredential(idToken: String): Result<UserData, DataError.Auth> {
-        return try {
+        return AuthErrorMapper.safeAuthCall(TAG) {
             val googleCredentials = GoogleAuthProvider.getCredential(idToken, null)
             val user = auth.signInWithCredential(googleCredentials).await().user
-                ?: return Result.Error(DataError.Auth.FAILED)
+                ?: error("Firebase returned null user")
 
-            Result.Success(
-                UserData(
-                    userId = user.uid,
-                    username = user.displayName,
-                    profilePictureUrl = user.photoUrl?.toString()
-                )
+            UserData(
+                userId = user.uid,
+                username = user.displayName,
+                profilePictureUrl = user.photoUrl?.toString()
             )
-        } catch (e: Exception) {
-            Timber.e(e, "Error signing in with Google credential")
-            if (e is CancellationException) throw e
-
-            val error = when {
-                e.message?.contains("network", ignoreCase = true) == true ->
-                    DataError.Auth.NETWORK_ERROR
-                else -> DataError.Auth.FAILED
-            }
-            Result.Error(error)
         }
     }
 
@@ -69,17 +57,12 @@ class GoogleAuthUiClient(
      * Signs out the current user from both Firebase and Google.
      */
     suspend fun signOut(): EmptyResult<DataError.Auth> {
-        return try {
+        return AuthErrorMapper.safeAuthCall(TAG) {
             credentialManager.clearCredentialState(
                 ClearCredentialStateRequest()
             )
             auth.signOut()
             Timber.d("User signed out successfully")
-            Result.Success(Unit)
-        } catch (e: Exception) {
-            Timber.e(e, "Error signing out")
-            if (e is CancellationException) throw e
-            Result.Error(DataError.Auth.FAILED)
         }
     }
 
@@ -92,5 +75,9 @@ class GoogleAuthUiClient(
             username = displayName,
             profilePictureUrl = photoUrl?.toString()
         )
+    }
+
+    companion object {
+        private const val TAG = "GoogleAuthUiClient"
     }
 }

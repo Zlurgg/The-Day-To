@@ -24,8 +24,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.auth.data.service.CredentialManagerUtil
 import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
@@ -43,6 +43,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 @Composable
 fun SignInScreenRoot(
     viewModel: SignInViewModel = koinViewModel(),
+    credentialProviderFactory: CredentialProviderFactory = koinInject(),
     onNavigateToOverview: () -> Unit
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
@@ -84,12 +85,7 @@ fun SignInScreenRoot(
         onDismissWelcomeDialog = { viewModel.dismissWelcomeDialog() },
         onSignInClick = {
             activity?.let { act ->
-                viewModel.signIn {
-                    CredentialManagerUtil.getGoogleCredential(
-                        activity = act,
-                        serverClientId = serverClientId
-                    )
-                }
+                viewModel.signIn(credentialProviderFactory.create(act, serverClientId))
             }
         },
         onDevSignInClick = { viewModel.devSignIn() },
