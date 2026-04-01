@@ -55,5 +55,4 @@ data class OverviewUiState(
 
 sealed interface OverviewNavigationTarget {
     data class ToEditor(val entryId: Int?) : OverviewNavigationTarget
-    data object ToSignIn : OverviewNavigationTarget
 }

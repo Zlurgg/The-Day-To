@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.sync.ui
 
 import android.content.res.Configuration
+import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,9 +18,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.CloudOff
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,6 +36,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -47,7 +49,11 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.ui.CredentialProviderFactory
+import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
+import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -62,10 +68,15 @@ import java.util.Date
 @Composable
 fun SyncSettingsScreenRoot(
     viewModel: SyncSettingsViewModel = koinViewModel(),
+    credentialProviderFactory: CredentialProviderFactory = koinInject(),
     onNavigateBack: () -> Unit
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+
+    // Get Activity for credential manager
+    val activity = LocalActivity.current
+    val serverClientId = stringResource(R.string.web_client_id)
 
     LaunchedEffect(uiState.error) {
         uiState.error?.let { error ->
@@ -79,7 +90,14 @@ fun SyncSettingsScreenRoot(
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
         onSyncToggled = viewModel::onSyncToggled,
-        onSyncNowClicked = viewModel::onSyncNowClicked
+        onSyncNowClicked = viewModel::onSyncNowClicked,
+        onSignInClick = {
+            activity?.let { act ->
+                viewModel.signIn(credentialProviderFactory.create(act, serverClientId))
+            }
+        },
+        onDevSignInClick = viewModel::devSignIn,
+        onSignOutClick = viewModel::signOut
     )
 }
 
@@ -94,6 +112,9 @@ private fun SyncSettingsScreen(
     onNavigateBack: () -> Unit,
     onSyncToggled: (Boolean) -> Unit,
     onSyncNowClicked: () -> Unit,
+    onSignInClick: () -> Unit,
+    onDevSignInClick: () -> Unit,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Scaffold(
@@ -114,7 +135,7 @@ private fun SyncSettingsScreen(
         modifier = modifier
     ) { paddingValues ->
         when {
-            uiState.isLoading && !uiState.isUserSignedIn -> {
+            uiState.isLoading && !uiState.isUserSignedIn && !uiState.isSigningIn -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -124,18 +145,14 @@ private fun SyncSettingsScreen(
                     CircularProgressIndicator()
                 }
             }
-            !uiState.isUserSignedIn -> {
-                NotSignedInContent(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                )
-            }
             else -> {
                 SyncSettingsContent(
                     uiState = uiState,
                     onSyncToggled = onSyncToggled,
                     onSyncNowClicked = onSyncNowClicked,
+                    onSignInClick = onSignInClick,
+                    onDevSignInClick = onDevSignInClick,
+                    onSignOutClick = onSignOutClick,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -146,30 +163,108 @@ private fun SyncSettingsScreen(
     }
 }
 
+/**
+ * Account section showing sign-in/sign-out state
+ */
 @Composable
-private fun NotSignedInContent(modifier: Modifier = Modifier) {
-    Column(
-        modifier = modifier.padding(paddingMedium),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+private fun AccountSection(
+    isSignedIn: Boolean,
+    userEmail: String?,
+    isSigningIn: Boolean,
+    isDevSignInAvailable: Boolean,
+    onSignInClick: () -> Unit,
+    onDevSignInClick: () -> Unit,
+    onSignOutClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+        )
     ) {
-        Icon(
-            imageVector = Icons.Default.CloudOff,
-            contentDescription = null,
-            modifier = Modifier.size(64.dp),
-            tint = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-        Spacer(modifier = Modifier.height(paddingMedium))
-        Text(
-            text = stringResource(R.string.sync_sign_in_required_title),
-            style = MaterialTheme.typography.headlineSmall
-        )
-        Spacer(modifier = Modifier.height(paddingSmall))
-        Text(
-            text = stringResource(R.string.sync_sign_in_required_message),
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
+        if (isSignedIn) {
+            // Signed in state
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingMedium),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary
+                    )
+                    Spacer(modifier = Modifier.width(paddingMedium))
+                    Column {
+                        Text(
+                            text = userEmail ?: stringResource(R.string.sync_signed_in),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                        Text(
+                            text = stringResource(R.string.sync_cloud_available),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                }
+                TextButton(onClick = onSignOutClick) {
+                    Text(
+                        text = stringResource(R.string.sign_out),
+                        color = MaterialTheme.colorScheme.error
+                    )
+                }
+            }
+        } else {
+            // Not signed in state
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(paddingMedium),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CloudSync,
+                    contentDescription = null,
+                    modifier = Modifier.size(48.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+                Spacer(modifier = Modifier.height(paddingMedium))
+                Text(
+                    text = stringResource(R.string.sync_sign_in_to_enable),
+                    style = MaterialTheme.typography.titleMedium
+                )
+                Spacer(modifier = Modifier.height(paddingSmall))
+                Text(
+                    text = stringResource(R.string.sync_sign_in_description),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Spacer(modifier = Modifier.height(paddingMedium))
+                if (isSigningIn) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(48.dp)
+                    )
+                } else {
+                    SignInButton(
+                        onClick = onSignInClick,
+                        showButton = true
+                    )
+                    if (isDevSignInAvailable) {
+                        DevSignInButton(
+                            onClick = onDevSignInClick,
+                            showButton = true
+                        )
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -178,26 +273,43 @@ private fun SyncSettingsContent(
     uiState: SyncSettingsState,
     onSyncToggled: (Boolean) -> Unit,
     onSyncNowClicked: () -> Unit,
+    onSignInClick: () -> Unit,
+    onDevSignInClick: () -> Unit,
+    onSignOutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier.padding(paddingMedium),
         verticalArrangement = Arrangement.spacedBy(paddingMedium)
     ) {
-        // Sync Enable Card
-        SyncToggleCard(
-            isSyncEnabled = uiState.isSyncEnabled,
-            isLoading = uiState.isLoading,
-            onSyncToggled = onSyncToggled
+        // Account Section (sign-in/sign-out)
+        AccountSection(
+            isSignedIn = uiState.isUserSignedIn,
+            userEmail = uiState.userEmail,
+            isSigningIn = uiState.isSigningIn,
+            isDevSignInAvailable = uiState.isDevSignInAvailable,
+            onSignInClick = onSignInClick,
+            onDevSignInClick = onDevSignInClick,
+            onSignOutClick = onSignOutClick
         )
 
-        // Sync Status Card (only when sync is enabled)
-        if (uiState.isSyncEnabled) {
-            SyncStatusCard(
-                syncState = uiState.syncState,
-                lastSyncTimestamp = uiState.lastSyncTimestamp,
-                onSyncNowClicked = onSyncNowClicked
+        // Only show sync controls when signed in
+        if (uiState.isUserSignedIn) {
+            // Sync Enable Card
+            SyncToggleCard(
+                isSyncEnabled = uiState.isSyncEnabled,
+                isLoading = uiState.isLoading,
+                onSyncToggled = onSyncToggled
             )
+
+            // Sync Status Card (only when sync is enabled)
+            if (uiState.isSyncEnabled) {
+                SyncStatusCard(
+                    syncState = uiState.syncState,
+                    lastSyncTimestamp = uiState.lastSyncTimestamp,
+                    onSyncNowClicked = onSyncNowClicked
+                )
+            }
         }
 
         // Info Card
@@ -442,6 +554,7 @@ private fun SyncSettingsScreenPreview() {
         SyncSettingsScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = true,
+                userEmail = "user@example.com",
                 isSyncEnabled = true,
                 syncState = SyncState.Success(SyncResult(2, 1, 3, 0)),
                 lastSyncTimestamp = System.currentTimeMillis(),
@@ -450,7 +563,10 @@ private fun SyncSettingsScreenPreview() {
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
             onSyncToggled = {},
-            onSyncNowClicked = {}
+            onSyncNowClicked = {},
+            onSignInClick = {},
+            onDevSignInClick = {},
+            onSignOutClick = {}
         )
     }
 }
@@ -462,13 +578,17 @@ private fun SyncSettingsScreenDisabledPreview() {
         SyncSettingsScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = true,
+                userEmail = "user@example.com",
                 isSyncEnabled = false,
                 isLoading = false
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
             onSyncToggled = {},
-            onSyncNowClicked = {}
+            onSyncNowClicked = {},
+            onSignInClick = {},
+            onDevSignInClick = {},
+            onSignOutClick = {}
         )
     }
 }
@@ -480,12 +600,16 @@ private fun SyncSettingsScreenNotSignedInPreview() {
         SyncSettingsScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = false,
+                isDevSignInAvailable = true,
                 isLoading = false
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
             onSyncToggled = {},
-            onSyncNowClicked = {}
+            onSyncNowClicked = {},
+            onSignInClick = {},
+            onDevSignInClick = {},
+            onSignOutClick = {}
         )
     }
 }
@@ -497,6 +621,7 @@ private fun SyncSettingsScreenSyncingPreview() {
         SyncSettingsScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = true,
+                userEmail = "user@example.com",
                 isSyncEnabled = true,
                 syncState = SyncState.Syncing(0.5f),
                 isLoading = false
@@ -504,7 +629,10 @@ private fun SyncSettingsScreenSyncingPreview() {
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
             onSyncToggled = {},
-            onSyncNowClicked = {}
+            onSyncNowClicked = {},
+            onSignInClick = {},
+            onDevSignInClick = {},
+            onSignOutClick = {}
         )
     }
 }

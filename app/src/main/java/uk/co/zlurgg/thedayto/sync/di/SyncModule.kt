@@ -91,7 +91,10 @@ val syncModule = module {
         SyncSettingsViewModel(
             syncUseCases = get(),
             authRepository = get(),
-            syncScheduler = get()
+            syncScheduler = get(),
+            signInUseCase = get(),
+            signOutUseCase = get(),
+            devSignInUseCase = getOrNull()
         )
     }
 }

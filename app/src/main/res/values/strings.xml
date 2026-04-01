@@ -99,9 +99,9 @@
     <string name="welcome_dialog_title">Welcome to The Day To</string>
     <string name="welcome_dialog_subtitle">Your personal mood journal for daily emotional wellbeing</string>
     <string name="welcome_dialog_features_title">Features</string>
-    <string name="welcome_dialog_features_list">• Track your daily mood with colors\n• Add personal notes and reflections\n• Visualize your month with a color calendar\n• Create custom mood-color combinations\n• Private and secure - all data stored locally</string>
+    <string name="welcome_dialog_features_list">• Track your daily mood with colors\n• Add personal notes and reflections\n• Visualize your month with a color calendar\n• Create custom mood-color combinations\n• Private and secure - all data stored locally\n• Optional cloud sync for backup</string>
     <string name="welcome_dialog_privacy_title">Privacy</string>
-    <string name="welcome_dialog_privacy_info">Your journal entries are stored locally on your device. We use Google Sign-In for authentication only - your journal data remains private and is never uploaded to external servers.</string>
+    <string name="welcome_dialog_privacy_info">Your journal entries are stored locally on your device. You can optionally enable cloud sync from settings to backup your data across devices.</string>
     <string name="welcome_dialog_button">Get Started</string>
 
     <!-- First-Time Tutorial Dialog (shown after sign-in) -->
@@ -223,7 +223,7 @@
     <string name="about_dialog_description_title">Description</string>
     <string name="about_dialog_description_content">The Day To is a minimalist mood tracking app designed to help you reflect on your daily emotional wellbeing. Track your moods with colors, add personal notes, and visualize your month at a glance. The app checks for updates automatically and lets you download new versions directly from GitHub.</string>
     <string name="about_dialog_privacy_title">Privacy &amp; Data</string>
-    <string name="about_dialog_privacy_content">Your journal entries are stored locally on your device. We use Google Sign-In for authentication only. Your personal data remains private and is never uploaded to external servers. You have complete control over your information.</string>
+    <string name="about_dialog_privacy_content">Your journal entries are stored locally on your device. You can optionally enable cloud sync to backup your data across devices. Your personal data remains private and under your control.</string>
     <string name="about_dialog_open_source_title">Open Source</string>
     <string name="about_dialog_open_source_content">The Day To is an open-source project built with modern Android technologies. Visit our GitHub repository to view the source code, report issues, or contribute to development.</string>
     <string name="about_dialog_credits_title">Credits</string>
@@ -249,4 +249,10 @@
     <string name="sync_info_title">About Cloud Sync</string>
     <string name="sync_info_content">Your journal entries are synced securely to Google Cloud. Data is encrypted in transit and at rest. Sync happens automatically in the background when enabled.</string>
     <string name="icon_description_sync">Cloud sync settings</string>
+
+    <!-- Sync Account Section -->
+    <string name="sync_signed_in">Signed In</string>
+    <string name="sync_cloud_available">Cloud sync available</string>
+    <string name="sync_sign_in_to_enable">Sign in to enable Cloud Sync</string>
+    <string name="sync_sign_in_description">Backup and sync your journal across devices</string>
 </resources>

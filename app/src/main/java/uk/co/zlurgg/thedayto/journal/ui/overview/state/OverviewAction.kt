@@ -24,7 +24,6 @@ sealed interface OverviewAction {
     data class SaveNotificationSettings(val enabled: Boolean, val hour: Int, val minute: Int) : OverviewAction
 
     // Other actions
-    data object RequestSignOut : OverviewAction
     data object RequestShowTutorial : OverviewAction
     data object RequestShowHelp : OverviewAction
     data object RequestShowAbout : OverviewAction

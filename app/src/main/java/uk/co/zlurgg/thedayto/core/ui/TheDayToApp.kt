@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -16,7 +17,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import androidx.navigation.compose.NavHost
@@ -24,13 +24,11 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
-import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
-import uk.co.zlurgg.thedayto.auth.ui.SignInScreenRoot
-import uk.co.zlurgg.thedayto.auth.ui.components.SignOutDialog
+import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
+import uk.co.zlurgg.thedayto.core.ui.components.WelcomeDialog
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.OverviewRoute
-import uk.co.zlurgg.thedayto.core.ui.navigation.SignInRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.SyncSettingsRoute
@@ -50,8 +48,27 @@ import uk.co.zlurgg.thedayto.sync.ui.SyncSettingsScreenRoot
  */
 @Composable
 fun TheDayToApp() {
-    /** uri for direction of page from notifications **/
-    val uri = stringResource(R.string.uri)
+    val checkWelcomeDialogSeen: CheckWelcomeDialogSeenUseCase = koinInject()
+    val markWelcomeDialogSeen: MarkWelcomeDialogSeenUseCase = koinInject()
+    val scope = rememberCoroutineScope()
+    var showWelcomeDialog by remember { mutableStateOf(false) }
+
+    // Check if welcome dialog should be shown (first-time users)
+    LaunchedEffect(Unit) {
+        if (!checkWelcomeDialogSeen()) {
+            showWelcomeDialog = true
+        }
+    }
+
+    // Welcome dialog for first-time users (shown at root level)
+    if (showWelcomeDialog) {
+        WelcomeDialog(
+            onDismiss = {
+                scope.launch { markWelcomeDialogSeen() }
+                showWelcomeDialog = false
+            }
+        )
+    }
 
     Surface(
         modifier = Modifier
@@ -61,22 +78,8 @@ fun TheDayToApp() {
         val navController = rememberNavController()
         NavHost(
             navController = navController,
-            startDestination = SignInRoute
+            startDestination = OverviewRoute
         ) {
-            // Sign In Screen
-            composable<SignInRoute>(
-                deepLinks = listOf(navDeepLink<SignInRoute>(basePath = uri))
-            ) {
-                SignInScreenRoot(
-                    onNavigateToOverview = {
-                        navController.navigate(OverviewRoute) {
-                            // Clear back stack so back button doesn't return to sign-in
-                            popUpTo<SignInRoute> { inclusive = true }
-                        }
-                    }
-                )
-            }
-
             // Editor Screen (Add/Edit Entry)
             composable<EditorRoute>(
                 deepLinks = listOf(
@@ -115,38 +118,9 @@ fun TheDayToApp() {
 
             // Overview Screen (Calendar + Entry List)
             composable<OverviewRoute>() {
-                val signOutUseCase: SignOutUseCase = koinInject()
-                val scope = rememberCoroutineScope()
-                var showSignOutDialog by remember { mutableStateOf(false) }
-
                 OverviewScreenRoot(
-                    navController = navController,
-                    onNavigateToSignIn = {
-                        navController.navigate(SignInRoute) {
-                            // Clear entire back stack on sign-out
-                            popUpTo(0) { inclusive = true }
-                        }
-                    },
-                    onShowSignOutDialog = {
-                        showSignOutDialog = true
-                    }
+                    navController = navController
                 )
-
-                // Sign Out Dialog (stateless)
-                if (showSignOutDialog) {
-                    SignOutDialog(
-                        onDismiss = { showSignOutDialog = false },
-                        onConfirm = {
-                            scope.launch {
-                                signOutUseCase()
-                                navController.navigate(SignInRoute) {
-                                    // Clear entire back stack on sign-out
-                                    popUpTo(0) { inclusive = true }
-                                }
-                            }
-                        }
-                    )
-                }
             }
 
             // Stats Screen

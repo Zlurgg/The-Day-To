@@ -5,7 +5,6 @@ sealed interface OverviewUiEvent {
     data object RequestNotificationPermission : OverviewUiEvent
     data object ShowSystemNotificationWarning : OverviewUiEvent
     data object ShowPermissionPermanentlyDeniedDialog : OverviewUiEvent
-    data object ShowSignOutDialog : OverviewUiEvent
     data object ShowHelpDialog : OverviewUiEvent
     data object ShowAboutDialog : OverviewUiEvent
 }

@@ -33,34 +33,49 @@ val authModule = module {
         AuthStateRepositoryImpl(androidContext())
     }
 
+    // Standalone SignInUseCase - used by SyncSettingsViewModel
+    single {
+        SignInUseCase(
+            authRepository = get(),
+            authStateRepository = get()
+        )
+    }
+
+    // Standalone SignOutUseCase - used by SyncSettingsViewModel
+    single {
+        SignOutUseCase(
+            authRepository = get(),
+            authStateRepository = get()
+        )
+    }
+
+    // Standalone CheckWelcomeDialogSeenUseCase - used by TheDayToApp
+    single {
+        CheckWelcomeDialogSeenUseCase(
+            preferencesRepository = get()
+        )
+    }
+
+    // Standalone MarkWelcomeDialogSeenUseCase - used by TheDayToApp
+    single {
+        MarkWelcomeDialogSeenUseCase(
+            preferencesRepository = get()
+        )
+    }
+
     // Auth UseCases
     single {
         SignInUseCases(
-            signIn = SignInUseCase(
-                authRepository = get(),
-                authStateRepository = get()
-            ),
+            signIn = get(),
             checkSignInStatus = CheckSignInStatusUseCase(
                 authRepository = get(),
                 authStateRepository = get()
             ),
             checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get()),
             seedDefaultMoodColors = get(),
-            checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(
-                preferencesRepository = get()
-            ),
-            markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(
-                preferencesRepository = get()
-            ),
+            checkWelcomeDialogSeen = get(),
+            markWelcomeDialogSeen = get(),
             devSignIn = getOrNull()
-        )
-    }
-
-    // Standalone SignOutUseCase - injected separately into OverviewViewModel
-    single {
-        SignOutUseCase(
-            authRepository = get(),
-            authStateRepository = get()
         )
     }
 

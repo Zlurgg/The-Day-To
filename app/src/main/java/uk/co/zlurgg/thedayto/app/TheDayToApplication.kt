@@ -1,11 +1,17 @@
 package uk.co.zlurgg.thedayto.app
 
 import android.app.Application
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
+import org.koin.java.KoinJavaComponent.get
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.app.di.appModule
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 
 class TheDayToApplication : Application() {
     override fun onCreate() {
@@ -19,6 +25,14 @@ class TheDayToApplication : Application() {
         startKoin {
             androidContext(this@TheDayToApplication)
             modules(appModule)
+        }
+
+        // Seed default mood colors on first launch (idempotent)
+        val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+        scope.launch {
+            val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase =
+                get(SeedDefaultMoodColorsUseCase::class.java)
+            seedDefaultMoodColorsUseCase()
         }
     }
 }

@@ -659,22 +659,6 @@ class OverviewViewModelTest {
     }
 
     @Test
-    fun `RequestSignOut action - emits sign out dialog event`() = runTest {
-        // When: User requests sign out
-        viewModel.uiEvents.test {
-            viewModel.onAction(OverviewAction.RequestSignOut)
-            testScheduler.advanceUntilIdle()
-
-            // Then: Sign out dialog event should be emitted
-            val event = awaitItem()
-            assertTrue(
-                "Should show sign out dialog",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSignOutDialog
-            )
-        }
-    }
-
-    @Test
     fun `RequestShowTutorial action - shows tutorial dialog via state`() = runTest {
         // When: User requests tutorial from settings menu
         viewModel.onAction(OverviewAction.RequestShowTutorial)

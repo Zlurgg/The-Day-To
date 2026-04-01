@@ -393,12 +393,6 @@ class OverviewViewModel(
                 }
             }
 
-            is OverviewAction.RequestSignOut -> {
-                viewModelScope.launch {
-                    _uiEvents.emit(OverviewUiEvent.ShowSignOutDialog)
-                }
-            }
-
             is OverviewAction.RequestShowTutorial -> {
                 _uiState.update { it.copy(showTutorialDialog = true) }
             }

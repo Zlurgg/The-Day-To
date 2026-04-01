@@ -91,9 +91,7 @@ import java.time.LocalDate
 @Composable
 fun OverviewScreenRoot(
     navController: NavController,
-    viewModel: OverviewViewModel = koinViewModel(),
-    onNavigateToSignIn: () -> Unit,
-    onShowSignOutDialog: () -> Unit
+    viewModel: OverviewViewModel = koinViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -123,9 +121,6 @@ fun OverviewScreenRoot(
                         EditorRoute(entryId = target.entryId, showBackButton = true)
                     )
                 }
-                OverviewNavigationTarget.ToSignIn -> {
-                    onNavigateToSignIn()
-                }
             }
             viewModel.onNavigationHandled()
         }
@@ -150,9 +145,6 @@ fun OverviewScreenRoot(
                     } else {
                         viewModel.onNotificationPermissionGranted()
                     }
-                }
-                is OverviewUiEvent.ShowSignOutDialog -> {
-                    onShowSignOutDialog()
                 }
                 is OverviewUiEvent.ShowHelpDialog -> {
                     showHelpDialog = true
@@ -326,8 +318,7 @@ private fun OverviewScreen(
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
                     onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
-                    onNavigateToSyncSettings = onNavigateToSyncSettings,
-                    onSignOut = { onAction(OverviewAction.RequestSignOut) }
+                    onNavigateToSyncSettings = onNavigateToSyncSettings
                 )
             }
         },

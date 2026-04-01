@@ -4,7 +4,6 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
-import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Info
@@ -37,8 +36,7 @@ fun SettingsMenu(
     onShowAbout: () -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
-    onNavigateToSyncSettings: () -> Unit,
-    onSignOut: () -> Unit
+    onNavigateToSyncSettings: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -157,20 +155,6 @@ fun SettingsMenu(
                     )
                 }
             )
-
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.sign_out)) },
-                onClick = {
-                    expanded = false
-                    onSignOut()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Logout,
-                        contentDescription = stringResource(R.string.icon_description_sign_out)
-                    )
-                }
-            )
         }
     }
 }
@@ -187,8 +171,7 @@ private fun SettingsMenuPreview() {
             onShowAbout = {},
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
-            onNavigateToSyncSettings = {},
-            onSignOut = {}
+            onNavigateToSyncSettings = {}
         )
     }
 }

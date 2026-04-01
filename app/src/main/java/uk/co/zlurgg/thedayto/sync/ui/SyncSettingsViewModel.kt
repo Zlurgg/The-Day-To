@@ -8,7 +8,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
@@ -18,12 +22,15 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 /**
  * ViewModel for the Sync Settings screen.
  *
- * Manages sync enable/disable state and triggers sync operations.
+ * Manages sync enable/disable state, sign-in/sign-out, and triggers sync operations.
  */
 class SyncSettingsViewModel(
     private val syncUseCases: SyncUseCases,
     private val authRepository: AuthRepository,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
+    private val signInUseCase: SignInUseCase,
+    private val signOutUseCase: SignOutUseCase,
+    private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncSettingsState())
@@ -37,15 +44,18 @@ class SyncSettingsViewModel(
     private fun loadInitialState() {
         viewModelScope.launch {
             try {
-                val isSignedIn = authRepository.getSignedInUser() != null
+                val user = authRepository.getSignedInUser()
+                val isSignedIn = user != null
                 val isSyncEnabled = syncUseCases.checkSyncEnabled()
                 val lastSync = syncUseCases.getLastSyncTimestamp()
 
                 _uiState.update {
                     it.copy(
                         isUserSignedIn = isSignedIn,
+                        userEmail = user?.username,
                         isSyncEnabled = isSyncEnabled,
                         lastSyncTimestamp = lastSync,
+                        isDevSignInAvailable = devSignInUseCase?.isAvailable() == true,
                         isLoading = false
                     )
                 }
@@ -150,5 +160,117 @@ class SyncSettingsViewModel(
 
     fun onErrorDismissed() {
         _uiState.update { it.copy(error = null) }
+    }
+
+    /**
+     * Sign in with Google credentials.
+     * Called when user taps Sign In button in Cloud Sync settings.
+     */
+    fun signIn(credentialProvider: CredentialProvider) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSigningIn = true, error = null) }
+
+            when (val result = signInUseCase(credentialProvider)) {
+                is Result.Success -> {
+                    val userName = authRepository.getSignedInUser()?.username
+                    _uiState.update {
+                        it.copy(
+                            isUserSignedIn = true,
+                            isSigningIn = false,
+                            userEmail = userName
+                        )
+                    }
+                    Timber.i("Sign in successful: $userName")
+                }
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isSigningIn = false,
+                            error = ErrorFormatter.format(result.error, "sign in")
+                        )
+                    }
+                    Timber.w("Sign in failed: ${result.error}")
+                }
+            }
+        }
+    }
+
+    /**
+     * Dev sign-in with Firebase Emulator (debug builds only).
+     * Called when user taps Dev Sign-In button in Cloud Sync settings.
+     */
+    fun devSignIn() {
+        val useCase = devSignInUseCase ?: return
+
+        viewModelScope.launch {
+            _uiState.update { it.copy(isSigningIn = true, error = null) }
+
+            when (val result = useCase(DEV_EMAIL, DEV_PASSWORD)) {
+                is Result.Success -> {
+                    val userName = authRepository.getSignedInUser()?.username
+                    _uiState.update {
+                        it.copy(
+                            isUserSignedIn = true,
+                            isSigningIn = false,
+                            userEmail = userName
+                        )
+                    }
+                    Timber.i("Dev sign in successful: $userName")
+                }
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isSigningIn = false,
+                            error = ErrorFormatter.format(result.error, "dev sign in")
+                        )
+                    }
+                    Timber.w("Dev sign in failed: ${result.error}")
+                }
+            }
+        }
+    }
+
+    /**
+     * Sign out and disable sync.
+     * Called when user taps Sign Out button in Cloud Sync settings.
+     */
+    fun signOut() {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, error = null) }
+
+            try {
+                // Cancel any sync workers first
+                syncScheduler.cancelAllSync()
+
+                // Disable sync
+                syncUseCases.disableSync()
+
+                // Sign out
+                signOutUseCase()
+
+                _uiState.update {
+                    it.copy(
+                        isUserSignedIn = false,
+                        isSyncEnabled = false,
+                        userEmail = null,
+                        isLoading = false
+                    )
+                }
+                Timber.i("Sign out successful")
+            } catch (e: Exception) {
+                Timber.e(e, "Error signing out")
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = "Failed to sign out"
+                    )
+                }
+            }
+        }
+    }
+
+    companion object {
+        private const val DEV_EMAIL = "test@example.com"
+        private const val DEV_PASSWORD = "password123"
     }
 }
