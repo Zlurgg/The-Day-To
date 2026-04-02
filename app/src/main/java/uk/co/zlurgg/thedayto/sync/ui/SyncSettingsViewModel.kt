@@ -19,6 +19,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
+import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 
 /**
@@ -35,6 +36,7 @@ class SyncSettingsViewModel(
     private val signOutUseCase: SignOutUseCase,
     private val preferencesRepository: PreferencesRepository,
     private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
+    private val syncRepository: SyncRepository,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
@@ -164,10 +166,15 @@ class SyncSettingsViewModel(
 
         // Auto-enable sync on sign-in
         preferencesRepository.setSyncEnabled(true)
-        syncScheduler.startPeriodicSync()
 
         // Seed default mood colors (idempotent - checks isFirstLaunch)
         seedDefaultMoodColorsUseCase()
+
+        // Mark any LOCAL_ONLY data as PENDING_SYNC so it gets uploaded
+        syncRepository.markLocalDataForSync()
+
+        // Start sync
+        syncScheduler.startPeriodicSync()
 
         val lastSync = syncUseCases.getLastSyncTimestamp()
         _uiState.update {

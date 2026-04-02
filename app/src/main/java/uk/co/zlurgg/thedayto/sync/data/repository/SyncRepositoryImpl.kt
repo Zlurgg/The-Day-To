@@ -32,7 +32,7 @@ import java.util.UUID
  *
  * Handles bidirectional sync between Room and Firestore.
  */
-@Suppress("MagicNumber", "ReturnCount")
+@Suppress("MagicNumber", "ReturnCount", "LongMethod")
 class SyncRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val entryDao: EntryDao,
@@ -143,13 +143,23 @@ class SyncRepositoryImpl(
                 .get()
                 .await()
 
+            Timber.d("Downloaded %d entries from Firestore", snapshot.documents.size)
+
             snapshot.documents.mapNotNull { doc ->
                 // We need to resolve moodColorId from moodColorSyncId
                 val moodColorSyncId = doc.getMoodColorSyncId()
                 val moodColorEntity = moodColorSyncId?.let {
                     moodColorDao.getMoodColorBySyncId(it)
                 }
-                val moodColorId = moodColorEntity?.id ?: return@mapNotNull null
+                val moodColorId = moodColorEntity?.id
+                if (moodColorId == null) {
+                    Timber.w(
+                        "Skipping entry %s: moodColorSyncId=%s not found locally",
+                        doc.id,
+                        moodColorSyncId
+                    )
+                    return@mapNotNull null
+                }
 
                 // Check if we have a local version
                 val localEntry = entryDao.getEntryBySyncId(doc.id)
@@ -237,8 +247,10 @@ class SyncRepositoryImpl(
 
             // Phase 3: Download remote mood colors
             _syncState.value = SyncState.Syncing(0.5f)
+            Timber.d("Phase 3: Downloading mood colors for user %s", userId)
             when (val result = downloadMoodColors(userId)) {
                 is Result.Success -> {
+                    Timber.d("Downloaded %d mood colors from Firestore", result.data.size)
                     result.data.forEach { remoteMoodColor ->
                         val localMoodColor = remoteMoodColor.syncId?.let {
                             moodColorDao.getMoodColorBySyncId(it)?.toDomain()
@@ -246,6 +258,11 @@ class SyncRepositoryImpl(
 
                         if (localMoodColor == null) {
                             // New remote mood color - insert locally
+                            Timber.d(
+                                "Inserting new mood color: %s (syncId=%s)",
+                                remoteMoodColor.mood,
+                                remoteMoodColor.syncId
+                            )
                             moodColorDao.insertMoodColor(remoteMoodColor.toEntity())
                             moodColorsDownloaded++
                         } else {
@@ -293,6 +310,14 @@ class SyncRepositoryImpl(
                 is Result.Error -> return result
             }
 
+            Timber.i(
+                "Sync complete: entries(up=%d, down=%d) moodColors(up=%d, down=%d) conflicts=%d",
+                entriesUploaded,
+                entriesDownloaded,
+                moodColorsUploaded,
+                moodColorsDownloaded,
+                conflictsResolved
+            )
             SyncResult(
                 entriesUploaded = entriesUploaded,
                 entriesDownloaded = entriesDownloaded,
@@ -341,6 +366,14 @@ class SyncRepositoryImpl(
         onSuccess = { Result.Success(Unit) },
         onFailure = { mapFirestoreException(it) }
     )
+
+    override suspend fun markLocalDataForSync(): Int {
+        val moodColorsMarked = moodColorDao.markLocalOnlyAsPendingSync()
+        val entriesMarked = entryDao.markLocalOnlyAsPendingSync()
+        val total = moodColorsMarked + entriesMarked
+        Timber.i("Marked %d items for sync (moodColors=%d, entries=%d)", total, moodColorsMarked, entriesMarked)
+        return total
+    }
 
     private fun <T> mapFirestoreException(throwable: Throwable): Result<T, DataError.Sync> {
         Timber.e(throwable, "Firestore sync error")

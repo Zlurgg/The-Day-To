@@ -14,6 +14,6 @@ val appModule = listOf(
     authModule,
     journalModule,
     journalViewModelModule
-) + debugModules + listOf(  // debugModules provides Firestore (emulator or production)
+) + debugModules + listOf( // debugModules provides Firestore (emulator or production)
     syncModule
 )

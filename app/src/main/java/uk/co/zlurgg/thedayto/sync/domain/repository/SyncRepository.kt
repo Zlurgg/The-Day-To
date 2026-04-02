@@ -46,4 +46,7 @@ interface SyncRepository {
 
     /** Clear all remote data for the user (used when disabling sync) */
     suspend fun clearRemoteData(userId: String): EmptyResult<DataError.Sync>
+
+    /** Mark all LOCAL_ONLY items as PENDING_SYNC (called on first sign-in) */
+    suspend fun markLocalDataForSync(): Int
 }

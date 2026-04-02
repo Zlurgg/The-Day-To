@@ -120,6 +120,13 @@ interface EntryDao {
         WHERE id = :id
     """)
     suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
+
+    /**
+     * Mark all LOCAL_ONLY entries as PENDING_SYNC.
+     * Called when user signs in to ensure local data gets uploaded.
+     */
+    @Query("UPDATE entry SET syncStatus = 'PENDING_SYNC' WHERE syncStatus = 'LOCAL_ONLY'")
+    suspend fun markLocalOnlyAsPendingSync(): Int
 }
 
 /**

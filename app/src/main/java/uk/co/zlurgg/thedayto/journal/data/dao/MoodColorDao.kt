@@ -65,4 +65,11 @@ interface MoodColorDao {
         """
     )
     suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
+
+    /**
+     * Mark all LOCAL_ONLY items as PENDING_SYNC.
+     * Called when user signs in to ensure local data gets uploaded.
+     */
+    @Query("UPDATE mood_color SET syncStatus = 'PENDING_SYNC' WHERE syncStatus = 'LOCAL_ONLY'")
+    suspend fun markLocalOnlyAsPendingSync(): Int
 }
