@@ -3,10 +3,11 @@ package uk.co.zlurgg.thedayto.sync.ui
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 
 /**
- * UI state for the Sync Settings screen.
+ * UI state for the Account screen.
+ *
+ * Sync is automatically enabled when signed in - no separate toggle needed.
  */
 data class SyncSettingsState(
-    val isSyncEnabled: Boolean = false,
     val isUserSignedIn: Boolean = false,
     val userEmail: String? = null,
     val isSigningIn: Boolean = false,

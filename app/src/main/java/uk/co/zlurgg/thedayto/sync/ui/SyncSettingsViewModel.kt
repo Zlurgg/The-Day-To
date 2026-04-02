@@ -14,15 +14,18 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 
 /**
- * ViewModel for the Sync Settings screen.
+ * ViewModel for the Account screen.
  *
- * Manages sync enable/disable state, sign-in/sign-out, and triggers sync operations.
+ * Manages sign-in/sign-out state and triggers sync operations.
+ * Sync is automatically enabled when signed in.
  */
 class SyncSettingsViewModel(
     private val syncUseCases: SyncUseCases,
@@ -30,6 +33,8 @@ class SyncSettingsViewModel(
     private val syncScheduler: SyncScheduler,
     private val signInUseCase: SignInUseCase,
     private val signOutUseCase: SignOutUseCase,
+    private val preferencesRepository: PreferencesRepository,
+    private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
@@ -46,27 +51,25 @@ class SyncSettingsViewModel(
             try {
                 val user = authRepository.getSignedInUser()
                 val isSignedIn = user != null
-                val isSyncEnabled = syncUseCases.checkSyncEnabled()
                 val lastSync = syncUseCases.getLastSyncTimestamp()
 
                 _uiState.update {
                     it.copy(
                         isUserSignedIn = isSignedIn,
                         userEmail = user?.username,
-                        isSyncEnabled = isSyncEnabled,
                         lastSyncTimestamp = lastSync,
                         isDevSignInAvailable = devSignInUseCase?.isAvailable() == true,
                         isLoading = false
                     )
                 }
 
-                Timber.d("Sync settings loaded: signedIn=$isSignedIn, enabled=$isSyncEnabled")
+                Timber.d("Account state loaded: signedIn=$isSignedIn")
             } catch (e: Exception) {
-                Timber.e(e, "Error loading sync settings")
+                Timber.e(e, "Error loading account state")
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to load sync settings"
+                        error = "Failed to load account state"
                     )
                 }
             }
@@ -87,70 +90,6 @@ class SyncSettingsViewModel(
         }
     }
 
-    fun onSyncToggled(enabled: Boolean) {
-        if (enabled) {
-            enableSync()
-        } else {
-            disableSync()
-        }
-    }
-
-    private fun enableSync() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-
-            when (val result = syncUseCases.enableSync()) {
-                is Result.Success -> {
-                    syncScheduler.startPeriodicSync()
-                    val lastSync = syncUseCases.getLastSyncTimestamp()
-                    _uiState.update {
-                        it.copy(
-                            isSyncEnabled = true,
-                            lastSyncTimestamp = lastSync,
-                            isLoading = false
-                        )
-                    }
-                    Timber.i("Sync enabled successfully")
-                }
-                is Result.Error -> {
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = ErrorFormatter.format(result.error, "enable sync")
-                        )
-                    }
-                    Timber.w("Failed to enable sync: ${result.error}")
-                }
-            }
-        }
-    }
-
-    private fun disableSync() {
-        viewModelScope.launch {
-            _uiState.update { it.copy(isLoading = true, error = null) }
-
-            try {
-                syncUseCases.disableSync()
-                syncScheduler.stopPeriodicSync()
-                _uiState.update {
-                    it.copy(
-                        isSyncEnabled = false,
-                        isLoading = false
-                    )
-                }
-                Timber.i("Sync disabled successfully")
-            } catch (e: Exception) {
-                Timber.e(e, "Error disabling sync")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Failed to disable sync"
-                    )
-                }
-            }
-        }
-    }
-
     fun onSyncNowClicked() {
         viewModelScope.launch {
             Timber.d("Manual sync requested")
@@ -164,7 +103,8 @@ class SyncSettingsViewModel(
 
     /**
      * Sign in with Google credentials.
-     * Called when user taps Sign In button in Cloud Sync settings.
+     * Called when user taps Sign In button in Account settings.
+     * Automatically enables sync on successful sign-in.
      */
     fun signIn(credentialProvider: CredentialProvider) {
         viewModelScope.launch {
@@ -172,15 +112,7 @@ class SyncSettingsViewModel(
 
             when (val result = signInUseCase(credentialProvider)) {
                 is Result.Success -> {
-                    val userName = authRepository.getSignedInUser()?.username
-                    _uiState.update {
-                        it.copy(
-                            isUserSignedIn = true,
-                            isSigningIn = false,
-                            userEmail = userName
-                        )
-                    }
-                    Timber.i("Sign in successful: $userName")
+                    handleSignInSuccess()
                 }
                 is Result.Error -> {
                     _uiState.update {
@@ -197,7 +129,8 @@ class SyncSettingsViewModel(
 
     /**
      * Dev sign-in with Firebase Emulator (debug builds only).
-     * Called when user taps Dev Sign-In button in Cloud Sync settings.
+     * Called when user taps Dev Sign-In button in Account settings.
+     * Automatically enables sync on successful sign-in.
      */
     fun devSignIn() {
         val useCase = devSignInUseCase ?: return
@@ -207,15 +140,7 @@ class SyncSettingsViewModel(
 
             when (val result = useCase(DEV_EMAIL, DEV_PASSWORD)) {
                 is Result.Success -> {
-                    val userName = authRepository.getSignedInUser()?.username
-                    _uiState.update {
-                        it.copy(
-                            isUserSignedIn = true,
-                            isSigningIn = false,
-                            userEmail = userName
-                        )
-                    }
-                    Timber.i("Dev sign in successful: $userName")
+                    handleSignInSuccess()
                 }
                 is Result.Error -> {
                     _uiState.update {
@@ -231,8 +156,34 @@ class SyncSettingsViewModel(
     }
 
     /**
+     * Common success handler for sign-in operations.
+     * Auto-enables sync and seeds default mood colors.
+     */
+    private suspend fun handleSignInSuccess() {
+        val userName = authRepository.getSignedInUser()?.username
+
+        // Auto-enable sync on sign-in
+        preferencesRepository.setSyncEnabled(true)
+        syncScheduler.startPeriodicSync()
+
+        // Seed default mood colors (idempotent - checks isFirstLaunch)
+        seedDefaultMoodColorsUseCase()
+
+        val lastSync = syncUseCases.getLastSyncTimestamp()
+        _uiState.update {
+            it.copy(
+                isUserSignedIn = true,
+                isSigningIn = false,
+                userEmail = userName,
+                lastSyncTimestamp = lastSync
+            )
+        }
+        Timber.i("Sign in successful: $userName")
+    }
+
+    /**
      * Sign out and disable sync.
-     * Called when user taps Sign Out button in Cloud Sync settings.
+     * Called when user taps Sign Out button in Account settings.
      */
     fun signOut() {
         viewModelScope.launch {
@@ -243,7 +194,7 @@ class SyncSettingsViewModel(
                 syncScheduler.cancelAllSync()
 
                 // Disable sync
-                syncUseCases.disableSync()
+                preferencesRepository.setSyncEnabled(false)
 
                 // Sign out
                 signOutUseCase()
@@ -251,7 +202,6 @@ class SyncSettingsViewModel(
                 _uiState.update {
                     it.copy(
                         isUserSignedIn = false,
-                        isSyncEnabled = false,
                         userEmail = null,
                         isLoading = false
                     )

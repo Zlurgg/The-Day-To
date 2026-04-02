@@ -34,7 +34,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
@@ -66,7 +65,7 @@ import java.util.Date
  * Root composable - handles ViewModel, state collection, and side effects
  */
 @Composable
-fun SyncSettingsScreenRoot(
+fun AccountScreenRoot(
     viewModel: SyncSettingsViewModel = koinViewModel(),
     credentialProviderFactory: CredentialProviderFactory = koinInject(),
     onNavigateBack: () -> Unit
@@ -85,11 +84,10 @@ fun SyncSettingsScreenRoot(
         }
     }
 
-    SyncSettingsScreen(
+    AccountScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
         onNavigateBack = onNavigateBack,
-        onSyncToggled = viewModel::onSyncToggled,
         onSyncNowClicked = viewModel::onSyncNowClicked,
         onSignInClick = {
             activity?.let { act ->
@@ -106,11 +104,10 @@ fun SyncSettingsScreenRoot(
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun SyncSettingsScreen(
+private fun AccountScreen(
     uiState: SyncSettingsState,
     snackbarHostState: SnackbarHostState,
     onNavigateBack: () -> Unit,
-    onSyncToggled: (Boolean) -> Unit,
     onSyncNowClicked: () -> Unit,
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
@@ -120,7 +117,7 @@ private fun SyncSettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(stringResource(R.string.sync_settings_title)) },
+                title = { Text(stringResource(R.string.account_title)) },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
@@ -146,9 +143,8 @@ private fun SyncSettingsScreen(
                 }
             }
             else -> {
-                SyncSettingsContent(
+                AccountContent(
                     uiState = uiState,
-                    onSyncToggled = onSyncToggled,
                     onSyncNowClicked = onSyncNowClicked,
                     onSignInClick = onSignInClick,
                     onDevSignInClick = onDevSignInClick,
@@ -269,9 +265,8 @@ private fun AccountSection(
 }
 
 @Composable
-private fun SyncSettingsContent(
+private fun AccountContent(
     uiState: SyncSettingsState,
-    onSyncToggled: (Boolean) -> Unit,
     onSyncNowClicked: () -> Unit,
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
@@ -293,83 +288,17 @@ private fun SyncSettingsContent(
             onSignOutClick = onSignOutClick
         )
 
-        // Only show sync controls when signed in
+        // Show sync status when signed in (sync is auto-enabled)
         if (uiState.isUserSignedIn) {
-            // Sync Enable Card
-            SyncToggleCard(
-                isSyncEnabled = uiState.isSyncEnabled,
-                isLoading = uiState.isLoading,
-                onSyncToggled = onSyncToggled
+            SyncStatusCard(
+                syncState = uiState.syncState,
+                lastSyncTimestamp = uiState.lastSyncTimestamp,
+                onSyncNowClicked = onSyncNowClicked
             )
-
-            // Sync Status Card (only when sync is enabled)
-            if (uiState.isSyncEnabled) {
-                SyncStatusCard(
-                    syncState = uiState.syncState,
-                    lastSyncTimestamp = uiState.lastSyncTimestamp,
-                    onSyncNowClicked = onSyncNowClicked
-                )
-            }
         }
 
         // Info Card
         SyncInfoCard()
-    }
-}
-
-@Composable
-private fun SyncToggleCard(
-    isSyncEnabled: Boolean,
-    isLoading: Boolean,
-    onSyncToggled: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingMedium),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CloudSync,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(paddingMedium))
-                Column {
-                    Text(
-                        text = stringResource(R.string.sync_enable_label),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                    Text(
-                        text = stringResource(R.string.sync_enable_description),
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    strokeWidth = 2.dp
-                )
-            } else {
-                Switch(
-                    checked = isSyncEnabled,
-                    onCheckedChange = onSyncToggled
-                )
-            }
-        }
     }
 }
 
@@ -549,42 +478,18 @@ private fun formatTimestamp(timestamp: Long): String {
 @Preview(name = "Light Mode", showBackground = true)
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun SyncSettingsScreenPreview() {
+private fun AccountScreenPreview() {
     TheDayToTheme {
-        SyncSettingsScreen(
+        AccountScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = true,
                 userEmail = "user@example.com",
-                isSyncEnabled = true,
                 syncState = SyncState.Success(SyncResult(2, 1, 3, 0)),
                 lastSyncTimestamp = System.currentTimeMillis(),
                 isLoading = false
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
-            onSyncToggled = {},
-            onSyncNowClicked = {},
-            onSignInClick = {},
-            onDevSignInClick = {},
-            onSignOutClick = {}
-        )
-    }
-}
-
-@Preview(name = "Sync Disabled", showBackground = true)
-@Composable
-private fun SyncSettingsScreenDisabledPreview() {
-    TheDayToTheme {
-        SyncSettingsScreen(
-            uiState = SyncSettingsState(
-                isUserSignedIn = true,
-                userEmail = "user@example.com",
-                isSyncEnabled = false,
-                isLoading = false
-            ),
-            snackbarHostState = SnackbarHostState(),
-            onNavigateBack = {},
-            onSyncToggled = {},
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},
@@ -595,9 +500,9 @@ private fun SyncSettingsScreenDisabledPreview() {
 
 @Preview(name = "Not Signed In", showBackground = true)
 @Composable
-private fun SyncSettingsScreenNotSignedInPreview() {
+private fun AccountScreenNotSignedInPreview() {
     TheDayToTheme {
-        SyncSettingsScreen(
+        AccountScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = false,
                 isDevSignInAvailable = true,
@@ -605,7 +510,6 @@ private fun SyncSettingsScreenNotSignedInPreview() {
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
-            onSyncToggled = {},
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},
@@ -616,19 +520,17 @@ private fun SyncSettingsScreenNotSignedInPreview() {
 
 @Preview(name = "Syncing", showBackground = true)
 @Composable
-private fun SyncSettingsScreenSyncingPreview() {
+private fun AccountScreenSyncingPreview() {
     TheDayToTheme {
-        SyncSettingsScreen(
+        AccountScreen(
             uiState = SyncSettingsState(
                 isUserSignedIn = true,
                 userEmail = "user@example.com",
-                isSyncEnabled = true,
                 syncState = SyncState.Syncing(0.5f),
                 isLoading = false
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
-            onSyncToggled = {},
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},

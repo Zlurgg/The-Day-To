@@ -60,9 +60,9 @@ import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.AccountRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
-import uk.co.zlurgg.thedayto.core.ui.navigation.SyncSettingsRoute
 import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
 import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
@@ -235,8 +235,8 @@ fun OverviewScreenRoot(
         onNavigateToMoodColorManagement = {
             navController.navigate(MoodColorManagementRoute)
         },
-        onNavigateToSyncSettings = {
-            navController.navigate(SyncSettingsRoute)
+        onNavigateToAccount = {
+            navController.navigate(AccountRoute)
         },
         snackbarHostState = snackbarHostState
     )
@@ -252,7 +252,7 @@ private fun OverviewScreen(
     onNavigateToEntry: (entryId: Int?, entryDate: Long?) -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
-    onNavigateToSyncSettings: () -> Unit,
+    onNavigateToAccount: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier
 ) {
@@ -313,12 +313,11 @@ private fun OverviewScreen(
                 )
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
-                    onCheckForUpdates = { onAction(OverviewAction.CheckForUpdates) },
                     onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
                     onNavigateToStats = onNavigateToStats,
                     onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
-                    onNavigateToSyncSettings = onNavigateToSyncSettings
+                    onNavigateToAccount = onNavigateToAccount
                 )
             }
         },
@@ -461,7 +460,7 @@ private fun OverviewScreenPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
-            onNavigateToSyncSettings = {},
+            onNavigateToAccount = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -481,7 +480,7 @@ private fun OverviewScreenSingleEntryPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
-            onNavigateToSyncSettings = {},
+            onNavigateToAccount = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }
@@ -501,7 +500,7 @@ private fun OverviewScreenEmptyPreview() {
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
-            onNavigateToSyncSettings = {},
+            onNavigateToAccount = {},
             snackbarHostState = remember { SnackbarHostState() }
         )
     }

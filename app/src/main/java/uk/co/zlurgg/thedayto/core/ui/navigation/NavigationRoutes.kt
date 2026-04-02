@@ -8,9 +8,6 @@ import kotlinx.serialization.Serializable
  */
 
 @Serializable
-data object SignInRoute
-
-@Serializable
 data object OverviewRoute
 
 @Serializable
@@ -27,4 +24,4 @@ data object StatsRoute
 data object MoodColorManagementRoute
 
 @Serializable
-data object SyncSettingsRoute
+data object AccountRoute
