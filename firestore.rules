@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Users can only access their own data
+    match /users/{userId} {
+      // Allow authenticated users to access their own user document
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // User's entries collection
+      match /entries/{entryId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // User's mood colors collection
+      match /mood_colors/{moodColorId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

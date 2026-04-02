@@ -1,9 +1,19 @@
 package uk.co.zlurgg.thedayto.di
 
+import com.google.firebase.firestore.FirebaseFirestore
 import org.koin.core.module.Module
+import org.koin.dsl.module
 
 /**
- * Empty module list for release builds.
- * Debug-only modules are not included in production.
+ * Release module providing production Firebase services.
+ * Debug-only features (emulators, dev sign-in) are not included.
  */
-val debugModules: List<Module> = emptyList()
+val releaseModule = module {
+    // Production Firestore (no emulator)
+    single { FirebaseFirestore.getInstance() }
+}
+
+/**
+ * Module list for release builds.
+ */
+val debugModules: List<Module> = listOf(releaseModule)
