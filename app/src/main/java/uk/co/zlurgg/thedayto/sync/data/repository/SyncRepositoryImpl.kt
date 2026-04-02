@@ -350,15 +350,29 @@ class SyncRepositoryImpl(
                 FirebaseFirestoreException.Code.PERMISSION_DENIED -> DataError.Sync.PERMISSION_DENIED
                 FirebaseFirestoreException.Code.UNAUTHENTICATED -> DataError.Sync.NOT_AUTHENTICATED
                 FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> DataError.Sync.QUOTA_EXCEEDED
-                FirebaseFirestoreException.Code.UNAVAILABLE -> DataError.Sync.NETWORK_ERROR
+                FirebaseFirestoreException.Code.UNAVAILABLE -> {
+                    logEmulatorHint()
+                    DataError.Sync.NETWORK_ERROR
+                }
                 else -> DataError.Sync.UNKNOWN
             }
-            is java.net.UnknownHostException -> DataError.Sync.NETWORK_ERROR
-            is java.net.SocketTimeoutException -> DataError.Sync.NETWORK_ERROR
+            is java.net.UnknownHostException,
+            is java.net.SocketTimeoutException,
+            is java.net.ConnectException -> {
+                logEmulatorHint()
+                DataError.Sync.NETWORK_ERROR
+            }
             else -> DataError.Sync.UNKNOWN
         }
 
         return Result.Error(error)
+    }
+
+    private fun logEmulatorHint() {
+        Timber.w(
+            "Firestore connection failed. If running locally, ensure Firebase emulator is started:\n" +
+                "  Run: scripts\\start-emulator.bat"
+        )
     }
 
     companion object {
