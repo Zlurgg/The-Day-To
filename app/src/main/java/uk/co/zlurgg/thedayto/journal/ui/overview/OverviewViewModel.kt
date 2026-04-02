@@ -414,17 +414,10 @@ class OverviewViewModel(
                     Timber.d("Tutorial dismissed - marking first launch complete")
                     // Mark first launch complete only when user actually dismisses tutorial
                     overviewUseCases.markFirstLaunchComplete()
+                    // Mark entry reminder as shown so it doesn't appear later today
+                    // (tutorial already explains how to create an entry)
+                    overviewUseCases.markEntryReminderShownToday()
                     _uiState.update { it.copy(showTutorialDialog = false) }
-
-                    // After tutorial is dismissed, check if entry reminder should be shown
-                    // This creates the flow: Tutorial → Entry Reminder → Create Entry
-                    val todayEpoch = DateUtils.getTodayStartEpoch()
-                    val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
-
-                    if (todayEntry == null && !overviewUseCases.checkEntryReminderShownToday()) {
-                        Timber.d("Tutorial dismissed, showing entry reminder")
-                        _uiState.update { it.copy(showEntryReminderDialog = true) }
-                    }
                 }
             }
 

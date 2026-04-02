@@ -5,12 +5,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
 import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.SystemUpdate
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -31,12 +30,11 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 @Composable
 fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
-    onCheckForUpdates: () -> Unit,
     onShowHelp: () -> Unit,
     onShowAbout: () -> Unit,
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
-    onNavigateToSyncSettings: () -> Unit
+    onNavigateToAccount: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -53,6 +51,21 @@ fun SettingsMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
+            // Account (at top)
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.account_title)) },
+                onClick = {
+                    expanded = false
+                    onNavigateToAccount()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = stringResource(R.string.icon_description_account)
+                    )
+                }
+            )
+
             // Statistics
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.statistics)) },
@@ -83,7 +96,7 @@ fun SettingsMenu(
                 }
             )
 
-            // Always show "Notification Settings" - permission handled inside dialog
+            // Notification Settings
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.notification_settings)) },
                 onClick = {
@@ -98,36 +111,7 @@ fun SettingsMenu(
                 }
             )
 
-            // Cloud Sync Settings
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.sync_settings_title)) },
-                onClick = {
-                    expanded = false
-                    onNavigateToSyncSettings()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.CloudSync,
-                        contentDescription = stringResource(R.string.icon_description_sync)
-                    )
-                }
-            )
-
-            // Check for Updates
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.check_for_updates)) },
-                onClick = {
-                    expanded = false
-                    onCheckForUpdates()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.SystemUpdate,
-                        contentDescription = stringResource(R.string.check_for_updates)
-                    )
-                }
-            )
-
+            // Help & Tutorial
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.help_and_tutorial)) },
                 onClick = {
@@ -142,6 +126,7 @@ fun SettingsMenu(
                 }
             )
 
+            // About
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.about)) },
                 onClick = {
@@ -166,12 +151,11 @@ private fun SettingsMenuPreview() {
     TheDayToTheme {
         SettingsMenu(
             onOpenNotificationSettings = {},
-            onCheckForUpdates = {},
             onShowHelp = {},
             onShowAbout = {},
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
-            onNavigateToSyncSettings = {}
+            onNavigateToAccount = {}
         )
     }
 }
