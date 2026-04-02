@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.auth.data.service
 
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import kotlinx.coroutines.tasks.await
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.BuildConfig
@@ -13,7 +14,8 @@ import java.util.concurrent.CancellationException
 /**
  * Debug implementation that connects to Firebase Auth Emulator.
  *
- * Emulator must be running at localhost:9099
+ * Emulator must be running at localhost:9099.
+ * Auto-creates the test user if it doesn't exist.
  */
 class FirebaseEmulatorAuthService : DevAuthService {
 
@@ -35,8 +37,13 @@ class FirebaseEmulatorAuthService : DevAuthService {
         return try {
             Timber.d("Dev sign-in attempt with email: %s", email)
 
-            val authResult = auth.signInWithEmailAndPassword(email, password).await()
-            val user = authResult.user
+            val user = try {
+                auth.signInWithEmailAndPassword(email, password).await().user
+            } catch (e: FirebaseAuthInvalidUserException) {
+                // User doesn't exist - create it
+                Timber.d("User not found, creating: %s", email)
+                auth.createUserWithEmailAndPassword(email, password).await().user
+            }
 
             if (user != null) {
                 Timber.d("Dev sign-in successful for user: %s", user.uid)
