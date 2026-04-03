@@ -19,7 +19,6 @@ import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
-import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
@@ -28,13 +27,15 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import java.time.LocalDate
 import java.time.LocalTime
 import java.util.Locale
 import kotlin.random.Random
 
 class OverviewViewModel(
-    private val overviewUseCases: OverviewUseCases
+    private val overviewUseCases: OverviewUseCases,
+    private val syncScheduler: SyncScheduler
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -56,6 +57,15 @@ class OverviewViewModel(
         overviewUseCases.setupDailyNotification()
         // Check for app updates on startup
         checkForUpdates(forceCheck = false)
+        // Trigger sync on app startup (if signed in)
+        triggerStartupSync()
+    }
+
+    /**
+     * Trigger sync when app starts to download any remote changes.
+     */
+    private fun triggerStartupSync() {
+        syncScheduler.requestImmediateSync()
     }
 
     /**
@@ -269,7 +279,8 @@ class OverviewViewModel(
             is OverviewAction.ConfirmDeleteEntry -> {
                 viewModelScope.launch {
                     val entry = _uiState.value.entryToDelete ?: return@launch
-                    Timber.d("Confirming delete for entry: ${entry.id}")
+                    val entryId = entry.id ?: return@launch
+                    Timber.d("Confirming delete for entry: $entryId")
 
                     // Close dialog first
                     _uiState.update {
@@ -280,15 +291,16 @@ class OverviewViewModel(
                         _uiState.update { it.copy(isLoading = isLoading) }
                     }
 
-                    when (val result = overviewUseCases.deleteEntry(entry.toEntry())) {
+                    when (val result = overviewUseCases.deleteEntry(entryId)) {
                         is Result.Success -> {
                             loadingJob.cancel()
                             _uiState.update { it.copy(isLoading = false) }
-                            Timber.i("Entry deleted successfully: ${entry.id}")
+                            Timber.i("Entry deleted successfully: $entryId")
+                            syncScheduler.requestImmediateSync()
                             _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
                         }
                         is Result.Error -> {
-                            Timber.e("Failed to delete entry: ${entry.id}")
+                            Timber.e("Failed to delete entry: $entryId")
                             loadingJob.cancel()
                             _uiState.update { it.copy(isLoading = false) }
                             val errorMessage = ErrorFormatter.format(result.error, "delete entry")

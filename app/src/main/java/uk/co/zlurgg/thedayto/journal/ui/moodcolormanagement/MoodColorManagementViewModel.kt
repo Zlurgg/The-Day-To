@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManag
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorWithCount
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import java.time.Instant
 
 /**
@@ -29,7 +30,8 @@ import java.time.Instant
  * Handles loading mood colors with entry counts, and CRUD operations.
  */
 class MoodColorManagementViewModel(
-    private val moodColorManagementUseCases: MoodColorManagementUseCases
+    private val moodColorManagementUseCases: MoodColorManagementUseCases,
+    private val syncScheduler: SyncScheduler
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -71,6 +73,7 @@ class MoodColorManagementViewModel(
                             return@launch
                         }
                         moodColorManagementUseCases.deleteMoodColor(moodColorId)
+                        syncScheduler.requestImmediateSync()
                         _uiState.update { it.copy(recentlyDeletedMoodColor = action.moodColor) }
                         _uiEvents.emit(
                             MoodColorManagementUiEvent.ShowSnackbar(
@@ -95,6 +98,7 @@ class MoodColorManagementViewModel(
                     try {
                         // Re-add the mood color (AddMoodColorUseCase handles restoration)
                         moodColorManagementUseCases.addMoodColor(deletedMoodColor)
+                        syncScheduler.requestImmediateSync()
                         _uiState.update { it.copy(recentlyDeletedMoodColor = null) }
                         _uiEvents.emit(
                             MoodColorManagementUiEvent.ShowSnackbar(
@@ -133,6 +137,7 @@ class MoodColorManagementViewModel(
                             dateStamp = Instant.now().epochSecond
                         )
                         moodColorManagementUseCases.addMoodColor(newMoodColor)
+                        syncScheduler.requestImmediateSync()
                         _uiState.update { it.copy(showAddMoodColorDialog = false) }
                         _uiEvents.emit(
                             MoodColorManagementUiEvent.ShowSnackbar(
@@ -181,6 +186,7 @@ class MoodColorManagementViewModel(
 
                         // Update color
                         moodColorManagementUseCases.updateMoodColor(action.moodColorId, action.newColorHex)
+                        syncScheduler.requestImmediateSync()
 
                         _uiState.update { it.copy(editingMoodColor = null) }
                         _uiEvents.emit(

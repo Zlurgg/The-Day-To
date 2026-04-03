@@ -14,6 +14,7 @@ val journalViewModelModule = module {
     viewModel { (savedStateHandle: SavedStateHandle) ->
         EditorViewModel(
             editorUseCases = get(),
+            syncScheduler = get(),
             savedStateHandle = savedStateHandle
         )
     }
@@ -21,7 +22,8 @@ val journalViewModelModule = module {
     // Overview ViewModel
     viewModel {
         OverviewViewModel(
-            overviewUseCases = get()
+            overviewUseCases = get(),
+            syncScheduler = get()
         )
     }
 
@@ -36,7 +38,8 @@ val journalViewModelModule = module {
     // MoodColorManagement ViewModel
     viewModel {
         MoodColorManagementViewModel(
-            moodColorManagementUseCases = get()
+            moodColorManagementUseCases = get(),
+            syncScheduler = get()
         )
     }
 }

@@ -26,12 +26,14 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
 import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneOffset
 
 class EditorViewModel(
     private val editorUseCases: EditorUseCases,
+    private val syncScheduler: SyncScheduler,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -305,6 +307,7 @@ class EditorViewModel(
                         )
                         // Auto-select the newly created/restored mood color
                         Timber.d("Successfully saved mood color: ${action.mood.trim()}, auto-selecting ID: $newMoodColorId")
+                        triggerSync()
                         _uiState.update {
                             it.copy(
                                 isMoodColorSectionVisible = false,
@@ -328,6 +331,7 @@ class EditorViewModel(
                 viewModelScope.launch {
                     Timber.d("Deleting mood color: ${action.moodColor.mood}")
                     editorUseCases.deleteMoodColor(action.moodColor.id ?: return@launch)
+                    triggerSync()
 
                     // Check if the deleted mood was currently selected
                     val currentState = _uiState.value
@@ -392,6 +396,8 @@ class EditorViewModel(
                             id = action.moodColorId,
                             newColor = action.newColorHex
                         )
+
+                        triggerSync()
 
                         // Close dialog and clear any errors
                         _uiState.update {
@@ -482,6 +488,7 @@ class EditorViewModel(
                         )
                         loadingJob.cancel() // Cancel if finished quickly
                         Timber.d("Successfully saved entry")
+                        triggerSync()
                         _uiState.update { it.copy(isLoading = false, shouldNavigateBack = true) }
                     } catch (e: InvalidEntryException) {
                         loadingJob.cancel()
@@ -555,5 +562,13 @@ class EditorViewModel(
                 _uiState.update { it.copy(moodColors = moodColors) }
             }
             .launchIn(viewModelScope)
+    }
+
+    /**
+     * Trigger sync after data changes.
+     * Uses WorkManager's KEEP policy for deduplication (no debounce needed).
+     */
+    private fun triggerSync() {
+        syncScheduler.requestImmediateSync()
     }
 }

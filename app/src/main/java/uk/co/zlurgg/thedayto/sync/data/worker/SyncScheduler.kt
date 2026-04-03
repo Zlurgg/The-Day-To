@@ -90,7 +90,7 @@ class SyncScheduler(
 
         workManager.enqueueUniqueWork(
             SyncWorker.WORK_NAME_IMMEDIATE,
-            ExistingWorkPolicy.REPLACE, // Replace any pending immediate sync
+            ExistingWorkPolicy.KEEP, // Don't cancel in-progress sync
             immediateWorkRequest
         )
 
