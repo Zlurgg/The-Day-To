@@ -72,8 +72,18 @@ interface EntryDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertEntry(entry: EntryEntity)
 
+    /**
+     * Hard delete an entry from the database by ID.
+     */
+    @Query("DELETE FROM entry WHERE id = :id")
+    suspend fun deleteEntry(id: Int)
+
+    /**
+     * Hard delete an entry from the database.
+     * Used by sync after successful remote deletion.
+     */
     @Delete
-    suspend fun deleteEntry(entry: EntryEntity)
+    suspend fun hardDeleteEntry(entry: EntryEntity)
 
     @Update
     suspend fun updateEntry(entry: EntryEntity)
@@ -94,9 +104,10 @@ interface EntryDao {
     // ==================== Sync Queries ====================
 
     /**
-     * Get all entries that need to be synced (PENDING_SYNC or PENDING_DELETE).
+     * Get all entries that need to be synced.
+     * Note: PENDING_DELETE entries are tracked separately in pending_sync_deletion table.
      */
-    @Query("SELECT * FROM entry WHERE syncStatus IN ('PENDING_SYNC', 'PENDING_DELETE')")
+    @Query("SELECT * FROM entry WHERE syncStatus = 'PENDING_SYNC'")
     suspend fun getEntriesPendingSync(): List<EntryEntity>
 
     /**
@@ -113,13 +124,21 @@ interface EntryDao {
 
     /**
      * Update sync fields after successful upload.
+     * Only updates if entry hasn't been modified since upload started (updatedAt matches).
+     * Returns number of rows updated (0 if entry was modified, 1 if updated).
      */
     @Query("""
         UPDATE entry
-        SET syncId = :syncId, userId = :userId, updatedAt = :updatedAt, syncStatus = :syncStatus
-        WHERE id = :id
+        SET syncId = :syncId, userId = :userId, syncStatus = :syncStatus
+        WHERE id = :id AND updatedAt = :expectedUpdatedAt
     """)
-    suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
+    suspend fun updateSyncFields(
+        id: Int,
+        syncId: String,
+        userId: String,
+        syncStatus: String,
+        expectedUpdatedAt: Long
+    ): Int
 
     /**
      * Mark all LOCAL_ONLY entries as PENDING_SYNC.
@@ -127,6 +146,20 @@ interface EntryDao {
      */
     @Query("UPDATE entry SET syncStatus = 'PENDING_SYNC' WHERE syncStatus = 'LOCAL_ONLY'")
     suspend fun markLocalOnlyAsPendingSync(): Int
+
+    /**
+     * Adopt orphaned entries (userId = null) by setting userId.
+     * Called when user signs in to claim local data.
+     */
+    @Query("UPDATE entry SET userId = :userId WHERE userId IS NULL")
+    suspend fun adoptOrphans(userId: String): Int
+
+    /**
+     * Mark all SYNCED entries as LOCAL_ONLY and clear userId.
+     * Called on sign-out to prepare data for offline use.
+     */
+    @Query("UPDATE entry SET syncStatus = 'LOCAL_ONLY', userId = NULL WHERE syncStatus = 'SYNCED'")
+    suspend fun markSyncedAsLocalOnly(): Int
 }
 
 /**

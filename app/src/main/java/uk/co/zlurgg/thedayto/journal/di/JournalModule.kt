@@ -49,7 +49,8 @@ val journalModule = module {
     single<EntryRepository> {
         EntryRepositoryImpl(
             dao = get<TheDayToDatabase>().entryDao,
-            preferencesRepository = get()
+            preferencesRepository = get(),
+            pendingSyncDeletionDao = get<TheDayToDatabase>().pendingSyncDeletionDao
         )
     }
 

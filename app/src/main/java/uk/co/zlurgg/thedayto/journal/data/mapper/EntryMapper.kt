@@ -29,6 +29,7 @@ fun Entry.toEntity(): EntryEntity {
         userId = userId,
         updatedAt = updatedAt,
         syncStatus = syncStatus.name
+        // isDeleted defaults to false - entries are hard-deleted
     )
 }
 

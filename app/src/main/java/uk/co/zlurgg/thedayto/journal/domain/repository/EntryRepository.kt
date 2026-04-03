@@ -43,7 +43,7 @@ interface EntryRepository {
     suspend fun getEntryByDate(date: Long): Result<Entry?, DataError.Local>
     suspend fun getEntryWithMoodColorByDate(date: Long): Result<EntryWithMoodColor?, DataError.Local>
     suspend fun insertEntry(entry: Entry): EmptyResult<DataError.Local>
-    suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local>
+    suspend fun deleteEntry(id: Int): EmptyResult<DataError.Local>
     suspend fun updateEntry(entry: Entry): EmptyResult<DataError.Local>
 
     /**

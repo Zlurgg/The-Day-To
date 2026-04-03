@@ -13,6 +13,8 @@ import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
+import uk.co.zlurgg.thedayto.sync.data.dao.PendingSyncDeletionDao
+import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -20,7 +22,8 @@ import java.util.UUID
 
 class EntryRepositoryImpl(
     private val dao: EntryDao,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val pendingSyncDeletionDao: PendingSyncDeletionDao
 ) : EntryRepository {
     override fun getEntries(): Flow<List<Entry>> {
         return dao.getEntries().map { entities ->
@@ -92,8 +95,13 @@ class EntryRepositoryImpl(
     override suspend fun insertEntry(entry: Entry): EmptyResult<DataError.Local> {
         return ErrorMapper.safeSuspendCall(TAG) {
             val syncEnabled = preferencesRepository.isSyncEnabled()
+
+            // Preserve existing sync fields when updating (entry.id != null)
+            val existingEntry = entry.id?.let { dao.getEntryById(it) }
+
             val entryWithSync = entry.copy(
-                syncId = entry.syncId ?: UUID.randomUUID().toString(),
+                syncId = entry.syncId ?: existingEntry?.syncId ?: UUID.randomUUID().toString(),
+                userId = entry.userId ?: existingEntry?.userId,
                 updatedAt = System.currentTimeMillis(),
                 syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY
             )
@@ -101,21 +109,23 @@ class EntryRepositoryImpl(
         }
     }
 
-    override suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local> {
+    override suspend fun deleteEntry(id: Int): EmptyResult<DataError.Local> {
         return ErrorMapper.safeSuspendCall(TAG) {
             val syncEnabled = preferencesRepository.isSyncEnabled()
-            if (syncEnabled && entry.syncId != null) {
-                // Mark for sync deletion, then delete locally
-                val entryToDelete = entry.copy(
-                    syncStatus = SyncStatus.PENDING_DELETE,
-                    updatedAt = System.currentTimeMillis()
+            val entry = dao.getEntryById(id)
+
+            // If entry was synced, track deletion for Firestore sync
+            if (syncEnabled && entry?.syncId != null && entry.userId != null) {
+                pendingSyncDeletionDao.insert(
+                    PendingSyncDeletionEntity(
+                        syncId = entry.syncId,
+                        collection = PendingSyncDeletionEntity.COLLECTION_ENTRIES,
+                        userId = entry.userId
+                    )
                 )
-                dao.updateEntry(entryToDelete.toEntity())
-                // Note: SyncWorker will delete from Firestore and then remove locally
-            } else {
-                // Not synced, delete immediately
-                dao.deleteEntry(entry.toEntity())
             }
+            // Hard delete immediately - entry is gone from local DB
+            dao.deleteEntry(id)
         }
     }
 
