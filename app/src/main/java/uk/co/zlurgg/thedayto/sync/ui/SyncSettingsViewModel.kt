@@ -194,20 +194,26 @@ class SyncSettingsViewModel(
     /**
      * Sign out and disable sync.
      * Called when user taps Sign Out button in Account settings.
+     * Clears synced data for privacy - user can re-download on next sign-in.
      */
     fun signOut() {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
             try {
+                val user = authRepository.getSignedInUser()
+                val userId = user?.userId
+
                 // Cancel any sync workers first
                 syncScheduler.cancelAllSync()
 
                 // Disable sync
                 preferencesRepository.setSyncEnabled(false)
 
-                // Reset synced items to LOCAL_ONLY for offline use
-                syncRepository.markSyncedAsLocalOnly()
+                // Clear this user's synced data (will re-download on next sign-in)
+                if (userId != null) {
+                    syncRepository.clearUserData(userId)
+                }
 
                 // Sign out
                 signOutUseCase()

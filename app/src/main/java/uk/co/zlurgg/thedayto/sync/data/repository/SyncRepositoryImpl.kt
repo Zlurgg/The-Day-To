@@ -412,6 +412,18 @@ class SyncRepositoryImpl(
         return totalDeleted
     }
 
+    override suspend fun clearUserData(userId: String): Int {
+        val entriesDeleted = entryDao.deleteByUserId(userId)
+        val moodColorsDeleted = moodColorDao.deleteByUserId(userId)
+        val total = entriesDeleted + moodColorsDeleted
+        Timber.i(
+            "Cleared user data on sign-out: entries=%d, moodColors=%d",
+            entriesDeleted,
+            moodColorsDeleted
+        )
+        return total
+    }
+
     /**
      * Process downloaded mood colors and merge with local data.
      * @throws SyncException if download fails

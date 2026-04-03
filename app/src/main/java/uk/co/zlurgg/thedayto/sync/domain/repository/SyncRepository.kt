@@ -58,4 +58,7 @@ interface SyncRepository {
 
     /** Clear data belonging to users other than the specified userId. Called on sign-in. */
     suspend fun clearOtherUserData(currentUserId: String): Int
+
+    /** Clear data belonging to a specific user. Called on sign-out for privacy. */
+    suspend fun clearUserData(userId: String): Int
 }
