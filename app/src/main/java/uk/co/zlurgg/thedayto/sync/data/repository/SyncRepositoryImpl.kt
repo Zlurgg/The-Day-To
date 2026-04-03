@@ -451,8 +451,13 @@ class SyncRepositoryImpl(
         }
 
         val resolved = resolveMoodColorConflict(local, remote)
-        if (resolved == local) return
+        if (resolved == local) {
+            Timber.d("Keeping local mood color: %s (local updatedAt=%d, remote=%d)",
+                local.mood, local.updatedAt ?: 0, remote.updatedAt ?: 0)
+            return
+        }
 
+        Timber.d("Updating mood color from remote: %s (syncId=%s)", resolved.mood, resolved.syncId)
         moodColorDao.updateMoodColor(resolved.toEntity())
         counts.moodColorsDownloaded++
         if (resolved.updatedAt != remote.updatedAt) {
@@ -480,6 +485,7 @@ class SyncRepositoryImpl(
         val local = remote.syncId?.let { entryDao.getEntryBySyncId(it)?.toDomain() }
 
         if (local == null) {
+            Timber.d("Inserting new entry: syncId=%s, moodColorId=%d", remote.syncId, remote.moodColorId)
             entryDao.insertEntry(remote.toEntity())
             counts.entriesDownloaded++
             return
