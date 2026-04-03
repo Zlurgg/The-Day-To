@@ -218,7 +218,10 @@ class SyncSettingsViewModel(
                 }
 
                 // Restore default mood colors for offline use
-                seedDefaultMoodColorsUseCase.reseed()
+                val seededCount = seedDefaultMoodColorsUseCase.reseed()
+                if (seededCount == 0) {
+                    throw IllegalStateException("Reseed returned 0 - no mood colors created")
+                }
 
                 // Sign out
                 signOutUseCase()
@@ -236,7 +239,7 @@ class SyncSettingsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to sign out"
+                        error = "Sign out failed: ${e.message}"
                     )
                 }
             }

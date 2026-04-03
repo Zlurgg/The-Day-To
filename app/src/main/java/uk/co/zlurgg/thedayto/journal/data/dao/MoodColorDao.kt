@@ -31,13 +31,12 @@ interface MoodColorDao {
     // ==================== Sync Queries ====================
 
     /**
-     * Get all mood colors that need to be synced.
-     * Excludes unmodified seeds (updatedAt <= 0) but includes deletes.
+     * Get all mood colors that need to be synced (including seeds).
      */
     @Query(
         """
         SELECT * FROM mood_color
-        WHERE (syncStatus = 'PENDING_SYNC' AND COALESCE(updatedAt, 0) > 0)
+        WHERE syncStatus = 'PENDING_SYNC'
            OR syncStatus = 'PENDING_DELETE'
         """
     )
@@ -90,10 +89,9 @@ interface MoodColorDao {
 
     /**
      * Adopt orphaned mood colors (userId = null) by setting userId.
-     * Only adopts user-modified items (updatedAt > 0), not default seeds.
-     * Called when user signs in to claim local data.
+     * Called when user signs in to claim local data (including seeds).
      */
-    @Query("UPDATE mood_color SET userId = :userId WHERE userId IS NULL AND COALESCE(updatedAt, 0) > 0")
+    @Query("UPDATE mood_color SET userId = :userId WHERE userId IS NULL")
     suspend fun adoptOrphans(userId: String): Int
 
     /**

@@ -1,9 +1,10 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
+import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 
 /**
  * Use Case: Seed default mood colors on first app launch
@@ -42,12 +43,15 @@ class SeedDefaultMoodColorsUseCase(
      * Force re-seed default mood colors.
      * Called after sign-out to restore defaults.
      * Uses REPLACE strategy so existing seeds are updated, not duplicated.
+     *
+     * @return Number of successfully seeded mood colors
+     * @throws IllegalStateException if seeding fails
      */
-    suspend fun reseed() {
-        seedDefaults()
+    suspend fun reseed(): Int {
+        return seedDefaults()
     }
 
-    private suspend fun seedDefaults() {
+    private suspend fun seedDefaults(): Int {
         val timestamp = DateUtils.getTodayStartEpoch()
 
         // Default mood colors with psychology-based colors
@@ -105,11 +109,22 @@ class SeedDefaultMoodColorsUseCase(
             )
         )
 
-        // Insert all default mood colors
+        // Insert all default mood colors and track results
+        var successCount = 0
+        val failures = mutableListOf<String>()
+
         defaultMoodColors.forEach { moodColor ->
-            moodColorRepository.insertMoodColor(moodColor)
+            when (val result = moodColorRepository.insertMoodColor(moodColor)) {
+                is Result.Success -> successCount++
+                is Result.Error -> failures.add("${moodColor.mood}: ${result.error}")
+            }
         }
 
+        if (successCount == 0 && failures.isNotEmpty()) {
+            throw IllegalStateException("Failed to seed any mood colors: ${failures.joinToString()}")
+        }
+
+        return successCount
         // Note: First launch is marked complete in OverviewViewModel after tutorial is shown
     }
 }

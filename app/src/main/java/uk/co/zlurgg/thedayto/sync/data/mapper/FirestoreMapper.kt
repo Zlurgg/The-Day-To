@@ -58,13 +58,17 @@ object FirestoreMapper {
 
     /**
      * Convert MoodColor domain model to Firestore document map.
+     * Seeds (updatedAt = 0) get current timestamp so they sync properly.
      */
     fun MoodColor.toFirestoreMap(): Map<String, Any?> = mapOf(
         "mood" to mood,
         "color" to color,
         "isDeleted" to isDeleted,
         "dateStamp" to dateStamp,
-        "updatedAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, ZERO_NANOSECONDS) } ?: Timestamp.now())
+        "updatedAt" to when {
+            updatedAt == null || updatedAt == 0L -> Timestamp.now()
+            else -> Timestamp(updatedAt / MILLIS_PER_SECOND, ZERO_NANOSECONDS)
+        }
     )
 
     /**
