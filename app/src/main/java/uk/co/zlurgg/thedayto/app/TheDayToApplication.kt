@@ -1,6 +1,9 @@
 package uk.co.zlurgg.thedayto.app
 
 import android.app.Application
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -12,6 +15,7 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.app.di.appModule
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 
 class TheDayToApplication : Application() {
     override fun onCreate() {
@@ -34,5 +38,22 @@ class TheDayToApplication : Application() {
                 get(SeedDefaultMoodColorsUseCase::class.java)
             seedDefaultMoodColorsUseCase()
         }
+
+        // Sync on app backgrounding
+        setupAppLifecycleSync()
+    }
+
+    /**
+     * Setup ProcessLifecycleOwner observer to sync when app goes to background.
+     * Uses ExistingWorkPolicy.KEEP to avoid canceling in-progress sync.
+     */
+    private fun setupAppLifecycleSync() {
+        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
+            override fun onStop(owner: LifecycleOwner) {
+                Timber.d("App going to background, triggering sync")
+                val syncScheduler: SyncScheduler = get(SyncScheduler::class.java)
+                syncScheduler.requestImmediateSync()
+            }
+        })
     }
 }
