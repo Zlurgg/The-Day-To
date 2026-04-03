@@ -244,7 +244,7 @@
     <string name="sync_status_title">Sync Status</string>
     <string name="sync_status_idle">Ready to sync</string>
     <string name="sync_status_syncing">Syncing…</string>
-    <string name="sync_status_success">Synced: %1$d uploaded, %2$d downloaded</string>
+    <string name="sync_status_success">Sync complete</string>
     <string name="sync_status_error">Sync failed</string>
     <string name="sync_last_sync_format">Last synced: %1$s</string>
     <string name="sync_now_button">Sync Now</string>

@@ -16,7 +16,6 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
@@ -35,7 +34,6 @@ class SyncSettingsViewModel(
     private val signInUseCase: SignInUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val preferencesRepository: PreferencesRepository,
-    private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
     private val syncRepository: SyncRepository,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
@@ -159,33 +157,35 @@ class SyncSettingsViewModel(
 
     /**
      * Common success handler for sign-in operations.
-     * Auto-enables sync and seeds default mood colors.
+     * Auto-enables sync and triggers immediate sync.
      */
     private suspend fun handleSignInSuccess() {
-        val userName = authRepository.getSignedInUser()?.username
+        val user = authRepository.getSignedInUser() ?: return
+        val userId = user.userId
 
         // Auto-enable sync on sign-in
         preferencesRepository.setSyncEnabled(true)
 
-        // Seed default mood colors (idempotent - checks isFirstLaunch)
-        seedDefaultMoodColorsUseCase()
+        // Adopt orphaned data (userId = null) before marking for sync
+        syncRepository.adoptOrphanedData(userId)
 
         // Mark any LOCAL_ONLY data as PENDING_SYNC so it gets uploaded
         syncRepository.markLocalDataForSync()
 
-        // Start sync
+        // Start background sync and trigger immediate first sync
         syncScheduler.startPeriodicSync()
+        syncScheduler.requestImmediateSync()
 
         val lastSync = syncUseCases.getLastSyncTimestamp()
         _uiState.update {
             it.copy(
                 isUserSignedIn = true,
                 isSigningIn = false,
-                userEmail = userName,
+                userEmail = user.username,
                 lastSyncTimestamp = lastSync
             )
         }
-        Timber.i("Sign in successful: $userName")
+        Timber.i("Sign in successful: %s", user.username)
     }
 
     /**
@@ -202,6 +202,9 @@ class SyncSettingsViewModel(
 
                 // Disable sync
                 preferencesRepository.setSyncEnabled(false)
+
+                // Reset synced items to LOCAL_ONLY for offline use
+                syncRepository.markSyncedAsLocalOnly()
 
                 // Sign out
                 signOutUseCase()

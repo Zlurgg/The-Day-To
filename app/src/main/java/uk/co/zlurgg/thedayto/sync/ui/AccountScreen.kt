@@ -416,11 +416,7 @@ private fun SyncStateIndicator(
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
-                    text = stringResource(
-                        R.string.sync_status_success,
-                        syncState.result.entriesUploaded + syncState.result.moodColorsUploaded,
-                        syncState.result.entriesDownloaded + syncState.result.moodColorsDownloaded
-                    ),
+                    text = stringResource(R.string.sync_status_success),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.primary
                 )
