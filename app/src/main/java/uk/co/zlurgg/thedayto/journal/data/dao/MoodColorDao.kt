@@ -96,9 +96,24 @@ interface MoodColorDao {
     suspend fun adoptOrphans(userId: String): Int
 
     /**
-     * Mark all SYNCED mood colors as LOCAL_ONLY and clear userId.
+     * Mark all SYNCED mood colors as LOCAL_ONLY.
      * Called on sign-out to prepare data for offline use.
+     * Keeps userId intact for user isolation.
      */
-    @Query("UPDATE mood_color SET syncStatus = 'LOCAL_ONLY', userId = NULL WHERE syncStatus = 'SYNCED'")
+    @Query("UPDATE mood_color SET syncStatus = 'LOCAL_ONLY' WHERE syncStatus = 'SYNCED'")
     suspend fun markSyncedAsLocalOnly(): Int
+
+    /**
+     * Delete all mood colors belonging to a specific user.
+     * Called when a different user signs in to clear previous user's data.
+     */
+    @Query("DELETE FROM mood_color WHERE userId = :userId")
+    suspend fun deleteByUserId(userId: String): Int
+
+    /**
+     * Get distinct userIds in the database (excluding null).
+     * Used to detect if data from another user exists.
+     */
+    @Query("SELECT DISTINCT userId FROM mood_color WHERE userId IS NOT NULL")
+    suspend fun getDistinctUserIds(): List<String>
 }

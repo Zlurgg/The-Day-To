@@ -155,11 +155,26 @@ interface EntryDao {
     suspend fun adoptOrphans(userId: String): Int
 
     /**
-     * Mark all SYNCED entries as LOCAL_ONLY and clear userId.
+     * Mark all SYNCED entries as LOCAL_ONLY.
      * Called on sign-out to prepare data for offline use.
+     * Keeps userId intact for user isolation.
      */
-    @Query("UPDATE entry SET syncStatus = 'LOCAL_ONLY', userId = NULL WHERE syncStatus = 'SYNCED'")
+    @Query("UPDATE entry SET syncStatus = 'LOCAL_ONLY' WHERE syncStatus = 'SYNCED'")
     suspend fun markSyncedAsLocalOnly(): Int
+
+    /**
+     * Delete all entries belonging to a specific user.
+     * Called when a different user signs in to clear previous user's data.
+     */
+    @Query("DELETE FROM entry WHERE userId = :userId")
+    suspend fun deleteByUserId(userId: String): Int
+
+    /**
+     * Get distinct userIds in the database (excluding null).
+     * Used to detect if data from another user exists.
+     */
+    @Query("SELECT DISTINCT userId FROM entry WHERE userId IS NOT NULL")
+    suspend fun getDistinctUserIds(): List<String>
 }
 
 /**

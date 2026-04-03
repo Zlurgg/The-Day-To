@@ -53,6 +53,9 @@ interface SyncRepository {
     /** Adopt orphaned items (userId = null) by setting userId. Called on sign-in. */
     suspend fun adoptOrphanedData(userId: String): Int
 
-    /** Mark SYNCED items as LOCAL_ONLY and clear userId. Called on sign-out. */
+    /** Mark SYNCED items as LOCAL_ONLY. Called on sign-out. Keeps userId intact. */
     suspend fun markSyncedAsLocalOnly(): Int
+
+    /** Clear data belonging to users other than the specified userId. Called on sign-in. */
+    suspend fun clearOtherUserData(currentUserId: String): Int
 }

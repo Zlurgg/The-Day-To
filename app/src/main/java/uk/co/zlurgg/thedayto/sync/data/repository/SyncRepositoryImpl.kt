@@ -140,25 +140,19 @@ class SyncRepositoryImpl(
                 .collection(MOOD_COLORS_COLLECTION)
                 .document(syncId)
 
-            if (moodColor.syncStatus == SyncStatus.PENDING_DELETE) {
-                docRef.delete().await()
-                // For mood colors, we keep the soft-delete locally
-                moodColor.id?.let { id ->
-                    moodColorDao.updateSyncStatus(id, SyncStatus.SYNCED.name)
-                }
-            } else {
-                docRef.set(moodColor.toFirestoreMap()).await()
-                // Update local mood color with sync info (only if not modified during sync)
-                moodColor.id?.let { id ->
-                    moodColor.updatedAt?.let { uploadedAt ->
-                        moodColorDao.updateSyncFields(
-                            id = id,
-                            syncId = syncId,
-                            userId = userId,
-                            syncStatus = SyncStatus.SYNCED.name,
-                            expectedUpdatedAt = uploadedAt
-                        )
-                    }
+            // Upload mood color (including soft-deletes with isDeleted=true)
+            // This ensures deleted mood colors sync to other devices and can be reactivated
+            docRef.set(moodColor.toFirestoreMap()).await()
+            // Update local mood color with sync info (only if not modified during sync)
+            moodColor.id?.let { id ->
+                moodColor.updatedAt?.let { uploadedAt ->
+                    moodColorDao.updateSyncFields(
+                        id = id,
+                        syncId = syncId,
+                        userId = userId,
+                        syncStatus = SyncStatus.SYNCED.name,
+                        expectedUpdatedAt = uploadedAt
+                    )
                 }
             }
             uploadedCount++
@@ -388,6 +382,34 @@ class SyncRepositoryImpl(
             entriesReset
         )
         return total
+    }
+
+    override suspend fun clearOtherUserData(currentUserId: String): Int {
+        // Find all userIds that are not the current user
+        val moodColorUserIds = moodColorDao.getDistinctUserIds()
+        val entryUserIds = entryDao.getDistinctUserIds()
+        val allUserIds = (moodColorUserIds + entryUserIds).distinct()
+        val otherUserIds = allUserIds.filter { it != currentUserId }
+
+        if (otherUserIds.isEmpty()) {
+            Timber.d("No other user data to clear")
+            return 0
+        }
+
+        var totalDeleted = 0
+        otherUserIds.forEach { userId ->
+            val entriesDeleted = entryDao.deleteByUserId(userId)
+            val moodColorsDeleted = moodColorDao.deleteByUserId(userId)
+            totalDeleted += entriesDeleted + moodColorsDeleted
+            Timber.i(
+                "Cleared data for user %s: entries=%d, moodColors=%d",
+                userId,
+                entriesDeleted,
+                moodColorsDeleted
+            )
+        }
+
+        return totalDeleted
     }
 
     /**

@@ -166,7 +166,10 @@ class SyncSettingsViewModel(
         // Auto-enable sync on sign-in
         preferencesRepository.setSyncEnabled(true)
 
-        // Adopt orphaned data (userId = null) before marking for sync
+        // Clear data from any other user (user isolation)
+        syncRepository.clearOtherUserData(userId)
+
+        // Adopt orphaned data (userId = null) - this is data created before first sign-in
         syncRepository.adoptOrphanedData(userId)
 
         // Mark any LOCAL_ONLY data as PENDING_SYNC so it gets uploaded
