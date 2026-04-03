@@ -11,6 +11,8 @@ import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.dao.MoodColorDao
+import uk.co.zlurgg.thedayto.sync.data.dao.PendingSyncDeletionDao
+import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
@@ -28,15 +30,20 @@ import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 import java.util.UUID
 
 /**
+ * Exception wrapper for sync errors to propagate through runCatching.
+ */
+private class SyncException(val error: DataError.Sync) : Exception()
+
+/**
  * Firestore implementation of SyncRepository.
  *
  * Handles bidirectional sync between Room and Firestore.
  */
-@Suppress("MagicNumber", "ReturnCount", "LongMethod")
 class SyncRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val entryDao: EntryDao,
-    private val moodColorDao: MoodColorDao
+    private val moodColorDao: MoodColorDao,
+    private val pendingSyncDeletionDao: PendingSyncDeletionDao
 ) : SyncRepository {
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
@@ -63,23 +70,16 @@ class SyncRepositoryImpl(
                 .collection(ENTRIES_COLLECTION)
                 .document(syncId)
 
-            if (entry.syncStatus == SyncStatus.PENDING_DELETE) {
-                docRef.delete().await()
-                // Hard delete locally after successful remote delete
-                entry.id?.let { id ->
-                    val entityToDelete = entryDao.getEntryById(id)
-                    entityToDelete?.let { entryDao.deleteEntry(it) }
-                }
-            } else {
-                docRef.set(entry.toFirestoreMap(moodColorSyncId)).await()
-                // Update local entry with sync info
-                entry.id?.let { id ->
+            docRef.set(entry.toFirestoreMap(moodColorSyncId)).await()
+            // Update local entry with sync info (only if not modified during sync)
+            entry.id?.let { id ->
+                entry.updatedAt?.let { uploadedAt ->
                     entryDao.updateSyncFields(
                         id = id,
                         syncId = syncId,
                         userId = userId,
-                        updatedAt = System.currentTimeMillis(),
-                        syncStatus = SyncStatus.SYNCED.name
+                        syncStatus = SyncStatus.SYNCED.name,
+                        expectedUpdatedAt = uploadedAt
                     )
                 }
             }
@@ -91,6 +91,39 @@ class SyncRepositoryImpl(
         onSuccess = { Result.Success(it) },
         onFailure = { mapFirestoreException(it) }
     )
+
+    /**
+     * Process pending entry deletions from the tracking table.
+     * Deletes from Firestore and removes tracking record on success.
+     */
+    private suspend fun processPendingEntryDeletions(): Int {
+        val pendingDeletions = pendingSyncDeletionDao.getByCollection(
+            PendingSyncDeletionEntity.COLLECTION_ENTRIES
+        )
+        var deletedCount = 0
+
+        pendingDeletions.forEach { deletion ->
+            try {
+                firestore
+                    .collection(USERS_COLLECTION)
+                    .document(deletion.userId)
+                    .collection(ENTRIES_COLLECTION)
+                    .document(deletion.syncId)
+                    .delete()
+                    .await()
+
+                // Successfully deleted from Firestore, remove tracking record
+                pendingSyncDeletionDao.delete(deletion.id)
+                deletedCount++
+                Timber.d("Deleted entry from Firestore: syncId=%s", deletion.syncId)
+            } catch (e: Exception) {
+                Timber.w(e, "Failed to delete entry from Firestore: syncId=%s", deletion.syncId)
+                // Keep the tracking record so we retry next sync
+            }
+        }
+
+        return deletedCount
+    }
 
     override suspend fun uploadPendingMoodColors(
         moodColors: List<MoodColor>,
@@ -115,14 +148,17 @@ class SyncRepositoryImpl(
                 }
             } else {
                 docRef.set(moodColor.toFirestoreMap()).await()
+                // Update local mood color with sync info (only if not modified during sync)
                 moodColor.id?.let { id ->
-                    moodColorDao.updateSyncFields(
-                        id = id,
-                        syncId = syncId,
-                        userId = userId,
-                        updatedAt = System.currentTimeMillis(),
-                        syncStatus = SyncStatus.SYNCED.name
-                    )
+                    moodColor.updatedAt?.let { uploadedAt ->
+                        moodColorDao.updateSyncFields(
+                            id = id,
+                            syncId = syncId,
+                            userId = userId,
+                            syncStatus = SyncStatus.SYNCED.name,
+                            expectedUpdatedAt = uploadedAt
+                        )
+                    }
                 }
             }
             uploadedCount++
@@ -220,111 +256,48 @@ class SyncRepositoryImpl(
     )
 
     override suspend fun performFullSync(userId: String): Result<SyncResult, DataError.Sync> {
-        _syncState.value = SyncState.Syncing(0f)
+        _syncState.value = SyncState.Syncing(PROGRESS_IDLE)
 
         return runCatching {
-            var entriesUploaded = 0
-            var entriesDownloaded = 0
-            var moodColorsUploaded = 0
-            var moodColorsDownloaded = 0
-            var conflictsResolved = 0
+            val counts = SyncCounts()
 
-            // Phase 1: Upload pending mood colors first (entries depend on them)
-            _syncState.value = SyncState.Syncing(0.1f)
-            val pendingMoodColors = moodColorDao.getMoodColorsPendingSync().map { it.toDomain() }
-            when (val result = uploadPendingMoodColors(pendingMoodColors, userId)) {
-                is Result.Success -> moodColorsUploaded = result.data
-                is Result.Error -> return result
+            // Phase 0: Process pending deletions FIRST (before download to avoid re-fetching)
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_0)
+            Timber.d("Phase 0: Processing pending entry deletions")
+            counts.entriesDeleted = processPendingEntryDeletions()
+            if (counts.entriesDeleted > 0) {
+                Timber.i("Deleted %d entries from Firestore", counts.entriesDeleted)
             }
 
-            // Phase 2: Upload pending entries
-            _syncState.value = SyncState.Syncing(0.3f)
-            val pendingEntries = entryDao.getEntriesPendingSync().map { it.toDomain() }
-            when (val result = uploadPendingEntries(pendingEntries, userId)) {
-                is Result.Success -> entriesUploaded = result.data
-                is Result.Error -> return result
-            }
+            // Phase 1: Download remote mood colors first (prevents overwriting user data)
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_1)
+            Timber.d("Phase 1: Downloading mood colors for user %s", userId)
+            processDownloadedMoodColors(userId, counts)
 
-            // Phase 3: Download remote mood colors
-            _syncState.value = SyncState.Syncing(0.5f)
-            Timber.d("Phase 3: Downloading mood colors for user %s", userId)
-            when (val result = downloadMoodColors(userId)) {
-                is Result.Success -> {
-                    Timber.d("Downloaded %d mood colors from Firestore", result.data.size)
-                    result.data.forEach { remoteMoodColor ->
-                        val localMoodColor = remoteMoodColor.syncId?.let {
-                            moodColorDao.getMoodColorBySyncId(it)?.toDomain()
-                        }
+            // Phase 2: Download remote entries
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_2)
+            Timber.d("Phase 2: Downloading entries for user %s", userId)
+            processDownloadedEntries(userId, counts)
 
-                        if (localMoodColor == null) {
-                            // New remote mood color - insert locally
-                            Timber.d(
-                                "Inserting new mood color: %s (syncId=%s)",
-                                remoteMoodColor.mood,
-                                remoteMoodColor.syncId
-                            )
-                            moodColorDao.insertMoodColor(remoteMoodColor.toEntity())
-                            moodColorsDownloaded++
-                        } else {
-                            // Conflict resolution
-                            val resolved = resolveMoodColorConflict(localMoodColor, remoteMoodColor)
-                            if (resolved != localMoodColor) {
-                                moodColorDao.updateMoodColor(resolved.toEntity())
-                                moodColorsDownloaded++
-                                if (resolved.updatedAt != remoteMoodColor.updatedAt) {
-                                    conflictsResolved++
-                                }
-                            }
-                        }
-                    }
-                }
-                is Result.Error -> return result
-            }
+            // Phase 3: Upload pending mood colors (after download to avoid overwriting)
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_3)
+            Timber.d("Phase 3: Uploading pending mood colors")
+            counts.moodColorsUploaded = uploadMoodColorsOrThrow(userId)
 
-            // Phase 4: Download remote entries
-            _syncState.value = SyncState.Syncing(0.8f)
-            when (val result = downloadEntries(userId)) {
-                is Result.Success -> {
-                    result.data.forEach { remoteEntry ->
-                        val localEntry = remoteEntry.syncId?.let {
-                            entryDao.getEntryBySyncId(it)?.toDomain()
-                        }
-
-                        if (localEntry == null) {
-                            // New remote entry - insert locally
-                            entryDao.insertEntry(remoteEntry.toEntity())
-                            entriesDownloaded++
-                        } else {
-                            // Conflict resolution
-                            val resolved = resolveEntryConflict(localEntry, remoteEntry)
-                            if (resolved != localEntry) {
-                                entryDao.updateEntry(resolved.toEntity())
-                                entriesDownloaded++
-                                if (resolved.updatedAt != remoteEntry.updatedAt) {
-                                    conflictsResolved++
-                                }
-                            }
-                        }
-                    }
-                }
-                is Result.Error -> return result
-            }
+            // Phase 4: Upload pending entries
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_4)
+            Timber.d("Phase 4: Uploading pending entries")
+            counts.entriesUploaded = uploadEntriesOrThrow(userId)
 
             Timber.i(
                 "Sync complete: entries(up=%d, down=%d) moodColors(up=%d, down=%d) conflicts=%d",
-                entriesUploaded,
-                entriesDownloaded,
-                moodColorsUploaded,
-                moodColorsDownloaded,
-                conflictsResolved
+                counts.entriesUploaded,
+                counts.entriesDownloaded,
+                counts.moodColorsUploaded,
+                counts.moodColorsDownloaded,
+                counts.conflictsResolved
             )
-            SyncResult(
-                entriesUploaded = entriesUploaded,
-                entriesDownloaded = entriesDownloaded,
-                moodColorsUploaded = moodColorsUploaded,
-                moodColorsDownloaded = moodColorsDownloaded,
-                conflictsResolved = conflictsResolved
-            )
+            counts.toSyncResult()
         }.fold(
             onSuccess = {
                 _syncState.value = SyncState.Success(it)
@@ -336,6 +309,22 @@ class SyncRepositoryImpl(
                 error
             }
         )
+    }
+
+    private suspend fun uploadMoodColorsOrThrow(userId: String): Int {
+        val pendingMoodColors = moodColorDao.getMoodColorsPendingSync().map { it.toDomain() }
+        return when (val result = uploadPendingMoodColors(pendingMoodColors, userId)) {
+            is Result.Success -> result.data
+            is Result.Error -> throw SyncException(result.error)
+        }
+    }
+
+    private suspend fun uploadEntriesOrThrow(userId: String): Int {
+        val pendingEntries = entryDao.getEntriesPendingSync().map { it.toDomain() }
+        return when (val result = uploadPendingEntries(pendingEntries, userId)) {
+            is Result.Success -> result.data
+            is Result.Error -> throw SyncException(result.error)
+        }
     }
 
     override suspend fun clearRemoteData(userId: String): EmptyResult<DataError.Sync> = runCatching {
@@ -375,20 +364,113 @@ class SyncRepositoryImpl(
         return total
     }
 
+    override suspend fun adoptOrphanedData(userId: String): Int {
+        val moodColorsAdopted = moodColorDao.adoptOrphans(userId)
+        val entriesAdopted = entryDao.adoptOrphans(userId)
+        val total = moodColorsAdopted + entriesAdopted
+        Timber.i(
+            "Adopted %d orphaned items (moodColors=%d, entries=%d)",
+            total,
+            moodColorsAdopted,
+            entriesAdopted
+        )
+        return total
+    }
+
+    override suspend fun markSyncedAsLocalOnly(): Int {
+        val moodColorsReset = moodColorDao.markSyncedAsLocalOnly()
+        val entriesReset = entryDao.markSyncedAsLocalOnly()
+        val total = moodColorsReset + entriesReset
+        Timber.i(
+            "Reset %d synced items to LOCAL_ONLY (moodColors=%d, entries=%d)",
+            total,
+            moodColorsReset,
+            entriesReset
+        )
+        return total
+    }
+
+    /**
+     * Process downloaded mood colors and merge with local data.
+     * @throws SyncException if download fails
+     */
+    private suspend fun processDownloadedMoodColors(userId: String, counts: SyncCounts) {
+        val remoteMoodColors = when (val result = downloadMoodColors(userId)) {
+            is Result.Success -> result.data
+            is Result.Error -> throw SyncException(result.error)
+        }
+
+        Timber.d("Downloaded %d mood colors from Firestore", remoteMoodColors.size)
+        remoteMoodColors.forEach { remote ->
+            mergeMoodColor(remote, counts)
+        }
+    }
+
+    private suspend fun mergeMoodColor(remote: MoodColor, counts: SyncCounts) {
+        val local = remote.syncId?.let { moodColorDao.getMoodColorBySyncId(it)?.toDomain() }
+
+        if (local == null) {
+            Timber.d("Inserting new mood color: %s (syncId=%s)", remote.mood, remote.syncId)
+            moodColorDao.insertMoodColor(remote.toEntity())
+            counts.moodColorsDownloaded++
+            return
+        }
+
+        val resolved = resolveMoodColorConflict(local, remote)
+        if (resolved == local) return
+
+        moodColorDao.updateMoodColor(resolved.toEntity())
+        counts.moodColorsDownloaded++
+        if (resolved.updatedAt != remote.updatedAt) {
+            counts.conflictsResolved++
+        }
+    }
+
+    /**
+     * Process downloaded entries and merge with local data.
+     * @throws SyncException if download fails
+     */
+    private suspend fun processDownloadedEntries(userId: String, counts: SyncCounts) {
+        val remoteEntries = when (val result = downloadEntries(userId)) {
+            is Result.Success -> result.data
+            is Result.Error -> throw SyncException(result.error)
+        }
+
+        Timber.d("Downloaded %d entries from Firestore", remoteEntries.size)
+        remoteEntries.forEach { remote ->
+            mergeEntry(remote, counts)
+        }
+    }
+
+    private suspend fun mergeEntry(remote: Entry, counts: SyncCounts) {
+        val local = remote.syncId?.let { entryDao.getEntryBySyncId(it)?.toDomain() }
+
+        if (local == null) {
+            entryDao.insertEntry(remote.toEntity())
+            counts.entriesDownloaded++
+            return
+        }
+
+        val resolved = resolveEntryConflict(local, remote)
+        if (resolved == local) return
+
+        entryDao.updateEntry(resolved.toEntity())
+        counts.entriesDownloaded++
+        if (resolved.updatedAt != remote.updatedAt) {
+            counts.conflictsResolved++
+        }
+    }
+
     private fun <T> mapFirestoreException(throwable: Throwable): Result<T, DataError.Sync> {
+        // SyncException wraps already-mapped errors, just unwrap
+        if (throwable is SyncException) {
+            return Result.Error(throwable.error)
+        }
+
         Timber.e(throwable, "Firestore sync error")
 
         val error = when (throwable) {
-            is FirebaseFirestoreException -> when (throwable.code) {
-                FirebaseFirestoreException.Code.PERMISSION_DENIED -> DataError.Sync.PERMISSION_DENIED
-                FirebaseFirestoreException.Code.UNAUTHENTICATED -> DataError.Sync.NOT_AUTHENTICATED
-                FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> DataError.Sync.QUOTA_EXCEEDED
-                FirebaseFirestoreException.Code.UNAVAILABLE -> {
-                    logEmulatorHint()
-                    DataError.Sync.NETWORK_ERROR
-                }
-                else -> DataError.Sync.UNKNOWN
-            }
+            is FirebaseFirestoreException -> mapFirebaseException(throwable)
             is java.net.UnknownHostException,
             is java.net.SocketTimeoutException,
             is java.net.ConnectException -> {
@@ -401,6 +483,17 @@ class SyncRepositoryImpl(
         return Result.Error(error)
     }
 
+    private fun mapFirebaseException(e: FirebaseFirestoreException): DataError.Sync = when (e.code) {
+        FirebaseFirestoreException.Code.PERMISSION_DENIED -> DataError.Sync.PERMISSION_DENIED
+        FirebaseFirestoreException.Code.UNAUTHENTICATED -> DataError.Sync.NOT_AUTHENTICATED
+        FirebaseFirestoreException.Code.RESOURCE_EXHAUSTED -> DataError.Sync.QUOTA_EXCEEDED
+        FirebaseFirestoreException.Code.UNAVAILABLE -> {
+            logEmulatorHint()
+            DataError.Sync.NETWORK_ERROR
+        }
+        else -> DataError.Sync.UNKNOWN
+    }
+
     private fun logEmulatorHint() {
         Timber.w(
             "Firestore connection failed. If running locally, ensure Firebase emulator is started:\n" +
@@ -408,9 +501,37 @@ class SyncRepositoryImpl(
         )
     }
 
+    /**
+     * Mutable container for tracking sync operation counts.
+     */
+    private class SyncCounts {
+        var entriesUploaded: Int = 0
+        var entriesDownloaded: Int = 0
+        var entriesDeleted: Int = 0
+        var moodColorsUploaded: Int = 0
+        var moodColorsDownloaded: Int = 0
+        var conflictsResolved: Int = 0
+
+        fun toSyncResult() = SyncResult(
+            entriesUploaded = entriesUploaded,
+            entriesDownloaded = entriesDownloaded,
+            moodColorsUploaded = moodColorsUploaded,
+            moodColorsDownloaded = moodColorsDownloaded,
+            conflictsResolved = conflictsResolved
+        )
+    }
+
     companion object {
         private const val USERS_COLLECTION = "users"
         private const val ENTRIES_COLLECTION = "entries"
         private const val MOOD_COLORS_COLLECTION = "mood_colors"
+
+        // Progress constants for sync phases
+        private const val PROGRESS_IDLE = 0f
+        private const val PROGRESS_PHASE_0 = 0.05f
+        private const val PROGRESS_PHASE_1 = 0.1f
+        private const val PROGRESS_PHASE_2 = 0.3f
+        private const val PROGRESS_PHASE_3 = 0.6f
+        private const val PROGRESS_PHASE_4 = 0.8f
     }
 }

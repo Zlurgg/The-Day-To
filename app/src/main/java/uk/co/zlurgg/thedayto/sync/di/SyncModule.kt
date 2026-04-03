@@ -20,7 +20,8 @@ val syncModule = module {
         SyncRepositoryImpl(
             firestore = get(),
             entryDao = get(),
-            moodColorDao = get()
+            moodColorDao = get(),
+            pendingSyncDeletionDao = get()
         )
     }
 
@@ -66,7 +67,6 @@ val syncModule = module {
             signInUseCase = get(),
             signOutUseCase = get(),
             preferencesRepository = get(),
-            seedDefaultMoodColorsUseCase = get(),
             syncRepository = get(),
             devSignInUseCase = getOrNull()
         )

@@ -31,9 +31,16 @@ interface MoodColorDao {
     // ==================== Sync Queries ====================
 
     /**
-     * Get all mood colors that need to be synced (PENDING_SYNC or PENDING_DELETE).
+     * Get all mood colors that need to be synced.
+     * Excludes unmodified seeds (updatedAt <= 0) but includes deletes.
      */
-    @Query("SELECT * FROM mood_color WHERE syncStatus IN ('PENDING_SYNC', 'PENDING_DELETE')")
+    @Query(
+        """
+        SELECT * FROM mood_color
+        WHERE (syncStatus = 'PENDING_SYNC' AND COALESCE(updatedAt, 0) > 0)
+           OR syncStatus = 'PENDING_DELETE'
+        """
+    )
     suspend fun getMoodColorsPendingSync(): List<MoodColorEntity>
 
     /**
@@ -56,15 +63,23 @@ interface MoodColorDao {
 
     /**
      * Update sync fields after successful upload.
+     * Only updates if item hasn't been modified since upload started (updatedAt matches).
+     * Returns number of rows updated (0 if modified, 1 if updated).
      */
     @Query(
         """
         UPDATE mood_color
-        SET syncId = :syncId, userId = :userId, updatedAt = :updatedAt, syncStatus = :syncStatus
-        WHERE id = :id
+        SET syncId = :syncId, userId = :userId, syncStatus = :syncStatus
+        WHERE id = :id AND updatedAt = :expectedUpdatedAt
         """
     )
-    suspend fun updateSyncFields(id: Int, syncId: String, userId: String, updatedAt: Long, syncStatus: String)
+    suspend fun updateSyncFields(
+        id: Int,
+        syncId: String,
+        userId: String,
+        syncStatus: String,
+        expectedUpdatedAt: Long
+    ): Int
 
     /**
      * Mark all LOCAL_ONLY items as PENDING_SYNC.
@@ -72,4 +87,18 @@ interface MoodColorDao {
      */
     @Query("UPDATE mood_color SET syncStatus = 'PENDING_SYNC' WHERE syncStatus = 'LOCAL_ONLY'")
     suspend fun markLocalOnlyAsPendingSync(): Int
+
+    /**
+     * Adopt orphaned mood colors (userId = null) by setting userId.
+     * Called when user signs in to claim local data.
+     */
+    @Query("UPDATE mood_color SET userId = :userId WHERE userId IS NULL")
+    suspend fun adoptOrphans(userId: String): Int
+
+    /**
+     * Mark all SYNCED mood colors as LOCAL_ONLY and clear userId.
+     * Called on sign-out to prepare data for offline use.
+     */
+    @Query("UPDATE mood_color SET syncStatus = 'LOCAL_ONLY', userId = NULL WHERE syncStatus = 'SYNCED'")
+    suspend fun markSyncedAsLocalOnly(): Int
 }

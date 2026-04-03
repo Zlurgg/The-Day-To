@@ -49,4 +49,10 @@ interface SyncRepository {
 
     /** Mark all LOCAL_ONLY items as PENDING_SYNC (called on first sign-in) */
     suspend fun markLocalDataForSync(): Int
+
+    /** Adopt orphaned items (userId = null) by setting userId. Called on sign-in. */
+    suspend fun adoptOrphanedData(userId: String): Int
+
+    /** Mark SYNCED items as LOCAL_ONLY and clear userId. Called on sign-out. */
+    suspend fun markSyncedAsLocalOnly(): Int
 }

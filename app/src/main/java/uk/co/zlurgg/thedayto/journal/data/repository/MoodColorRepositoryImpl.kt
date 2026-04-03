@@ -25,7 +25,7 @@ class MoodColorRepositoryImpl(
             val syncEnabled = preferencesRepository.isSyncEnabled()
             val moodColorWithSync = moodColor.copy(
                 syncId = moodColor.syncId ?: UUID.randomUUID().toString(),
-                updatedAt = System.currentTimeMillis(),
+                updatedAt = moodColor.updatedAt ?: System.currentTimeMillis(),
                 syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY
             )
             dao.insertMoodColor(moodColorWithSync.toEntity())
@@ -66,8 +66,13 @@ class MoodColorRepositoryImpl(
     override suspend fun updateMoodColor(moodColor: MoodColor): EmptyResult<DataError.Local> {
         return ErrorMapper.safeSuspendCall(TAG) {
             val syncEnabled = preferencesRepository.isSyncEnabled()
+
+            // Preserve existing sync fields when updating
+            val existingMoodColor = moodColor.id?.let { dao.getMoodColorById(it) }
+
             val moodColorWithSync = moodColor.copy(
-                syncId = moodColor.syncId ?: UUID.randomUUID().toString(),
+                syncId = moodColor.syncId ?: existingMoodColor?.syncId ?: UUID.randomUUID().toString(),
+                userId = moodColor.userId ?: existingMoodColor?.userId,
                 updatedAt = System.currentTimeMillis(),
                 syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else moodColor.syncStatus
             )

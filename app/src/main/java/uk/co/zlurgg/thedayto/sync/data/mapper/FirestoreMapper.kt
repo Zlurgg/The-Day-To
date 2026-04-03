@@ -9,26 +9,27 @@ import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 /**
  * Mapper for converting between domain models and Firestore documents.
  */
-@Suppress("MagicNumber")
 object FirestoreMapper {
 
     private const val MILLIS_PER_SECOND = 1000L
+    private const val ZERO_NANOSECONDS = 0
 
     // ==================== Entry Mapping ====================
 
     /**
      * Convert Entry domain model to Firestore document map.
+     * Note: Entries are hard-deleted, so isDeleted is not stored in Firestore.
      */
     fun Entry.toFirestoreMap(moodColorSyncId: String?): Map<String, Any?> = mapOf(
         "moodColorSyncId" to moodColorSyncId,
         "content" to content,
         "dateStamp" to dateStamp,
-        "updatedAt" to Timestamp.now(),
-        "createdAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, 0) } ?: Timestamp.now())
+        "updatedAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, ZERO_NANOSECONDS) } ?: Timestamp.now())
     )
 
     /**
      * Convert Firestore document to Entry domain model.
+     * Note: Entries are hard-deleted, so isDeleted is not read from Firestore.
      */
     fun DocumentSnapshot.toEntry(
         moodColorId: Int,
@@ -63,7 +64,7 @@ object FirestoreMapper {
         "color" to color,
         "isDeleted" to isDeleted,
         "dateStamp" to dateStamp,
-        "updatedAt" to Timestamp.now()
+        "updatedAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, ZERO_NANOSECONDS) } ?: Timestamp.now())
     )
 
     /**
@@ -89,14 +90,27 @@ object FirestoreMapper {
 
     /**
      * Resolve conflict between local and remote entries using last-write-wins.
+     * Never overwrites pending local changes - let upload phase handle the conflict.
+     * Exception: Seeds (updatedAt <= 0) are always overwritten by remote.
+     *
+     * Note: Entries are hard-deleted, so PENDING_DELETE is not applicable here.
+     * Deletions are tracked separately in pending_sync_deletion table.
      *
      * @param local Local entry
      * @param remote Remote entry
-     * @return The winning entry (remote with local ID preserved, or local if newer)
+     * @return The winning entry (local if pending, remote if newer, or local marked for re-upload)
      */
     fun resolveEntryConflict(local: Entry, remote: Entry): Entry {
         val localTime = local.updatedAt ?: 0L
         val remoteTime = remote.updatedAt ?: 0L
+
+        // Seeds (updatedAt <= 0) are always overwritten by remote data
+        val isLocalSeed = localTime <= 0L
+
+        // Never overwrite pending local changes, unless it's a seed
+        if (local.syncStatus == SyncStatus.PENDING_SYNC && !isLocalSeed) {
+            return local
+        }
 
         return if (remoteTime >= localTime) {
             // Remote wins - preserve local Room ID
@@ -109,10 +123,22 @@ object FirestoreMapper {
 
     /**
      * Resolve conflict between local and remote mood colors using last-write-wins.
+     * Never overwrites pending local changes - let upload phase handle the conflict.
+     * Exception: Seeds (updatedAt <= 0) are always overwritten by remote.
      */
     fun resolveMoodColorConflict(local: MoodColor, remote: MoodColor): MoodColor {
         val localTime = local.updatedAt ?: 0L
         val remoteTime = remote.updatedAt ?: 0L
+
+        // Seeds (updatedAt <= 0) are always overwritten by remote data
+        val isLocalSeed = localTime <= 0L
+
+        // Never overwrite pending local changes (PENDING_SYNC or PENDING_DELETE), unless it's a seed
+        val hasPendingChanges = local.syncStatus == SyncStatus.PENDING_SYNC ||
+            local.syncStatus == SyncStatus.PENDING_DELETE
+        if (hasPendingChanges && !isLocalSeed) {
+            return local
+        }
 
         return if (remoteTime >= localTime) {
             // Remote wins - preserve local Room ID

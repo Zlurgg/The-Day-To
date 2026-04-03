@@ -36,14 +36,58 @@ class SeedDefaultMoodColorsUseCase(
         val timestamp = DateUtils.getTodayStartEpoch()
 
         // Default mood colors with psychology-based colors
+        // Fixed syncIds ensure no duplicates across reinstalls
+        // updatedAt = 0L ensures user edits always win in conflict resolution
         val defaultMoodColors = listOf(
-            MoodColor(mood = "Happy", color = "FFA726", dateStamp = timestamp),
-            MoodColor(mood = "Sad", color = "1565C0", dateStamp = timestamp),
-            MoodColor(mood = "In Love", color = "EC407A", dateStamp = timestamp),
-            MoodColor(mood = "Calm", color = "66BB6A", dateStamp = timestamp),
-            MoodColor(mood = "Excited", color = "FFEB3B", dateStamp = timestamp),
-            MoodColor(mood = "Anxious", color = "8E24AA", dateStamp = timestamp),
-            MoodColor(mood = "Grateful", color = "26A69A", dateStamp = timestamp)
+            MoodColor(
+                mood = "Happy",
+                color = "FFA726",
+                dateStamp = timestamp,
+                syncId = "seed_happy",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "Sad",
+                color = "1565C0",
+                dateStamp = timestamp,
+                syncId = "seed_sad",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "In Love",
+                color = "EC407A",
+                dateStamp = timestamp,
+                syncId = "seed_in_love",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "Calm",
+                color = "66BB6A",
+                dateStamp = timestamp,
+                syncId = "seed_calm",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "Excited",
+                color = "FFEB3B",
+                dateStamp = timestamp,
+                syncId = "seed_excited",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "Anxious",
+                color = "8E24AA",
+                dateStamp = timestamp,
+                syncId = "seed_anxious",
+                updatedAt = 0L
+            ),
+            MoodColor(
+                mood = "Grateful",
+                color = "26A69A",
+                dateStamp = timestamp,
+                syncId = "seed_grateful",
+                updatedAt = 0L
+            )
         )
 
         // Insert all default mood colors
