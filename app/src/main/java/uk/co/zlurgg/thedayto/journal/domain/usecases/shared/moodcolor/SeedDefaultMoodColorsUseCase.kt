@@ -27,12 +27,27 @@ class SeedDefaultMoodColorsUseCase(
     private val moodColorRepository: MoodColorRepository,
     private val preferencesRepository: PreferencesRepository
 ) {
+    /**
+     * Seed default mood colors on first launch only.
+     */
     suspend operator fun invoke() {
         // Only seed if this is the first launch
         if (!preferencesRepository.isFirstLaunch()) {
             return
         }
+        seedDefaults()
+    }
 
+    /**
+     * Force re-seed default mood colors.
+     * Called after sign-out to restore defaults.
+     * Uses REPLACE strategy so existing seeds are updated, not duplicated.
+     */
+    suspend fun reseed() {
+        seedDefaults()
+    }
+
+    private suspend fun seedDefaults() {
         val timestamp = DateUtils.getTodayStartEpoch()
 
         // Default mood colors with psychology-based colors

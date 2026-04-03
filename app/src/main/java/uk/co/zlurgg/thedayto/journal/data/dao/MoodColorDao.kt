@@ -90,9 +90,10 @@ interface MoodColorDao {
 
     /**
      * Adopt orphaned mood colors (userId = null) by setting userId.
+     * Only adopts user-modified items (updatedAt > 0), not default seeds.
      * Called when user signs in to claim local data.
      */
-    @Query("UPDATE mood_color SET userId = :userId WHERE userId IS NULL")
+    @Query("UPDATE mood_color SET userId = :userId WHERE userId IS NULL AND COALESCE(updatedAt, 0) > 0")
     suspend fun adoptOrphans(userId: String): Int
 
     /**

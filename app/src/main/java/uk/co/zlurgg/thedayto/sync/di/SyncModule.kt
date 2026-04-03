@@ -68,6 +68,7 @@ val syncModule = module {
             signOutUseCase = get(),
             preferencesRepository = get(),
             syncRepository = get(),
+            seedDefaultMoodColorsUseCase = get(),
             devSignInUseCase = getOrNull()
         )
     }

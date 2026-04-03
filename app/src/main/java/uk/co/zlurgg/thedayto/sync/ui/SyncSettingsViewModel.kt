@@ -16,6 +16,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
@@ -35,6 +36,7 @@ class SyncSettingsViewModel(
     private val signOutUseCase: SignOutUseCase,
     private val preferencesRepository: PreferencesRepository,
     private val syncRepository: SyncRepository,
+    private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
@@ -214,6 +216,9 @@ class SyncSettingsViewModel(
                 if (userId != null) {
                     syncRepository.clearUserData(userId)
                 }
+
+                // Restore default mood colors for offline use
+                seedDefaultMoodColorsUseCase.reseed()
 
                 // Sign out
                 signOutUseCase()
