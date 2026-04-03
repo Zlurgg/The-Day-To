@@ -20,6 +20,7 @@ val coreModule = module {
     single { get<DatabaseFactory>().create() }
     single { get<TheDayToDatabase>().entryDao }
     single { get<TheDayToDatabase>().moodColorDao }
+    single { get<TheDayToDatabase>().pendingSyncDeletionDao }
 
     // Network
     single { HttpClientFactory.create(enableLogging = BuildConfig.DEBUG) }
