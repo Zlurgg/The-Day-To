@@ -140,12 +140,12 @@ class FakeEntryRepository(
         return Result.Success(Unit)
     }
 
-    override suspend fun deleteEntry(entry: Entry): EmptyResult<DataError.Local> {
+    override suspend fun deleteEntry(id: Int): EmptyResult<DataError.Local> {
         if (shouldThrowOnDelete) {
             return Result.Error(DataError.Local.DATABASE_ERROR)
         }
         val currentList = _entries.value.toMutableList()
-        currentList.removeIf { it.id == entry.id }
+        currentList.removeIf { it.id == id }
         _entries.value = currentList
         return Result.Success(Unit)
     }

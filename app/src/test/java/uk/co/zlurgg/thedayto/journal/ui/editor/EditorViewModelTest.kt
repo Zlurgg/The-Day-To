@@ -38,6 +38,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMood
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 import java.time.Instant
 import java.time.LocalDate
@@ -97,7 +98,8 @@ class EditorViewModelTest {
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository)
         )
-        return EditorViewModel(editorUseCases, savedStateHandle)
+        val syncScheduler = mockk<SyncScheduler>(relaxed = true)
+        return EditorViewModel(editorUseCases, syncScheduler, savedStateHandle)
     }
 
     // ============================================================

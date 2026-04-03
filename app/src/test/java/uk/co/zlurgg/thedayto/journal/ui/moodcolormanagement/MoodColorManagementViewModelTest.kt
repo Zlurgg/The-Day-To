@@ -27,8 +27,10 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
+import io.mockk.mockk
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
+import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 
 /**
@@ -50,6 +52,7 @@ class MoodColorManagementViewModelTest {
     private lateinit var viewModel: MoodColorManagementViewModel
     private lateinit var fakeEntryRepository: FakeEntryRepository
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
+    private val mockSyncScheduler: SyncScheduler = mockk(relaxed = true)
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -75,7 +78,7 @@ class MoodColorManagementViewModelTest {
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             getMoodColorEntryCounts = GetMoodColorEntryCountsUseCase(fakeEntryRepository)
         )
-        return MoodColorManagementViewModel(useCases)
+        return MoodColorManagementViewModel(useCases, mockSyncScheduler)
     }
 
     // ============================================================
