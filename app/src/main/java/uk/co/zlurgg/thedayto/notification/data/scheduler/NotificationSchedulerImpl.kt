@@ -19,9 +19,9 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker
-import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker
+import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler

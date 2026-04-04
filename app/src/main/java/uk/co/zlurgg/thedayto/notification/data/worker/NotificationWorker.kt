@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.core.data.service.notifications
+package uk.co.zlurgg.thedayto.notification.data.worker
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
@@ -22,16 +22,18 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
+import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsDao
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
-import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params), KoinComponent {
 
     // Inject dependencies via Koin
     private val notificationScheduler: NotificationScheduler by inject()
-    private val settingsRepository: NotificationSettingsRepository by inject()
     private val authRepository: AuthRepository by inject()
+    private val notificationSettingsDao: NotificationSettingsDao by inject()
+    private val timeProvider: TimeProvider by inject()
 
     override fun doWork(): Result {
         // Check if notification permission is granted (Android 13+)
@@ -42,21 +44,28 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
         return runBlocking {
             val currentUserId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-            val settings = settingsRepository.getSettings(currentUserId)
+            val settingsEntity = notificationSettingsDao.getByUserId(currentUserId)
 
             // Guard 1: No settings for current user
-            if (settings == null) {
+            if (settingsEntity == null) {
                 Timber.d("No notification settings for user %s", currentUserId)
                 return@runBlocking Result.success()
             }
 
             // Guard 2: Notifications disabled
-            if (!settings.enabled) {
+            if (!settingsEntity.enabled) {
                 Timber.d("Notifications disabled for user %s", currentUserId)
                 return@runBlocking Result.success()
             }
 
-            // Guard 3: Check if entry exists for today (delegates to scheduler)
+            // Guard 3: Already notified today
+            val todayEpoch = timeProvider.todayStorageEpoch()
+            if (settingsEntity.lastNotifiedDateEpoch == todayEpoch) {
+                Timber.d("Already notified today for user %s", currentUserId)
+                return@runBlocking Result.success()
+            }
+
+            // Guard 4: Check if entry exists for today (delegates to scheduler)
             if (!notificationScheduler.shouldSendNotification()) {
                 Timber.d("Notification not needed - entry exists for today")
                 return@runBlocking Result.success()
@@ -64,6 +73,11 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
             val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
             createNotification(id)
+
+            // Mark as notified today (will sync to other devices)
+            notificationSettingsDao.updateLastNotifiedDate(currentUserId, todayEpoch)
+            Timber.d("Marked notification as sent for user %s on %d", currentUserId, todayEpoch)
+
             Result.success()
         }
     }
