@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 import uk.co.zlurgg.thedayto.sync.DevCredentials
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
@@ -38,6 +39,7 @@ class SyncSettingsViewModel(
     private val preferencesRepository: PreferencesRepository,
     private val syncRepository: SyncRepository,
     private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
+    private val notificationAuthUseCase: NotificationAuthUseCase,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
@@ -161,6 +163,7 @@ class SyncSettingsViewModel(
     /**
      * Common success handler for sign-in operations.
      * Auto-enables sync and triggers immediate sync.
+     * Migrates anonymous notification settings to the signed-in user.
      */
     private suspend fun handleSignInSuccess() {
         val user = authRepository.getSignedInUser() ?: return
@@ -171,6 +174,9 @@ class SyncSettingsViewModel(
 
         // Prepare local data for sync (clear other users, adopt orphaned, mark for upload)
         syncUseCases.prepareForSync(userId)
+
+        // Migrate anonymous notification settings to signed-in user
+        notificationAuthUseCase.handleSignInSuccess(userId)
 
         // Start background sync and trigger immediate first sync
         syncScheduler.startPeriodicSync()
@@ -192,6 +198,7 @@ class SyncSettingsViewModel(
      * Sign out and disable sync.
      * Called when user taps Sign Out button in Account settings.
      * Clears synced data for privacy - user can re-download on next sign-in.
+     * Cancels notifications and clears notification settings.
      */
     fun signOut() {
         viewModelScope.launch {
@@ -209,6 +216,9 @@ class SyncSettingsViewModel(
             // Clear this user's synced data (will re-download on next sign-in)
             if (userId != null) {
                 syncRepository.clearUserData(userId)
+
+                // Cancel notifications and clear notification settings
+                notificationAuthUseCase.handleSignOut(userId)
             }
 
             // Restore default mood colors for offline use

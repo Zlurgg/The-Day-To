@@ -6,6 +6,7 @@ import org.koin.dsl.module
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService
 import uk.co.zlurgg.thedayto.notification.data.repository.NotificationSettingsRepositoryImpl
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 
 private const val PREFS_NAME = "journal_prefs"
 
@@ -30,6 +31,14 @@ val notificationModule = module {
         NotificationSettingsRepositoryImpl(
             dao = get(),
             migrationService = get()
+        )
+    }
+
+    // Use cases
+    single {
+        NotificationAuthUseCase(
+            settingsRepository = get(),
+            notificationScheduler = get()
         )
     }
 }

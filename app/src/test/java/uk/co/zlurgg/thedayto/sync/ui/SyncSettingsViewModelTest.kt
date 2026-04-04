@@ -27,9 +27,12 @@ import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
 import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.FakeSyncRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncResult
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
@@ -62,6 +65,8 @@ class SyncSettingsViewModelTest {
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
     private lateinit var fakeDevAuthService: FakeDevAuthService
     private lateinit var fakeTimeProvider: FakeTimeProvider
+    private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
+    private lateinit var fakeNotificationRepository: FakeNotificationRepository
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -88,6 +93,8 @@ class SyncSettingsViewModelTest {
         fakeMoodColorRepository = FakeMoodColorRepository()
         fakeDevAuthService = FakeDevAuthService()
         fakeTimeProvider = FakeTimeProvider()
+        fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
+        fakeNotificationRepository = FakeNotificationRepository()
     }
 
     @After
@@ -125,6 +132,10 @@ class SyncSettingsViewModelTest {
                 fakeMoodColorRepository,
                 fakePreferencesRepository,
                 fakeTimeProvider
+            ),
+            notificationAuthUseCase = NotificationAuthUseCase(
+                settingsRepository = fakeNotificationSettingsRepository,
+                notificationScheduler = fakeNotificationRepository
             ),
             devSignInUseCase = devSignInUseCase
         )
@@ -400,5 +411,64 @@ class SyncSettingsViewModelTest {
             assertEquals(5000L, state.lastSyncTimestamp)
             cancelAndIgnoreRemainingEvents()
         }
+    }
+
+    // ============================================================
+    // Notification Auth Integration Tests
+    // ============================================================
+
+    @Test
+    fun `signIn migrates anonymous notification settings to user`() = runTest {
+        // Given: Anonymous user has notification settings
+        fakeNotificationSettingsRepository.setSettings(
+            "anonymous",
+            uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings(
+                enabled = true,
+                hour = 8,
+                minute = 30
+            )
+        )
+        fakeAuthRepository.shouldReturnError = false
+        viewModel = createViewModel()
+
+        // When: User signs in
+        viewModel.signIn(mockCredentialProvider)
+
+        // Then: Settings migrated to signed-in user
+        val userSettings = fakeNotificationSettingsRepository.getSettings(testUser.userId)
+        assertEquals(true, userSettings?.enabled)
+        assertEquals(8, userSettings?.hour)
+        assertEquals(30, userSettings?.minute)
+
+        // And: Anonymous settings deleted
+        assertNull(fakeNotificationSettingsRepository.getSettings("anonymous"))
+    }
+
+    @Test
+    fun `signOut cancels notifications and clears settings`() = runTest {
+        // Given: User is signed in with notification settings
+        fakeAuthRepository.setSignedInUser(testUser)
+        fakeAuthStateRepository.setSignedInState(true)
+        fakeNotificationSettingsRepository.setSettings(
+            testUser.userId,
+            uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings(
+                enabled = true,
+                hour = 9,
+                minute = 0
+            )
+        )
+        viewModel = createViewModel()
+
+        // When: User signs out
+        viewModel.signOut()
+
+        // Then: Notifications cancelled
+        assertTrue(
+            "Notifications should be cancelled",
+            fakeNotificationRepository.cancelNotificationsCalled
+        )
+
+        // And: User's notification settings deleted
+        assertNull(fakeNotificationSettingsRepository.getSettings(testUser.userId))
     }
 }
