@@ -7,7 +7,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.fake.FakeNotificationRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
@@ -23,13 +23,13 @@ import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 class NotificationAuthUseCaseTest {
 
     private lateinit var settingsRepository: FakeNotificationSettingsRepository
-    private lateinit var notificationScheduler: FakeNotificationRepository
+    private lateinit var notificationScheduler: FakeNotificationScheduler
     private lateinit var useCase: NotificationAuthUseCase
 
     @Before
     fun setup() {
         settingsRepository = FakeNotificationSettingsRepository()
-        notificationScheduler = FakeNotificationRepository()
+        notificationScheduler = FakeNotificationScheduler()
         useCase = NotificationAuthUseCase(
             settingsRepository = settingsRepository,
             notificationScheduler = notificationScheduler

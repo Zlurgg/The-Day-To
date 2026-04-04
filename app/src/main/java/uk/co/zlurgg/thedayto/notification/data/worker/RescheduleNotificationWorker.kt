@@ -7,15 +7,15 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Worker that reschedules notifications after timezone change.
  *
- * Reads notification settings from Room and uses the existing NotificationRepository
- * (scheduler) to set up the notification at the correct time for the new timezone.
+ * Reads notification settings from Room and uses NotificationScheduler
+ * to set up the notification at the correct time for the new timezone.
  *
  * Enqueued by [TimezoneChangeReceiver] when ACTION_TIMEZONE_CHANGED is received.
  */
@@ -25,7 +25,7 @@ class RescheduleNotificationWorker(
 ) : CoroutineWorker(context, params), KoinComponent {
 
     private val settingsRepository: NotificationSettingsRepository by inject()
-    private val scheduler: NotificationRepository by inject()
+    private val scheduler: NotificationScheduler by inject()
     private val authRepository: AuthRepository by inject()
 
     override suspend fun doWork(): Result {

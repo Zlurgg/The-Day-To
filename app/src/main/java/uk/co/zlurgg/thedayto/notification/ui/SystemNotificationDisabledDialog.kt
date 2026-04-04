@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.core.ui.notifications
+package uk.co.zlurgg.thedayto.notification.ui
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
@@ -13,14 +13,6 @@ import uk.co.zlurgg.thedayto.R
  *
  * This helps users understand why notifications aren't working and guides them
  * to the correct settings screen to fix the issue.
- *
- * User Flow:
- * 1. User tries to enable notifications in app
- * 2. System check fails (notifications disabled in Android Settings)
- * 3. This dialog appears with explanation
- * 4. User clicks "Open Settings" → Taken to Android Settings
- * 5. User enables notifications in system settings
- * 6. User returns to app and tries again → Works!
  *
  * @param onDismiss Callback when dialog is dismissed without action
  * @param onOpenSettings Callback when user chooses to open system settings

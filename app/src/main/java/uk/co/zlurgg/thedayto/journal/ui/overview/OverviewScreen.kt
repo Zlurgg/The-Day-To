@@ -63,9 +63,9 @@ import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.AccountRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
-import uk.co.zlurgg.thedayto.core.ui.notifications.NotificationSettingsDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.PermissionPermanentlyDeniedDialog
-import uk.co.zlurgg.thedayto.core.ui.notifications.SystemNotificationDisabledDialog
+import uk.co.zlurgg.thedayto.notification.ui.NotificationSettingsDialog
+import uk.co.zlurgg.thedayto.notification.ui.PermissionPermanentlyDeniedDialog
+import uk.co.zlurgg.thedayto.notification.ui.SystemNotificationDisabledDialog
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall

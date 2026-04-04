@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Use case for checking if notification permission is granted.
@@ -9,9 +9,9 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
  * On API < 33, always returns true (permission not required).
  */
 class CheckNotificationPermissionUseCase(
-    private val notificationRepository: NotificationRepository
+    private val notificationScheduler: NotificationScheduler
 ) {
     operator fun invoke(): Boolean {
-        return notificationRepository.hasNotificationPermission()
+        return notificationScheduler.hasNotificationPermission()
     }
 }

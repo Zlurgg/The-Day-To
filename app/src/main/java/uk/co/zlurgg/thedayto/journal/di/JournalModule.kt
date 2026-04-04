@@ -118,15 +118,15 @@ val journalModule = module {
                 authRepository = get()
             ),
             checkNotificationPermission = CheckNotificationPermissionUseCase(
-                notificationRepository = get()
+                notificationScheduler = get()
             ),
             checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(
-                notificationRepository = get()
+                notificationScheduler = get()
             ),
             shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(
-                notificationRepository = get()
+                notificationScheduler = get()
             ),
-            setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository = get()),
+            setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler = get()),
             checkForUpdate = get(),
             dismissUpdate = get(),
             downloadUpdate = get(),

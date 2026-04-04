@@ -1,9 +1,9 @@
 package uk.co.zlurgg.thedayto.notification.domain.usecase
 
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Result of sign-in notification settings handling.
@@ -34,7 +34,7 @@ sealed interface SignInNotificationResult {
  */
 class NotificationAuthUseCase(
     private val settingsRepository: NotificationSettingsRepository,
-    private val notificationScheduler: NotificationRepository
+    private val notificationScheduler: NotificationScheduler
 ) {
 
     /**

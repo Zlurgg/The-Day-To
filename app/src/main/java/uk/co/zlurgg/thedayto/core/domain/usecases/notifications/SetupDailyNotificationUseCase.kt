@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Use case for setting up the daily notification schedule.
@@ -15,9 +15,9 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
  * - Existing users with notifications ON: Ensures periodic work is scheduled
  */
 class SetupDailyNotificationUseCase(
-    private val notificationRepository: NotificationRepository
+    private val notificationScheduler: NotificationScheduler
 ) {
     operator fun invoke() {
-        notificationRepository.setupDailyNotification()
+        notificationScheduler.setupDailyNotification()
     }
 }

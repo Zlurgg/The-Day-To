@@ -1,12 +1,12 @@
 package uk.co.zlurgg.thedayto.fake
 
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
- * Fake implementation of NotificationRepository for testing.
+ * Fake implementation of NotificationScheduler for testing.
  * Simulates notification operations in memory.
  */
-open class FakeNotificationRepository : NotificationRepository {
+open class FakeNotificationScheduler : NotificationScheduler {
 
     // In-memory storage for testing
     private var notificationScheduled: Boolean = false
@@ -59,7 +59,6 @@ open class FakeNotificationRepository : NotificationRepository {
 
     /**
      * Helper method to reset all values to defaults.
-     * Useful for cleaning up between tests.
      */
     fun reset() {
         notificationScheduled = false

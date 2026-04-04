@@ -22,14 +22,14 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params), KoinComponent {
 
-    // Inject repositories via Koin
-    private val notificationRepository: NotificationRepository by inject()
+    // Inject dependencies via Koin
+    private val notificationScheduler: NotificationScheduler by inject()
     private val settingsRepository: NotificationSettingsRepository by inject()
     private val authRepository: AuthRepository by inject()
 
@@ -56,8 +56,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
                 return@runBlocking Result.success()
             }
 
-            // Guard 3: Check if entry exists for today (delegates to repository)
-            if (!notificationRepository.shouldSendNotification()) {
+            // Guard 3: Check if entry exists for today (delegates to scheduler)
+            if (!notificationScheduler.shouldSendNotification()) {
                 Timber.d("Notification not needed - entry exists for today")
                 return@runBlocking Result.success()
             }

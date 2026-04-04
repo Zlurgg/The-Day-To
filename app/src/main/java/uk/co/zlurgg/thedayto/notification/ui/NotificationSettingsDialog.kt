@@ -1,5 +1,6 @@
-package uk.co.zlurgg.thedayto.core.ui.notifications
+package uk.co.zlurgg.thedayto.notification.ui
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -25,13 +26,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMediumSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import android.content.res.Configuration
-import androidx.compose.ui.tooling.preview.Preview
-import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Notification settings dialog with enable/disable toggle and time picker.

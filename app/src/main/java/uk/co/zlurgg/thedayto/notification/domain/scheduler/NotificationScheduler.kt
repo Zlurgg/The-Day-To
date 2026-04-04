@@ -1,12 +1,14 @@
-package uk.co.zlurgg.thedayto.core.domain.repository
+package uk.co.zlurgg.thedayto.notification.domain.scheduler
 
 /**
- * Repository interface for managing notification operations.
+ * Scheduler interface for managing notification operations.
  *
- * Follows Clean Architecture principles by defining the contract in the domain layer,
- * while the implementation resides in the data layer.
+ * Handles WorkManager-based scheduling, permission checks, and notification cancellation.
+ * This is the renamed version of NotificationRepository to better reflect its purpose.
+ *
+ * Settings storage is handled by [NotificationSettingsRepository].
  */
-interface NotificationRepository {
+interface NotificationScheduler {
 
     /**
      * Sets up daily notification based on user preferences.
@@ -46,9 +48,6 @@ interface NotificationRepository {
      * Checks if an entry already exists for today. If user has already
      * logged their mood, no reminder notification should be sent.
      *
-     * This encapsulates the business logic decision of when to send notifications,
-     * keeping the Worker purely focused on infrastructure concerns.
-     *
      * @return true if notification should be sent, false otherwise
      */
     suspend fun shouldSendNotification(): Boolean
@@ -73,8 +72,6 @@ interface NotificationRepository {
      *
      * Returns true if:
      * - Permission was denied but can be requested again
-     *
-     * Note: This requires Activity context and should be called from UI layer.
      *
      * @return true if rationale should be shown, false otherwise
      */

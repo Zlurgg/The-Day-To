@@ -20,6 +20,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForM
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
@@ -41,7 +42,7 @@ private val DEFAULT_UPDATE_CONFIG = UpdateConfig(
  */
 fun createFakeOverviewUseCases(
     preferencesRepository: FakePreferencesRepository,
-    notificationRepository: FakeNotificationRepository,
+    notificationScheduler: NotificationScheduler,
     notificationSettingsRepository: NotificationSettingsRepository = FakeNotificationSettingsRepository(),
     authRepository: AuthRepository = FakeAuthRepository(),
     entryRepository: EntryRepository = FakeEntryRepository(),
@@ -49,20 +50,20 @@ fun createFakeOverviewUseCases(
     currentVersion: String = DEFAULT_CURRENT_VERSION
 ): OverviewUseCases {
 
-    // Create real notification use cases with fake repositories
+    // Create real notification use cases with fake dependencies
     val getNotificationSettings = GetNotificationSettingsUseCase(
         settingsRepository = notificationSettingsRepository,
         authRepository = authRepository
     )
     val saveNotificationSettings = SaveNotificationSettingsUseCase(
         settingsRepository = notificationSettingsRepository,
-        scheduler = notificationRepository,
+        scheduler = notificationScheduler,
         authRepository = authRepository
     )
-    val checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository)
-    val checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationRepository)
-    val shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(notificationRepository)
-    val setupDailyNotification = SetupDailyNotificationUseCase(notificationRepository)
+    val checkNotificationPermission = CheckNotificationPermissionUseCase(notificationScheduler)
+    val checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationScheduler)
+    val shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(notificationScheduler)
+    val setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler)
 
     val checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(preferencesRepository)
     val markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(preferencesRepository)

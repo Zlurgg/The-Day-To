@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Use case to check if notifications are enabled at the system level.
@@ -15,13 +15,13 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
  * Following Clean Architecture:
  * - Single responsibility: Check system notification state
  * - Pure domain layer - no Android framework dependencies
- * - Delegates to repository for platform-specific implementation
+ * - Delegates to scheduler for platform-specific implementation
  * - Used by ViewModels to make decisions about notification settings
  *
- * @param notificationRepository Repository for notification operations
+ * @param notificationScheduler Scheduler for notification operations
  */
 class CheckSystemNotificationsEnabledUseCase(
-    private val notificationRepository: NotificationRepository
+    private val notificationScheduler: NotificationScheduler
 ) {
     /**
      * Check if notifications are enabled for this app in system settings.
@@ -35,6 +35,6 @@ class CheckSystemNotificationsEnabledUseCase(
      * @return true if system notifications are enabled, false otherwise
      */
     operator fun invoke(): Boolean {
-        return notificationRepository.areSystemNotificationsEnabled()
+        return notificationScheduler.areSystemNotificationsEnabled()
     }
 }

@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Checks if we should show a rationale for notification permission.
@@ -16,14 +16,14 @@ import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
  * Following Clean Architecture:
  * - Single responsibility: Check permission rationale state
  * - Pure domain layer - no Android framework dependencies
- * - Delegates to repository for platform-specific implementation
+ * - Delegates to scheduler for platform-specific implementation
  *
- * @param notificationRepository Repository for notification operations
+ * @param notificationScheduler Scheduler for notification operations
  */
 class ShouldShowPermissionRationaleUseCase(
-    private val notificationRepository: NotificationRepository
+    private val notificationScheduler: NotificationScheduler
 ) {
     operator fun invoke(): Boolean {
-        return notificationRepository.shouldShowPermissionRationale()
+        return notificationScheduler.shouldShowPermissionRationale()
     }
 }

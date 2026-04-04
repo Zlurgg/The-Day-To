@@ -27,7 +27,7 @@ import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
 import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
-import uk.co.zlurgg.thedayto.fake.FakeNotificationRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.FakeSyncRepository
@@ -66,7 +66,7 @@ class SyncSettingsViewModelTest {
     private lateinit var fakeDevAuthService: FakeDevAuthService
     private lateinit var fakeTimeProvider: FakeTimeProvider
     private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
-    private lateinit var fakeNotificationRepository: FakeNotificationRepository
+    private lateinit var fakeNotificationScheduler: FakeNotificationScheduler
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -94,7 +94,7 @@ class SyncSettingsViewModelTest {
         fakeDevAuthService = FakeDevAuthService()
         fakeTimeProvider = FakeTimeProvider()
         fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
-        fakeNotificationRepository = FakeNotificationRepository()
+        fakeNotificationScheduler = FakeNotificationScheduler()
     }
 
     @After
@@ -135,7 +135,7 @@ class SyncSettingsViewModelTest {
             ),
             notificationAuthUseCase = NotificationAuthUseCase(
                 settingsRepository = fakeNotificationSettingsRepository,
-                notificationScheduler = fakeNotificationRepository
+                notificationScheduler = fakeNotificationScheduler
             ),
             devSignInUseCase = devSignInUseCase
         )
@@ -465,7 +465,7 @@ class SyncSettingsViewModelTest {
         // Then: Notifications cancelled
         assertTrue(
             "Notifications should be cancelled",
-            fakeNotificationRepository.cancelNotificationsCalled
+            fakeNotificationScheduler.cancelNotificationsCalled
         )
 
         // And: User's notification settings deleted

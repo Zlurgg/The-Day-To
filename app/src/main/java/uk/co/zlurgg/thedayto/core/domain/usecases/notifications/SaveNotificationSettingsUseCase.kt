@@ -1,10 +1,10 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
+import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 
 /**
  * Saves notification settings to Room and updates notification schedule.
@@ -14,7 +14,7 @@ import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettings
  */
 class SaveNotificationSettingsUseCase(
     private val settingsRepository: NotificationSettingsRepository,
-    private val scheduler: NotificationRepository,
+    private val scheduler: NotificationScheduler,
     private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(enabled: Boolean, hour: Int, minute: Int) {
