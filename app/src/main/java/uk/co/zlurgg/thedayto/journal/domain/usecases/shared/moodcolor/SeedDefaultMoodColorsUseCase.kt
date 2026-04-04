@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
@@ -31,12 +32,12 @@ class SeedDefaultMoodColorsUseCase(
     /**
      * Seed default mood colors on first launch only.
      */
-    suspend operator fun invoke() {
+    suspend operator fun invoke(): Result<Int, DataError.Local> {
         // Only seed if this is the first launch
         if (!preferencesRepository.isFirstLaunch()) {
-            return
+            return Result.Success(0)
         }
-        seedDefaults()
+        return seedDefaults()
     }
 
     /**
@@ -44,14 +45,13 @@ class SeedDefaultMoodColorsUseCase(
      * Called after sign-out to restore defaults.
      * Uses REPLACE strategy so existing seeds are updated, not duplicated.
      *
-     * @return Number of successfully seeded mood colors
-     * @throws IllegalStateException if seeding fails
+     * @return Result with number of successfully seeded mood colors, or error if seeding fails
      */
-    suspend fun reseed(): Int {
+    suspend fun reseed(): Result<Int, DataError.Local> {
         return seedDefaults()
     }
 
-    private suspend fun seedDefaults(): Int {
+    private suspend fun seedDefaults(): Result<Int, DataError.Local> {
         val timestamp = DateUtils.getTodayStartEpoch()
 
         // Default mood colors with psychology-based colors
@@ -111,20 +111,19 @@ class SeedDefaultMoodColorsUseCase(
 
         // Insert all default mood colors and track results
         var successCount = 0
-        val failures = mutableListOf<String>()
 
         defaultMoodColors.forEach { moodColor ->
-            when (val result = moodColorRepository.insertMoodColor(moodColor)) {
+            when (moodColorRepository.insertMoodColor(moodColor)) {
                 is Result.Success -> successCount++
-                is Result.Error -> failures.add("${moodColor.mood}: ${result.error}")
+                is Result.Error -> { /* Continue trying other mood colors */ }
             }
         }
 
-        if (successCount == 0 && failures.isNotEmpty()) {
-            throw IllegalStateException("Failed to seed any mood colors: ${failures.joinToString()}")
+        return if (successCount == 0) {
+            Result.Error(DataError.Local.DATABASE_ERROR)
+        } else {
+            Result.Success(successCount)
         }
-
-        return successCount
         // Note: First launch is marked complete in OverviewViewModel after tutorial is shown
     }
 }
