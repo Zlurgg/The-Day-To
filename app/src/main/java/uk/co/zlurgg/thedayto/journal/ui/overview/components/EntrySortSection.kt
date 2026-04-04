@@ -6,7 +6,12 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -28,6 +33,7 @@ fun EntrySortSection(
     onOrderChange: (EntryOrder) -> Unit
 ) {
     val haptic = LocalHapticFeedback.current
+    val isAscending = entryOrder.orderType is OrderType.Ascending
 
     Row(
         modifier = modifier.fillMaxWidth(),
@@ -53,26 +59,23 @@ fun EntrySortSection(
             label = { Text(stringResource(R.string.mood)) }
         )
 
-        Spacer(modifier = Modifier.width(paddingSmall))
+        Spacer(modifier = Modifier.weight(1f))
 
-        // Order chips
-        FilterChip(
-            selected = entryOrder.orderType is OrderType.Ascending,
+        // Sort direction toggle
+        IconButton(
             onClick = {
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onOrderChange(entryOrder.copy(OrderType.Ascending))
-            },
-            label = { Text(stringResource(R.string.ascending)) }
-        )
-        Spacer(modifier = Modifier.width(paddingSmall))
-        FilterChip(
-            selected = entryOrder.orderType is OrderType.Descending,
-            onClick = {
-                haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                onOrderChange(entryOrder.copy(OrderType.Descending))
-            },
-            label = { Text(stringResource(R.string.descending)) }
-        )
+                val newOrderType = if (isAscending) OrderType.Descending else OrderType.Ascending
+                onOrderChange(entryOrder.copy(newOrderType))
+            }
+        ) {
+            Icon(
+                imageVector = if (isAscending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
+                contentDescription = stringResource(
+                    if (isAscending) R.string.sort_descending else R.string.sort_ascending
+                )
+            )
+        }
     }
 }
 

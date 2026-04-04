@@ -63,6 +63,8 @@
     <string name="date">Date</string>
     <string name="ascending">Ascending</string>
     <string name="descending">Descending</string>
+    <string name="sort_ascending">Sort ascending</string>
+    <string name="sort_descending">Sort descending</string>
     <string name="empty_state_title">No entries yet</string>
     <string name="empty_state_description">Start tracking your daily moods by tapping on today\'s date in the calendar</string>
     <string name="empty_state_create_button">Create an Entry</string>
