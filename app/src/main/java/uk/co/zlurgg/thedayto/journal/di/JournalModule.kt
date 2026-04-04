@@ -41,8 +41,13 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistribu
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
+import uk.co.zlurgg.thedayto.journal.ui.util.CalendarHelper
 
 val journalModule = module {
+
+    // ========== UI Helpers ==========
+
+    single { CalendarHelper(timeProvider = get()) }
 
     // ========== Repositories ==========
 
