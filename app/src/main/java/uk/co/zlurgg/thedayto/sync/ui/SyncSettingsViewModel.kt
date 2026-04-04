@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.sync.DevCredentials
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
@@ -140,7 +141,7 @@ class SyncSettingsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isSigningIn = true, error = null) }
 
-            when (val result = useCase(DEV_EMAIL, DEV_PASSWORD)) {
+            when (val result = useCase(DevCredentials.DEV_EMAIL, DevCredentials.DEV_PASSWORD)) {
                 is Result.Success -> {
                     handleSignInSuccess()
                 }
@@ -168,14 +169,8 @@ class SyncSettingsViewModel(
         // Auto-enable sync on sign-in
         preferencesRepository.setSyncEnabled(true)
 
-        // Clear data from any other user (user isolation)
-        syncRepository.clearOtherUserData(userId)
-
-        // Adopt orphaned data (userId = null) - this is data created before first sign-in
-        syncRepository.adoptOrphanedData(userId)
-
-        // Mark any LOCAL_ONLY data as PENDING_SYNC so it gets uploaded
-        syncRepository.markLocalDataForSync()
+        // Prepare local data for sync (clear other users, adopt orphaned, mark for upload)
+        syncUseCases.prepareForSync(userId)
 
         // Start background sync and trigger immediate first sync
         syncScheduler.startPeriodicSync()
@@ -202,52 +197,45 @@ class SyncSettingsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            try {
-                val user = authRepository.getSignedInUser()
-                val userId = user?.userId
+            val user = authRepository.getSignedInUser()
+            val userId = user?.userId
 
-                // Cancel any sync workers first
-                syncScheduler.cancelAllSync()
+            // Cancel any sync workers first
+            syncScheduler.cancelAllSync()
 
-                // Disable sync
-                preferencesRepository.setSyncEnabled(false)
+            // Disable sync
+            preferencesRepository.setSyncEnabled(false)
 
-                // Clear this user's synced data (will re-download on next sign-in)
-                if (userId != null) {
-                    syncRepository.clearUserData(userId)
+            // Clear this user's synced data (will re-download on next sign-in)
+            if (userId != null) {
+                syncRepository.clearUserData(userId)
+            }
+
+            // Restore default mood colors for offline use
+            when (val reseedResult = seedDefaultMoodColorsUseCase.reseed()) {
+                is Result.Success -> {
+                    // Sign out
+                    signOutUseCase()
+
+                    _uiState.update {
+                        it.copy(
+                            isUserSignedIn = false,
+                            userEmail = null,
+                            isLoading = false
+                        )
+                    }
+                    Timber.i("Sign out successful")
                 }
-
-                // Restore default mood colors for offline use
-                val seededCount = seedDefaultMoodColorsUseCase.reseed()
-                if (seededCount == 0) {
-                    throw IllegalStateException("Reseed returned 0 - no mood colors created")
-                }
-
-                // Sign out
-                signOutUseCase()
-
-                _uiState.update {
-                    it.copy(
-                        isUserSignedIn = false,
-                        userEmail = null,
-                        isLoading = false
-                    )
-                }
-                Timber.i("Sign out successful")
-            } catch (e: Exception) {
-                Timber.e(e, "Error signing out")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Sign out failed: ${e.message}"
-                    )
+                is Result.Error -> {
+                    Timber.e("Failed to reseed mood colors: %s", reseedResult.error)
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = ErrorFormatter.format(reseedResult.error, "restore defaults")
+                        )
+                    }
                 }
             }
         }
-    }
-
-    companion object {
-        private const val DEV_EMAIL = "test@example.com"
-        private const val DEV_PASSWORD = "password123"
     }
 }
