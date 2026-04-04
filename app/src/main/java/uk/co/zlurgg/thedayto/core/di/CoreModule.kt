@@ -8,12 +8,17 @@ import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.core.data.network.HttpClientFactory
 import uk.co.zlurgg.thedayto.core.data.repository.NotificationRepositoryImpl
 import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.core.data.util.SystemTimeProvider
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckTodayEntryExistsUseCaseImpl
 
 val coreModule = module {
+
+    // Time Provider
+    single<TimeProvider> { SystemTimeProvider() }
 
     // Database
     single { DatabaseFactory(androidContext()) }
