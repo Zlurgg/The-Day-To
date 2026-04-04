@@ -25,7 +25,8 @@ data class NotificationSettingsEntity(
     val minute: Int,
     val syncId: String,
     val syncStatus: String,
-    val updatedAt: Long
+    val updatedAt: Long,
+    val lastNotifiedDateEpoch: Long = 0
 ) {
     /**
      * Converts to domain model. Returns null if data is corrupt.
@@ -60,7 +61,8 @@ data class NotificationSettingsEntity(
             userId: String,
             syncId: String = UUID.randomUUID().toString(),
             syncStatus: SyncStatus = SyncStatus.PENDING_SYNC,
-            updatedAt: Long = System.currentTimeMillis()
+            updatedAt: Long = System.currentTimeMillis(),
+            lastNotifiedDateEpoch: Long = 0
         ) = NotificationSettingsEntity(
             userId = userId,
             enabled = settings.enabled,
@@ -68,7 +70,8 @@ data class NotificationSettingsEntity(
             minute = settings.minute,
             syncId = syncId,
             syncStatus = syncStatus.name,
-            updatedAt = updatedAt
+            updatedAt = updatedAt,
+            lastNotifiedDateEpoch = lastNotifiedDateEpoch
         )
     }
 }
