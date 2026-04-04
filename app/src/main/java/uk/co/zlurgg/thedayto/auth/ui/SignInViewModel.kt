@@ -15,6 +15,7 @@ import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.sync.DevCredentials
 
 class SignInViewModel(
     private val signInUseCases: SignInUseCases
@@ -96,7 +97,7 @@ class SignInViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
-            when (val result = devSignInUseCase(DEV_TEST_EMAIL, DEV_TEST_PASSWORD)) {
+            when (val result = devSignInUseCase(DevCredentials.DEV_EMAIL, DevCredentials.DEV_PASSWORD)) {
                 is Result.Success -> {
                     _state.update { it.copy(isSignInSuccessful = true, signInError = null) }
                     signInUseCases.seedDefaultMoodColors()
@@ -130,10 +131,5 @@ class SignInViewModel(
      */
     fun onNavigationHandled() {
         _state.update { it.copy(navigationTarget = null) }
-    }
-
-    companion object {
-        private const val DEV_TEST_EMAIL = "test@example.com"
-        private const val DEV_TEST_PASSWORD = "password123"
     }
 }
