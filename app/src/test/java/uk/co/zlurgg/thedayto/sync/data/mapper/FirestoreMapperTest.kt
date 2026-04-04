@@ -4,6 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsEntity
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 
 /**
@@ -389,5 +390,193 @@ class FirestoreMapperTest {
         // Then: Remote wins on tie (>= comparison)
         assertEquals("FF5722", result.color)
         assertEquals(5, result.id)
+    }
+
+    // ============================================================
+    // NotificationSettings Conflict Resolution Tests
+    // ============================================================
+
+    @Test
+    fun `resolveNotificationSettingsConflict - local PENDING_SYNC wins over remote`() {
+        // Given: Local settings with PENDING_SYNC status
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.PENDING_SYNC.name,
+            updatedAt = 5000L
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = false,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 6000L // Remote is newer
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Local wins because it has pending changes
+        assertEquals(local, result)
+    }
+
+    @Test
+    fun `resolveNotificationSettingsConflict - local PENDING_DELETE wins over remote`() {
+        // Given: Local settings marked for deletion
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = false,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.PENDING_DELETE.name,
+            updatedAt = 5000L
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 6000L // Remote is newer
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Local wins because it has pending delete
+        assertEquals(local, result)
+    }
+
+    @Test
+    fun `resolveNotificationSettingsConflict - remote newer wins and preserves local userId`() {
+        // Given: Local settings with SYNCED status and older timestamp
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 5000L
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_remote", // Different userId from remote
+            enabled = false,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 6000L // Remote is newer
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Remote wins but preserves local userId
+        assertEquals("user_1", result.userId)
+        assertEquals(false, result.enabled)
+        assertEquals(10, result.hour)
+        assertEquals(30, result.minute)
+        assertEquals(6000L, result.updatedAt)
+    }
+
+    @Test
+    fun `resolveNotificationSettingsConflict - local newer marks for PENDING_SYNC`() {
+        // Given: Local settings with newer timestamp
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 7000L // Local is newer
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = false,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 5000L
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Local wins and is marked for re-upload
+        assertEquals(true, result.enabled)
+        assertEquals(9, result.hour)
+        assertEquals(0, result.minute)
+        assertEquals(SyncStatus.PENDING_SYNC.name, result.syncStatus)
+    }
+
+    @Test
+    fun `resolveNotificationSettingsConflict - equal timestamps prefer remote`() {
+        // Given: Local and remote with equal timestamps
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 5000L
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = false,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 5000L // Equal timestamp
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Remote wins on tie (>= comparison)
+        assertEquals(false, result.enabled)
+        assertEquals(10, result.hour)
+        assertEquals(30, result.minute)
+    }
+
+    @Test
+    fun `resolveNotificationSettingsConflict - LOCAL_ONLY loses to remote`() {
+        // Given: Local settings with LOCAL_ONLY status
+        val local = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = true,
+            hour = 9,
+            minute = 0,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.LOCAL_ONLY.name,
+            updatedAt = 5000L
+        )
+        val remote = NotificationSettingsEntity(
+            userId = "user_1",
+            enabled = false,
+            hour = 10,
+            minute = 30,
+            syncId = "settings_123",
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = 6000L
+        )
+
+        // When: Resolving conflict
+        val result = FirestoreMapper.resolveNotificationSettingsConflict(local, remote)
+
+        // Then: Remote wins because LOCAL_ONLY doesn't have pending changes
+        assertEquals(false, result.enabled)
+        assertEquals(10, result.hour)
     }
 }

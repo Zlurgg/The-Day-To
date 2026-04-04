@@ -4,6 +4,7 @@ import com.google.firebase.Timestamp
 import com.google.firebase.firestore.DocumentSnapshot
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsEntity
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
 
 /**
@@ -150,6 +151,78 @@ object FirestoreMapper {
         } else {
             // Local wins - mark for re-upload
             local.copy(syncStatus = SyncStatus.PENDING_SYNC)
+        }
+    }
+
+    // ==================== NotificationSettings Mapping ====================
+
+    /**
+     * Convert NotificationSettingsEntity to Firestore document map.
+     */
+    fun NotificationSettingsEntity.toFirestoreMap(): Map<String, Any?> = mapOf(
+        "enabled" to enabled,
+        "hour" to hour,
+        "minute" to minute,
+        "updatedAt" to Timestamp(updatedAt / MILLIS_PER_SECOND, ZERO_NANOSECONDS),
+        "lastNotifiedDateEpoch" to lastNotifiedDateEpoch
+    )
+
+    /**
+     * Convert Firestore document to NotificationSettingsEntity.
+     *
+     * @param userId The user ID to associate with the entity
+     * @return The entity or null if document doesn't exist
+     */
+    fun DocumentSnapshot.toNotificationSettingsEntity(userId: String): NotificationSettingsEntity? {
+        if (!exists()) return null
+
+        return NotificationSettingsEntity(
+            userId = userId,
+            enabled = getBoolean("enabled") ?: false,
+            hour = getLong("hour")?.toInt() ?: 0,
+            minute = getLong("minute")?.toInt() ?: 0,
+            syncId = id,
+            syncStatus = SyncStatus.SYNCED.name,
+            updatedAt = getTimestamp("updatedAt")?.seconds?.times(MILLIS_PER_SECOND) ?: 0L,
+            lastNotifiedDateEpoch = getLong("lastNotifiedDateEpoch") ?: 0L
+        )
+    }
+
+    /**
+     * Resolve conflict between local and remote notification settings using last-write-wins.
+     * Never overwrites pending local changes - let upload phase handle the conflict.
+     *
+     * @param local Local notification settings entity
+     * @param remote Remote notification settings entity
+     * @return The winning entity (local if pending, remote if newer, or local marked for re-upload)
+     */
+    fun resolveNotificationSettingsConflict(
+        local: NotificationSettingsEntity,
+        remote: NotificationSettingsEntity
+    ): NotificationSettingsEntity {
+        val localTime = local.updatedAt
+        val remoteTime = remote.updatedAt
+
+        // Parse sync status safely
+        val localSyncStatus = try {
+            SyncStatus.valueOf(local.syncStatus)
+        } catch (_: IllegalArgumentException) {
+            SyncStatus.LOCAL_ONLY
+        }
+
+        // Never overwrite pending local changes
+        val hasPendingChanges = localSyncStatus == SyncStatus.PENDING_SYNC ||
+            localSyncStatus == SyncStatus.PENDING_DELETE
+        if (hasPendingChanges) {
+            return local
+        }
+
+        return if (remoteTime >= localTime) {
+            // Remote wins - preserve local userId
+            remote.copy(userId = local.userId)
+        } else {
+            // Local wins - mark for re-upload
+            local.copy(syncStatus = SyncStatus.PENDING_SYNC.name)
         }
     }
 }

@@ -22,7 +22,8 @@ val syncModule = module {
             firestore = get(),
             entryDao = get(),
             moodColorDao = get(),
-            pendingSyncDeletionDao = get()
+            pendingSyncDeletionDao = get(),
+            notificationSyncService = get()
         )
     }
 

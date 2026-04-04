@@ -17,6 +17,7 @@ import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.notification.domain.sync.NotificationSyncService
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.getMoodColorSyncId
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.resolveEntryConflict
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.resolveMoodColorConflict
@@ -43,7 +44,8 @@ class SyncRepositoryImpl(
     private val firestore: FirebaseFirestore,
     private val entryDao: EntryDao,
     private val moodColorDao: MoodColorDao,
-    private val pendingSyncDeletionDao: PendingSyncDeletionDao
+    private val pendingSyncDeletionDao: PendingSyncDeletionDao,
+    private val notificationSyncService: NotificationSyncService
 ) : SyncRepository {
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
@@ -283,12 +285,31 @@ class SyncRepositoryImpl(
             Timber.d("Phase 4: Uploading pending entries")
             counts.entriesUploaded = uploadEntriesOrThrow(userId)
 
+            // Phase 5: Download notification settings
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_5)
+            Timber.d("Phase 5: Downloading notification settings")
+            when (val result = notificationSyncService.download(userId)) {
+                is Result.Success -> if (result.data != null) counts.notificationSettingsDownloaded = 1
+                is Result.Error -> throw SyncException(result.error)
+            }
+
+            // Phase 6: Upload pending notification settings
+            _syncState.value = SyncState.Syncing(PROGRESS_PHASE_6)
+            Timber.d("Phase 6: Uploading notification settings")
+            counts.notificationSettingsUploaded = when (val result = notificationSyncService.uploadPending(userId)) {
+                is Result.Success -> result.data
+                is Result.Error -> throw SyncException(result.error)
+            }
+
             Timber.i(
-                "Sync complete: entries(up=%d, down=%d) moodColors(up=%d, down=%d) conflicts=%d",
+                "Sync complete: entries(up=%d, down=%d) moodColors(up=%d, down=%d) " +
+                    "notificationSettings(up=%d, down=%d) conflicts=%d",
                 counts.entriesUploaded,
                 counts.entriesDownloaded,
                 counts.moodColorsUploaded,
                 counts.moodColorsDownloaded,
+                counts.notificationSettingsUploaded,
+                counts.notificationSettingsDownloaded,
                 counts.conflictsResolved
             )
             counts.toSyncResult()
@@ -544,6 +565,8 @@ class SyncRepositoryImpl(
         var entriesDeleted: Int = 0
         var moodColorsUploaded: Int = 0
         var moodColorsDownloaded: Int = 0
+        var notificationSettingsUploaded: Int = 0
+        var notificationSettingsDownloaded: Int = 0
         var conflictsResolved: Int = 0
 
         fun toSyncResult() = SyncResult(
@@ -551,6 +574,8 @@ class SyncRepositoryImpl(
             entriesDownloaded = entriesDownloaded,
             moodColorsUploaded = moodColorsUploaded,
             moodColorsDownloaded = moodColorsDownloaded,
+            notificationSettingsUploaded = notificationSettingsUploaded,
+            notificationSettingsDownloaded = notificationSettingsDownloaded,
             conflictsResolved = conflictsResolved
         )
     }
@@ -564,8 +589,10 @@ class SyncRepositoryImpl(
         private const val PROGRESS_IDLE = 0f
         private const val PROGRESS_PHASE_0 = 0.05f
         private const val PROGRESS_PHASE_1 = 0.1f
-        private const val PROGRESS_PHASE_2 = 0.3f
-        private const val PROGRESS_PHASE_3 = 0.6f
-        private const val PROGRESS_PHASE_4 = 0.8f
+        private const val PROGRESS_PHASE_2 = 0.25f
+        private const val PROGRESS_PHASE_3 = 0.45f
+        private const val PROGRESS_PHASE_4 = 0.65f
+        private const val PROGRESS_PHASE_5 = 0.8f
+        private const val PROGRESS_PHASE_6 = 0.9f
     }
 }
