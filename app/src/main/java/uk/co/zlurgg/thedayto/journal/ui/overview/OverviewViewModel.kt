@@ -339,14 +339,16 @@ class OverviewViewModel(
 
             is OverviewAction.OpenNotificationSettings -> {
                 viewModelScope.launch {
-                    // Re-check permission status in case user revoked it in system settings
+                    // Re-fetch settings in case they changed (e.g., after sign-out)
+                    val settings = overviewUseCases.getNotificationSettings()
                     val hasPermission = overviewUseCases.checkNotificationPermission()
                     _uiState.update {
                         it.copy(
                             showNotificationSettingsDialog = true,
-                            hasNotificationPermission = hasPermission,
-                            // If permission was revoked, ensure toggle is off
-                            notificationsEnabled = if (hasPermission) it.notificationsEnabled else false
+                            notificationsEnabled = settings.enabled,
+                            notificationHour = settings.hour,
+                            notificationMinute = settings.minute,
+                            hasNotificationPermission = hasPermission
                         )
                     }
                 }
