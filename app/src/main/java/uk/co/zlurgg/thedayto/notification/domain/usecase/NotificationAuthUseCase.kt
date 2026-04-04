@@ -113,22 +113,45 @@ class NotificationAuthUseCase(
     }
 
     /**
-     * Handles notification settings cleanup on sign-out.
+     * Handles notification settings on sign-out.
      *
-     * Cancels scheduled notifications and deletes the user's settings.
-     * User can reconfigure notifications after signing in again.
+     * Copies account settings to anonymous so notifications continue after sign-out.
+     * Then deletes account settings for privacy.
      *
      * @param userId The Firebase UID of the signing-out user
      */
     suspend fun handleSignOut(userId: String) {
-        Timber.d("Handling sign-out notification cleanup for user: %s", userId)
+        Timber.d("Handling sign-out notification settings for user: %s", userId)
 
-        // Cancel any scheduled notifications
-        notificationScheduler.cancelNotifications()
+        // Get account settings before deleting
+        val accountSettings = settingsRepository.getSettings(userId)
 
-        // Delete user's notification settings
+        // Delete account settings (privacy - don't keep user data locally)
         settingsRepository.deleteSettings(userId)
 
-        Timber.d("Sign-out notification cleanup complete for user: %s", userId)
+        // Copy to anonymous so notifications continue seamlessly
+        if (accountSettings != null) {
+            Timber.d(
+                "Copying account settings to anonymous: enabled=%b, hour=%d, minute=%d",
+                accountSettings.enabled,
+                accountSettings.hour,
+                accountSettings.minute
+            )
+            settingsRepository.saveSettings(ANONYMOUS_USER_ID, accountSettings)
+
+            if (accountSettings.enabled) {
+                notificationScheduler.updateNotificationTime(
+                    accountSettings.hour,
+                    accountSettings.minute
+                )
+            } else {
+                notificationScheduler.cancelNotifications()
+            }
+        } else {
+            Timber.d("No account settings to copy for user: %s", userId)
+            notificationScheduler.cancelNotifications()
+        }
+
+        Timber.d("Sign-out notification handling complete for user: %s", userId)
     }
 }

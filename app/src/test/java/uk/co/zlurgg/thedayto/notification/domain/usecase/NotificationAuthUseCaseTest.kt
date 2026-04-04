@@ -222,7 +222,7 @@ class NotificationAuthUseCaseTest {
     // ============================================================
 
     @Test
-    fun `handleSignOut - cancels scheduled notifications`() = runTest {
+    fun `handleSignOut - copies enabled settings to anonymous and reschedules`() = runTest {
         // Given: User has notification settings enabled
         settingsRepository.setSettings(
             "firebase_user_123",
@@ -232,11 +232,29 @@ class NotificationAuthUseCaseTest {
         // When: User signs out
         useCase.handleSignOut("firebase_user_123")
 
-        // Then: Notifications are cancelled
-        assertTrue(
-            "Notifications should be cancelled",
-            notificationScheduler.cancelNotificationsCalled
+        // Then: Settings copied to anonymous and rescheduled
+        val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        assertEquals(true, anonymousSettings?.enabled)
+        assertEquals(8, anonymousSettings?.hour)
+        assertEquals(0, anonymousSettings?.minute)
+        assertTrue(notificationScheduler.isScheduledAt(8, 0))
+    }
+
+    @Test
+    fun `handleSignOut - copies disabled settings to anonymous and cancels`() = runTest {
+        // Given: User has notification settings disabled
+        settingsRepository.setSettings(
+            "firebase_user_123",
+            NotificationSettings(enabled = false, hour = 10, minute = 30)
         )
+
+        // When: User signs out
+        useCase.handleSignOut("firebase_user_123")
+
+        // Then: Settings copied to anonymous but notifications cancelled
+        val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        assertEquals(false, anonymousSettings?.enabled)
+        assertTrue(notificationScheduler.cancelNotificationsCalled)
     }
 
     @Test
@@ -250,22 +268,20 @@ class NotificationAuthUseCaseTest {
         // When: User signs out
         useCase.handleSignOut("firebase_user_123")
 
-        // Then: Settings are deleted
+        // Then: Account settings are deleted
         assertNull(settingsRepository.getSettings("firebase_user_123"))
     }
 
     @Test
-    fun `handleSignOut - is safe when no settings exist`() = runTest {
+    fun `handleSignOut - cancels when no settings exist`() = runTest {
         // Given: No settings for user
 
         // When: User signs out
         useCase.handleSignOut("firebase_user_123")
 
-        // Then: No exception thrown, notifications cancelled as precaution
-        assertTrue(
-            "Notifications should be cancelled",
-            notificationScheduler.cancelNotificationsCalled
-        )
+        // Then: No exception thrown, notifications cancelled
+        assertTrue(notificationScheduler.cancelNotificationsCalled)
+        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
     }
 
     @Test
@@ -286,6 +302,8 @@ class NotificationAuthUseCaseTest {
         // Then: User A settings deleted, User B settings remain
         assertNull(settingsRepository.getSettings("user_A"))
         assertEquals(9, settingsRepository.getSettings("user_B")?.hour)
+        // And: Anonymous gets User A's settings
+        assertEquals(8, settingsRepository.getSettings(ANONYMOUS_USER_ID)?.hour)
     }
 
     // ============================================================

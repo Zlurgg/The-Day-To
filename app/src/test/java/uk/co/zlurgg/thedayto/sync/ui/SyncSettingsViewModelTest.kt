@@ -449,7 +449,7 @@ class SyncSettingsViewModelTest {
     }
 
     @Test
-    fun `signOut cancels notifications and clears settings`() = runTest {
+    fun `signOut copies settings to anonymous and clears account settings`() = runTest {
         // Given: User is signed in with notification settings
         fakeAuthRepository.setSignedInUser(testUser)
         fakeAuthStateRepository.setSignedInState(true)
@@ -466,13 +466,13 @@ class SyncSettingsViewModelTest {
         // When: User signs out
         viewModel.signOut()
 
-        // Then: Notifications cancelled
-        assertTrue(
-            "Notifications should be cancelled",
-            fakeNotificationScheduler.cancelNotificationsCalled
-        )
+        // Then: Settings copied to anonymous and rescheduled
+        val anonymousSettings = fakeNotificationSettingsRepository.getSettings("anonymous")
+        assertEquals(true, anonymousSettings?.enabled)
+        assertEquals(9, anonymousSettings?.hour)
+        assertTrue(fakeNotificationScheduler.isScheduledAt(9, 0))
 
-        // And: User's notification settings deleted
+        // And: User's account settings deleted
         assertNull(fakeNotificationSettingsRepository.getSettings(testUser.userId))
     }
 }
