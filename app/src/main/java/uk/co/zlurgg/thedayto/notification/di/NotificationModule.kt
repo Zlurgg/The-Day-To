@@ -48,7 +48,8 @@ val notificationModule = module {
     single {
         NotificationAuthUseCase(
             settingsRepository = get(),
-            notificationScheduler = get()
+            notificationScheduler = get(),
+            syncService = get()
         )
     }
 }

@@ -29,6 +29,7 @@ import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationSyncService
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.FakeSyncRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
@@ -67,6 +68,7 @@ class SyncSettingsViewModelTest {
     private lateinit var fakeTimeProvider: FakeTimeProvider
     private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
     private lateinit var fakeNotificationScheduler: FakeNotificationScheduler
+    private lateinit var fakeNotificationSyncService: FakeNotificationSyncService
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -95,6 +97,7 @@ class SyncSettingsViewModelTest {
         fakeTimeProvider = FakeTimeProvider()
         fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
         fakeNotificationScheduler = FakeNotificationScheduler()
+        fakeNotificationSyncService = FakeNotificationSyncService()
     }
 
     @After
@@ -135,7 +138,8 @@ class SyncSettingsViewModelTest {
             ),
             notificationAuthUseCase = NotificationAuthUseCase(
                 settingsRepository = fakeNotificationSettingsRepository,
-                notificationScheduler = fakeNotificationScheduler
+                notificationScheduler = fakeNotificationScheduler,
+                syncService = fakeNotificationSyncService
             ),
             devSignInUseCase = devSignInUseCase
         )

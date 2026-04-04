@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationSyncService
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 
@@ -16,35 +17,120 @@ import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
  * Unit tests for NotificationAuthUseCase.
  *
  * Tests sign-in and sign-out notification settings handling:
+ * - Sign-in with remote settings (restores from account)
  * - Sign-in with anonymous settings (migrates to user)
- * - Sign-in without anonymous settings (no-op)
+ * - Sign-in without any settings (no-op)
  * - Sign-out (cancels notifications and deletes settings)
  */
 class NotificationAuthUseCaseTest {
 
     private lateinit var settingsRepository: FakeNotificationSettingsRepository
     private lateinit var notificationScheduler: FakeNotificationScheduler
+    private lateinit var syncService: FakeNotificationSyncService
     private lateinit var useCase: NotificationAuthUseCase
 
     @Before
     fun setup() {
         settingsRepository = FakeNotificationSettingsRepository()
         notificationScheduler = FakeNotificationScheduler()
+        syncService = FakeNotificationSyncService()
         useCase = NotificationAuthUseCase(
             settingsRepository = settingsRepository,
-            notificationScheduler = notificationScheduler
+            notificationScheduler = notificationScheduler,
+            syncService = syncService
         )
     }
 
     // ============================================================
-    // Sign-In Tests
+    // Sign-In Tests - Remote Settings (Account Priority)
     // ============================================================
 
     @Test
-    fun `handleSignInSuccess - migrates anonymous settings to signed-in user`() = runTest {
-        // Given: Anonymous user has notification settings
+    fun `handleSignInSuccess - restores settings from account when remote exists`() = runTest {
+        // Given: Remote settings exist for user
+        val remoteSettings = NotificationSettings(enabled = true, hour = 10, minute = 30)
+        syncService.setRemoteSettings("firebase_user_123", remoteSettings)
+
+        // When: User signs in
+        val result = useCase.handleSignInSuccess("firebase_user_123")
+
+        // Then: Returns restored from account
+        assertEquals(SignInNotificationResult.RestoredFromAccount, result)
+    }
+
+    @Test
+    fun `handleSignInSuccess - reschedules notifications when remote settings enabled`() = runTest {
+        // Given: Remote settings with notifications enabled
+        syncService.setRemoteSettings(
+            "firebase_user_123",
+            NotificationSettings(enabled = true, hour = 14, minute = 45)
+        )
+
+        // When: User signs in
+        useCase.handleSignInSuccess("firebase_user_123")
+
+        // Then: Notifications are rescheduled to remote time
+        assertTrue(
+            "Notification should be scheduled at 14:45",
+            notificationScheduler.isScheduledAt(14, 45)
+        )
+    }
+
+    @Test
+    fun `handleSignInSuccess - remote settings take priority over anonymous settings`() = runTest {
+        // Given: Both remote and anonymous settings exist
+        syncService.setRemoteSettings(
+            "firebase_user_123",
+            NotificationSettings(enabled = true, hour = 10, minute = 0)
+        )
+        settingsRepository.setSettings(
+            ANONYMOUS_USER_ID,
+            NotificationSettings(enabled = true, hour = 8, minute = 30)
+        )
+
+        // When: User signs in
+        val result = useCase.handleSignInSuccess("firebase_user_123")
+
+        // Then: Returns restored from account (remote wins)
+        assertEquals(SignInNotificationResult.RestoredFromAccount, result)
+
+        // And: Anonymous settings are deleted
+        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+
+        // And: Scheduled at remote time, not anonymous time
+        assertTrue(notificationScheduler.isScheduledAt(10, 0))
+        assertFalse(notificationScheduler.isScheduledAt(8, 30))
+    }
+
+    @Test
+    fun `handleSignInSuccess - deletes anonymous settings when remote exists`() = runTest {
+        // Given: Both remote and anonymous settings exist
+        syncService.setRemoteSettings(
+            "firebase_user_123",
+            NotificationSettings(enabled = true, hour = 10, minute = 0)
+        )
+        settingsRepository.setSettings(
+            ANONYMOUS_USER_ID,
+            NotificationSettings(enabled = true, hour = 8, minute = 30)
+        )
+
+        // When: User signs in
+        useCase.handleSignInSuccess("firebase_user_123")
+
+        // Then: Anonymous settings are deleted
+        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+    }
+
+    // ============================================================
+    // Sign-In Tests - Anonymous Migration (No Remote)
+    // ============================================================
+
+    @Test
+    fun `handleSignInSuccess - migrates anonymous settings when no remote exists`() = runTest {
+        // Given: Anonymous user has settings, no remote settings
         val anonymousSettings = NotificationSettings(enabled = true, hour = 8, minute = 30)
         settingsRepository.setSettings(ANONYMOUS_USER_ID, anonymousSettings)
+        // syncService has no remote settings (default)
 
         // When: User signs in
         val result = useCase.handleSignInSuccess("firebase_user_123")
@@ -207,14 +293,35 @@ class NotificationAuthUseCaseTest {
     // ============================================================
 
     @Test
-    fun `handleSignInSuccess - handles sign-in after previous sign-out`() = runTest {
-        // Given: Previous sign-in/sign-out cycle, now new anonymous settings
+    fun `handleSignInSuccess - restores remote settings after previous sign-out`() = runTest {
+        // Given: User had settings from previous sign-in (now in Firestore)
+        // And: New anonymous settings exist
+        syncService.setRemoteSettings(
+            "firebase_user_456",
+            NotificationSettings(enabled = true, hour = 10, minute = 0)
+        )
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
             NotificationSettings(enabled = true, hour = 7, minute = 15)
         )
 
         // When: User signs in again
+        val result = useCase.handleSignInSuccess("firebase_user_456")
+
+        // Then: Remote settings restored (not anonymous)
+        assertEquals(SignInNotificationResult.RestoredFromAccount, result)
+        assertTrue(notificationScheduler.isScheduledAt(10, 0))
+    }
+
+    @Test
+    fun `handleSignInSuccess - adopts anonymous when no prior account settings`() = runTest {
+        // Given: New user with anonymous settings, no remote settings
+        settingsRepository.setSettings(
+            ANONYMOUS_USER_ID,
+            NotificationSettings(enabled = true, hour = 7, minute = 15)
+        )
+
+        // When: User signs in
         val result = useCase.handleSignInSuccess("firebase_user_456")
 
         // Then: Settings migrated successfully

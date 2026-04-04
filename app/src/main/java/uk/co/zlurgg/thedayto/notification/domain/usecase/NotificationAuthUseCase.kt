@@ -1,9 +1,11 @@
 package uk.co.zlurgg.thedayto.notification.domain.usecase
 
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
+import uk.co.zlurgg.thedayto.notification.domain.sync.NotificationSyncService
 
 /**
  * Result of sign-in notification settings handling.
@@ -11,6 +13,9 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  * Allows UI to provide appropriate feedback based on what happened.
  */
 sealed interface SignInNotificationResult {
+    /** Settings were restored from the user's account (Firestore) */
+    data object RestoredFromAccount : SignInNotificationResult
+
     /** Anonymous settings were migrated to the signed-in user */
     data object MigratedAnonymous : SignInNotificationResult
 
@@ -34,14 +39,17 @@ sealed interface SignInNotificationResult {
  */
 class NotificationAuthUseCase(
     private val settingsRepository: NotificationSettingsRepository,
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
+    private val syncService: NotificationSyncService
 ) {
 
     /**
      * Handles notification settings on successful sign-in.
      *
-     * Migrates anonymous settings to the signed-in user if they exist.
-     * In Phase 4, this will also attempt to download remote settings first.
+     * Priority:
+     * 1. Download settings from Firestore (account settings take precedence)
+     * 2. If no remote settings, adopt anonymous settings if they exist
+     * 3. Otherwise, user starts fresh
      *
      * @param userId The Firebase UID of the signed-in user
      * @return Result indicating what happened with the settings
@@ -49,13 +57,37 @@ class NotificationAuthUseCase(
     suspend fun handleSignInSuccess(userId: String): SignInNotificationResult {
         Timber.d("Handling sign-in notification settings for user: %s", userId)
 
-        // Check for existing anonymous settings to migrate
+        // First, try to download settings from Firestore
+        val downloadResult = syncService.download(userId)
+        if (downloadResult is Result.Success && downloadResult.data != null) {
+            val remoteSettings = downloadResult.data
+            Timber.d(
+                "Restored settings from account: enabled=%b, hour=%d, minute=%d",
+                remoteSettings.enabled,
+                remoteSettings.hour,
+                remoteSettings.minute
+            )
+
+            // Delete any anonymous settings (account takes precedence)
+            settingsRepository.deleteSettings(ANONYMOUS_USER_ID)
+
+            // Reschedule notifications if enabled
+            if (remoteSettings.enabled) {
+                notificationScheduler.updateNotificationTime(
+                    remoteSettings.hour,
+                    remoteSettings.minute
+                )
+            }
+
+            return SignInNotificationResult.RestoredFromAccount
+        }
+
+        // No remote settings - check for anonymous settings to adopt
         val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
 
         return if (anonymousSettings != null) {
-            // Migrate anonymous settings to signed-in user
             Timber.d(
-                "Migrating anonymous settings to user %s: enabled=%b, hour=%d, minute=%d",
+                "Adopting anonymous settings to user %s: enabled=%b, hour=%d, minute=%d",
                 userId,
                 anonymousSettings.enabled,
                 anonymousSettings.hour,
@@ -75,7 +107,7 @@ class NotificationAuthUseCase(
 
             SignInNotificationResult.MigratedAnonymous
         } else {
-            Timber.d("No anonymous settings found for user %s", userId)
+            Timber.d("No settings found for user %s", userId)
             SignInNotificationResult.NoSettingsFound
         }
     }
