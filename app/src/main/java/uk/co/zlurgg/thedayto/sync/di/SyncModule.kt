@@ -9,6 +9,7 @@ import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 import uk.co.zlurgg.thedayto.sync.domain.usecase.GetLastSyncTimestampUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.ObserveSyncStateUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PerformSyncUseCase
+import uk.co.zlurgg.thedayto.sync.domain.usecase.PrepareForSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 import uk.co.zlurgg.thedayto.sync.ui.SyncSettingsViewModel
 
@@ -46,12 +47,19 @@ val syncModule = module {
         )
     }
 
+    single {
+        PrepareForSyncUseCase(
+            syncRepository = get()
+        )
+    }
+
     // SyncUseCases aggregator
     single {
         SyncUseCases(
             performSync = get(),
             observeSyncState = get(),
-            getLastSyncTimestamp = get()
+            getLastSyncTimestamp = get(),
+            prepareForSync = get()
         )
     }
 

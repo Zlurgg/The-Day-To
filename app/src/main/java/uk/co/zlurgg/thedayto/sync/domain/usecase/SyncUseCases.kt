@@ -8,5 +8,6 @@ package uk.co.zlurgg.thedayto.sync.domain.usecase
 data class SyncUseCases(
     val performSync: PerformSyncUseCase,
     val observeSyncState: ObserveSyncStateUseCase,
-    val getLastSyncTimestamp: GetLastSyncTimestampUseCase
+    val getLastSyncTimestamp: GetLastSyncTimestampUseCase,
+    val prepareForSync: PrepareForSyncUseCase
 )
