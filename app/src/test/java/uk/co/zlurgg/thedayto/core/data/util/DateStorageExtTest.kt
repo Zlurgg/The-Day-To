@@ -53,10 +53,10 @@ class DateStorageExtTest {
     fun `roundtrip works for edge dates`() {
         // Test year boundaries
         listOf(
-            LocalDate.of(2024, 1, 1),   // New Year
+            LocalDate.of(2024, 1, 1), // New Year
             LocalDate.of(2024, 12, 31), // Year End
-            LocalDate.of(2000, 1, 1),   // Y2K
-            LocalDate.of(2038, 1, 19),  // Near Unix 32-bit limit
+            LocalDate.of(2000, 1, 1), // Y2K
+            LocalDate.of(2038, 1, 19), // Near Unix 32-bit limit
         ).forEach { date ->
             assertEquals(
                 "Roundtrip failed for $date",

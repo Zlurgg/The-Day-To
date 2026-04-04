@@ -99,7 +99,11 @@ class SignInViewModelTest {
             signIn = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkSignInStatus = CheckSignInStatusUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkTodayEntry = CheckTodayEntryUseCase(fakeEntryRepository),
-            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(fakeMoodColorRepository, fakePreferencesRepository, fakeTimeProvider),
+            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(
+                fakeMoodColorRepository,
+                fakePreferencesRepository,
+                fakeTimeProvider
+            ),
             checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(fakePreferencesRepository),
             markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(fakePreferencesRepository),
             devSignIn = devSignInUseCase

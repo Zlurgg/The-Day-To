@@ -54,18 +54,17 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.data.util.toStorageEpoch
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarConstants
-import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarUtils
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToMonthValue
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToYearValue
-import uk.co.zlurgg.thedayto.journal.ui.util.dayToDatestampForCurrentMonthAndYear
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
 import java.time.format.TextStyle
+import java.time.temporal.ChronoUnit
 import java.util.Locale
 
 /**
@@ -136,8 +135,8 @@ private fun CalendarContent(
     Column(modifier = Modifier.fillMaxWidth()) {
         // Filter entries for current month/year
         val filteredEntries = entries.filter { entry ->
-            date.monthValue.toString() == datestampToMonthValue(entry.dateStamp) &&
-                    date.year.toString() == datestampToYearValue(entry.dateStamp)
+            date.monthValue == DateFormatter.formatMonthValue(entry.dateStamp) &&
+                    date.year == DateFormatter.formatYear(entry.dateStamp)
         }
 
         // Month statistics summary
@@ -285,7 +284,7 @@ private fun CalendarMonthGrid(
 
         // Helper to calculate month offset between dates
         fun calculateDateOffset(current: LocalDate, initial: LocalDate): Long {
-            return CalendarUtils.calculateMonthsBetween(initial, current)
+            return ChronoUnit.MONTHS.between(initial, current)
         }
 
         // Wrap pager in key(date) so it recreates when MonthYearPicker changes date
@@ -295,7 +294,7 @@ private fun CalendarMonthGrid(
 
             // Calculate max page: can go back infinitely, but forward only to current month
             val monthsToCurrentFromCreation =
-                CalendarUtils.calculateMonthsBetween(pagerCreationDate, currentDate)
+                ChronoUnit.MONTHS.between(pagerCreationDate, currentDate)
             val maxPageIndex = initialPage + monthsToCurrentFromCreation.toInt()
 
             val pagerState = rememberPagerState(
@@ -359,11 +358,11 @@ private fun CalendarMonthGrid(
                             } else {
                                 // Calculate the actual day number (1-based)
                                 val dayNumber = index - emptyCellsAtStart + 1
-                                val entryDate = dayToDatestampForCurrentMonthAndYear(
-                                    dayNumber,
+                                val entryDate = LocalDate.of(
+                                    date.year,
                                     date.monthValue,
-                                    date.year
-                                )
+                                    dayNumber
+                                ).toStorageEpoch()
                                 val entry = entries.find { it.dateStamp == entryDate }
 
                                 if (entry != null) {
@@ -378,8 +377,9 @@ private fun CalendarMonthGrid(
                                     )
                                 } else {
                                     // No entry for this date - determine if clickable
-                                    val isToday = CalendarUtils.isToday(entryDate, currentDate)
-                                    val isPast = CalendarUtils.isPast(entryDate, currentDate)
+                                    val currentDateEpoch = currentDate.toStorageEpoch()
+                                    val isToday = entryDate == currentDateEpoch
+                                    val isPast = entryDate < currentDateEpoch
 
                                     // Accessibility description for empty days
                                     val emptyDayDescription = when {

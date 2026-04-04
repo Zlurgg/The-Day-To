@@ -66,7 +66,7 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -229,7 +229,7 @@ private fun EditorScreen(
                     modifier = Modifier.size(24.dp)
                 )
                 Text(
-                    text = datestampToFormattedDate(uiState.entryDate),
+                    text = DateFormatter.formatDate(uiState.entryDate),
                     style = MaterialTheme.typography.displaySmall,
                     color = MaterialTheme.colorScheme.onSurface
                 )

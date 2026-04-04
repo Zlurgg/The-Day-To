@@ -13,7 +13,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 
 /**
  * Confirmation dialog for deleting an entry.
@@ -30,7 +30,7 @@ fun DeleteEntryConfirmDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val formattedDate = datestampToFormattedDate(entry.dateStamp)
+    val formattedDate = DateFormatter.formatDate(entry.dateStamp)
 
     AlertDialog(
         onDismissRequest = onDismiss,

@@ -23,7 +23,7 @@ import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToDay
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
@@ -34,7 +34,7 @@ fun CalendarDay(
     cornerRadius: Dp = 10.dp
 ) {
     val color = getColorSafe(entry.moodColor)
-    val dayNumber = datestampToDay(entry.dateStamp)
+    val dayNumber = DateFormatter.formatDay(entry.dateStamp)
     val dayDescription = stringResource(
         R.string.calendar_day_with_entry,
         dayNumber,

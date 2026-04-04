@@ -2,7 +2,7 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.overview
 
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
 
 /**
@@ -20,20 +20,22 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
  * - Depends on abstraction (EntryRepository interface)
  *
  * @param repository EntryRepository for data access
+ * @param timeProvider TimeProvider for testable time access
  */
 class CheckTodayEntryExistsUseCaseImpl(
-    private val repository: EntryRepository
+    private val repository: EntryRepository,
+    private val timeProvider: TimeProvider
 ) : CheckTodayEntryExistsUseCase {
     /**
      * Check if an entry exists for today's date.
      *
-     * Uses DateUtils to get today's start epoch (midnight) and queries
+     * Uses TimeProvider to get today's start epoch (midnight) and queries
      * the repository for an entry with that date.
      *
      * @return true if an entry exists for today, false otherwise
      */
     override suspend fun invoke(): Boolean {
-        val todayEpoch = DateUtils.getTodayStartEpoch()
+        val todayEpoch = timeProvider.todayStorageEpoch()
         val entry = repository.getEntryByDate(todayEpoch).getOrNull()
         return entry != null
     }

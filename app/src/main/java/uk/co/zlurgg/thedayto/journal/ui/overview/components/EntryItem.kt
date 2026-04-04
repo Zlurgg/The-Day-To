@@ -19,7 +19,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
-import uk.co.zlurgg.thedayto.journal.ui.util.datestampToFormattedDate
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 
@@ -62,7 +62,7 @@ fun EntryItem(
                     modifier = Modifier.weight(1f, fill = false)
                 )
                 Text(
-                    text = datestampToFormattedDate(entry.dateStamp),
+                    text = DateFormatter.formatDate(entry.dateStamp),
                     style = MaterialTheme.typography.labelLarge,
                     color = textColor.copy(alpha = 0.8f),
                     overflow = TextOverflow.Ellipsis

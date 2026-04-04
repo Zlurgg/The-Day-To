@@ -37,7 +37,7 @@ val coreModule = module {
     // CheckTodayEntryExistsUseCase - used by NotificationRepository
     // Note: Depends on EntryRepository from journalModule, resolved at runtime
     single<CheckTodayEntryExistsUseCase> {
-        CheckTodayEntryExistsUseCaseImpl(repository = get())
+        CheckTodayEntryExistsUseCaseImpl(repository = get(), timeProvider = get())
     }
 
     // Notification Repository
