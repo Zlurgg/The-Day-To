@@ -16,8 +16,8 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
@@ -35,7 +35,8 @@ import kotlin.random.Random
 
 class OverviewViewModel(
     private val overviewUseCases: OverviewUseCases,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
+    private val timeProvider: TimeProvider
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -143,7 +144,7 @@ class OverviewViewModel(
      */
     private fun checkTodayEntry() {
         viewModelScope.launch {
-            val todayEpoch = DateUtils.getTodayStartEpoch()
+            val todayEpoch = timeProvider.todayStorageEpoch()
             val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
 
             val hasTodayEntry = todayEntry != null
@@ -550,7 +551,7 @@ class OverviewViewModel(
      * to prevent showing the reminder after the user has already created an entry.
      */
     private suspend fun updateHasTodayEntry() {
-        val todayEpoch = DateUtils.getTodayStartEpoch()
+        val todayEpoch = timeProvider.todayStorageEpoch()
         val todayEntry = overviewUseCases.getEntryByDate(todayEpoch).getOrNull()
         val hasTodayEntry = todayEntry != null
 

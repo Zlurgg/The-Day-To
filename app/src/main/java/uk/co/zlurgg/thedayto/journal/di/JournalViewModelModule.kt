@@ -23,7 +23,8 @@ val journalViewModelModule = module {
     viewModel {
         OverviewViewModel(
             overviewUseCases = get(),
-            syncScheduler = get()
+            syncScheduler = get(),
+            timeProvider = get()
         )
     }
 

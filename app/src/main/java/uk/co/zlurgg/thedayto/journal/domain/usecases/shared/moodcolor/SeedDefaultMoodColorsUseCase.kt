@@ -3,7 +3,7 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
-import uk.co.zlurgg.thedayto.core.domain.util.DateUtils
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
@@ -27,7 +27,8 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
  */
 class SeedDefaultMoodColorsUseCase(
     private val moodColorRepository: MoodColorRepository,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
+    private val timeProvider: TimeProvider
 ) {
     /**
      * Seed default mood colors on first launch only.
@@ -52,7 +53,7 @@ class SeedDefaultMoodColorsUseCase(
     }
 
     private suspend fun seedDefaults(): Result<Int, DataError.Local> {
-        val timestamp = DateUtils.getTodayStartEpoch()
+        val timestamp = timeProvider.todayStorageEpoch()
 
         // Default mood colors with psychology-based colors
         // Fixed syncIds ensure no duplicates across reinstalls

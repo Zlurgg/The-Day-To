@@ -33,6 +33,7 @@ import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 
 /**
  * Unit tests for SignInViewModel.
@@ -59,6 +60,7 @@ class SignInViewModelTest {
     private lateinit var fakeEntryRepository: FakeEntryRepository
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
     private lateinit var fakeDevAuthService: FakeDevAuthService
+    private lateinit var fakeTimeProvider: FakeTimeProvider
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -78,6 +80,7 @@ class SignInViewModelTest {
         fakeEntryRepository = FakeEntryRepository()
         fakeMoodColorRepository = FakeMoodColorRepository()
         fakeDevAuthService = FakeDevAuthService()
+        fakeTimeProvider = FakeTimeProvider()
     }
 
     @After
@@ -96,7 +99,7 @@ class SignInViewModelTest {
             signIn = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkSignInStatus = CheckSignInStatusUseCase(fakeAuthRepository, fakeAuthStateRepository),
             checkTodayEntry = CheckTodayEntryUseCase(fakeEntryRepository),
-            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(fakeMoodColorRepository, fakePreferencesRepository),
+            seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(fakeMoodColorRepository, fakePreferencesRepository, fakeTimeProvider),
             checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(fakePreferencesRepository),
             markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(fakePreferencesRepository),
             devSignIn = devSignInUseCase

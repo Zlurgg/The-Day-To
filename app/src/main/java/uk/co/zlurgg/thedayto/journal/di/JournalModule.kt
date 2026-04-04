@@ -77,7 +77,13 @@ val journalModule = module {
     single { UpdateMoodColorUseCase(repository = get()) }
     single { UpdateMoodColorNameUseCase(repository = get()) }
     single { DeleteMoodColorUseCase(repository = get()) }
-    single { SeedDefaultMoodColorsUseCase(moodColorRepository = get(), preferencesRepository = get()) }
+    single {
+        SeedDefaultMoodColorsUseCase(
+            moodColorRepository = get(),
+            preferencesRepository = get(),
+            timeProvider = get()
+        )
+    }
 
     // ========== Overview Use Cases ==========
 

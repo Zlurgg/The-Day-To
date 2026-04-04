@@ -38,6 +38,7 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.ObserveSyncStateUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PerformSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PrepareForSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
+import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 
 /**
  * Unit tests for SyncSettingsViewModel.
@@ -60,6 +61,7 @@ class SyncSettingsViewModelTest {
     private lateinit var mockSyncScheduler: SyncScheduler
     private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
     private lateinit var fakeDevAuthService: FakeDevAuthService
+    private lateinit var fakeTimeProvider: FakeTimeProvider
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -85,6 +87,7 @@ class SyncSettingsViewModelTest {
         mockSyncScheduler = mockk(relaxed = true)
         fakeMoodColorRepository = FakeMoodColorRepository()
         fakeDevAuthService = FakeDevAuthService()
+        fakeTimeProvider = FakeTimeProvider()
     }
 
     @After
@@ -120,7 +123,8 @@ class SyncSettingsViewModelTest {
             syncRepository = fakeSyncRepository,
             seedDefaultMoodColorsUseCase = SeedDefaultMoodColorsUseCase(
                 fakeMoodColorRepository,
-                fakePreferencesRepository
+                fakePreferencesRepository,
+                fakeTimeProvider
             ),
             devSignInUseCase = devSignInUseCase
         )
