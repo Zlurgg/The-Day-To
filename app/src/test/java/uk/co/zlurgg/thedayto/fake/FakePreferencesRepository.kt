@@ -18,9 +18,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
     private var isFirstLaunch: Boolean = true
     private var welcomeDialogSeen: Boolean = false
     private var editorTutorialSeen: Boolean = false
-    private var notificationEnabled: Boolean = false
-    private var notificationHour: Int = 9
-    private var notificationMinute: Int = 0
     private var dismissedVersion: String? = null
     private var syncEnabled: Boolean = false
     private var lastSyncTimestamp: Long? = null
@@ -55,27 +52,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
 
     override suspend fun markEditorTutorialSeen() {
         editorTutorialSeen = true
-    }
-
-    override suspend fun isNotificationEnabled(): Boolean {
-        return notificationEnabled
-    }
-
-    override suspend fun setNotificationEnabled(enabled: Boolean) {
-        notificationEnabled = enabled
-    }
-
-    override suspend fun getNotificationHour(): Int {
-        return notificationHour
-    }
-
-    override suspend fun getNotificationMinute(): Int {
-        return notificationMinute
-    }
-
-    override suspend fun setNotificationTime(hour: Int, minute: Int) {
-        notificationHour = hour
-        notificationMinute = minute
     }
 
     override suspend fun getDismissedVersion(): String? {
@@ -127,9 +103,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         isFirstLaunch = true
         welcomeDialogSeen = false
         editorTutorialSeen = false
-        notificationEnabled = false
-        notificationHour = 9
-        notificationMinute = 0
         dismissedVersion = null
         syncEnabled = false
         lastSyncTimestamp = null

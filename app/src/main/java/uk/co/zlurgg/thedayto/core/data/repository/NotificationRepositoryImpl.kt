@@ -18,33 +18,36 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker
 import uk.co.zlurgg.thedayto.core.data.service.notifications.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
+import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
 /**
- * Implementation of NotificationRepository.
+ * Implementation of NotificationRepository (scheduler).
  *
- * Handles notification scheduling using WorkManager based on user preferences.
+ * Handles notification scheduling using WorkManager based on user settings.
  *
  * Follows Clean Architecture:
- * - Uses dependency injection (Context + PreferencesRepository via Koin)
- * - Single source of truth: PreferencesRepository for notification settings
+ * - Uses dependency injection via Koin
+ * - Single source of truth: NotificationSettingsRepository (Room) for settings
  * - Implements domain layer interface
- * - Repository can use domain use cases (proper layer interaction)
  *
  * @param context Application context for WorkManager and permission checks
- * @param preferencesRepository Repository for reading/writing notification preferences
+ * @param settingsRepository Repository for reading notification settings
+ * @param authRepository Repository for getting current user
  * @param checkTodayEntryExists Use case to check if today's entry exists
  */
 class NotificationRepositoryImpl(
     private val context: Context,
-    private val preferencesRepository: PreferencesRepository,
+    private val settingsRepository: NotificationSettingsRepository,
+    private val authRepository: AuthRepository,
     private val checkTodayEntryExists: CheckTodayEntryExistsUseCase
 ) : NotificationRepository {
 
@@ -52,25 +55,21 @@ class NotificationRepositoryImpl(
     private val repositoryScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun setupDailyNotification() {
-        Timber.d("setupDailyNotification called - checking preferences")
+        Timber.d("setupDailyNotification called - checking settings")
         // Launch in repository scope to avoid blocking
         repositoryScope.launch {
             try {
-                // Check if notifications are enabled in preferences
-                val isEnabled = preferencesRepository.isNotificationEnabled()
-                Timber.d("Notifications enabled in preferences: $isEnabled")
+                val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
+                val settings = settingsRepository.getSettings(userId)
 
-                if (!isEnabled) {
-                    Timber.d("Notifications disabled - skipping schedule")
+                if (settings == null || !settings.enabled) {
+                    Timber.d("Notifications disabled or not configured - skipping schedule")
                     cancelNotifications()
                     return@launch
                 }
 
-                // Get user-configured notification time
-                val hour = preferencesRepository.getNotificationHour()
-                val minute = preferencesRepository.getNotificationMinute()
-
-                scheduleNotification(hour, minute)
+                Timber.d("Notifications enabled: hour=%d, minute=%d", settings.hour, settings.minute)
+                scheduleNotification(settings.hour, settings.minute)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to setup daily notification")
             }
@@ -88,19 +87,12 @@ class NotificationRepositoryImpl(
     }
 
     override fun updateNotificationTime(hour: Int, minute: Int) {
+        // Schedule notification at the specified time
+        // Note: Settings are saved by SaveNotificationSettingsUseCase before calling this
         repositoryScope.launch {
             try {
-                // Save new time to preferences
-                preferencesRepository.setNotificationTime(hour, minute)
-
-                // Reschedule with new time (if notifications are enabled)
-                val isEnabled = preferencesRepository.isNotificationEnabled()
-                if (isEnabled) {
-                    scheduleNotification(hour, minute)
-                    Timber.i("Notification rescheduled for $hour:${minute.toString().padStart(2, '0')}")
-                } else {
-                    Timber.d("Notifications disabled - time updated but not scheduled")
-                }
+                scheduleNotification(hour, minute)
+                Timber.i("Notification rescheduled for %d:%02d", hour, minute)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to update notification time")
             }

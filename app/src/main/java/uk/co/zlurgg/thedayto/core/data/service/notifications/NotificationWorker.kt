@@ -21,12 +21,17 @@ import org.koin.core.component.inject
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.MainActivity
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
+import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
+import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 
 class NotificationWorker(context: Context, params: WorkerParameters) : Worker(context, params), KoinComponent {
 
-    // Inject repository via Koin (data layer depends on data layer - Clean Architecture ✅)
+    // Inject repositories via Koin
     private val notificationRepository: NotificationRepository by inject()
+    private val settingsRepository: NotificationSettingsRepository by inject()
+    private val authRepository: AuthRepository by inject()
 
     override fun doWork(): Result {
         // Check if notification permission is granted (Android 13+)
@@ -35,19 +40,32 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             return Result.success()  // Not a failure, just can't show notification
         }
 
-        // Check if notification should be sent (delegates to repository)
-        val shouldSend = runBlocking {
-            notificationRepository.shouldSendNotification()
-        }
+        return runBlocking {
+            val currentUserId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
+            val settings = settingsRepository.getSettings(currentUserId)
 
-        if (!shouldSend) {
-            Timber.d("Notification not needed - skipping")
-            return Result.success()
-        }
+            // Guard 1: No settings for current user
+            if (settings == null) {
+                Timber.d("No notification settings for user %s", currentUserId)
+                return@runBlocking Result.success()
+            }
 
-        val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
-        createNotification(id)
-        return Result.success()
+            // Guard 2: Notifications disabled
+            if (!settings.enabled) {
+                Timber.d("Notifications disabled for user %s", currentUserId)
+                return@runBlocking Result.success()
+            }
+
+            // Guard 3: Check if entry exists for today (delegates to repository)
+            if (!notificationRepository.shouldSendNotification()) {
+                Timber.d("Notification not needed - entry exists for today")
+                return@runBlocking Result.success()
+            }
+
+            val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
+            createNotification(id)
+            Result.success()
+        }
     }
 
     /**

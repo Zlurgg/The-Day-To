@@ -14,10 +14,13 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeNotificationRepository
+import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.createFakeOverviewUseCases
+import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
@@ -44,6 +47,8 @@ class OverviewViewModelTest {
     // Fake repositories
     private lateinit var fakePreferencesRepository: FakePreferencesRepository
     private lateinit var fakeNotificationRepository: FakeNotificationRepository
+    private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
+    private lateinit var fakeAuthRepository: FakeAuthRepository
     private lateinit var fakeTimeProvider: FakeTimeProvider
 
     // Mock sync scheduler
@@ -60,12 +65,16 @@ class OverviewViewModelTest {
         // Initialize fake repositories
         fakePreferencesRepository = FakePreferencesRepository()
         fakeNotificationRepository = FakeNotificationRepository()
+        fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
+        fakeAuthRepository = FakeAuthRepository()
         fakeTimeProvider = FakeTimeProvider()
 
         // Create ViewModel with fake dependencies
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository
+            notificationRepository = fakeNotificationRepository,
+            notificationSettingsRepository = fakeNotificationSettingsRepository,
+            authRepository = fakeAuthRepository
         )
         viewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
     }
@@ -78,15 +87,19 @@ class OverviewViewModelTest {
 
     @Test
     fun `loadNotificationSettings - loads settings on init`() = runTest {
-        // Given: Set up notification preferences
-        fakePreferencesRepository.setNotificationEnabled(true)
-        fakePreferencesRepository.setNotificationTime(14, 30)
+        // Given: Set up notification preferences via new repository
+        fakeNotificationSettingsRepository.setSettings(
+            "anonymous",
+            NotificationSettings(enabled = true, hour = 14, minute = 30)
+        )
         fakeNotificationRepository.hasPermission = true
 
         // When: Create new ViewModel (triggers init)
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationRepository = fakeNotificationRepository
+            notificationRepository = fakeNotificationRepository,
+            notificationSettingsRepository = fakeNotificationSettingsRepository,
+            authRepository = fakeAuthRepository
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -188,11 +201,23 @@ class OverviewViewModelTest {
     @Test
     fun `SaveNotificationSettings - cancels notifications when disabled`() = runTest {
         // Given: Notifications are currently enabled
-        fakePreferencesRepository.setNotificationEnabled(true)
-        fakePreferencesRepository.setNotificationTime(10, 0)
+        fakeNotificationSettingsRepository.setSettings(
+            "anonymous",
+            NotificationSettings(enabled = true, hour = 10, minute = 0)
+        )
+
+        // Recreate ViewModel to pick up the settings
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationRepository = fakeNotificationRepository,
+            notificationSettingsRepository = fakeNotificationSettingsRepository,
+            authRepository = fakeAuthRepository
+        )
+        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        testScheduler.advanceUntilIdle()
 
         // When: User disables notifications
-        viewModel.onAction(
+        testViewModel.onAction(
             OverviewAction.SaveNotificationSettings(
                 enabled = false,
                 hour = 10,
@@ -204,13 +229,14 @@ class OverviewViewModelTest {
         // Then: State should be updated
         assertFalse(
             "Notifications should be disabled",
-            viewModel.uiState.value.notificationsEnabled
+            testViewModel.uiState.value.notificationsEnabled
         )
 
         // And: Repository should have saved disabled state
+        val savedSettings = fakeNotificationSettingsRepository.getSettings("anonymous")
         assertFalse(
             "Repository should have enabled=false",
-            fakePreferencesRepository.isNotificationEnabled()
+            savedSettings?.enabled ?: true
         )
 
         // And: Notifications should be cancelled

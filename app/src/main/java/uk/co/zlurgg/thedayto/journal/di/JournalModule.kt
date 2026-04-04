@@ -108,10 +108,14 @@ val journalModule = module {
             ),
             checkFirstLaunch = CheckFirstLaunchUseCase(preferencesRepository = get()),
             markFirstLaunchComplete = MarkFirstLaunchCompleteUseCase(preferencesRepository = get()),
-            getNotificationSettings = GetNotificationSettingsUseCase(preferencesRepository = get()),
+            getNotificationSettings = GetNotificationSettingsUseCase(
+                settingsRepository = get(),
+                authRepository = get()
+            ),
             saveNotificationSettings = SaveNotificationSettingsUseCase(
-                preferencesRepository = get(),
-                notificationRepository = get()
+                settingsRepository = get(),
+                scheduler = get(),
+                authRepository = get()
             ),
             checkNotificationPermission = CheckNotificationPermissionUseCase(
                 notificationRepository = get()

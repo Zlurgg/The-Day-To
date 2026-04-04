@@ -26,6 +26,7 @@ val coreModule = module {
     single { get<TheDayToDatabase>().entryDao }
     single { get<TheDayToDatabase>().moodColorDao }
     single { get<TheDayToDatabase>().pendingSyncDeletionDao }
+    single { get<TheDayToDatabase>().notificationSettingsDao }
 
     // Network
     single { HttpClientFactory.create(enableLogging = BuildConfig.DEBUG) }
@@ -40,11 +41,12 @@ val coreModule = module {
         CheckTodayEntryExistsUseCaseImpl(repository = get(), timeProvider = get())
     }
 
-    // Notification Repository
+    // Notification Repository (scheduler)
     single<NotificationRepository> {
         NotificationRepositoryImpl(
             context = androidContext(),
-            preferencesRepository = get(),
+            settingsRepository = get(),
+            authRepository = get(),
             checkTodayEntryExists = get()
         )
     }

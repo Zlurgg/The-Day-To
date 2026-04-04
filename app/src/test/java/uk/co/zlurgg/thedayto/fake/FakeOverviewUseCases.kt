@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.fake
 
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckNotificationPermissionUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckSystemNotificationsEnabledUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.GetNotificationSettingsUseCase
@@ -15,9 +16,10 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.MarkFirstLaunchCom
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.OverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.RestoreEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.UpdateEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesForMonthUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
+import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
 import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
 import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
@@ -40,16 +42,22 @@ private val DEFAULT_UPDATE_CONFIG = UpdateConfig(
 fun createFakeOverviewUseCases(
     preferencesRepository: FakePreferencesRepository,
     notificationRepository: FakeNotificationRepository,
+    notificationSettingsRepository: NotificationSettingsRepository = FakeNotificationSettingsRepository(),
+    authRepository: AuthRepository = FakeAuthRepository(),
     entryRepository: EntryRepository = FakeEntryRepository(),
     updateRepository: FakeUpdateRepository = FakeUpdateRepository(),
     currentVersion: String = DEFAULT_CURRENT_VERSION
 ): OverviewUseCases {
 
     // Create real notification use cases with fake repositories
-    val getNotificationSettings = GetNotificationSettingsUseCase(preferencesRepository)
+    val getNotificationSettings = GetNotificationSettingsUseCase(
+        settingsRepository = notificationSettingsRepository,
+        authRepository = authRepository
+    )
     val saveNotificationSettings = SaveNotificationSettingsUseCase(
-        preferencesRepository,
-        notificationRepository
+        settingsRepository = notificationSettingsRepository,
+        scheduler = notificationRepository,
+        authRepository = authRepository
     )
     val checkNotificationPermission = CheckNotificationPermissionUseCase(notificationRepository)
     val checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationRepository)

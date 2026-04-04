@@ -8,6 +8,7 @@ import org.junit.Before
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.dao.MoodColorDao
+import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsDao
 
 /**
  * Base class for Room database instrumented tests.
@@ -22,7 +23,7 @@ import uk.co.zlurgg.thedayto.journal.data.dao.MoodColorDao
  * class MyRepositoryTest : DatabaseTest() {
  *     @Test
  *     fun myTest() {
- *         // Use entryDao, moodColorDao, or database
+ *         // Use entryDao, moodColorDao, notificationSettingsDao, or database
  *     }
  * }
  * ```
@@ -32,6 +33,7 @@ abstract class DatabaseTest {
     protected lateinit var database: TheDayToDatabase
     protected lateinit var entryDao: EntryDao
     protected lateinit var moodColorDao: MoodColorDao
+    protected lateinit var notificationSettingsDao: NotificationSettingsDao
 
     @Before
     fun createDb() {
@@ -45,6 +47,7 @@ abstract class DatabaseTest {
 
         entryDao = database.entryDao
         moodColorDao = database.moodColorDao
+        notificationSettingsDao = database.notificationSettingsDao
     }
 
     @After

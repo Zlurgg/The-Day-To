@@ -1,25 +1,34 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
+import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.repository.NotificationRepository
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
+import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
+import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
+import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 
 /**
- * Saves notification settings and updates notification schedule.
+ * Saves notification settings to Room and updates notification schedule.
+ *
+ * Saves settings for the current user (signed-in or anonymous).
+ * Also schedules/cancels notifications based on the enabled flag.
  */
 class SaveNotificationSettingsUseCase(
-    private val preferencesRepository: PreferencesRepository,
-    private val notificationRepository: NotificationRepository
+    private val settingsRepository: NotificationSettingsRepository,
+    private val scheduler: NotificationRepository,
+    private val authRepository: AuthRepository
 ) {
     suspend operator fun invoke(enabled: Boolean, hour: Int, minute: Int) {
-        // Save settings to preferences
-        preferencesRepository.setNotificationEnabled(enabled)
-        preferencesRepository.setNotificationTime(hour, minute)
+        val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
+        val settings = NotificationSettings(enabled = enabled, hour = hour, minute = minute)
+
+        // Save settings to Room
+        settingsRepository.saveSettings(userId, settings)
 
         // Update notification schedule
         if (enabled) {
-            notificationRepository.updateNotificationTime(hour, minute)
+            scheduler.updateNotificationTime(hour, minute)
         } else {
-            notificationRepository.cancelNotifications()
+            scheduler.cancelNotifications()
         }
     }
 }
