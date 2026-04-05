@@ -46,6 +46,25 @@ class FakeAuthRepository : AuthRepository {
         return currentUser
     }
 
+    override suspend fun deleteAccount(): EmptyResult<DataError.Auth> {
+        return if (shouldReturnError) {
+            Result.Error(authError)
+        } else {
+            currentUser = null
+            Result.Success(Unit)
+        }
+    }
+
+    override suspend fun reauthenticate(
+        credentialProvider: CredentialProvider
+    ): EmptyResult<DataError.Auth> {
+        return if (shouldReturnError) {
+            Result.Error(authError)
+        } else {
+            Result.Success(Unit)
+        }
+    }
+
     /**
      * Helper method to set a signed-in user for testing.
      */

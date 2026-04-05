@@ -42,6 +42,10 @@ class FakeNotificationSettingsDao : NotificationSettingsDao {
         }
     }
 
+    override suspend fun deleteAll() {
+        settingsMap.clear()
+    }
+
     /**
      * Helper for verification in tests.
      */

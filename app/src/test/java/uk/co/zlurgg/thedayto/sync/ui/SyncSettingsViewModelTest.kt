@@ -19,9 +19,11 @@ import org.junit.Test
 import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
+import uk.co.zlurgg.thedayto.core.domain.repository.LocalDataClearer
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
@@ -64,6 +66,7 @@ class SyncSettingsViewModelTest {
     private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
     private lateinit var fakeNotificationScheduler: FakeNotificationScheduler
     private lateinit var fakeNotificationSyncService: FakeNotificationSyncService
+    private lateinit var mockLocalDataClearer: LocalDataClearer
 
     private val testDispatcher = UnconfinedTestDispatcher()
 
@@ -91,6 +94,7 @@ class SyncSettingsViewModelTest {
         fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
         fakeNotificationScheduler = FakeNotificationScheduler()
         fakeNotificationSyncService = FakeNotificationSyncService()
+        mockLocalDataClearer = mockk(relaxed = true)
     }
 
     @After
@@ -116,6 +120,13 @@ class SyncSettingsViewModelTest {
             prepareForSync = PrepareForSyncUseCase(fakeSyncRepository)
         )
 
+        val deleteAccountUseCase = DeleteAccountUseCase(
+            authRepository = fakeAuthRepository,
+            syncRepository = fakeSyncRepository,
+            localDataClearer = mockLocalDataClearer,
+            syncScheduler = mockSyncScheduler
+        )
+
         return SyncSettingsViewModel(
             syncUseCases = syncUseCases,
             authRepository = fakeAuthRepository,
@@ -128,6 +139,7 @@ class SyncSettingsViewModelTest {
                 notificationScheduler = fakeNotificationScheduler,
                 syncService = fakeNotificationSyncService
             ),
+            deleteAccountUseCase = deleteAccountUseCase,
             devSignInUseCase = devSignInUseCase
         )
     }

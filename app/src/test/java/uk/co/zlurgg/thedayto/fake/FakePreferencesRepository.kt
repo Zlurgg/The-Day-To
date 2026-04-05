@@ -80,6 +80,16 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         lastSyncTimestamp = timestamp
     }
 
+    override suspend fun clear() {
+        entryReminderDate = null
+        isFirstLaunch = true
+        welcomeDialogSeen = false
+        editorTutorialSeen = false
+        dismissedVersion = null
+        syncEnabled = false
+        lastSyncTimestamp = null
+    }
+
     /**
      * Helper method to set editor tutorial seen state for testing.
      */
