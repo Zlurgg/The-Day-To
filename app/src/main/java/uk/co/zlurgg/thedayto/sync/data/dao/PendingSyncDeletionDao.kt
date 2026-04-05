@@ -23,4 +23,11 @@ interface PendingSyncDeletionDao {
 
     @Query("DELETE FROM pending_sync_deletion WHERE syncId = :syncId AND collection = :collection")
     suspend fun deleteBySyncId(syncId: String, collection: String)
+
+    /**
+     * Delete all pending sync deletions from the database.
+     * Used during account deletion to clear all local data.
+     */
+    @Query("DELETE FROM pending_sync_deletion")
+    suspend fun deleteAll()
 }

@@ -171,6 +171,16 @@ class PreferencesRepositoryImpl(
         prefs.edit { putLong(KEY_LAST_SYNC_TIMESTAMP, timestamp) }
     }
 
+    /**
+     * Clear all preferences.
+     *
+     * Removes all stored preferences, returning the app to a fresh state.
+     * Used during account deletion to ensure no user data remains.
+     */
+    override suspend fun clear() {
+        prefs.edit { clear() }
+    }
+
     companion object {
         private const val PREFS_NAME = "journal_prefs"
         private const val KEY_LAST_REMINDER_DATE = "last_entry_reminder_date"

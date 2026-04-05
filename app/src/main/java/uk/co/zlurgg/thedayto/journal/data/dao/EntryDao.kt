@@ -175,6 +175,13 @@ interface EntryDao {
      */
     @Query("SELECT DISTINCT userId FROM entry WHERE userId IS NOT NULL")
     suspend fun getDistinctUserIds(): List<String>
+
+    /**
+     * Delete all entries from the database.
+     * Used during account deletion to clear all local data.
+     */
+    @Query("DELETE FROM entry")
+    suspend fun deleteAll()
 }
 
 /**

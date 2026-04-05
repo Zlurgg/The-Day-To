@@ -115,4 +115,11 @@ interface MoodColorDao {
      */
     @Query("SELECT DISTINCT userId FROM mood_color WHERE userId IS NOT NULL")
     suspend fun getDistinctUserIds(): List<String>
+
+    /**
+     * Delete all mood colors from the database.
+     * Used during account deletion to clear all local data.
+     */
+    @Query("DELETE FROM mood_color")
+    suspend fun deleteAll()
 }

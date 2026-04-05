@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.auth.data.error
 
 import androidx.credentials.exceptions.GetCredentialCancellationException
 import androidx.credentials.exceptions.NoCredentialException
+import com.google.firebase.auth.FirebaseAuthRecentLoginRequiredException
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
 import timber.log.Timber
@@ -44,6 +45,7 @@ object AuthErrorMapper {
         return when (e) {
             is GetCredentialCancellationException -> DataError.Auth.CANCELLED
             is NoCredentialException -> DataError.Auth.NO_CREDENTIAL
+            is FirebaseAuthRecentLoginRequiredException -> DataError.Auth.REQUIRES_RECENT_LOGIN
             else -> {
                 when {
                     e.message?.contains("network", ignoreCase = true) == true ->

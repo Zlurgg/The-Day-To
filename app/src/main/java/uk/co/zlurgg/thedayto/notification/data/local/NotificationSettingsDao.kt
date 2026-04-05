@@ -69,4 +69,11 @@ interface NotificationSettingsDao {
         """
     )
     suspend fun updateLastNotifiedDate(userId: String, dateEpoch: Long)
+
+    /**
+     * Delete all notification settings from the database.
+     * Used during account deletion to clear all local data.
+     */
+    @Query("DELETE FROM notification_settings")
+    suspend fun deleteAll()
 }

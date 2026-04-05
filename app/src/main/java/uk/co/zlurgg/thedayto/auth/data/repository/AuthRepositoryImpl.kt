@@ -45,4 +45,19 @@ class AuthRepositoryImpl(
     override fun getSignedInUser(): UserData? {
         return googleAuthUiClient.getSignedInUser()
     }
+
+    override suspend fun deleteAccount(): EmptyResult<DataError.Auth> {
+        return googleAuthUiClient.deleteAccount()
+    }
+
+    override suspend fun reauthenticate(credentialProvider: CredentialProvider): EmptyResult<DataError.Auth> {
+        return when (val credentialResult = credentialProvider()) {
+            is Result.Success -> {
+                googleAuthUiClient.reauthenticateWithCredential(credentialResult.data.idToken)
+            }
+            is Result.Error -> {
+                Result.Error(credentialResult.error)
+            }
+        }
+    }
 }

@@ -366,6 +366,18 @@ class SyncRepositoryImpl(
         moodColorsSnapshot.documents.forEach { doc ->
             doc.reference.delete().await()
         }
+
+        // Delete notification settings
+        val notificationSettingsSnapshot = firestore
+            .collection(USERS_COLLECTION)
+            .document(userId)
+            .collection(NOTIFICATION_SETTINGS_COLLECTION)
+            .get()
+            .await()
+
+        notificationSettingsSnapshot.documents.forEach { doc ->
+            doc.reference.delete().await()
+        }
     }.fold(
         onSuccess = { Result.Success(Unit) },
         onFailure = { mapFirestoreException(it) }
@@ -584,6 +596,7 @@ class SyncRepositoryImpl(
         private const val USERS_COLLECTION = "users"
         private const val ENTRIES_COLLECTION = "entries"
         private const val MOOD_COLORS_COLLECTION = "mood_colors"
+        private const val NOTIFICATION_SETTINGS_COLLECTION = "notification_settings"
 
         // Progress constants for sync phases
         private const val PROGRESS_IDLE = 0f

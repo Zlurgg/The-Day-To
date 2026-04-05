@@ -77,6 +77,35 @@ class GoogleAuthUiClient(
         )
     }
 
+    /**
+     * Deletes the current user's Firebase Auth account.
+     *
+     * Also clears credential state to ensure clean sign-out.
+     */
+    suspend fun deleteAccount(): EmptyResult<DataError.Auth> {
+        return AuthErrorMapper.safeAuthCall(TAG) {
+            val user = auth.currentUser ?: error("No user signed in")
+            user.delete().await()
+            credentialManager.clearCredentialState(ClearCredentialStateRequest())
+            Timber.d("User account deleted successfully")
+        }
+    }
+
+    /**
+     * Re-authenticates the current user with a fresh Google credential.
+     *
+     * Required before sensitive operations like account deletion if the
+     * user hasn't signed in recently.
+     */
+    suspend fun reauthenticateWithCredential(idToken: String): EmptyResult<DataError.Auth> {
+        return AuthErrorMapper.safeAuthCall(TAG) {
+            val user = auth.currentUser ?: error("No user signed in")
+            val credential = GoogleAuthProvider.getCredential(idToken, null)
+            user.reauthenticate(credential).await()
+            Timber.d("User re-authenticated successfully")
+        }
+    }
+
     companion object {
         private const val TAG = "GoogleAuthUiClient"
     }
