@@ -16,12 +16,10 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 import uk.co.zlurgg.thedayto.sync.DevCredentials
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
-import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 
 /**
@@ -37,8 +35,6 @@ class SyncSettingsViewModel(
     private val signInUseCase: SignInUseCase,
     private val signOutUseCase: SignOutUseCase,
     private val preferencesRepository: PreferencesRepository,
-    private val syncRepository: SyncRepository,
-    private val seedDefaultMoodColorsUseCase: SeedDefaultMoodColorsUseCase,
     private val notificationAuthUseCase: NotificationAuthUseCase,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
@@ -197,8 +193,8 @@ class SyncSettingsViewModel(
     /**
      * Sign out and disable sync.
      * Called when user taps Sign Out button in Account settings.
-     * Clears synced data for privacy - user can re-download on next sign-in.
-     * Cancels notifications and clears notification settings.
+     * Keeps local data intact - sync is for backup/transfer, not data isolation.
+     * Reverse-adopts notification settings to anonymous for continuity.
      */
     fun signOut() {
         viewModelScope.launch {
@@ -213,39 +209,22 @@ class SyncSettingsViewModel(
             // Disable sync
             preferencesRepository.setSyncEnabled(false)
 
-            // Clear this user's synced data (will re-download on next sign-in)
+            // Reverse-adopt notification settings to anonymous (keeps notifications working)
             if (userId != null) {
-                syncRepository.clearUserData(userId)
-
-                // Cancel notifications and clear notification settings
                 notificationAuthUseCase.handleSignOut(userId)
             }
 
-            // Restore default mood colors for offline use
-            when (val reseedResult = seedDefaultMoodColorsUseCase.reseed()) {
-                is Result.Success -> {
-                    // Sign out
-                    signOutUseCase()
+            // Sign out (local entries/mood colors remain for offline use)
+            signOutUseCase()
 
-                    _uiState.update {
-                        it.copy(
-                            isUserSignedIn = false,
-                            userEmail = null,
-                            isLoading = false
-                        )
-                    }
-                    Timber.i("Sign out successful")
-                }
-                is Result.Error -> {
-                    Timber.e("Failed to reseed mood colors: %s", reseedResult.error)
-                    _uiState.update {
-                        it.copy(
-                            isLoading = false,
-                            error = ErrorFormatter.format(reseedResult.error, "restore defaults")
-                        )
-                    }
-                }
+            _uiState.update {
+                it.copy(
+                    isUserSignedIn = false,
+                    userEmail = null,
+                    isLoading = false
+                )
             }
+            Timber.i("Sign out successful")
         }
     }
 }

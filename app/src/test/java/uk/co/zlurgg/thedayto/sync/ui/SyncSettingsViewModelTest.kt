@@ -26,13 +26,11 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
 import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
-import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSyncService
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.FakeSyncRepository
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncResult
@@ -42,7 +40,6 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.ObserveSyncStateUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PerformSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PrepareForSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
-import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 
 /**
  * Unit tests for SyncSettingsViewModel.
@@ -63,9 +60,7 @@ class SyncSettingsViewModelTest {
     private lateinit var fakePreferencesRepository: FakePreferencesRepository
     private lateinit var fakeSyncRepository: FakeSyncRepository
     private lateinit var mockSyncScheduler: SyncScheduler
-    private lateinit var fakeMoodColorRepository: FakeMoodColorRepository
     private lateinit var fakeDevAuthService: FakeDevAuthService
-    private lateinit var fakeTimeProvider: FakeTimeProvider
     private lateinit var fakeNotificationSettingsRepository: FakeNotificationSettingsRepository
     private lateinit var fakeNotificationScheduler: FakeNotificationScheduler
     private lateinit var fakeNotificationSyncService: FakeNotificationSyncService
@@ -92,9 +87,7 @@ class SyncSettingsViewModelTest {
         fakePreferencesRepository = FakePreferencesRepository()
         fakeSyncRepository = FakeSyncRepository()
         mockSyncScheduler = mockk(relaxed = true)
-        fakeMoodColorRepository = FakeMoodColorRepository()
         fakeDevAuthService = FakeDevAuthService()
-        fakeTimeProvider = FakeTimeProvider()
         fakeNotificationSettingsRepository = FakeNotificationSettingsRepository()
         fakeNotificationScheduler = FakeNotificationScheduler()
         fakeNotificationSyncService = FakeNotificationSyncService()
@@ -130,12 +123,6 @@ class SyncSettingsViewModelTest {
             signInUseCase = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
             signOutUseCase = SignOutUseCase(fakeAuthRepository, fakeAuthStateRepository),
             preferencesRepository = fakePreferencesRepository,
-            syncRepository = fakeSyncRepository,
-            seedDefaultMoodColorsUseCase = SeedDefaultMoodColorsUseCase(
-                fakeMoodColorRepository,
-                fakePreferencesRepository,
-                fakeTimeProvider
-            ),
             notificationAuthUseCase = NotificationAuthUseCase(
                 settingsRepository = fakeNotificationSettingsRepository,
                 notificationScheduler = fakeNotificationScheduler,
@@ -225,10 +212,9 @@ class SyncSettingsViewModelTest {
             cancelAndIgnoreRemainingEvents()
         }
 
-        // And: Sync preparation was called
-        assertTrue("PrepareForSync should be called", fakeSyncRepository.clearOtherUserDataCalled)
-        assertTrue("PrepareForSync should be called", fakeSyncRepository.adoptOrphanedDataCalled)
-        assertTrue("PrepareForSync should be called", fakeSyncRepository.markLocalDataForSyncCalled)
+        // And: Sync preparation was called (adopts orphaned data, marks for sync)
+        assertTrue("adoptOrphanedData should be called", fakeSyncRepository.adoptOrphanedDataCalled)
+        assertTrue("markLocalDataForSync should be called", fakeSyncRepository.markLocalDataForSyncCalled)
     }
 
     @Test
@@ -279,7 +265,7 @@ class SyncSettingsViewModelTest {
     // ============================================================
 
     @Test
-    fun `signOut cancels sync and clears user data`() = runTest {
+    fun `signOut cancels sync and keeps local data`() = runTest {
         // Given: User is signed in
         fakeAuthRepository.setSignedInUser(testUser)
         fakeAuthStateRepository.setSignedInState(true)
@@ -294,24 +280,8 @@ class SyncSettingsViewModelTest {
         // And: Sync disabled
         assertFalse("Sync should be disabled", fakePreferencesRepository.isSyncEnabled())
 
-        // And: User data cleared
-        assertTrue("User data should be cleared", fakeSyncRepository.clearUserDataCalled)
-        assertEquals("test_user_123", fakeSyncRepository.lastClearedUserId)
-    }
-
-    @Test
-    fun `signOut reseeds default mood colors`() = runTest {
-        // Given: User is signed in
-        fakeAuthRepository.setSignedInUser(testUser)
-        fakeAuthStateRepository.setSignedInState(true)
-        viewModel = createViewModel()
-
-        // When: User signs out
-        viewModel.signOut()
-
-        // Then: Default mood colors seeded
-        val moodColors = fakeMoodColorRepository.getMoodColorsSync()
-        assertEquals("Should have 7 default mood colors", 7, moodColors.size)
+        // And: Local data is preserved (no clearUserData call)
+        assertFalse("User data should NOT be cleared", fakeSyncRepository.clearUserDataCalled)
     }
 
     @Test
