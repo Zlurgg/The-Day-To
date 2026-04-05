@@ -126,11 +126,7 @@ val journalModule = module {
             shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(
                 notificationScheduler = get()
             ),
-            setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler = get()),
-            checkForUpdate = get(),
-            dismissUpdate = get(),
-            downloadUpdate = get(),
-            getCurrentVersionInfo = get()
+            setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler = get())
         )
     }
 

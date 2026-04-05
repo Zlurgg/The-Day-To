@@ -31,10 +31,4 @@ sealed interface OverviewAction {
     data object DismissEntryReminder : OverviewAction
     data object CreateTodayEntry : OverviewAction
     data object CreateNewEntry : OverviewAction
-
-    // Update actions
-    data object CheckForUpdates : OverviewAction
-    data object DownloadUpdate : OverviewAction
-    data object DismissUpdate : OverviewAction
-    data object DismissUpToDate : OverviewAction
 }

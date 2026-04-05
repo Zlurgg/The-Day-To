@@ -53,7 +53,6 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
-import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
@@ -81,8 +80,6 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
-import uk.co.zlurgg.thedayto.update.ui.components.UpdateDialog
-import uk.co.zlurgg.thedayto.update.ui.components.UpToDateDialog
 import java.time.LocalDate
 
 /**
@@ -414,24 +411,6 @@ private fun OverviewScreen(
             onSave = { enabled, hour, minute ->
                 onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
             }
-        )
-    }
-
-    // Update available dialog
-    if (uiState.showUpdateDialog && uiState.availableUpdate != null) {
-        UpdateDialog(
-            updateInfo = uiState.availableUpdate,
-            onDownload = { onAction(OverviewAction.DownloadUpdate) },
-            onDismiss = { onAction(OverviewAction.DismissUpdate) }
-        )
-    }
-
-    // Up to date dialog (shown when user manually checks and is on latest version)
-    if (uiState.showUpToDateDialog) {
-        UpToDateDialog(
-            currentVersionInfo = uiState.currentVersionInfo,
-            currentVersionName = BuildConfig.VERSION_NAME,
-            onDismiss = { onAction(OverviewAction.DismissUpToDate) }
         )
     }
 

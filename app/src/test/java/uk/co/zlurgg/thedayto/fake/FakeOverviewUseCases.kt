@@ -21,18 +21,6 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseC
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
-import uk.co.zlurgg.thedayto.update.domain.model.UpdateConfig
-import uk.co.zlurgg.thedayto.update.domain.usecases.CheckForUpdateUseCase
-import uk.co.zlurgg.thedayto.update.domain.usecases.DismissUpdateUseCase
-import uk.co.zlurgg.thedayto.update.domain.usecases.DownloadUpdateUseCase
-import uk.co.zlurgg.thedayto.update.domain.usecases.GetCurrentVersionInfoUseCase
-
-private const val DEFAULT_CURRENT_VERSION = "1.0.0"
-private val DEFAULT_UPDATE_CONFIG = UpdateConfig(
-    gitHubOwner = "TestOwner",
-    gitHubRepo = "TestRepo",
-    appName = "test-app"
-)
 
 /**
  * Creates a fake OverviewUseCases instance for testing.
@@ -45,9 +33,7 @@ fun createFakeOverviewUseCases(
     notificationScheduler: NotificationScheduler,
     notificationSettingsRepository: NotificationSettingsRepository = FakeNotificationSettingsRepository(),
     authRepository: AuthRepository = FakeAuthRepository(),
-    entryRepository: EntryRepository = FakeEntryRepository(),
-    updateRepository: FakeUpdateRepository = FakeUpdateRepository(),
-    currentVersion: String = DEFAULT_CURRENT_VERSION
+    entryRepository: EntryRepository = FakeEntryRepository()
 ): OverviewUseCases {
 
     // Create real notification use cases with fake dependencies
@@ -78,22 +64,6 @@ fun createFakeOverviewUseCases(
     val getEntryByDate = GetEntryByDateUseCase(entryRepository)
     val updateEntry = UpdateEntryUseCase(entryRepository)
 
-    // Create real update use cases with fake repository
-    val checkForUpdate = CheckForUpdateUseCase(
-        updateRepository = updateRepository,
-        updatePreferencesRepository = preferencesRepository,
-        currentVersion = currentVersion
-    )
-    val dismissUpdate = DismissUpdateUseCase(updatePreferencesRepository = preferencesRepository)
-    val downloadUpdate = DownloadUpdateUseCase(
-        updateRepository = updateRepository,
-        config = DEFAULT_UPDATE_CONFIG
-    )
-    val getCurrentVersionInfo = GetCurrentVersionInfoUseCase(
-        updateRepository = updateRepository,
-        currentVersion = currentVersion
-    )
-
     return OverviewUseCases(
         getEntries = getEntries,
         getEntriesForMonth = getEntriesForMonth,
@@ -110,10 +80,6 @@ fun createFakeOverviewUseCases(
         checkNotificationPermission = checkNotificationPermission,
         checkSystemNotificationsEnabled = checkSystemNotificationsEnabled,
         shouldShowPermissionRationale = shouldShowPermissionRationale,
-        setupDailyNotification = setupDailyNotification,
-        checkForUpdate = checkForUpdate,
-        dismissUpdate = dismissUpdate,
-        downloadUpdate = downloadUpdate,
-        getCurrentVersionInfo = getCurrentVersionInfo
+        setupDailyNotification = setupDailyNotification
     )
 }

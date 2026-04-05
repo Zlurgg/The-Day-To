@@ -3,7 +3,6 @@ package uk.co.zlurgg.thedayto.core.data.repository
 import android.content.Context
 import androidx.core.content.edit
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**
@@ -16,16 +15,12 @@ import java.time.LocalDate
  * - Journal: entry reminders, first launch setup
  * - Notifications: notification settings (enabled, time)
  * - Auth: welcome dialog tracking
- * - Update: dismissed version tracking
- *
- * Also implements UpdatePreferencesRepository to allow the update package
- * to be used independently without depending on the full PreferencesRepository.
  *
  * @param context Application context for accessing SharedPreferences
  */
 class PreferencesRepositoryImpl(
     context: Context
-) : PreferencesRepository, UpdatePreferencesRepository {
+) : PreferencesRepository {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
 
@@ -112,26 +107,6 @@ class PreferencesRepositoryImpl(
         prefs.edit { putBoolean(KEY_EDITOR_TUTORIAL_SEEN, true) }
     }
 
-    /**
-     * Get the version the user has dismissed (opted out of updating to).
-     *
-     * @return version string that was dismissed, or null if none
-     */
-    override suspend fun getDismissedVersion(): String? {
-        return prefs.getString(KEY_DISMISSED_VERSION, null)
-    }
-
-    /**
-     * Set the version the user has dismissed.
-     *
-     * Stores the version so the user won't be prompted about this update again.
-     *
-     * @param version the version string to mark as dismissed
-     */
-    override suspend fun setDismissedVersion(version: String) {
-        prefs.edit { putString(KEY_DISMISSED_VERSION, version) }
-    }
-
     // ==================== Cloud Sync ====================
 
     /**
@@ -187,7 +162,6 @@ class PreferencesRepositoryImpl(
         private const val KEY_FIRST_LAUNCH_COMPLETE = "first_launch_complete"
         private const val KEY_WELCOME_DIALOG_SEEN = "welcome_dialog_seen"
         private const val KEY_EDITOR_TUTORIAL_SEEN = "editor_tutorial_seen"
-        private const val KEY_DISMISSED_VERSION = "dismissed_update_version"
         private const val KEY_SYNC_ENABLED = "sync_enabled"
         private const val KEY_LAST_SYNC_TIMESTAMP = "last_sync_timestamp"
     }

@@ -56,8 +56,6 @@ class OverviewViewModel(
         loadNotificationSettings()
         // Fail-safe: ensure periodic notification is scheduled on app startup
         overviewUseCases.setupDailyNotification()
-        // Check for app updates on startup
-        checkForUpdates(forceCheck = false)
         // Trigger sync on app startup (if signed in)
         triggerStartupSync()
     }
@@ -67,40 +65,6 @@ class OverviewViewModel(
      */
     private fun triggerStartupSync() {
         syncScheduler.requestImmediateSync()
-    }
-
-    /**
-     * Check for available app updates.
-     *
-     * @param forceCheck If true, ignores dismissed version (for manual check)
-     */
-    private fun checkForUpdates(forceCheck: Boolean) {
-        viewModelScope.launch {
-            Timber.d("Checking for updates (force: $forceCheck)")
-            val updateInfo = overviewUseCases.checkForUpdate(forceCheck)
-
-            if (updateInfo != null) {
-                Timber.i("Update available: ${updateInfo.versionName}")
-                _uiState.update {
-                    it.copy(
-                        availableUpdate = updateInfo,
-                        showUpdateDialog = true
-                    )
-                }
-            } else {
-                Timber.d("No update available or update dismissed")
-                // For manual check, show "Up to Date" dialog with current version info
-                if (forceCheck) {
-                    val currentVersionInfo = overviewUseCases.getCurrentVersionInfo()
-                    _uiState.update {
-                        it.copy(
-                            currentVersionInfo = currentVersionInfo,
-                            showUpToDateDialog = true
-                        )
-                    }
-                }
-            }
-        }
     }
 
     /**
@@ -446,57 +410,6 @@ class OverviewViewModel(
             is OverviewAction.CreateTodayEntry,
             is OverviewAction.CreateNewEntry -> {
                 _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
-            }
-
-            is OverviewAction.CheckForUpdates -> {
-                checkForUpdates(forceCheck = true)
-            }
-
-            is OverviewAction.DownloadUpdate -> {
-                viewModelScope.launch {
-                    val updateInfo = _uiState.value.availableUpdate ?: return@launch
-
-                    Timber.i("Starting download for version ${updateInfo.versionName}")
-                    val downloadId = overviewUseCases.downloadUpdate(updateInfo)
-
-                    if (downloadId != null) {
-                        _uiState.update {
-                            it.copy(showUpdateDialog = false)
-                        }
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar("Download started - check notifications")
-                        )
-                    } else {
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar("Failed to start download")
-                        )
-                    }
-                }
-            }
-
-            is OverviewAction.DismissUpdate -> {
-                viewModelScope.launch {
-                    val updateInfo = _uiState.value.availableUpdate ?: return@launch
-
-                    Timber.d("User dismissed update ${updateInfo.versionName}")
-                    overviewUseCases.dismissUpdate(updateInfo.versionName)
-
-                    _uiState.update {
-                        it.copy(
-                            showUpdateDialog = false,
-                            availableUpdate = null
-                        )
-                    }
-                }
-            }
-
-            is OverviewAction.DismissUpToDate -> {
-                _uiState.update {
-                    it.copy(
-                        showUpToDateDialog = false,
-                        currentVersionInfo = null
-                    )
-                }
             }
         }
     }

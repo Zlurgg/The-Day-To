@@ -4,7 +4,6 @@ import androidx.compose.runtime.Stable
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
-import uk.co.zlurgg.thedayto.update.domain.model.UpdateInfo
 import java.time.LocalDate
 
 /**
@@ -42,12 +41,6 @@ data class OverviewUiState(
     val notificationMinute: Int = 0,
     val hasNotificationPermission: Boolean = false,
     val showNotificationSettingsDialog: Boolean = false,
-
-    // Update checker state
-    val availableUpdate: UpdateInfo? = null,
-    val showUpdateDialog: Boolean = false,
-    val currentVersionInfo: UpdateInfo? = null,
-    val showUpToDateDialog: Boolean = false,
 
     // Navigation state
     val navigationTarget: OverviewNavigationTarget? = null

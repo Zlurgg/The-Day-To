@@ -7,11 +7,9 @@ import uk.co.zlurgg.thedayto.journal.di.journalModule
 import uk.co.zlurgg.thedayto.journal.di.journalViewModelModule
 import uk.co.zlurgg.thedayto.notification.di.notificationModule
 import uk.co.zlurgg.thedayto.sync.di.syncModule
-import uk.co.zlurgg.thedayto.update.di.updateModule
 
 val appModule = listOf(
     coreModule,
-    updateModule,
     authModule,
     journalModule,
     journalViewModelModule,

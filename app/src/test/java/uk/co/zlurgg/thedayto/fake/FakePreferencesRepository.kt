@@ -1,24 +1,19 @@
 package uk.co.zlurgg.thedayto.fake
 
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
-import uk.co.zlurgg.thedayto.update.domain.repository.UpdatePreferencesRepository
 import java.time.LocalDate
 
 /**
  * Fake implementation of PreferencesRepository for testing.
  * Stores data in memory instead of SharedPreferences.
- *
- * Also implements UpdatePreferencesRepository to match the real implementation
- * and allow testing update-related use cases.
  */
-class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesRepository {
+class FakePreferencesRepository : PreferencesRepository {
 
     // In-memory storage for testing
     private var entryReminderDate: LocalDate? = null
     private var isFirstLaunch: Boolean = true
     private var welcomeDialogSeen: Boolean = false
     private var editorTutorialSeen: Boolean = false
-    private var dismissedVersion: String? = null
     private var syncEnabled: Boolean = false
     private var lastSyncTimestamp: Long? = null
 
@@ -54,14 +49,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         editorTutorialSeen = true
     }
 
-    override suspend fun getDismissedVersion(): String? {
-        return dismissedVersion
-    }
-
-    override suspend fun setDismissedVersion(version: String) {
-        dismissedVersion = version
-    }
-
     // ==================== Cloud Sync ====================
 
     override suspend fun isSyncEnabled(): Boolean {
@@ -85,7 +72,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         isFirstLaunch = true
         welcomeDialogSeen = false
         editorTutorialSeen = false
-        dismissedVersion = null
         syncEnabled = false
         lastSyncTimestamp = null
     }
@@ -98,13 +84,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
     }
 
     /**
-     * Helper method to set dismissed version for testing.
-     */
-    fun setDismissedVersionForTest(version: String?) {
-        dismissedVersion = version
-    }
-
-    /**
      * Helper method to reset all values to defaults.
      * Useful for cleaning up between tests.
      */
@@ -113,7 +92,6 @@ class FakePreferencesRepository : PreferencesRepository, UpdatePreferencesReposi
         isFirstLaunch = true
         welcomeDialogSeen = false
         editorTutorialSeen = false
-        dismissedVersion = null
         syncEnabled = false
         lastSyncTimestamp = null
     }

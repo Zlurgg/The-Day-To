@@ -83,24 +83,6 @@ interface PreferencesRepository {
      */
     suspend fun markEditorTutorialSeen()
 
-    /**
-     * Get the version the user has dismissed (opted out of updating to).
-     *
-     * Used to avoid repeatedly prompting about the same update.
-     *
-     * @return version string that was dismissed, or null if none
-     */
-    suspend fun getDismissedVersion(): String?
-
-    /**
-     * Set the version the user has dismissed.
-     *
-     * Called when user taps "Not Now" on the update dialog.
-     *
-     * @param version the version string to mark as dismissed
-     */
-    suspend fun setDismissedVersion(version: String)
-
     // ==================== Cloud Sync ====================
 
     /**
