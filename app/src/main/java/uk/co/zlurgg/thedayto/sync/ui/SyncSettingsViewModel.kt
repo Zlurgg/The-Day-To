@@ -188,7 +188,8 @@ class SyncSettingsViewModel(
                 isUserSignedIn = true,
                 isSigningIn = false,
                 userEmail = user.username,
-                lastSyncTimestamp = lastSync
+                lastSyncTimestamp = lastSync,
+                shouldNavigateBack = true
             )
         }
         Timber.i("Sign in successful: %s", user.username)
@@ -225,7 +226,8 @@ class SyncSettingsViewModel(
                 it.copy(
                     isUserSignedIn = false,
                     userEmail = null,
-                    isLoading = false
+                    isLoading = false,
+                    shouldNavigateBack = true
                 )
             }
             Timber.i("Sign out successful")
@@ -265,7 +267,8 @@ class SyncSettingsViewModel(
                             it.copy(
                                 deletionProgress = null,
                                 isUserSignedIn = false,
-                                userEmail = null
+                                userEmail = null,
+                                shouldNavigateBack = true
                             )
                         }
                         Timber.i("Account deletion completed")
@@ -325,6 +328,13 @@ class SyncSettingsViewModel(
      */
     fun onDeletionProgressDismissed() {
         _uiState.update { it.copy(deletionProgress = null) }
+    }
+
+    /**
+     * Reset navigation flag after navigation has occurred.
+     */
+    fun onNavigationHandled() {
+        _uiState.update { it.copy(shouldNavigateBack = false) }
     }
 
     companion object {

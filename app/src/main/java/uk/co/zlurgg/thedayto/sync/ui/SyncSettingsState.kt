@@ -19,5 +19,6 @@ data class SyncSettingsState(
     val error: String? = null,
     val showDeleteConfirmDialog: Boolean = false,
     val deletionProgress: DeletionProgress? = null,
-    val showReAuthDialog: Boolean = false
+    val showReAuthDialog: Boolean = false,
+    val shouldNavigateBack: Boolean = false
 )

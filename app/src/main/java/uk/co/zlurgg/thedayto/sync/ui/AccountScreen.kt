@@ -91,6 +91,13 @@ fun AccountScreenRoot(
         }
     }
 
+    LaunchedEffect(uiState.shouldNavigateBack) {
+        if (uiState.shouldNavigateBack) {
+            viewModel.onNavigationHandled()
+            onNavigateBack()
+        }
+    }
+
     AccountScreen(
         uiState = uiState,
         snackbarHostState = snackbarHostState,
