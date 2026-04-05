@@ -226,6 +226,8 @@
     <string name="about_dialog_description_content">The Day To is a mood tracking app designed to help you reflect on your daily emotional wellbeing. Track your moods with colors, add personal notes, and visualize your month at a glance. Optionally sync across devices and set daily reminders to build your journaling habit.</string>
     <string name="about_dialog_privacy_title">Privacy &amp; Data</string>
     <string name="about_dialog_privacy_content">Your journal entries are stored locally on your device. You can optionally enable cloud sync to backup your data across devices. Your personal data remains private and under your control.</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_url">https://zlurgg.github.io/the-day-to/privacy</string>
     <string name="about_dialog_open_source_title">Open Source</string>
     <string name="about_dialog_open_source_content">The Day To is an open-source project built with modern Android technologies. Visit our GitHub repository to view the source code, report issues, or contribute to development.</string>
     <string name="about_dialog_credits_title">Credits</string>

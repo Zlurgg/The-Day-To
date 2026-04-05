@@ -3,8 +3,11 @@ package uk.co.zlurgg.thedayto.core.ui.components
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.BuildConfig
@@ -30,6 +33,9 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 fun AboutDialog(
     onDismiss: () -> Unit
 ) {
+    val uriHandler = LocalUriHandler.current
+    val privacyUrl = stringResource(R.string.privacy_policy_url)
+
     BaseInfoDialog(
         title = stringResource(R.string.about_dialog_title),
         buttonText = stringResource(R.string.about_dialog_button),
@@ -54,6 +60,10 @@ fun AboutDialog(
             title = stringResource(R.string.about_dialog_privacy_title),
             content = stringResource(R.string.about_dialog_privacy_content)
         )
+
+        TextButton(onClick = { uriHandler.openUri(privacyUrl) }) {
+            Text(stringResource(R.string.privacy_policy))
+        }
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
