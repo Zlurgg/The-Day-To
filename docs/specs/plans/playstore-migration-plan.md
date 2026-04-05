@@ -351,13 +351,13 @@ Before production, consider a Closed Testing track for broader validation:
 
 | Priority | Phase | Dependencies | Effort | Status |
 |----------|-------|--------------|--------|--------|
-| 1 | Phase 1: Remove update module | None | Small | |
-| 2 | Phase 3: Privacy policy | None | Medium | |
+| 1 | Phase 1: Remove update module | None | Small | Done |
+| 2 | Phase 3: Privacy policy | None | Medium | Done |
 | 3 | Phase 2: Account deletion | None | Large | Done |
-| 4 | Phase 5: App assets | None | Medium | |
+| 4 | Phase 5: App assets | None | Medium | Done |
 | 5 | Phase 4: SHA key config | Play Console account | Small | |
 | 6 | Phase 6: Build & test AAB | Priority 1, 3 | Small | |
-| 7 | Phase 7: Play Console setup | Priority 2, 4, 5 | Medium | |
+| 7 | Phase 7: Play Console setup | Priority 2, 4, 5 | Medium | Done |
 | 8 | Phase 8: Internal testing | Priority 6, 7 | Small | |
 | 9 | Phase 9: Closed testing | Priority 8 | Small | |
 
@@ -395,16 +395,16 @@ Before production, consider a Closed Testing track for broader validation:
 ## Verification Checklist
 
 ### Before Upload
-- [ ] Update module deleted (not just disabled)
+- [x] Update module deleted (not just disabled)
 - [x] Account deletion working
-- [ ] Privacy policy live and accessible
+- [x] Privacy policy live and accessible
 - [ ] SHA key added to Firebase
 - [ ] Version code incremented
 - [ ] Release AAB builds successfully
 - [ ] Release build tested locally via bundletool
 - [ ] Google Sign-In works in release build
 - [ ] Firestore sync works in release build
-- [ ] App icon looks good at all sizes
+- [x] App icon looks good at all sizes
 
 ### After Internal Testing
 - [ ] Testers can install from Play Store

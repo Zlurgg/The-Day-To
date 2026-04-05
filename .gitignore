@@ -15,6 +15,9 @@ keystore.properties
 *.keystore
 *.jks
 
+# Play Store service account (never commit)
+play-service-account.json
+
 # Firebase config (contains API keys)
 google-services.json
 
