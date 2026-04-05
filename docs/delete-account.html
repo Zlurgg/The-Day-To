@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Delete Account - The Day To</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-light: #E8F4F8;
+            --bg-gradient: linear-gradient(135deg, #E8F4F8 0%, #D0E8F0 100%);
+            --accent: #26A69A;
+            --accent-dark: #00897B;
+            --text-primary: #37474F;
+            --text-secondary: #607D8B;
+            --card-bg: #FFFFFF;
+            --card-shadow: 0 4px 20px rgba(38, 166, 154, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 20px;
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .back-link:hover {
+            text-decoration: underline;
+        }
+
+        .header {
+            text-align: center;
+            padding: 40px 20px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+
+        .content-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: var(--card-shadow);
+            margin-bottom: 20px;
+        }
+
+        .content-card h2 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent-dark);
+            margin-bottom: 15px;
+        }
+
+        .content-card p {
+            font-size: 1rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .steps {
+            margin: 20px 0;
+        }
+
+        .step {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            background: var(--accent);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            flex-shrink: 0;
+            margin-right: 15px;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content strong {
+            color: var(--text-primary);
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .step-content span {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        .warning {
+            background: #FFF3E0;
+            border-left: 4px solid #FF9800;
+            padding: 15px;
+            border-radius: 0 8px 8px 0;
+            margin: 20px 0;
+        }
+
+        .warning strong {
+            color: #E65100;
+        }
+
+        .warning p {
+            color: #5D4037;
+            margin: 0;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 30px 20px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+        }
+
+        .footer a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 600px) {
+            .header h1 {
+                font-size: 1.6rem;
+            }
+
+            .content-card {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <a href="index.html" class="back-link">&larr; Back to Home</a>
+
+        <header class="header">
+            <h1>Delete Your Account</h1>
+        </header>
+
+        <section class="content-card">
+            <h2>How to Delete Your Account</h2>
+            <p>You can delete your account and all associated data directly within The Day To app.</p>
+
+            <div class="steps">
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <strong>Open the app</strong>
+                        <span>Launch The Day To on your device</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <strong>Go to Account</strong>
+                        <span>Tap the menu icon (three dots) and select "Account"</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <strong>Delete Account</strong>
+                        <span>Scroll down and tap "Delete Account"</span>
+                    </div>
+                </div>
+
+                <div class="step">
+                    <div class="step-number">4</div>
+                    <div class="step-content">
+                        <strong>Confirm deletion</strong>
+                        <span>Review the warning and confirm to permanently delete your account</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="warning">
+                <strong>Warning:</strong>
+                <p>Account deletion is permanent and cannot be undone. All your journal entries, mood colors, and account data will be permanently removed.</p>
+            </div>
+        </section>
+
+        <section class="content-card">
+            <h2>What Gets Deleted</h2>
+            <p>When you delete your account, the following data is permanently removed:</p>
+            <ul style="margin-left: 20px; color: var(--text-secondary);">
+                <li>All journal entries stored in the cloud</li>
+                <li>All custom mood colors stored in the cloud</li>
+                <li>Your Firebase Authentication account</li>
+                <li>All local data on your device</li>
+            </ul>
+        </section>
+
+        <section class="content-card">
+            <h2>Need Help?</h2>
+            <p>
+                If you're unable to access the app or need assistance, please open an issue on our
+                <a href="https://github.com/Zlurgg/The-Day-To/issues" target="_blank">GitHub repository</a>.
+            </p>
+        </section>
+
+        <footer class="footer">
+            <p>
+                <a href="index.html">The Day To</a> |
+                <a href="privacy.html">Privacy Policy</a>
+            </p>
+        </footer>
+    </div>
+</body>
+</html>
