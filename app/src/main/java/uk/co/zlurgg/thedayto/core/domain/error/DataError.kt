@@ -47,7 +47,9 @@ sealed interface DataError : Error {
         CANCELLED,
         NO_CREDENTIAL,
         FAILED,
-        NETWORK_ERROR
+        NETWORK_ERROR,
+        REQUIRES_RECENT_LOGIN,
+        DELETE_FAILED
     }
 
     /**

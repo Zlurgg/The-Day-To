@@ -138,4 +138,11 @@ interface PreferencesRepository {
      * @param timestamp epoch millis of the sync completion
      */
     suspend fun setLastSyncTimestamp(timestamp: Long)
+
+    /**
+     * Clear all preferences.
+     *
+     * Used during account deletion to reset all user preferences.
+     */
+    suspend fun clear()
 }

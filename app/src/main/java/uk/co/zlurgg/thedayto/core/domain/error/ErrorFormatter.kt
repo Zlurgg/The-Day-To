@@ -58,6 +58,8 @@ object ErrorFormatter {
         DataError.Auth.NO_CREDENTIAL -> "No Google account found on device."
         DataError.Auth.FAILED -> "Sign-in failed. Please try again."
         DataError.Auth.NETWORK_ERROR -> "Network error during sign-in."
+        DataError.Auth.REQUIRES_RECENT_LOGIN -> "Please sign in again to continue."
+        DataError.Auth.DELETE_FAILED -> "Account deletion failed. Please try again."
     }
 
     private fun formatSyncError(error: DataError.Sync): String = when (error) {

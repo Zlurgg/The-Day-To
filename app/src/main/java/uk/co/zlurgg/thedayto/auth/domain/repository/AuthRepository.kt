@@ -41,4 +41,26 @@ interface AuthRepository {
      * @return UserData if user is signed in, null otherwise
      */
     fun getSignedInUser(): UserData?
+
+    /**
+     * Deletes the current user's Firebase Auth account.
+     *
+     * This is a sensitive operation that may require recent authentication.
+     * If the user hasn't signed in recently, this may return REQUIRES_RECENT_LOGIN.
+     *
+     * @return EmptyResult with success or DataError.Auth on failure
+     */
+    suspend fun deleteAccount(): EmptyResult<DataError.Auth>
+
+    /**
+     * Re-authenticates with fresh credentials (required for sensitive operations).
+     *
+     * Firebase requires recent authentication for sensitive operations like
+     * account deletion. This method allows re-authentication using the same
+     * credential provider pattern as signIn.
+     *
+     * @param credentialProvider Suspend lambda that fetches Google credentials
+     * @return EmptyResult with success or DataError.Auth on failure
+     */
+    suspend fun reauthenticate(credentialProvider: CredentialProvider): EmptyResult<DataError.Auth>
 }
