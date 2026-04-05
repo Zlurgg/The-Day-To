@@ -22,11 +22,15 @@ import androidx.compose.material.icons.filled.CloudSync
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -50,6 +54,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
 import uk.co.zlurgg.thedayto.auth.ui.CredentialProviderFactory
 import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
@@ -58,6 +63,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncResult
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
+import uk.co.zlurgg.thedayto.sync.ui.components.DeleteAccountConfirmDialog
+import uk.co.zlurgg.thedayto.sync.ui.components.DeletionProgressDialog
 import java.text.DateFormat
 import java.util.Date
 
@@ -95,7 +102,17 @@ fun AccountScreenRoot(
             }
         },
         onDevSignInClick = viewModel::devSignIn,
-        onSignOutClick = viewModel::signOut
+        onSignOutClick = viewModel::signOut,
+        onDeleteAccountClick = viewModel::onDeleteAccountRequested,
+        onDeleteAccountConfirm = viewModel::onDeleteAccountConfirmed,
+        onDeleteAccountCancel = viewModel::onDeleteAccountCancelled,
+        onDeletionProgressDismiss = viewModel::onDeletionProgressDismissed,
+        onReAuthConfirm = {
+            activity?.let { act ->
+                viewModel.onReAuthCompleted(credentialProviderFactory.create(act, serverClientId))
+            }
+        },
+        onReAuthDismiss = viewModel::onReAuthDismissed
     )
 }
 
@@ -112,8 +129,51 @@ private fun AccountScreen(
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
+    onDeleteAccountConfirm: () -> Unit,
+    onDeleteAccountCancel: () -> Unit,
+    onDeletionProgressDismiss: () -> Unit,
+    onReAuthConfirm: () -> Unit,
+    onReAuthDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Delete Account Confirmation Dialog
+    if (uiState.showDeleteConfirmDialog) {
+        DeleteAccountConfirmDialog(
+            onConfirm = onDeleteAccountConfirm,
+            onDismiss = onDeleteAccountCancel
+        )
+    }
+
+    // Deletion Progress Dialog
+    uiState.deletionProgress?.let { progress ->
+        if (progress !is DeletionProgress.RequiresReAuth && progress !is DeletionProgress.Failed) {
+            DeletionProgressDialog(
+                progress = progress,
+                onDismiss = onDeletionProgressDismiss
+            )
+        }
+    }
+
+    // Re-authentication Dialog
+    if (uiState.showReAuthDialog) {
+        AlertDialog(
+            onDismissRequest = onReAuthDismiss,
+            title = { Text(stringResource(R.string.delete_account_reauth_title)) },
+            text = { Text(stringResource(R.string.delete_account_reauth_message)) },
+            confirmButton = {
+                Button(onClick = onReAuthConfirm) {
+                    Text(stringResource(R.string.sign_in))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onReAuthDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -149,6 +209,7 @@ private fun AccountScreen(
                     onSignInClick = onSignInClick,
                     onDevSignInClick = onDevSignInClick,
                     onSignOutClick = onSignOutClick,
+                    onDeleteAccountClick = onDeleteAccountClick,
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
@@ -171,6 +232,7 @@ private fun AccountSection(
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -181,40 +243,60 @@ private fun AccountSection(
     ) {
         if (isSignedIn) {
             // Signed in state
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(paddingMedium),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
                 Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(paddingMedium),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.width(paddingMedium))
-                    Column {
-                        Text(
-                            text = userEmail ?: stringResource(R.string.sync_signed_in),
-                            style = MaterialTheme.typography.titleMedium
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary
                         )
+                        Spacer(modifier = Modifier.width(paddingMedium))
+                        Column {
+                            Text(
+                                text = userEmail ?: stringResource(R.string.sync_signed_in),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                            Text(
+                                text = stringResource(R.string.sync_cloud_available),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                    }
+                    TextButton(onClick = onSignOutClick) {
                         Text(
-                            text = stringResource(R.string.sync_cloud_available),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = stringResource(R.string.sign_out),
+                            color = MaterialTheme.colorScheme.error
                         )
                     }
                 }
-                TextButton(onClick = onSignOutClick) {
-                    Text(
-                        text = stringResource(R.string.sign_out),
-                        color = MaterialTheme.colorScheme.error
+
+                // Danger Zone - Delete Account
+                HorizontalDivider(modifier = Modifier.padding(horizontal = paddingMedium))
+                TextButton(
+                    onClick = onDeleteAccountClick,
+                    modifier = Modifier.padding(horizontal = paddingSmall),
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = MaterialTheme.colorScheme.error
                     )
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.DeleteForever,
+                        contentDescription = null,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(paddingSmall))
+                    Text(stringResource(R.string.delete_account_label))
                 }
             }
         } else {
@@ -271,6 +353,7 @@ private fun AccountContent(
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
+    onDeleteAccountClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Column(
@@ -285,7 +368,8 @@ private fun AccountContent(
             isDevSignInAvailable = uiState.isDevSignInAvailable,
             onSignInClick = onSignInClick,
             onDevSignInClick = onDevSignInClick,
-            onSignOutClick = onSignOutClick
+            onSignOutClick = onSignOutClick,
+            onDeleteAccountClick = onDeleteAccountClick
         )
 
         // Show sync status when signed in (sync is auto-enabled)
@@ -489,7 +573,13 @@ private fun AccountScreenPreview() {
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},
-            onSignOutClick = {}
+            onSignOutClick = {},
+            onDeleteAccountClick = {},
+            onDeleteAccountConfirm = {},
+            onDeleteAccountCancel = {},
+            onDeletionProgressDismiss = {},
+            onReAuthConfirm = {},
+            onReAuthDismiss = {}
         )
     }
 }
@@ -509,7 +599,13 @@ private fun AccountScreenNotSignedInPreview() {
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},
-            onSignOutClick = {}
+            onSignOutClick = {},
+            onDeleteAccountClick = {},
+            onDeleteAccountConfirm = {},
+            onDeleteAccountCancel = {},
+            onDeletionProgressDismiss = {},
+            onReAuthConfirm = {},
+            onReAuthDismiss = {}
         )
     }
 }
@@ -530,7 +626,13 @@ private fun AccountScreenSyncingPreview() {
             onSyncNowClicked = {},
             onSignInClick = {},
             onDevSignInClick = {},
-            onSignOutClick = {}
+            onSignOutClick = {},
+            onDeleteAccountClick = {},
+            onDeleteAccountConfirm = {},
+            onDeleteAccountCancel = {},
+            onDeletionProgressDismiss = {},
+            onReAuthConfirm = {},
+            onReAuthDismiss = {}
         )
     }
 }

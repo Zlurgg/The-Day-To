@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.sync.ui
 
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 
 /**
@@ -15,5 +16,8 @@ data class SyncSettingsState(
     val syncState: SyncState = SyncState.Idle,
     val lastSyncTimestamp: Long? = null,
     val isLoading: Boolean = true,
-    val error: String? = null
+    val error: String? = null,
+    val showDeleteConfirmDialog: Boolean = false,
+    val deletionProgress: DeletionProgress? = null,
+    val showReAuthDialog: Boolean = false
 )

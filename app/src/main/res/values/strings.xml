@@ -259,4 +259,24 @@
     <string name="sync_cloud_available">Cloud sync available</string>
     <string name="sync_sign_in_to_enable">Sign in to enable Cloud Sync</string>
     <string name="sync_sign_in_description">Backup and sync your journal across devices</string>
+
+    <!-- Delete Account -->
+    <string name="delete_account_title">Delete Account?</string>
+    <string name="delete_account_warning_intro">This will permanently delete:</string>
+    <string name="delete_account_warning_account">\u2022 Your account</string>
+    <string name="delete_account_warning_entries">\u2022 All journal entries</string>
+    <string name="delete_account_warning_mood_colors">\u2022 All mood colors</string>
+    <string name="delete_account_warning_permanent">This cannot be undone.</string>
+    <string name="delete_account_confirm_hint">Type DELETE to confirm</string>
+    <string name="delete_account_button">Delete Account</string>
+    <string name="delete_account_label">Delete Account</string>
+    <string name="delete_account_progress_title">Deleting Account</string>
+    <string name="delete_account_progress_starting">Starting…</string>
+    <string name="delete_account_progress_cancelling_sync">Cancelling sync…</string>
+    <string name="delete_account_progress_deleting_remote">Deleting cloud data…</string>
+    <string name="delete_account_progress_deleting_account">Deleting account…</string>
+    <string name="delete_account_progress_clearing_local">Clearing local data…</string>
+    <string name="delete_account_progress_complete">Account deleted successfully</string>
+    <string name="delete_account_reauth_title">Re-authentication Required</string>
+    <string name="delete_account_reauth_message">For security, please sign in again to delete your account.</string>
 </resources>

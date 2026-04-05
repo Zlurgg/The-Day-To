@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.sync.ui
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -10,6 +11,8 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
@@ -36,6 +39,7 @@ class SyncSettingsViewModel(
     private val signOutUseCase: SignOutUseCase,
     private val preferencesRepository: PreferencesRepository,
     private val notificationAuthUseCase: NotificationAuthUseCase,
+    private val deleteAccountUseCase: DeleteAccountUseCase,
     private val devSignInUseCase: DevSignInUseCase? = null
 ) : ViewModel() {
 
@@ -226,5 +230,104 @@ class SyncSettingsViewModel(
             }
             Timber.i("Sign out successful")
         }
+    }
+
+    // ==================== Delete Account ====================
+
+    /**
+     * Request account deletion. Shows confirmation dialog.
+     */
+    fun onDeleteAccountRequested() {
+        _uiState.update { it.copy(showDeleteConfirmDialog = true) }
+    }
+
+    /**
+     * Cancel account deletion request. Hides confirmation dialog.
+     */
+    fun onDeleteAccountCancelled() {
+        _uiState.update { it.copy(showDeleteConfirmDialog = false) }
+    }
+
+    /**
+     * Confirm account deletion. Starts the deletion process.
+     */
+    fun onDeleteAccountConfirmed() {
+        _uiState.update { it.copy(showDeleteConfirmDialog = false) }
+
+        viewModelScope.launch {
+            deleteAccountUseCase().collect { progress ->
+                _uiState.update { it.copy(deletionProgress = progress) }
+
+                when (progress) {
+                    is DeletionProgress.Complete -> {
+                        delay(COMPLETION_DELAY_MS)
+                        _uiState.update {
+                            it.copy(
+                                deletionProgress = null,
+                                isUserSignedIn = false,
+                                userEmail = null
+                            )
+                        }
+                        Timber.i("Account deletion completed")
+                    }
+                    is DeletionProgress.RequiresReAuth -> {
+                        _uiState.update {
+                            it.copy(deletionProgress = null, showReAuthDialog = true)
+                        }
+                    }
+                    is DeletionProgress.Failed -> {
+                        _uiState.update {
+                            it.copy(deletionProgress = null, error = progress.message)
+                        }
+                        Timber.w("Account deletion failed: %s", progress.message)
+                    }
+                    else -> { /* Progress update - no action needed */ }
+                }
+            }
+        }
+    }
+
+    /**
+     * Handle re-authentication completion.
+     * Called after user signs in again for account deletion.
+     */
+    fun onReAuthCompleted(credentialProvider: CredentialProvider) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(showReAuthDialog = false, isLoading = true) }
+
+            when (val result = authRepository.reauthenticate(credentialProvider)) {
+                is Result.Success -> {
+                    _uiState.update { it.copy(isLoading = false) }
+                    onDeleteAccountConfirmed() // Retry deletion
+                }
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = ErrorFormatter.format(result.error, "re-authenticate")
+                        )
+                    }
+                    Timber.w("Re-authentication failed: %s", result.error)
+                }
+            }
+        }
+    }
+
+    /**
+     * Dismiss re-authentication dialog without retrying.
+     */
+    fun onReAuthDismissed() {
+        _uiState.update { it.copy(showReAuthDialog = false) }
+    }
+
+    /**
+     * Dismiss deletion progress dialog.
+     */
+    fun onDeletionProgressDismissed() {
+        _uiState.update { it.copy(deletionProgress = null) }
+    }
+
+    companion object {
+        private const val COMPLETION_DELAY_MS = 500L
     }
 }
