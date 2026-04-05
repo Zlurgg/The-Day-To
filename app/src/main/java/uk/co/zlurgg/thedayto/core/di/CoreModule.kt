@@ -6,8 +6,10 @@ import uk.co.zlurgg.thedayto.BuildConfig
 import uk.co.zlurgg.thedayto.core.data.database.DatabaseFactory
 import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.core.data.network.HttpClientFactory
+import uk.co.zlurgg.thedayto.core.data.repository.LocalDataClearerImpl
 import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
 import uk.co.zlurgg.thedayto.core.data.util.SystemTimeProvider
+import uk.co.zlurgg.thedayto.core.domain.repository.LocalDataClearer
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
@@ -34,6 +36,17 @@ val coreModule = module {
     // Preferences
     single { PreferencesRepositoryImpl(androidContext()) }
     single<PreferencesRepository> { get<PreferencesRepositoryImpl>() }
+
+    // Local Data Clearer (for account deletion)
+    single<LocalDataClearer> {
+        LocalDataClearerImpl(
+            entryDao = get(),
+            moodColorDao = get(),
+            notificationSettingsDao = get(),
+            pendingSyncDeletionDao = get(),
+            preferencesRepository = get()
+        )
+    }
 
     // CheckTodayEntryExistsUseCase - used by NotificationRepository
     // Note: Depends on EntryRepository from journalModule, resolved at runtime

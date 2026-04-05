@@ -77,6 +77,7 @@ val syncModule = module {
             signOutUseCase = get(),
             preferencesRepository = get(),
             notificationAuthUseCase = get(),
+            deleteAccountUseCase = get(),
             devSignInUseCase = getOrNull()
         )
     }

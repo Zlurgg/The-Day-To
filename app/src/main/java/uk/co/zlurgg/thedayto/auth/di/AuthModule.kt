@@ -11,6 +11,7 @@ import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.MarkWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
@@ -46,6 +47,16 @@ val authModule = module {
         SignOutUseCase(
             authRepository = get(),
             authStateRepository = get()
+        )
+    }
+
+    // DeleteAccountUseCase - used by SyncSettingsViewModel
+    single {
+        DeleteAccountUseCase(
+            authRepository = get(),
+            syncRepository = get(),
+            localDataClearer = get(),
+            syncScheduler = get()
         )
     }
 
