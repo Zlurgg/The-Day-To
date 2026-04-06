@@ -234,203 +234,160 @@ class EditorViewModel(
 
     fun onAction(action: EditorAction) {
         when (action) {
-            is EditorAction.EnteredDate -> {
-                viewModelScope.launch {
-                    Timber.d("Date changed to: ${action.date}, checking for existing entry")
+            is EditorAction.EnteredDate -> handleDateChange(action.date)
+            is EditorAction.SelectMoodColor -> handleSelectMoodColor(action.moodColorId)
+            is EditorAction.EnteredContent -> handleContentChange(action.value)
+            is EditorAction.ChangeContentFocus -> handleContentFocusChange(action.focusState)
+            is EditorAction.ToggleMoodColorSection -> handleToggleMoodColorSection()
+            is EditorAction.SaveMoodColor -> handleSaveMoodColor(action.mood, action.colorHex)
+            is EditorAction.DeleteMoodColor -> handleDeleteMoodColor(action.moodColor)
+            is EditorAction.EditMoodColor -> handleEditMoodColor(action.moodColor)
+            is EditorAction.UpdateMoodColor -> handleUpdateMoodColor(
+                action.moodColorId,
+                action.newMood,
+                action.newColorHex
+            )
+            is EditorAction.CloseEditMoodColorDialog -> handleCloseEditMoodColorDialog()
+            is EditorAction.ClearEditMoodColorError -> handleClearEditMoodColorError()
+            is EditorAction.DismissEditorTutorial -> handleDismissEditorTutorial()
+            is EditorAction.ToggleDatePicker -> handleToggleDatePicker()
+            is EditorAction.SaveEntry -> handleSaveEntry()
+            is EditorAction.RequestNavigateBack -> handleRequestNavigateBack()
+            is EditorAction.ConfirmDiscardChanges -> handleConfirmDiscardChanges()
+            is EditorAction.DismissUnsavedChangesDialog -> handleDismissUnsavedChangesDialog()
+            is EditorAction.RetryLoadEntry -> handleRetryLoadEntry()
+            is EditorAction.DismissLoadError -> handleDismissLoadError()
+        }
+    }
 
-                    try {
-                        // Check if entry exists for this date
-                        val existingEntry = editorUseCases.getEntryByDateUseCase(action.date).getOrNull()
+    // region Action Handlers
 
-                        if (existingEntry != null) {
-                            // Load existing entry for this date
-                            Timber.d("Found existing entry for date, loading: id=${existingEntry.id}")
-                            loadEntryIntoState(existingEntry)
-                        } else {
-                            // No entry for this date - reset to blank state
-                            Timber.d("No entry found for date, resetting to blank state")
-                            resetToBlankState(action.date)
-                        }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to load entry for date: ${action.date}")
-                        // On error, reset to blank state so user can still create entry
-                        resetToBlankState(action.date)
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = "Failed to load entry for this date"
-                            )
-                        )
-                    }
+    private fun handleDateChange(date: Long) {
+        viewModelScope.launch {
+            Timber.d("Date changed to: $date, checking for existing entry")
+
+            try {
+                val existingEntry = editorUseCases.getEntryByDateUseCase(date).getOrNull()
+
+                if (existingEntry != null) {
+                    Timber.d("Found existing entry for date, loading: id=${existingEntry.id}")
+                    loadEntryIntoState(existingEntry)
+                } else {
+                    Timber.d("No entry found for date, resetting to blank state")
+                    resetToBlankState(date)
                 }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load entry for date: $date")
+                resetToBlankState(date)
+                _uiEvents.emit(
+                    EditorUiEvent.ShowSnackbar(message = "Failed to load entry for this date")
+                )
             }
+        }
+    }
 
-            is EditorAction.SelectMoodColor -> {
+    private fun handleSelectMoodColor(moodColorId: Int) {
+        _uiState.update {
+            it.copy(
+                selectedMoodColorId = moodColorId,
+                isMoodHintVisible = false,
+                moodError = null
+            )
+        }
+    }
+
+    private fun handleContentChange(value: String) {
+        _uiState.update { it.copy(entryContent = value) }
+    }
+
+    private fun handleContentFocusChange(focusState: androidx.compose.ui.focus.FocusState) {
+        _uiState.update {
+            it.copy(isContentHintVisible = !focusState.isFocused && it.entryContent.isBlank())
+        }
+    }
+
+    private fun handleToggleMoodColorSection() {
+        _uiState.update { it.copy(isMoodColorSectionVisible = !it.isMoodColorSectionVisible) }
+    }
+
+    private fun handleSaveMoodColor(mood: String, colorHex: String) {
+        viewModelScope.launch {
+            try {
+                Timber.d("Saving new mood color: %s", mood)
+                val newMoodColorId = editorUseCases.addMoodColorUseCase(
+                    MoodColor(
+                        mood = mood,
+                        color = colorHex,
+                        dateStamp = Instant.now().epochSecond,
+                        id = null
+                    )
+                )
+                Timber.d("Successfully saved mood color: $mood, auto-selecting ID: $newMoodColorId")
+                triggerSync()
                 _uiState.update {
                     it.copy(
-                        selectedMoodColorId = action.moodColorId,
+                        isMoodColorSectionVisible = false,
+                        selectedMoodColorId = newMoodColorId,
                         isMoodHintVisible = false,
-                        moodError = null // Clear error when mood selected
+                        moodError = null
                     )
                 }
+            } catch (e: InvalidMoodColorException) {
+                Timber.e(e, "Failed to save mood color: $mood")
+                _uiEvents.emit(
+                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save mood color!")
+                )
             }
+        }
+    }
 
-            is EditorAction.EnteredContent -> {
-                _uiState.update { it.copy(entryContent = action.value) }
-            }
+    private fun handleDeleteMoodColor(moodColor: MoodColor) {
+        viewModelScope.launch {
+            Timber.d("Deleting mood color: ${moodColor.mood}")
+            editorUseCases.deleteMoodColor(moodColor.id ?: return@launch)
+            triggerSync()
 
-            is EditorAction.ChangeContentFocus -> {
-                _uiState.update {
-                    it.copy(
-                        isContentHintVisible = !action.focusState.isFocused &&
-                                it.entryContent.isBlank()
-                    )
-                }
-            }
+            val currentState = _uiState.value
+            if (currentState.selectedMoodColorId == moodColor.id) {
+                val remainingMoodColors = currentState.moodColors.filter { it.id != moodColor.id }
 
-            is EditorAction.ToggleMoodColorSection -> {
-                _uiState.update {
-                    it.copy(isMoodColorSectionVisible = !it.isMoodColorSectionVisible)
-                }
-            }
-
-            is EditorAction.SaveMoodColor -> {
-                viewModelScope.launch {
-                    try {
-                        Timber.d("Saving new mood color: %s", action.mood)
-                        val newMoodColorId = editorUseCases.addMoodColorUseCase(
-                            MoodColor(
-                                mood = action.mood, // UseCase handles sanitization/trimming
-                                color = action.colorHex,
-                                dateStamp = Instant.now().epochSecond,
-                                id = null
-                            )
-                        )
-                        // Auto-select the newly created/restored mood color
-                        Timber.d("Successfully saved mood color: ${action.mood}, auto-selecting ID: $newMoodColorId")
-                        triggerSync()
-                        _uiState.update {
-                            it.copy(
-                                isMoodColorSectionVisible = false,
-                                selectedMoodColorId = newMoodColorId,
-                                isMoodHintVisible = false, // Hide hint since mood is now selected
-                                moodError = null // Clear error since mood is now selected
-                            )
-                        }
-                    } catch (e: InvalidMoodColorException) {
-                        Timber.e(e, "Failed to save mood color: ${action.mood}")
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = e.message ?: "Couldn't save mood color!"
-                            )
-                        )
+                if (remainingMoodColors.isNotEmpty()) {
+                    val defaultMoodColor = remainingMoodColors.first()
+                    Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
+                    _uiState.update {
+                        it.copy(selectedMoodColorId = defaultMoodColor.id, isMoodHintVisible = false)
+                    }
+                } else {
+                    Timber.w("No mood colors remaining after deletion")
+                    _uiState.update {
+                        it.copy(selectedMoodColorId = null, isMoodHintVisible = true)
                     }
                 }
             }
+        }
+    }
 
-            is EditorAction.DeleteMoodColor -> {
-                viewModelScope.launch {
-                    Timber.d("Deleting mood color: ${action.moodColor.mood}")
-                    editorUseCases.deleteMoodColor(action.moodColor.id ?: return@launch)
-                    triggerSync()
+    private fun handleEditMoodColor(moodColor: MoodColor) {
+        Timber.d("Opening edit dialog for mood: ${moodColor.mood}")
+        _uiState.update {
+            it.copy(showEditMoodColorDialog = true, editingMoodColor = moodColor)
+        }
+    }
 
-                    // Check if the deleted mood was currently selected
-                    val currentState = _uiState.value
-                    if (currentState.selectedMoodColorId == action.moodColor.id) {
+    private fun handleUpdateMoodColor(moodColorId: Int, newMood: String, newColorHex: String) {
+        viewModelScope.launch {
+            try {
+                val originalMood = _uiState.value.editingMoodColor
+                Timber.d("Updating mood color: id=$moodColorId, newMood=$newMood, newColor=$newColorHex")
 
-                        // Reset to first available mood color or null
-                        val remainingMoodColors = currentState.moodColors.filter {
-                            it.id != action.moodColor.id
-                        }
-
-                        if (remainingMoodColors.isNotEmpty()) {
-                            // Default to first mood color in list
-                            val defaultMoodColor = remainingMoodColors.first()
-                            Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
-                            _uiState.update {
-                                it.copy(
-                                    selectedMoodColorId = defaultMoodColor.id,
-                                    isMoodHintVisible = false
-                                )
-                            }
-                        } else {
-                            // No mood colors left, reset to null
-                            Timber.w("No mood colors remaining after deletion")
-                            _uiState.update {
-                                it.copy(
-                                    selectedMoodColorId = null,
-                                    isMoodHintVisible = true
-                                )
-                            }
-                        }
-                    }
+                if (originalMood != null && originalMood.mood != newMood) {
+                    Timber.d("Updating mood name: ${originalMood.mood} -> $newMood")
+                    editorUseCases.updateMoodColorNameUseCase(id = moodColorId, newMood = newMood)
                 }
-            }
 
-            is EditorAction.EditMoodColor -> {
-                Timber.d("Opening edit dialog for mood: ${action.moodColor.mood}")
-                _uiState.update {
-                    it.copy(
-                        showEditMoodColorDialog = true,
-                        editingMoodColor = action.moodColor
-                    )
-                }
-            }
+                editorUseCases.updateMoodColorUseCase(id = moodColorId, newColor = newColorHex)
+                triggerSync()
 
-            is EditorAction.UpdateMoodColor -> {
-                viewModelScope.launch {
-                    try {
-                        val originalMood = _uiState.value.editingMoodColor
-                        Timber.d("Updating mood color: id=${action.moodColorId}, newMood=${action.newMood}, newColor=${action.newColorHex}")
-
-                        // Update name if changed
-                        if (originalMood != null && originalMood.mood != action.newMood) {
-                            Timber.d("Updating mood name: ${originalMood.mood} -> ${action.newMood}")
-                            editorUseCases.updateMoodColorNameUseCase(
-                                id = action.moodColorId,
-                                newMood = action.newMood
-                            )
-                        }
-
-                        // Update color
-                        editorUseCases.updateMoodColorUseCase(
-                            id = action.moodColorId,
-                            newColor = action.newColorHex
-                        )
-
-                        triggerSync()
-
-                        // Close dialog and clear any errors
-                        _uiState.update {
-                            it.copy(
-                                showEditMoodColorDialog = false,
-                                editingMoodColor = null,
-                                editMoodColorError = null
-                            )
-                        }
-
-                        Timber.i("Successfully updated mood color: ${action.newMood}")
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar("\"${action.newMood}\" updated")
-                        )
-                    } catch (e: InvalidMoodColorException) {
-                        Timber.w(e, "Invalid mood color update")
-                        // Show inline error in dialog instead of snackbar
-                        _uiState.update {
-                            it.copy(editMoodColorError = e.message ?: "Invalid mood")
-                        }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to update mood color")
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = "Failed to update: ${e.message}"
-                            )
-                        )
-                    }
-                }
-            }
-
-            is EditorAction.CloseEditMoodColorDialog -> {
-                Timber.d("Closing edit mood color dialog")
                 _uiState.update {
                     it.copy(
                         showEditMoodColorDialog = false,
@@ -438,111 +395,127 @@ class EditorViewModel(
                         editMoodColorError = null
                     )
                 }
-            }
 
-            is EditorAction.ClearEditMoodColorError -> {
-                _uiState.update {
-                    it.copy(editMoodColorError = null)
-                }
-            }
-
-            is EditorAction.DismissEditorTutorial -> {
-                viewModelScope.launch {
-                    Timber.d("Editor tutorial dismissed - marking as seen")
-                    editorUseCases.markEditorTutorialSeen()
-                    _uiState.update { it.copy(showEditorTutorial = false) }
-                }
-            }
-
-            is EditorAction.ToggleDatePicker -> {
-                Timber.d("Toggling date picker dialog")
-                _uiState.update { it.copy(showDatePicker = !it.showDatePicker) }
-            }
-
-            is EditorAction.SaveEntry -> {
-                viewModelScope.launch {
-                    val state = _uiState.value
-
-                    // Validate moodColorId is selected
-                    val moodColorId = state.selectedMoodColorId
-                    if (moodColorId == null) {
-                        // Show inline error
-                        _uiState.update { it.copy(moodError = "Please select or create a mood") }
-                        return@launch
-                    }
-
-                    Timber.d("Saving entry: moodColorId=$moodColorId, date=${state.entryDate}, id=${state.currentEntryId}")
-
-                    val loadingJob = launchDebouncedLoading { isLoading ->
-                        _uiState.update { it.copy(isLoading = isLoading) }
-                    }
-
-                    try {
-                        editorUseCases.addEntryUseCase(
-                            Entry(
-                                moodColorId = moodColorId,
-                                content = state.entryContent,
-                                dateStamp = state.entryDate,
-                                id = state.currentEntryId
-                            )
-                        )
-                        loadingJob.cancel() // Cancel if finished quickly
-                        Timber.d("Successfully saved entry")
-                        triggerSync()
-                        _uiState.update { it.copy(isLoading = false, shouldNavigateBack = true) }
-                    } catch (e: InvalidEntryException) {
-                        loadingJob.cancel()
-                        Timber.e(e, "Failed to save entry")
-                        _uiState.update { it.copy(isLoading = false) }
-                        _uiEvents.emit(
-                            EditorUiEvent.ShowSnackbar(
-                                message = e.message ?: "Couldn't save entry"
-                            )
-                        )
-                    }
-                }
-            }
-
-            is EditorAction.RequestNavigateBack -> {
-                Timber.d("Back button pressed, checking for unsaved changes")
-                if (hasUnsavedChanges()) {
-                    // Show unsaved changes dialog
-                    Timber.d("Unsaved changes detected, showing dialog")
-                    _uiState.update { it.copy(showUnsavedChangesDialog = true) }
-                } else {
-                    // No unsaved changes, navigate back immediately
-                    Timber.d("No unsaved changes, navigating back")
-                    _uiState.update { it.copy(shouldNavigateBack = true) }
-                }
-            }
-
-            is EditorAction.ConfirmDiscardChanges -> {
-                Timber.d("User confirmed discard changes")
-                _uiState.update { it.copy(showUnsavedChangesDialog = false, shouldNavigateBack = true) }
-            }
-
-            is EditorAction.DismissUnsavedChangesDialog -> {
-                Timber.d("User dismissed unsaved changes dialog")
-                _uiState.update { it.copy(showUnsavedChangesDialog = false) }
-            }
-
-            is EditorAction.RetryLoadEntry -> {
-                Timber.d("Retrying entry load")
-                _uiState.update { it.copy(loadError = null) }
-                loadingEntryId?.let { entryId ->
-                    loadEntry(entryId)
-                } ?: run {
-                    Timber.w("Cannot retry: no entry ID stored")
-                    _uiState.update { it.copy(loadError = "Cannot retry: no entry ID") }
-                }
-            }
-
-            is EditorAction.DismissLoadError -> {
-                Timber.d("Dismissing load error banner")
-                _uiState.update { it.copy(loadError = null) }
+                Timber.i("Successfully updated mood color: $newMood")
+                _uiEvents.emit(EditorUiEvent.ShowSnackbar("\"$newMood\" updated"))
+            } catch (e: InvalidMoodColorException) {
+                Timber.w(e, "Invalid mood color update")
+                _uiState.update { it.copy(editMoodColorError = e.message ?: "Invalid mood") }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to update mood color")
+                _uiEvents.emit(
+                    EditorUiEvent.ShowSnackbar(message = "Failed to update: ${e.message}")
+                )
             }
         }
     }
+
+    private fun handleCloseEditMoodColorDialog() {
+        Timber.d("Closing edit mood color dialog")
+        _uiState.update {
+            it.copy(
+                showEditMoodColorDialog = false,
+                editingMoodColor = null,
+                editMoodColorError = null
+            )
+        }
+    }
+
+    private fun handleClearEditMoodColorError() {
+        _uiState.update { it.copy(editMoodColorError = null) }
+    }
+
+    private fun handleDismissEditorTutorial() {
+        viewModelScope.launch {
+            Timber.d("Editor tutorial dismissed - marking as seen")
+            editorUseCases.markEditorTutorialSeen()
+            _uiState.update { it.copy(showEditorTutorial = false) }
+        }
+    }
+
+    private fun handleToggleDatePicker() {
+        Timber.d("Toggling date picker dialog")
+        _uiState.update { it.copy(showDatePicker = !it.showDatePicker) }
+    }
+
+    private fun handleSaveEntry() {
+        viewModelScope.launch {
+            val state = _uiState.value
+
+            val moodColorId = state.selectedMoodColorId
+            if (moodColorId == null) {
+                _uiState.update { it.copy(moodError = "Please select or create a mood") }
+                return@launch
+            }
+
+            Timber.d("Saving entry: moodColorId=$moodColorId, date=${state.entryDate}, id=${state.currentEntryId}")
+
+            val loadingJob = launchDebouncedLoading { isLoading ->
+                _uiState.update { it.copy(isLoading = isLoading) }
+            }
+
+            try {
+                editorUseCases.addEntryUseCase(
+                    Entry(
+                        moodColorId = moodColorId,
+                        content = state.entryContent,
+                        dateStamp = state.entryDate,
+                        id = state.currentEntryId
+                    )
+                )
+                loadingJob.cancel()
+                Timber.d("Successfully saved entry")
+                triggerSync()
+                _uiState.update { it.copy(isLoading = false, shouldNavigateBack = true) }
+            } catch (e: InvalidEntryException) {
+                loadingJob.cancel()
+                Timber.e(e, "Failed to save entry")
+                _uiState.update { it.copy(isLoading = false) }
+                _uiEvents.emit(
+                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save entry")
+                )
+            }
+        }
+    }
+
+    private fun handleRequestNavigateBack() {
+        Timber.d("Back button pressed, checking for unsaved changes")
+        if (hasUnsavedChanges()) {
+            Timber.d("Unsaved changes detected, showing dialog")
+            _uiState.update { it.copy(showUnsavedChangesDialog = true) }
+        } else {
+            Timber.d("No unsaved changes, navigating back")
+            _uiState.update { it.copy(shouldNavigateBack = true) }
+        }
+    }
+
+    private fun handleConfirmDiscardChanges() {
+        Timber.d("User confirmed discard changes")
+        _uiState.update { it.copy(showUnsavedChangesDialog = false, shouldNavigateBack = true) }
+    }
+
+    private fun handleDismissUnsavedChangesDialog() {
+        Timber.d("User dismissed unsaved changes dialog")
+        _uiState.update { it.copy(showUnsavedChangesDialog = false) }
+    }
+
+    private fun handleRetryLoadEntry() {
+        Timber.d("Retrying entry load")
+        _uiState.update { it.copy(loadError = null) }
+        loadingEntryId?.let { entryId ->
+            loadEntry(entryId)
+        } ?: run {
+            Timber.w("Cannot retry: no entry ID stored")
+            _uiState.update { it.copy(loadError = "Cannot retry: no entry ID") }
+        }
+    }
+
+    private fun handleDismissLoadError() {
+        Timber.d("Dismissing load error banner")
+        _uiState.update { it.copy(loadError = null) }
+    }
+
+    // endregion
 
     /**
      * Called after navigation has been handled by the UI
