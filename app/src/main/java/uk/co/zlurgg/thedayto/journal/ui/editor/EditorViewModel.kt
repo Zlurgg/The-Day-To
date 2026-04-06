@@ -18,8 +18,6 @@ import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
-import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
-import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
@@ -56,6 +54,15 @@ class EditorViewModel(
 
     // Store entry ID for retry on load failure
     private var loadingEntryId: Int? = null
+
+    // Delegate for mood color actions
+    private val moodColorDelegate = MoodColorActionDelegate(
+        editorUseCases = editorUseCases,
+        uiState = _uiState,
+        uiEvents = _uiEvents,
+        scope = viewModelScope,
+        onSyncRequired = ::triggerSync
+    )
 
     init {
         Timber.d("EditorViewModel initialized")
@@ -234,24 +241,39 @@ class EditorViewModel(
 
     fun onAction(action: EditorAction) {
         when (action) {
+            // Entry actions
             is EditorAction.EnteredDate -> handleDateChange(action.date)
-            is EditorAction.SelectMoodColor -> handleSelectMoodColor(action.moodColorId)
             is EditorAction.EnteredContent -> handleContentChange(action.value)
             is EditorAction.ChangeContentFocus -> handleContentFocusChange(action.focusState)
-            is EditorAction.ToggleMoodColorSection -> handleToggleMoodColorSection()
-            is EditorAction.SaveMoodColor -> handleSaveMoodColor(action.mood, action.colorHex)
-            is EditorAction.DeleteMoodColor -> handleDeleteMoodColor(action.moodColor)
-            is EditorAction.EditMoodColor -> handleEditMoodColor(action.moodColor)
-            is EditorAction.UpdateMoodColor -> handleUpdateMoodColor(
-                action.moodColorId,
-                action.newMood,
-                action.newColorHex
-            )
-            is EditorAction.CloseEditMoodColorDialog -> handleCloseEditMoodColorDialog()
-            is EditorAction.ClearEditMoodColorError -> handleClearEditMoodColorError()
+            is EditorAction.SaveEntry -> handleSaveEntry()
+
+            // Mood color actions (delegated)
+            is EditorAction.SelectMoodColor ->
+                moodColorDelegate.handleSelectMoodColor(action.moodColorId)
+            is EditorAction.ToggleMoodColorSection ->
+                moodColorDelegate.handleToggleMoodColorSection()
+            is EditorAction.SaveMoodColor ->
+                moodColorDelegate.handleSaveMoodColor(action.mood, action.colorHex)
+            is EditorAction.DeleteMoodColor ->
+                moodColorDelegate.handleDeleteMoodColor(action.moodColor)
+            is EditorAction.EditMoodColor ->
+                moodColorDelegate.handleEditMoodColor(action.moodColor)
+            is EditorAction.UpdateMoodColor ->
+                moodColorDelegate.handleUpdateMoodColor(
+                    action.moodColorId,
+                    action.newMood,
+                    action.newColorHex
+                )
+            is EditorAction.CloseEditMoodColorDialog ->
+                moodColorDelegate.handleCloseEditMoodColorDialog()
+            is EditorAction.ClearEditMoodColorError ->
+                moodColorDelegate.handleClearEditMoodColorError()
+
+            // UI actions
             is EditorAction.DismissEditorTutorial -> handleDismissEditorTutorial()
             is EditorAction.ToggleDatePicker -> handleToggleDatePicker()
-            is EditorAction.SaveEntry -> handleSaveEntry()
+
+            // Navigation actions
             is EditorAction.RequestNavigateBack -> handleRequestNavigateBack()
             is EditorAction.ConfirmDiscardChanges -> handleConfirmDiscardChanges()
             is EditorAction.DismissUnsavedChangesDialog -> handleDismissUnsavedChangesDialog()
@@ -286,16 +308,6 @@ class EditorViewModel(
         }
     }
 
-    private fun handleSelectMoodColor(moodColorId: Int) {
-        _uiState.update {
-            it.copy(
-                selectedMoodColorId = moodColorId,
-                isMoodHintVisible = false,
-                moodError = null
-            )
-        }
-    }
-
     private fun handleContentChange(value: String) {
         _uiState.update { it.copy(entryContent = value) }
     }
@@ -304,125 +316,6 @@ class EditorViewModel(
         _uiState.update {
             it.copy(isContentHintVisible = !focusState.isFocused && it.entryContent.isBlank())
         }
-    }
-
-    private fun handleToggleMoodColorSection() {
-        _uiState.update { it.copy(isMoodColorSectionVisible = !it.isMoodColorSectionVisible) }
-    }
-
-    private fun handleSaveMoodColor(mood: String, colorHex: String) {
-        viewModelScope.launch {
-            try {
-                Timber.d("Saving new mood color: %s", mood)
-                val newMoodColorId = editorUseCases.addMoodColorUseCase(
-                    MoodColor(
-                        mood = mood,
-                        color = colorHex,
-                        dateStamp = Instant.now().epochSecond,
-                        id = null
-                    )
-                )
-                Timber.d("Successfully saved mood color: $mood, auto-selecting ID: $newMoodColorId")
-                triggerSync()
-                _uiState.update {
-                    it.copy(
-                        isMoodColorSectionVisible = false,
-                        selectedMoodColorId = newMoodColorId,
-                        isMoodHintVisible = false,
-                        moodError = null
-                    )
-                }
-            } catch (e: InvalidMoodColorException) {
-                Timber.e(e, "Failed to save mood color: $mood")
-                _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save mood color!")
-                )
-            }
-        }
-    }
-
-    private fun handleDeleteMoodColor(moodColor: MoodColor) {
-        viewModelScope.launch {
-            Timber.d("Deleting mood color: ${moodColor.mood}")
-            editorUseCases.deleteMoodColor(moodColor.id ?: return@launch)
-            triggerSync()
-
-            val currentState = _uiState.value
-            if (currentState.selectedMoodColorId == moodColor.id) {
-                val remainingMoodColors = currentState.moodColors.filter { it.id != moodColor.id }
-
-                if (remainingMoodColors.isNotEmpty()) {
-                    val defaultMoodColor = remainingMoodColors.first()
-                    Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
-                    _uiState.update {
-                        it.copy(selectedMoodColorId = defaultMoodColor.id, isMoodHintVisible = false)
-                    }
-                } else {
-                    Timber.w("No mood colors remaining after deletion")
-                    _uiState.update {
-                        it.copy(selectedMoodColorId = null, isMoodHintVisible = true)
-                    }
-                }
-            }
-        }
-    }
-
-    private fun handleEditMoodColor(moodColor: MoodColor) {
-        Timber.d("Opening edit dialog for mood: ${moodColor.mood}")
-        _uiState.update {
-            it.copy(showEditMoodColorDialog = true, editingMoodColor = moodColor)
-        }
-    }
-
-    private fun handleUpdateMoodColor(moodColorId: Int, newMood: String, newColorHex: String) {
-        viewModelScope.launch {
-            try {
-                val originalMood = _uiState.value.editingMoodColor
-                Timber.d("Updating mood color: id=$moodColorId, newMood=$newMood, newColor=$newColorHex")
-
-                if (originalMood != null && originalMood.mood != newMood) {
-                    Timber.d("Updating mood name: ${originalMood.mood} -> $newMood")
-                    editorUseCases.updateMoodColorNameUseCase(id = moodColorId, newMood = newMood)
-                }
-
-                editorUseCases.updateMoodColorUseCase(id = moodColorId, newColor = newColorHex)
-                triggerSync()
-
-                _uiState.update {
-                    it.copy(
-                        showEditMoodColorDialog = false,
-                        editingMoodColor = null,
-                        editMoodColorError = null
-                    )
-                }
-
-                Timber.i("Successfully updated mood color: $newMood")
-                _uiEvents.emit(EditorUiEvent.ShowSnackbar("\"$newMood\" updated"))
-            } catch (e: InvalidMoodColorException) {
-                Timber.w(e, "Invalid mood color update")
-                _uiState.update { it.copy(editMoodColorError = e.message ?: "Invalid mood") }
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to update mood color")
-                _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = "Failed to update: ${e.message}")
-                )
-            }
-        }
-    }
-
-    private fun handleCloseEditMoodColorDialog() {
-        Timber.d("Closing edit mood color dialog")
-        _uiState.update {
-            it.copy(
-                showEditMoodColorDialog = false,
-                editingMoodColor = null,
-                editMoodColorError = null
-            )
-        }
-    }
-
-    private fun handleClearEditMoodColorError() {
-        _uiState.update { it.copy(editMoodColorError = null) }
     }
 
     private fun handleDismissEditorTutorial() {

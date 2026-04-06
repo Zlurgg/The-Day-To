@@ -26,10 +26,11 @@ class SignInUseCaseTest {
     private lateinit var fakeAuthRepository: FakeAuthRepository
     private lateinit var fakeAuthStateRepository: FakeAuthStateRepository
 
+    // Must match the hardcoded return value in FakeAuthRepository.signIn()
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = null
+        profilePictureUrl = "https://example.com/profile.jpg"
     )
 
     private val mockCredentialProvider: suspend () -> Result<GoogleCredential, DataError.Auth> = {
