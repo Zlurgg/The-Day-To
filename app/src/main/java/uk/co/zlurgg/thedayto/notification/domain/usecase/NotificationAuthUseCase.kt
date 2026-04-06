@@ -69,7 +69,10 @@ class NotificationAuthUseCase(
             )
 
             // Delete any anonymous settings (account takes precedence)
-            settingsRepository.deleteSettings(ANONYMOUS_USER_ID)
+            when (val deleteResult = settingsRepository.deleteSettings(ANONYMOUS_USER_ID)) {
+                is Result.Error -> Timber.w("Failed to delete anonymous settings: %s", deleteResult.error)
+                is Result.Success -> { /* success */ }
+            }
 
             // Reschedule notifications if enabled
             if (remoteSettings.enabled) {
@@ -83,7 +86,14 @@ class NotificationAuthUseCase(
         }
 
         // No remote settings - check for anonymous settings to adopt
-        val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        val anonymousSettingsResult = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        val anonymousSettings = when (anonymousSettingsResult) {
+            is Result.Success -> anonymousSettingsResult.data
+            is Result.Error -> {
+                Timber.w("Failed to get anonymous settings: %s", anonymousSettingsResult.error)
+                null
+            }
+        }
 
         return if (anonymousSettings != null) {
             Timber.d(
@@ -94,8 +104,14 @@ class NotificationAuthUseCase(
                 anonymousSettings.minute
             )
 
-            settingsRepository.saveSettings(userId, anonymousSettings)
-            settingsRepository.deleteSettings(ANONYMOUS_USER_ID)
+            when (val saveResult = settingsRepository.saveSettings(userId, anonymousSettings)) {
+                is Result.Error -> Timber.w("Failed to save settings for user: %s", saveResult.error)
+                is Result.Success -> { /* success */ }
+            }
+            when (val deleteResult = settingsRepository.deleteSettings(ANONYMOUS_USER_ID)) {
+                is Result.Error -> Timber.w("Failed to delete anonymous settings: %s", deleteResult.error)
+                is Result.Success -> { /* success */ }
+            }
 
             // Reschedule notifications for new user context if enabled
             if (anonymousSettings.enabled) {
@@ -124,10 +140,20 @@ class NotificationAuthUseCase(
         Timber.d("Handling sign-out notification settings for user: %s", userId)
 
         // Get account settings before deleting
-        val accountSettings = settingsRepository.getSettings(userId)
+        val accountSettingsResult = settingsRepository.getSettings(userId)
+        val accountSettings = when (accountSettingsResult) {
+            is Result.Success -> accountSettingsResult.data
+            is Result.Error -> {
+                Timber.w("Failed to get account settings: %s", accountSettingsResult.error)
+                null
+            }
+        }
 
         // Delete account settings (privacy - don't keep user data locally)
-        settingsRepository.deleteSettings(userId)
+        when (val deleteResult = settingsRepository.deleteSettings(userId)) {
+            is Result.Error -> Timber.w("Failed to delete account settings: %s", deleteResult.error)
+            is Result.Success -> { /* success */ }
+        }
 
         // Copy to anonymous so notifications continue seamlessly
         if (accountSettings != null) {
@@ -137,7 +163,10 @@ class NotificationAuthUseCase(
                 accountSettings.hour,
                 accountSettings.minute
             )
-            settingsRepository.saveSettings(ANONYMOUS_USER_ID, accountSettings)
+            when (val saveResult = settingsRepository.saveSettings(ANONYMOUS_USER_ID, accountSettings)) {
+                is Result.Error -> Timber.w("Failed to save anonymous settings: %s", saveResult.error)
+                is Result.Success -> { /* success */ }
+            }
 
             if (accountSettings.enabled) {
                 notificationScheduler.updateNotificationTime(

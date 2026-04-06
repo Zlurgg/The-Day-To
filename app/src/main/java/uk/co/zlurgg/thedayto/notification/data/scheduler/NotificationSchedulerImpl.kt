@@ -19,6 +19,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker.Companion.NOTIFICATION_ID
@@ -53,7 +54,16 @@ class NotificationSchedulerImpl(
         schedulerScope.launch {
             try {
                 val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-                val settings = settingsRepository.getSettings(userId)
+                val settingsResult = settingsRepository.getSettings(userId)
+
+                val settings = when (settingsResult) {
+                    is Result.Success -> settingsResult.data
+                    is Result.Error -> {
+                        Timber.e("Failed to get notification settings: %s", settingsResult.error)
+                        cancelNotifications()
+                        return@launch
+                    }
+                }
 
                 if (settings == null || !settings.enabled) {
                     Timber.d("Notifications disabled or not configured - skipping schedule")

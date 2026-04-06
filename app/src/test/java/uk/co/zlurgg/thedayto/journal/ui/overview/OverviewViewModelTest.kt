@@ -233,7 +233,7 @@ class OverviewViewModelTest {
         )
 
         // And: Repository should have saved disabled state
-        val savedSettings = fakeNotificationSettingsRepository.getSettings("anonymous")
+        val savedSettings = fakeNotificationSettingsRepository.getSettingsDirectly("anonymous")
         assertFalse(
             "Repository should have enabled=false",
             savedSettings?.enabled ?: true

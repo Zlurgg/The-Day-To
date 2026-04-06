@@ -421,13 +421,13 @@ class SyncSettingsViewModelTest {
         viewModel.signIn(mockCredentialProvider)
 
         // Then: Settings migrated to signed-in user
-        val userSettings = fakeNotificationSettingsRepository.getSettings(testUser.userId)
+        val userSettings = fakeNotificationSettingsRepository.getSettingsDirectly(testUser.userId)
         assertEquals(true, userSettings?.enabled)
         assertEquals(8, userSettings?.hour)
         assertEquals(30, userSettings?.minute)
 
         // And: Anonymous settings deleted
-        assertNull(fakeNotificationSettingsRepository.getSettings("anonymous"))
+        assertNull(fakeNotificationSettingsRepository.getSettingsDirectly("anonymous"))
     }
 
     @Test
@@ -449,12 +449,12 @@ class SyncSettingsViewModelTest {
         viewModel.signOut()
 
         // Then: Settings copied to anonymous and rescheduled
-        val anonymousSettings = fakeNotificationSettingsRepository.getSettings("anonymous")
+        val anonymousSettings = fakeNotificationSettingsRepository.getSettingsDirectly("anonymous")
         assertEquals(true, anonymousSettings?.enabled)
         assertEquals(9, anonymousSettings?.hour)
         assertTrue(fakeNotificationScheduler.isScheduledAt(9, 0))
 
         // And: User's account settings deleted
-        assertNull(fakeNotificationSettingsRepository.getSettings(testUser.userId))
+        assertNull(fakeNotificationSettingsRepository.getSettingsDirectly(testUser.userId))
     }
 }

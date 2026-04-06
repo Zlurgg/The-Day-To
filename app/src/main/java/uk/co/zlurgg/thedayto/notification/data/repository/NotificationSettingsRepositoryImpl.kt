@@ -2,6 +2,10 @@ package uk.co.zlurgg.thedayto.notification.data.repository
 
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.error.ErrorMapper
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsDao
 import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsEntity
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService
@@ -42,51 +46,65 @@ class NotificationSettingsRepositoryImpl(
         }
     }
 
-    override suspend fun getSettingsState(userId: String): NotificationSettingsState {
+    override suspend fun getSettingsState(userId: String): Result<NotificationSettingsState, DataError.Local> {
         ensureMigrated()
-        val entity = dao.getByUserId(userId) ?: return NotificationSettingsState.NotConfigured
-
-        val settings = entity.toDomain()
-        return if (settings != null) {
-            NotificationSettingsState.Configured(settings)
-        } else {
-            // Corrupt data - treat as not configured
-            NotificationSettingsState.NotConfigured
+        return ErrorMapper.safeSuspendCall(TAG) {
+            val entity = dao.getByUserId(userId)
+            if (entity == null) {
+                NotificationSettingsState.NotConfigured
+            } else {
+                val settings = entity.toDomain()
+                if (settings != null) {
+                    NotificationSettingsState.Configured(settings)
+                } else {
+                    // Corrupt data - treat as not configured
+                    NotificationSettingsState.NotConfigured
+                }
+            }
         }
     }
 
-    override suspend fun getSettings(userId: String): NotificationSettings? {
+    override suspend fun getSettings(userId: String): Result<NotificationSettings?, DataError.Local> {
         ensureMigrated()
-        return dao.getByUserId(userId)?.toDomain()
-    }
-
-    override suspend fun saveSettings(userId: String, settings: NotificationSettings) {
-        ensureMigrated()
-
-        // Check if we have existing settings to preserve syncId
-        val existing = dao.getByUserId(userId)
-        val entity = if (existing != null) {
-            // Update existing - preserve syncId, mark as pending sync
-            NotificationSettingsEntity.fromDomain(
-                settings = settings,
-                userId = userId,
-                syncId = existing.syncId,
-                syncStatus = SyncStatus.PENDING_SYNC,
-                updatedAt = System.currentTimeMillis()
-            )
-        } else {
-            // New settings
-            NotificationSettingsEntity.fromDomain(
-                settings = settings,
-                userId = userId
-            )
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getByUserId(userId)?.toDomain()
         }
-
-        dao.upsert(entity)
     }
 
-    override suspend fun deleteSettings(userId: String) {
+    override suspend fun saveSettings(userId: String, settings: NotificationSettings): EmptyResult<DataError.Local> {
         ensureMigrated()
-        dao.deleteByUserId(userId)
+        return ErrorMapper.safeSuspendCall(TAG) {
+            // Check if we have existing settings to preserve syncId
+            val existing = dao.getByUserId(userId)
+            val entity = if (existing != null) {
+                // Update existing - preserve syncId, mark as pending sync
+                NotificationSettingsEntity.fromDomain(
+                    settings = settings,
+                    userId = userId,
+                    syncId = existing.syncId,
+                    syncStatus = SyncStatus.PENDING_SYNC,
+                    updatedAt = System.currentTimeMillis()
+                )
+            } else {
+                // New settings
+                NotificationSettingsEntity.fromDomain(
+                    settings = settings,
+                    userId = userId
+                )
+            }
+
+            dao.upsert(entity)
+        }
+    }
+
+    override suspend fun deleteSettings(userId: String): EmptyResult<DataError.Local> {
+        ensureMigrated()
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.deleteByUserId(userId)
+        }
+    }
+
+    companion object {
+        private const val TAG = "NotificationSettingsRepository"
     }
 }

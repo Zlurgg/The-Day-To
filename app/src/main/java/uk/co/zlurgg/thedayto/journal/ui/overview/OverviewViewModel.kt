@@ -137,16 +137,24 @@ class OverviewViewModel(
      */
     private fun loadNotificationSettings() {
         viewModelScope.launch {
-            val settings = overviewUseCases.getNotificationSettings()
+            val settingsResult = overviewUseCases.getNotificationSettings()
             val hasPermission = overviewUseCases.checkNotificationPermission()
 
-            _uiState.update {
-                it.copy(
-                    notificationsEnabled = settings.enabled,
-                    notificationHour = settings.hour,
-                    notificationMinute = settings.minute,
-                    hasNotificationPermission = hasPermission
-                )
+            when (settingsResult) {
+                is Result.Success -> {
+                    val settings = settingsResult.data
+                    _uiState.update {
+                        it.copy(
+                            notificationsEnabled = settings.enabled,
+                            notificationHour = settings.hour,
+                            notificationMinute = settings.minute,
+                            hasNotificationPermission = hasPermission
+                        )
+                    }
+                }
+                is Result.Error -> {
+                    Timber.e("Failed to load notification settings: %s", settingsResult.error)
+                }
             }
         }
     }
@@ -304,16 +312,27 @@ class OverviewViewModel(
             is OverviewAction.OpenNotificationSettings -> {
                 viewModelScope.launch {
                     // Re-fetch settings in case they changed (e.g., after sign-out)
-                    val settings = overviewUseCases.getNotificationSettings()
+                    val settingsResult = overviewUseCases.getNotificationSettings()
                     val hasPermission = overviewUseCases.checkNotificationPermission()
-                    _uiState.update {
-                        it.copy(
-                            showNotificationSettingsDialog = true,
-                            notificationsEnabled = settings.enabled,
-                            notificationHour = settings.hour,
-                            notificationMinute = settings.minute,
-                            hasNotificationPermission = hasPermission
-                        )
+                    when (settingsResult) {
+                        is Result.Success -> {
+                            val settings = settingsResult.data
+                            _uiState.update {
+                                it.copy(
+                                    showNotificationSettingsDialog = true,
+                                    notificationsEnabled = settings.enabled,
+                                    notificationHour = settings.hour,
+                                    notificationMinute = settings.minute,
+                                    hasNotificationPermission = hasPermission
+                                )
+                            }
+                        }
+                        is Result.Error -> {
+                            Timber.e("Failed to load notification settings: %s", settingsResult.error)
+                            _uiEvents.emit(
+                                OverviewUiEvent.ShowSnackbar("Failed to load notification settings")
+                            )
+                        }
                     }
                 }
             }
@@ -324,50 +343,52 @@ class OverviewViewModel(
 
             is OverviewAction.SaveNotificationSettings -> {
                 viewModelScope.launch {
-                    try {
-                        // Check system notification settings when user tries to enable
-                        if (action.enabled) {
-                            val systemEnabled = overviewUseCases.checkSystemNotificationsEnabled()
-                            if (!systemEnabled) {
-                                Timber.w("System notifications are disabled")
-                                _uiState.update { it.copy(showNotificationSettingsDialog = false) }
-                                _uiEvents.emit(OverviewUiEvent.ShowSystemNotificationWarning)
-                                return@launch  // Don't save if system notifications are disabled
+                    // Check system notification settings when user tries to enable
+                    if (action.enabled) {
+                        val systemEnabled = overviewUseCases.checkSystemNotificationsEnabled()
+                        if (!systemEnabled) {
+                            Timber.w("System notifications are disabled")
+                            _uiState.update { it.copy(showNotificationSettingsDialog = false) }
+                            _uiEvents.emit(OverviewUiEvent.ShowSystemNotificationWarning)
+                            return@launch  // Don't save if system notifications are disabled
+                        }
+                    }
+
+                    // Save notification settings
+                    val saveResult = overviewUseCases.saveNotificationSettings(
+                        action.enabled,
+                        action.hour,
+                        action.minute
+                    )
+
+                    when (saveResult) {
+                        is Result.Success -> {
+                            _uiState.update {
+                                it.copy(
+                                    notificationsEnabled = action.enabled,
+                                    notificationHour = action.hour,
+                                    notificationMinute = action.minute,
+                                    showNotificationSettingsDialog = false
+                                )
                             }
+
+                            // Show confirmation message
+                            val timeStr = String.format(Locale.getDefault(), "%02d:%02d", action.hour, action.minute)
+                            val message = if (action.enabled) {
+                                "Daily reminder set for $timeStr"
+                            } else {
+                                "Daily reminders disabled"
+                            }
+                            _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
                         }
-
-                        // Save notification settings
-                        overviewUseCases.saveNotificationSettings(
-                            action.enabled,
-                            action.hour,
-                            action.minute
-                        )
-
-                        _uiState.update {
-                            it.copy(
-                                notificationsEnabled = action.enabled,
-                                notificationHour = action.hour,
-                                notificationMinute = action.minute,
-                                showNotificationSettingsDialog = false
+                        is Result.Error -> {
+                            Timber.e("Failed to save notification settings: %s", saveResult.error)
+                            _uiEvents.emit(
+                                OverviewUiEvent.ShowSnackbar(
+                                    message = "Failed to save notification settings"
+                                )
                             )
                         }
-
-                        // Show confirmation message
-                        val timeStr = String.format(Locale.getDefault(), "%02d:%02d", action.hour, action.minute)
-                        val message = if (action.enabled) {
-                            "Daily reminder set for $timeStr"
-                        } else {
-                            "Daily reminders disabled"
-                        }
-                        _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
-
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to save notification settings")
-                        _uiEvents.emit(
-                            OverviewUiEvent.ShowSnackbar(
-                                message = "Failed to save notification settings: ${e.message}"
-                            )
-                        )
                     }
                 }
             }

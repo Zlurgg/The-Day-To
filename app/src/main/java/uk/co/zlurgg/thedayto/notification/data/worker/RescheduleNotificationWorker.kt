@@ -7,6 +7,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
@@ -31,7 +32,14 @@ class RescheduleNotificationWorker(
     override suspend fun doWork(): Result {
         return try {
             val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-            val settings = settingsRepository.getSettings(userId)
+
+            val settings = when (val result = settingsRepository.getSettings(userId)) {
+                is uk.co.zlurgg.thedayto.core.domain.result.Result.Success -> result.data
+                is uk.co.zlurgg.thedayto.core.domain.result.Result.Error -> {
+                    Timber.e("Failed to get notification settings: %s", result.error)
+                    return Result.failure()
+                }
+            }
 
             if (settings == null) {
                 Timber.d("No notification settings for user %s, nothing to reschedule", userId)

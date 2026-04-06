@@ -1,6 +1,8 @@
 package uk.co.zlurgg.thedayto.core.domain.usecases.notifications
 
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
@@ -15,8 +17,11 @@ class GetNotificationSettingsUseCase(
     private val settingsRepository: NotificationSettingsRepository,
     private val authRepository: AuthRepository
 ) {
-    suspend operator fun invoke(): NotificationSettings {
+    suspend operator fun invoke(): Result<NotificationSettings, DataError.Local> {
         val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-        return settingsRepository.getSettings(userId) ?: NotificationSettings()
+        return when (val result = settingsRepository.getSettings(userId)) {
+            is Result.Success -> Result.Success(result.data ?: NotificationSettings())
+            is Result.Error -> result
+        }
     }
 }

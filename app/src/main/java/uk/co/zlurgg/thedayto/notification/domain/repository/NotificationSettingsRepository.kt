@@ -1,5 +1,8 @@
 package uk.co.zlurgg.thedayto.notification.domain.repository
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettingsState
 
@@ -20,24 +23,29 @@ interface NotificationSettingsRepository {
      *
      * Use this when you need to distinguish between "not configured" and "disabled":
      * ```
-     * when (val state = repository.getSettingsState(userId)) {
-     *     is NotConfigured -> showOnboarding()
-     *     is Configured -> if (state.settings.enabled) showEnabled() else showDisabled()
+     * when (val result = repository.getSettingsState(userId)) {
+     *     is Result.Success -> when (result.data) {
+     *         is NotConfigured -> showOnboarding()
+     *         is Configured -> if (result.data.settings.enabled) showEnabled() else showDisabled()
+     *     }
+     *     is Result.Error -> showError()
      * }
      * ```
      */
-    suspend fun getSettingsState(userId: String): NotificationSettingsState
+    suspend fun getSettingsState(userId: String): Result<NotificationSettingsState, DataError.Local>
 
     /**
      * Get settings for internal logic where null indicates no settings.
      *
      * Use this for simpler null checks in background logic:
      * ```
-     * val settings = repository.getSettings(userId) ?: return
-     * if (settings.enabled) { ... }
+     * when (val result = repository.getSettings(userId)) {
+     *     is Result.Success -> result.data?.let { if (it.enabled) { ... } }
+     *     is Result.Error -> log error
+     * }
      * ```
      */
-    suspend fun getSettings(userId: String): NotificationSettings?
+    suspend fun getSettings(userId: String): Result<NotificationSettings?, DataError.Local>
 
     /**
      * Save or update settings for a user.
@@ -45,12 +53,12 @@ interface NotificationSettingsRepository {
      * Creates a new record if none exists, updates existing record otherwise.
      * Sets sync status to PENDING_SYNC for later cloud synchronization.
      */
-    suspend fun saveSettings(userId: String, settings: NotificationSettings)
+    suspend fun saveSettings(userId: String, settings: NotificationSettings): EmptyResult<DataError.Local>
 
     /**
      * Delete settings for a user.
      *
      * Called on sign-out to clean up user data.
      */
-    suspend fun deleteSettings(userId: String)
+    suspend fun deleteSettings(userId: String): EmptyResult<DataError.Local>
 }

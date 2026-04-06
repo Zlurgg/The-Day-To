@@ -1,5 +1,8 @@
 package uk.co.zlurgg.thedayto.fake
 
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
+import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettingsState
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
@@ -13,25 +16,36 @@ class FakeNotificationSettingsRepository : NotificationSettingsRepository {
     // In-memory storage for settings per user
     private val settingsMap = mutableMapOf<String, NotificationSettings>()
 
-    override suspend fun getSettingsState(userId: String): NotificationSettingsState {
+    // Control error simulation for testing
+    var shouldReturnError: Boolean = false
+    var errorToReturn: DataError.Local = DataError.Local.DATABASE_ERROR
+
+    override suspend fun getSettingsState(userId: String): Result<NotificationSettingsState, DataError.Local> {
+        if (shouldReturnError) return Result.Error(errorToReturn)
+
         val settings = settingsMap[userId]
         return if (settings != null) {
-            NotificationSettingsState.Configured(settings)
+            Result.Success(NotificationSettingsState.Configured(settings))
         } else {
-            NotificationSettingsState.NotConfigured
+            Result.Success(NotificationSettingsState.NotConfigured)
         }
     }
 
-    override suspend fun getSettings(userId: String): NotificationSettings? {
-        return settingsMap[userId]
+    override suspend fun getSettings(userId: String): Result<NotificationSettings?, DataError.Local> {
+        if (shouldReturnError) return Result.Error(errorToReturn)
+        return Result.Success(settingsMap[userId])
     }
 
-    override suspend fun saveSettings(userId: String, settings: NotificationSettings) {
+    override suspend fun saveSettings(userId: String, settings: NotificationSettings): EmptyResult<DataError.Local> {
+        if (shouldReturnError) return Result.Error(errorToReturn)
         settingsMap[userId] = settings
+        return Result.Success(Unit)
     }
 
-    override suspend fun deleteSettings(userId: String) {
+    override suspend fun deleteSettings(userId: String): EmptyResult<DataError.Local> {
+        if (shouldReturnError) return Result.Error(errorToReturn)
         settingsMap.remove(userId)
+        return Result.Success(Unit)
     }
 
     /**
@@ -39,6 +53,13 @@ class FakeNotificationSettingsRepository : NotificationSettingsRepository {
      */
     fun setSettings(userId: String, settings: NotificationSettings) {
         settingsMap[userId] = settings
+    }
+
+    /**
+     * Helper method to get settings directly for test assertions (bypasses Result wrapper).
+     */
+    fun getSettingsDirectly(userId: String): NotificationSettings? {
+        return settingsMap[userId]
     }
 
     /**
@@ -54,5 +75,7 @@ class FakeNotificationSettingsRepository : NotificationSettingsRepository {
      */
     fun reset() {
         settingsMap.clear()
+        shouldReturnError = false
+        errorToReturn = DataError.Local.DATABASE_ERROR
     }
 }

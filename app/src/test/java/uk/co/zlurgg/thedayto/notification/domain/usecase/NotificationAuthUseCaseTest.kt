@@ -95,7 +95,7 @@ class NotificationAuthUseCaseTest {
         assertEquals(SignInNotificationResult.RestoredFromAccount, result)
 
         // And: Anonymous settings are deleted
-        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+        assertNull(settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID))
 
         // And: Scheduled at remote time, not anonymous time
         assertTrue(notificationScheduler.isScheduledAt(10, 0))
@@ -118,7 +118,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignInSuccess("firebase_user_123")
 
         // Then: Anonymous settings are deleted
-        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+        assertNull(settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID))
     }
 
     // ============================================================
@@ -138,7 +138,7 @@ class NotificationAuthUseCaseTest {
         // Then: Settings are migrated to user
         assertEquals(SignInNotificationResult.MigratedAnonymous, result)
 
-        val userSettings = settingsRepository.getSettings("firebase_user_123")
+        val userSettings = settingsRepository.getSettingsDirectly("firebase_user_123")
         assertEquals(anonymousSettings.enabled, userSettings?.enabled)
         assertEquals(anonymousSettings.hour, userSettings?.hour)
         assertEquals(anonymousSettings.minute, userSettings?.minute)
@@ -156,7 +156,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignInSuccess("firebase_user_123")
 
         // Then: Anonymous settings are deleted
-        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+        assertNull(settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID))
     }
 
     @Test
@@ -214,7 +214,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignInSuccess("firebase_user_123")
 
         // Then: No settings created for user
-        assertNull(settingsRepository.getSettings("firebase_user_123"))
+        assertNull(settingsRepository.getSettingsDirectly("firebase_user_123"))
     }
 
     // ============================================================
@@ -233,7 +233,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignOut("firebase_user_123")
 
         // Then: Settings copied to anonymous and rescheduled
-        val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        val anonymousSettings = settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID)
         assertEquals(true, anonymousSettings?.enabled)
         assertEquals(8, anonymousSettings?.hour)
         assertEquals(0, anonymousSettings?.minute)
@@ -252,7 +252,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignOut("firebase_user_123")
 
         // Then: Settings copied to anonymous but notifications cancelled
-        val anonymousSettings = settingsRepository.getSettings(ANONYMOUS_USER_ID)
+        val anonymousSettings = settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID)
         assertEquals(false, anonymousSettings?.enabled)
         assertTrue(notificationScheduler.cancelNotificationsCalled)
     }
@@ -269,7 +269,7 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignOut("firebase_user_123")
 
         // Then: Account settings are deleted
-        assertNull(settingsRepository.getSettings("firebase_user_123"))
+        assertNull(settingsRepository.getSettingsDirectly("firebase_user_123"))
     }
 
     @Test
@@ -281,7 +281,7 @@ class NotificationAuthUseCaseTest {
 
         // Then: No exception thrown, notifications cancelled
         assertTrue(notificationScheduler.cancelNotificationsCalled)
-        assertNull(settingsRepository.getSettings(ANONYMOUS_USER_ID))
+        assertNull(settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID))
     }
 
     @Test
@@ -300,10 +300,10 @@ class NotificationAuthUseCaseTest {
         useCase.handleSignOut("user_A")
 
         // Then: User A settings deleted, User B settings remain
-        assertNull(settingsRepository.getSettings("user_A"))
-        assertEquals(9, settingsRepository.getSettings("user_B")?.hour)
+        assertNull(settingsRepository.getSettingsDirectly("user_A"))
+        assertEquals(9, settingsRepository.getSettingsDirectly("user_B")?.hour)
         // And: Anonymous gets User A's settings
-        assertEquals(8, settingsRepository.getSettings(ANONYMOUS_USER_ID)?.hour)
+        assertEquals(8, settingsRepository.getSettingsDirectly(ANONYMOUS_USER_ID)?.hour)
     }
 
     // ============================================================
@@ -344,7 +344,7 @@ class NotificationAuthUseCaseTest {
 
         // Then: Settings migrated successfully
         assertEquals(SignInNotificationResult.MigratedAnonymous, result)
-        assertEquals(7, settingsRepository.getSettings("firebase_user_456")?.hour)
-        assertEquals(15, settingsRepository.getSettings("firebase_user_456")?.minute)
+        assertEquals(7, settingsRepository.getSettingsDirectly("firebase_user_456")?.hour)
+        assertEquals(15, settingsRepository.getSettingsDirectly("firebase_user_456")?.minute)
     }
 }

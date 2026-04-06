@@ -9,6 +9,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsDao
 import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsEntity
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService
@@ -67,10 +68,11 @@ class NotificationSettingsRepositoryImplTest {
         // Given: No settings in database
 
         // When
-        val state = repository.getSettingsState("user_123")
+        val result = repository.getSettingsState("user_123")
 
         // Then
-        assertTrue(state is NotificationSettingsState.NotConfigured)
+        assertTrue(result is Result.Success)
+        assertTrue((result as Result.Success).data is NotificationSettingsState.NotConfigured)
     }
 
     @Test
@@ -79,9 +81,11 @@ class NotificationSettingsRepositoryImplTest {
         fakeDao.upsert(createValidEntity("user_123", enabled = true, hour = 10, minute = 30))
 
         // When
-        val state = repository.getSettingsState("user_123")
+        val result = repository.getSettingsState("user_123")
 
         // Then
+        assertTrue(result is Result.Success)
+        val state = (result as Result.Success).data
         assertTrue(state is NotificationSettingsState.Configured)
         val configured = state as NotificationSettingsState.Configured
         assertEquals(true, configured.settings.enabled)
@@ -95,10 +99,11 @@ class NotificationSettingsRepositoryImplTest {
         fakeDao.upsert(createCorruptEntity("user_123"))
 
         // When
-        val state = repository.getSettingsState("user_123")
+        val result = repository.getSettingsState("user_123")
 
         // Then: Should treat as not configured
-        assertTrue(state is NotificationSettingsState.NotConfigured)
+        assertTrue(result is Result.Success)
+        assertTrue((result as Result.Success).data is NotificationSettingsState.NotConfigured)
     }
 
     // ============================================================
@@ -108,10 +113,11 @@ class NotificationSettingsRepositoryImplTest {
     @Test
     fun `getSettings returns null when no settings exist`() = runTest {
         // When
-        val settings = repository.getSettings("user_123")
+        val result = repository.getSettings("user_123")
 
         // Then
-        assertNull(settings)
+        assertTrue(result is Result.Success)
+        assertNull((result as Result.Success).data)
     }
 
     @Test
@@ -120,9 +126,11 @@ class NotificationSettingsRepositoryImplTest {
         fakeDao.upsert(createValidEntity("user_123", enabled = false, hour = 14, minute = 0))
 
         // When
-        val settings = repository.getSettings("user_123")
+        val result = repository.getSettings("user_123")
 
         // Then
+        assertTrue(result is Result.Success)
+        val settings = (result as Result.Success).data
         assertNotNull(settings)
         assertEquals(false, settings!!.enabled)
         assertEquals(14, settings.hour)
@@ -145,10 +153,11 @@ class NotificationSettingsRepositoryImplTest {
         )
 
         // When
-        val settings = repository.getSettings("user_123")
+        val result = repository.getSettings("user_123")
 
         // Then
-        assertNull(settings)
+        assertTrue(result is Result.Success)
+        assertNull((result as Result.Success).data)
     }
 
     // ============================================================
@@ -239,13 +248,17 @@ class NotificationSettingsRepositoryImplTest {
         fakeDao.upsert(createValidEntity("user_B", enabled = false, hour = 20))
 
         // When
-        val settingsA = repository.getSettings("user_A")
-        val settingsB = repository.getSettings("user_B")
+        val resultA = repository.getSettings("user_A")
+        val resultB = repository.getSettings("user_B")
 
         // Then
-        assertEquals(true, settingsA!!.enabled)
+        assertTrue(resultA is Result.Success)
+        assertTrue(resultB is Result.Success)
+        val settingsA = (resultA as Result.Success).data!!
+        val settingsB = (resultB as Result.Success).data!!
+        assertEquals(true, settingsA.enabled)
         assertEquals(8, settingsA.hour)
-        assertEquals(false, settingsB!!.enabled)
+        assertEquals(false, settingsB.enabled)
         assertEquals(20, settingsB.hour)
     }
 
