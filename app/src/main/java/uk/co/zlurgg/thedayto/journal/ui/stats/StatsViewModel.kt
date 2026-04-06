@@ -26,9 +26,12 @@ class StatsViewModel(
 
     private fun loadStats() {
         viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true) }
             try {
                 Timber.d("Loading stats")
                 getEntriesUseCase().collect { entries ->
+                    // Note: If entries exceed 1000, consider streaming calculation
+                    // to avoid loading all entries into memory at once.
                     Timber.d("Calculating stats for ${entries.size} entries")
 
                     if (entries.isEmpty()) {
