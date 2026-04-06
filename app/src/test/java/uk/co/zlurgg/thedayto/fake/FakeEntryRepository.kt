@@ -30,6 +30,9 @@ class FakeEntryRepository(
     /** Set to true to make deleteEntry throw an exception (for error handling tests) */
     var shouldThrowOnDelete = false
 
+    /** Set to true to make read operations return errors */
+    var shouldReturnError = false
+
     override fun getEntries(): Flow<List<Entry>> = _entries
 
     override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> {
@@ -108,6 +111,9 @@ class FakeEntryRepository(
     }
 
     override suspend fun getEntryByDate(date: Long): Result<Entry?, DataError.Local> {
+        if (shouldReturnError) {
+            return Result.Error(DataError.Local.DATABASE_ERROR)
+        }
         return Result.Success(_entries.value.find { it.dateStamp == date })
     }
 
@@ -172,6 +178,7 @@ class FakeEntryRepository(
         _entries.value = emptyList()
         nextId = 1
         shouldThrowOnDelete = false
+        shouldReturnError = false
     }
 
     /**

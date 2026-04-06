@@ -20,6 +20,12 @@ class FakeAuthRepository : AuthRepository {
     var shouldReturnError = false
     var authError: DataError.Auth = DataError.Auth.FAILED
 
+    // Separate control for deleteAccount to test partial failure scenarios
+    var deleteAccountError: DataError.Auth? = null
+
+    // Call tracking for verification
+    var signOutCalled = false
+
     override suspend fun signIn(
         credentialProvider: CredentialProvider
     ): Result<UserData, DataError.Auth> {
@@ -38,6 +44,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun signOut(): EmptyResult<DataError.Auth> {
+        signOutCalled = true
         currentUser = null
         return Result.Success(Unit)
     }
@@ -47,6 +54,9 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun deleteAccount(): EmptyResult<DataError.Auth> {
+        // Use specific deleteAccountError if set, otherwise fall back to general error behavior
+        deleteAccountError?.let { return Result.Error(it) }
+
         return if (shouldReturnError) {
             Result.Error(authError)
         } else {
@@ -80,5 +90,7 @@ class FakeAuthRepository : AuthRepository {
         currentUser = null
         shouldReturnError = false
         authError = DataError.Auth.FAILED
+        deleteAccountError = null
+        signOutCalled = false
     }
 }
