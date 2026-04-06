@@ -200,6 +200,9 @@ dependencies {
     // Timber (Logging)
     implementation(libs.timber)
 
+    // Splash Screen
+    implementation(libs.androidx.splashscreen)
+
     // Credential Manager (Modern Auth)
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services)
