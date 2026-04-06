@@ -248,13 +248,14 @@ class OverviewViewModelTest {
 
     @Test
     fun `SaveNotificationSettings - shows snackbar on error`() = runTest {
-        // Given: Create a failing use case
-        val failingRepository = FakeNotificationScheduler().apply {
-            updateNotificationTimeThrows = true
+        // Given: Repository that returns errors
+        val failingSettingsRepository = FakeNotificationSettingsRepository().apply {
+            shouldReturnError = true
         }
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationScheduler = failingRepository
+            notificationScheduler = fakeNotificationScheduler,
+            notificationSettingsRepository = failingSettingsRepository
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
