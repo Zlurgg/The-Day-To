@@ -4,7 +4,7 @@ import uk.co.zlurgg.thedayto.journal.data.model.EntryEntity
 import uk.co.zlurgg.thedayto.journal.data.model.EntryWithMoodColorEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
-import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
+import uk.co.zlurgg.thedayto.sync.domain.model.toSyncStatusOrDefault
 
 fun EntryEntity.toDomain(): Entry {
     return Entry(
@@ -15,7 +15,7 @@ fun EntryEntity.toDomain(): Entry {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = SyncStatus.valueOf(syncStatus)
+        syncStatus = syncStatus.toSyncStatusOrDefault()
     )
 }
 

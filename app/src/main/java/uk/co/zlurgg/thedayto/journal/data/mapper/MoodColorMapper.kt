@@ -2,7 +2,7 @@ package uk.co.zlurgg.thedayto.journal.data.mapper
 
 import uk.co.zlurgg.thedayto.journal.data.model.MoodColorEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
+import uk.co.zlurgg.thedayto.sync.domain.model.toSyncStatusOrDefault
 
 fun MoodColorEntity.toDomain(): MoodColor {
     return MoodColor(
@@ -14,7 +14,7 @@ fun MoodColorEntity.toDomain(): MoodColor {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = SyncStatus.valueOf(syncStatus)
+        syncStatus = syncStatus.toSyncStatusOrDefault()
     )
 }
 
