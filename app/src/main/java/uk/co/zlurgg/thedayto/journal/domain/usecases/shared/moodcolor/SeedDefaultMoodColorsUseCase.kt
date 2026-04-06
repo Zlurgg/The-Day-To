@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
@@ -114,15 +115,19 @@ class SeedDefaultMoodColorsUseCase(
         var successCount = 0
 
         defaultMoodColors.forEach { moodColor ->
-            when (moodColorRepository.insertMoodColor(moodColor)) {
+            when (val result = moodColorRepository.insertMoodColor(moodColor)) {
                 is Result.Success -> successCount++
-                is Result.Error -> { /* Continue trying other mood colors */ }
+                is Result.Error -> {
+                    // Log warning but continue - partial success is acceptable for seeding
+                    Timber.w("Failed to seed mood color '%s': %s", moodColor.mood, result.error)
+                }
             }
         }
 
         return if (successCount == 0) {
             Result.Error(DataError.Local.DATABASE_ERROR)
         } else {
+            // Partial success is acceptable - users won't notice missing defaults
             Result.Success(successCount)
         }
         // Note: First launch is marked complete in OverviewViewModel after tutorial is shown
