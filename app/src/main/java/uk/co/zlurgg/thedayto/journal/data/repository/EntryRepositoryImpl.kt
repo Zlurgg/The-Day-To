@@ -132,8 +132,12 @@ class EntryRepositoryImpl(
     override suspend fun updateEntry(entry: Entry): EmptyResult<DataError.Local> {
         return ErrorMapper.safeSuspendCall(TAG) {
             val syncEnabled = preferencesRepository.isSyncEnabled()
+
+            // Preserve existing syncId when updating
+            val existingEntry = entry.id?.let { dao.getEntryById(it) }
+
             val entryWithSync = entry.copy(
-                syncId = entry.syncId ?: UUID.randomUUID().toString(),
+                syncId = entry.syncId ?: existingEntry?.syncId ?: UUID.randomUUID().toString(),
                 updatedAt = System.currentTimeMillis(),
                 syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else entry.syncStatus
             )
