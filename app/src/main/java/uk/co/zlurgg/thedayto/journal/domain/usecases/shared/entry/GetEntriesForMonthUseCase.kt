@@ -37,6 +37,9 @@ class GetEntriesForMonthUseCase(
         year: Int,
         entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending)
     ): Flow<List<EntryWithMoodColor>> {
+        require(month in MIN_MONTH..MAX_MONTH) { "Month must be between $MIN_MONTH and $MAX_MONTH, got: $month" }
+        require(year > 0) { "Year must be positive, got: $year" }
+
         return repository.getEntriesForMonth(month, year).map { entries ->
             when (entryOrder.orderType) {
                 is OrderType.Ascending -> {
@@ -54,5 +57,10 @@ class GetEntriesForMonthUseCase(
                 }
             }
         }
+    }
+
+    companion object {
+        private const val MIN_MONTH = 1
+        private const val MAX_MONTH = 12
     }
 }
