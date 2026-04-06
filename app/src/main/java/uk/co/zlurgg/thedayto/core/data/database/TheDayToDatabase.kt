@@ -18,8 +18,8 @@ import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
         PendingSyncDeletionEntity::class,
         NotificationSettingsEntity::class
     ],
-    version = 8,  // Added notification_settings table
-    exportSchema = false
+    version = 1, // Release baseline - no production users yet
+    exportSchema = true
 )
 abstract class TheDayToDatabase : RoomDatabase() {
     abstract val entryDao: EntryDao

@@ -16,7 +16,7 @@ class DatabaseFactory(
             TheDayToDatabase.DATABASE_NAME
         )
             .addMigrations(*Migrations.ALL)
-            .fallbackToDestructiveMigration(dropAllTables = true)
+            // No fallbackToDestructiveMigration - crash on migration failure instead of silent data loss
             .addCallback(object : RoomDatabase.Callback() {
                 override fun onOpen(db: SupportSQLiteDatabase) {
                     super.onOpen(db)
