@@ -16,6 +16,9 @@ interface MoodColorDao {
     @Query("SELECT * FROM mood_color WHERE id = :id")
     suspend fun getMoodColorById(id: Int): MoodColorEntity?
 
+    @Query("SELECT * FROM mood_color WHERE id IN (:ids)")
+    suspend fun getMoodColorsByIds(ids: List<Int>): List<MoodColorEntity>
+
     @Query("SELECT * FROM mood_color WHERE moodNormalized = :moodNormalized")
     suspend fun getMoodColorByName(moodNormalized: String): MoodColorEntity?
 

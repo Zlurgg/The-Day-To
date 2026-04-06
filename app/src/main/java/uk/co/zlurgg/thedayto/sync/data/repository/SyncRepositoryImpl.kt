@@ -58,9 +58,17 @@ class SyncRepositoryImpl(
     ): Result<Int, DataError.Sync> = runCatching {
         var uploadedCount = 0
 
+        // Batch fetch all mood colors to avoid N+1 queries
+        // Chunk to stay under SQLite's 999 parameter limit
+        val moodColorIds = entries.map { it.moodColorId }.distinct()
+        val moodColorsMap = moodColorIds
+            .chunked(SQLITE_BATCH_SIZE)
+            .flatMap { chunk -> moodColorDao.getMoodColorsByIds(chunk) }
+            .associateBy { it.id }
+
         entries.forEach { entry ->
-            // Get the moodColor's syncId for the reference
-            val moodColor = moodColorDao.getMoodColorById(entry.moodColorId)
+            // Get the moodColor's syncId for the reference (O(1) lookup)
+            val moodColor = moodColorsMap[entry.moodColorId]
             val moodColorSyncId = moodColor?.syncId
 
             // Generate syncId if not present
@@ -597,6 +605,9 @@ class SyncRepositoryImpl(
         private const val ENTRIES_COLLECTION = "entries"
         private const val MOOD_COLORS_COLLECTION = "mood_colors"
         private const val NOTIFICATION_SETTINGS_COLLECTION = "notification_settings"
+
+        // SQLite has a ~999 parameter limit for IN clauses
+        private const val SQLITE_BATCH_SIZE = 500
 
         // Progress constants for sync phases
         private const val PROGRESS_IDLE = 0f
