@@ -296,17 +296,17 @@ class EditorViewModel(
             is EditorAction.SaveMoodColor -> {
                 viewModelScope.launch {
                     try {
-                        Timber.d("Saving new mood color: ${action.mood.trim()}")
+                        Timber.d("Saving new mood color: %s", action.mood)
                         val newMoodColorId = editorUseCases.addMoodColorUseCase(
                             MoodColor(
-                                mood = action.mood.trim(),
+                                mood = action.mood, // UseCase handles sanitization/trimming
                                 color = action.colorHex,
-                                dateStamp = System.currentTimeMillis() / 1000, // Use precise timestamp so user moods sort first
+                                dateStamp = Instant.now().epochSecond,
                                 id = null
                             )
                         )
                         // Auto-select the newly created/restored mood color
-                        Timber.d("Successfully saved mood color: ${action.mood.trim()}, auto-selecting ID: $newMoodColorId")
+                        Timber.d("Successfully saved mood color: ${action.mood}, auto-selecting ID: $newMoodColorId")
                         triggerSync()
                         _uiState.update {
                             it.copy(
@@ -317,7 +317,7 @@ class EditorViewModel(
                             )
                         }
                     } catch (e: InvalidMoodColorException) {
-                        Timber.e(e, "Failed to save mood color: ${action.mood.trim()}")
+                        Timber.e(e, "Failed to save mood color: ${action.mood}")
                         _uiEvents.emit(
                             EditorUiEvent.ShowSnackbar(
                                 message = e.message ?: "Couldn't save mood color!"
