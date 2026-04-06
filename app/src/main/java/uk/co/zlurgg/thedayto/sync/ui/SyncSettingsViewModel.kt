@@ -10,14 +10,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
-import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.AccountUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
-import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
-import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
-import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
-import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
 import uk.co.zlurgg.thedayto.sync.DevCredentials
@@ -33,14 +28,9 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
  */
 class SyncSettingsViewModel(
     private val syncUseCases: SyncUseCases,
-    private val authRepository: AuthRepository,
+    private val accountUseCases: AccountUseCases,
     private val syncScheduler: SyncScheduler,
-    private val signInUseCase: SignInUseCase,
-    private val signOutUseCase: SignOutUseCase,
-    private val preferencesRepository: PreferencesRepository,
-    private val notificationAuthUseCase: NotificationAuthUseCase,
-    private val deleteAccountUseCase: DeleteAccountUseCase,
-    private val devSignInUseCase: DevSignInUseCase? = null
+    private val notificationAuthUseCase: NotificationAuthUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncSettingsState())
@@ -54,7 +44,7 @@ class SyncSettingsViewModel(
     private fun loadInitialState() {
         viewModelScope.launch {
             try {
-                val user = authRepository.getSignedInUser()
+                val user = accountUseCases.getSignedInUser()
                 val isSignedIn = user != null
                 val lastSync = syncUseCases.getLastSyncTimestamp()
 
@@ -63,7 +53,7 @@ class SyncSettingsViewModel(
                         isUserSignedIn = isSignedIn,
                         userEmail = user?.username,
                         lastSyncTimestamp = lastSync,
-                        isDevSignInAvailable = devSignInUseCase?.isAvailable() == true,
+                        isDevSignInAvailable = accountUseCases.devSignIn?.isAvailable() == true,
                         isLoading = false
                     )
                 }
@@ -115,7 +105,7 @@ class SyncSettingsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isSigningIn = true, error = null) }
 
-            when (val result = signInUseCase(credentialProvider)) {
+            when (val result = accountUseCases.signIn(credentialProvider)) {
                 is Result.Success -> {
                     handleSignInSuccess()
                 }
@@ -138,7 +128,7 @@ class SyncSettingsViewModel(
      * Automatically enables sync on successful sign-in.
      */
     fun devSignIn() {
-        val useCase = devSignInUseCase ?: return
+        val useCase = accountUseCases.devSignIn ?: return
 
         viewModelScope.launch {
             _uiState.update { it.copy(isSigningIn = true, error = null) }
@@ -166,11 +156,11 @@ class SyncSettingsViewModel(
      * Migrates anonymous notification settings to the signed-in user.
      */
     private suspend fun handleSignInSuccess() {
-        val user = authRepository.getSignedInUser() ?: return
+        val user = accountUseCases.getSignedInUser() ?: return
         val userId = user.userId
 
         // Auto-enable sync on sign-in
-        preferencesRepository.setSyncEnabled(true)
+        syncUseCases.setSyncEnabled(true)
 
         // Prepare local data for sync (clear other users, adopt orphaned, mark for upload)
         syncUseCases.prepareForSync(userId)
@@ -205,14 +195,14 @@ class SyncSettingsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, error = null) }
 
-            val user = authRepository.getSignedInUser()
+            val user = accountUseCases.getSignedInUser()
             val userId = user?.userId
 
             // Cancel any sync workers first
             syncScheduler.cancelAllSync()
 
             // Disable sync
-            preferencesRepository.setSyncEnabled(false)
+            syncUseCases.setSyncEnabled(false)
 
             // Reverse-adopt notification settings to anonymous (keeps notifications working)
             if (userId != null) {
@@ -220,7 +210,7 @@ class SyncSettingsViewModel(
             }
 
             // Sign out (local entries/mood colors remain for offline use)
-            signOutUseCase()
+            accountUseCases.signOut()
 
             _uiState.update {
                 it.copy(
@@ -257,7 +247,7 @@ class SyncSettingsViewModel(
         _uiState.update { it.copy(showDeleteConfirmDialog = false) }
 
         viewModelScope.launch {
-            deleteAccountUseCase().collect { progress ->
+            accountUseCases.deleteAccount().collect { progress ->
                 _uiState.update { it.copy(deletionProgress = progress) }
 
                 when (progress) {
@@ -298,7 +288,7 @@ class SyncSettingsViewModel(
         viewModelScope.launch {
             _uiState.update { it.copy(showReAuthDialog = false, isLoading = true) }
 
-            when (val result = authRepository.reauthenticate(credentialProvider)) {
+            when (val result = accountUseCases.reauthenticate(credentialProvider)) {
                 is Result.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                     onDeleteAccountConfirmed() // Retry deletion

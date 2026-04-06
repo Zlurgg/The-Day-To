@@ -3,6 +3,9 @@ package uk.co.zlurgg.thedayto.sync.di
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
+import uk.co.zlurgg.thedayto.auth.domain.usecases.AccountUseCases
+import uk.co.zlurgg.thedayto.auth.domain.usecases.GetSignedInUserUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.ReauthenticateUseCase
 import uk.co.zlurgg.thedayto.sync.data.repository.SyncRepositoryImpl
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
@@ -10,6 +13,7 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.GetLastSyncTimestampUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.ObserveSyncStateUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PerformSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PrepareForSyncUseCase
+import uk.co.zlurgg.thedayto.sync.domain.usecase.SetSyncEnabledUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 import uk.co.zlurgg.thedayto.sync.ui.SyncSettingsViewModel
 
@@ -54,13 +58,45 @@ val syncModule = module {
         )
     }
 
+    single {
+        SetSyncEnabledUseCase(
+            preferencesRepository = get()
+        )
+    }
+
     // SyncUseCases aggregator
     single {
         SyncUseCases(
             performSync = get(),
             observeSyncState = get(),
             getLastSyncTimestamp = get(),
-            prepareForSync = get()
+            prepareForSync = get(),
+            setSyncEnabled = get()
+        )
+    }
+
+    // Auth UseCases for account management
+    single {
+        GetSignedInUserUseCase(
+            authRepository = get()
+        )
+    }
+
+    single {
+        ReauthenticateUseCase(
+            authRepository = get()
+        )
+    }
+
+    // AccountUseCases aggregator
+    single {
+        AccountUseCases(
+            getSignedInUser = get(),
+            signIn = get(),
+            signOut = get(),
+            reauthenticate = get(),
+            deleteAccount = get(),
+            devSignIn = getOrNull()
         )
     }
 
@@ -71,14 +107,9 @@ val syncModule = module {
     viewModel {
         SyncSettingsViewModel(
             syncUseCases = get(),
-            authRepository = get(),
+            accountUseCases = get(),
             syncScheduler = get(),
-            signInUseCase = get(),
-            signOutUseCase = get(),
-            preferencesRepository = get(),
-            notificationAuthUseCase = get(),
-            deleteAccountUseCase = get(),
-            devSignInUseCase = getOrNull()
+            notificationAuthUseCase = get()
         )
     }
 }

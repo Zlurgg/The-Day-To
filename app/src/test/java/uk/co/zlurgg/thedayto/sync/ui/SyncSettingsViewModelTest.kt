@@ -19,8 +19,11 @@ import org.junit.Test
 import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
+import uk.co.zlurgg.thedayto.auth.domain.usecases.AccountUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.GetSignedInUserUseCase
+import uk.co.zlurgg.thedayto.auth.domain.usecases.ReauthenticateUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.repository.LocalDataClearer
@@ -41,6 +44,7 @@ import uk.co.zlurgg.thedayto.sync.domain.usecase.GetLastSyncTimestampUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.ObserveSyncStateUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PerformSyncUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.PrepareForSyncUseCase
+import uk.co.zlurgg.thedayto.sync.domain.usecase.SetSyncEnabledUseCase
 import uk.co.zlurgg.thedayto.sync.domain.usecase.SyncUseCases
 
 /**
@@ -117,30 +121,33 @@ class SyncSettingsViewModelTest {
             ),
             observeSyncState = ObserveSyncStateUseCase(fakeSyncRepository),
             getLastSyncTimestamp = GetLastSyncTimestampUseCase(fakePreferencesRepository),
-            prepareForSync = PrepareForSyncUseCase(fakeSyncRepository)
+            prepareForSync = PrepareForSyncUseCase(fakeSyncRepository),
+            setSyncEnabled = SetSyncEnabledUseCase(fakePreferencesRepository)
         )
 
-        val deleteAccountUseCase = DeleteAccountUseCase(
-            authRepository = fakeAuthRepository,
-            syncRepository = fakeSyncRepository,
-            localDataClearer = mockLocalDataClearer,
-            syncScheduler = mockSyncScheduler
+        val accountUseCases = AccountUseCases(
+            getSignedInUser = GetSignedInUserUseCase(fakeAuthRepository),
+            signIn = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
+            signOut = SignOutUseCase(fakeAuthRepository, fakeAuthStateRepository),
+            reauthenticate = ReauthenticateUseCase(fakeAuthRepository),
+            deleteAccount = DeleteAccountUseCase(
+                authRepository = fakeAuthRepository,
+                syncRepository = fakeSyncRepository,
+                localDataClearer = mockLocalDataClearer,
+                syncScheduler = mockSyncScheduler
+            ),
+            devSignIn = devSignInUseCase
         )
 
         return SyncSettingsViewModel(
             syncUseCases = syncUseCases,
-            authRepository = fakeAuthRepository,
+            accountUseCases = accountUseCases,
             syncScheduler = mockSyncScheduler,
-            signInUseCase = SignInUseCase(fakeAuthRepository, fakeAuthStateRepository),
-            signOutUseCase = SignOutUseCase(fakeAuthRepository, fakeAuthStateRepository),
-            preferencesRepository = fakePreferencesRepository,
             notificationAuthUseCase = NotificationAuthUseCase(
                 settingsRepository = fakeNotificationSettingsRepository,
                 notificationScheduler = fakeNotificationScheduler,
                 syncService = fakeNotificationSyncService
-            ),
-            deleteAccountUseCase = deleteAccountUseCase,
-            devSignInUseCase = devSignInUseCase
+            )
         )
     }
 
