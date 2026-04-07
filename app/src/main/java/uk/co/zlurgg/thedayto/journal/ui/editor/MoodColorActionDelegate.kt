@@ -24,6 +24,8 @@ class MoodColorActionDelegate(
     private val scope: CoroutineScope,
     private val onSyncRequired: () -> Unit
 ) {
+    // Track pending favorite toggles to prevent race conditions during rapid tapping
+    private val pendingFavorites = mutableMapOf<Int, Boolean>()
 
     fun handleSelectMoodColor(moodColorId: Int) {
         uiState.update {
@@ -70,29 +72,18 @@ class MoodColorActionDelegate(
         }
     }
 
-    fun handleDeleteMoodColor(moodColor: MoodColor) {
+    fun handleToggleFavorite(moodColor: MoodColor) {
+        val id = moodColor.id ?: return
+        // Use pending state if rapidly toggling, otherwise use current state
+        val targetState = pendingFavorites[id] ?: !moodColor.isFavorite
+        pendingFavorites[id] = targetState
+
+        Timber.d("Toggling favorite for %s: %s", moodColor.mood, targetState)
+
         scope.launch {
-            Timber.d("Deleting mood color: ${moodColor.mood}")
-            editorUseCases.deleteMoodColor(moodColor.id ?: return@launch)
+            editorUseCases.setMoodColorFavorite(id, targetState)
+            pendingFavorites.remove(id)
             onSyncRequired()
-
-            val currentState = uiState.value
-            if (currentState.selectedMoodColorId == moodColor.id) {
-                val remainingMoodColors = currentState.moodColors.filter { it.id != moodColor.id }
-
-                if (remainingMoodColors.isNotEmpty()) {
-                    val defaultMoodColor = remainingMoodColors.first()
-                    Timber.d("Selected mood was deleted, switching to: ${defaultMoodColor.mood}")
-                    uiState.update {
-                        it.copy(selectedMoodColorId = defaultMoodColor.id, isMoodHintVisible = false)
-                    }
-                } else {
-                    Timber.w("No mood colors remaining after deletion")
-                    uiState.update {
-                        it.copy(selectedMoodColorId = null, isMoodHintVisible = true)
-                    }
-                }
-            }
         }
     }
 

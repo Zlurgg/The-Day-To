@@ -7,24 +7,17 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AddCircle
-import androidx.compose.material.icons.filled.Cancel
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -49,24 +42,32 @@ import androidx.compose.ui.unit.toSize
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.AddMoodColorDialog
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.ColorWheelButton
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorRow
 import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 
 /**
  * Pure presenter component for mood selection with color picker.
  * No ViewModel dependency - receives all state and callbacks as parameters.
  *
+ * Dropdown shows mood colors with:
+ * - Star toggle for favorites (sorted to top)
+ * - Color circle with edit icon
+ * - No delete (use Management screen for that)
+ *
  * @param selectedMoodColorId The currently selected mood color ID (null if none selected)
- * @param moodColors List of available mood-color combinations
+ * @param moodColors List of available mood-color combinations (sorted by favorites)
  * @param hint Hint text to display
  * @param showMoodColorDialog Whether to show the mood color picker dialog
  * @param onMoodSelected Callback when a mood is selected (moodColorId)
- * @param onDeleteMoodColor Callback to delete a mood color
+ * @param onToggleFavorite Callback to toggle mood color favorite status
  * @param onEditMoodColor Callback to edit a mood color
  * @param onToggleMoodColorDialog Callback to toggle the mood color picker dialog
  * @param onSaveMoodColor Callback to save a new mood color (mood, colorHex)
  * @param modifier Optional modifier
  */
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalStdlibApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MoodItem(
     selectedMoodColorId: Int?,
@@ -74,7 +75,7 @@ fun MoodItem(
     hint: String,
     showMoodColorDialog: Boolean,
     onMoodSelected: (moodColorId: Int) -> Unit,
-    onDeleteMoodColor: (MoodColor) -> Unit,
+    onToggleFavorite: (MoodColor) -> Unit,
     onEditMoodColor: (MoodColor) -> Unit,
     onToggleMoodColorDialog: () -> Unit,
     onSaveMoodColor: (mood: String, colorHex: String) -> Unit,
@@ -191,9 +192,8 @@ fun MoodItem(
                 )
             }
 
-            // Existing mood colors
+            // Mood colors with unified MoodColorRow (compact mode for dropdown)
             moodColors.forEach { moodColor ->
-                val color = getColorSafe(moodColor.color)
                 DropdownMenuItem(
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -201,114 +201,29 @@ fun MoodItem(
                         mExpanded = false
                     },
                     text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Color indicator - prominent circle with border
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .background(color, CircleShape)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                        shape = CircleShape
-                                    )
-                            )
-
-                            Spacer(modifier = Modifier.width(12.dp))
-
-                            // Mood text - takes remaining space
-                            Text(
-                                text = moodColor.mood,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            // Edit button
-                            IconButton(
-                                onClick = {
-                                    onEditMoodColor(moodColor)
-                                    mExpanded = false
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = stringResource(R.string.edit_mood_color_button),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-
-                            // Delete button
-                            IconButton(
-                                onClick = {
-                                    onDeleteMoodColor(moodColor)
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Cancel,
-                                    contentDescription = stringResource(R.string.delete_custom_mood_color),
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
+                        MoodColorRow(
+                            moodColor = moodColor,
+                            onToggleFavorite = { onToggleFavorite(moodColor) },
+                            onEdit = {
+                                onEditMoodColor(moodColor)
+                                mExpanded = false
+                            },
+                            compact = true
+                        )
                     }
                 )
             }
-
-            // Button to add a new mood color - ALWAYS shown
-            // More prominent when list is empty (highlighted background)
-            DropdownMenuItem(
-                onClick = {
-                    onToggleMoodColorDialog()
-                    mExpanded = false
-                },
-                text = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(
-                                if (moodColors.isEmpty()) {
-                                    Modifier.background(
-                                        color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                        shape = MaterialTheme.shapes.small
-                                    )
-                                } else {
-                                    Modifier
-                                }
-                            ),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.add_custom_mood_color),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.add_custom_mood_color),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            )
         }
     }
 
         // Color wheel button - always visible for easy access to create new mood colors
-        ColorWheelAddButton(
+        ColorWheelButton(
             onClick = onToggleMoodColorDialog
         )
     }
 
     // Mood color picker dialog
-    MoodColorPickerDialog(
+    AddMoodColorDialog(
         showDialog = showMoodColorDialog,
         onDismiss = onToggleMoodColorDialog,
         onSave = { mood, colorHex ->
@@ -345,44 +260,12 @@ private fun EmptyDropdownContentPreview() {
                     )
                 }
             )
-
-            // Highlighted + Add button (when empty)
-            DropdownMenuItem(
-                onClick = { },
-                text = {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .then(
-                                Modifier.background(
-                                    color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f),
-                                    shape = MaterialTheme.shapes.small
-                                )
-                            ),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.add_custom_mood_color),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.add_custom_mood_color),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            )
         }
     }
 }
 
 /**
- * Preview showing the dropdown menu with existing moods
- * Shows normal + Add button without highlight
+ * Preview showing the dropdown menu with existing moods using unified MoodColorRow
  */
 @Preview(name = "Dropdown with Moods - Light", showBackground = true)
 @Preview(name = "Dropdown with Moods - Dark", showBackground = true, uiMode = UI_MODE_NIGHT_YES)
@@ -395,82 +278,43 @@ private fun DropdownWithMoodsPreview() {
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             val moodColors = listOf(
-                MoodColor(id = 1, mood = "Happy", color = "FFD700", dateStamp = System.currentTimeMillis()),
-                MoodColor(id = 2, mood = "Calm", color = "87CEEB", dateStamp = System.currentTimeMillis()),
-                MoodColor(id = 3, mood = "Energetic", color = "FF6347", dateStamp = System.currentTimeMillis())
+                MoodColor(
+                    id = 1,
+                    mood = "Happy",
+                    color = "FFD700",
+                    isFavorite = true,
+                    dateStamp = System.currentTimeMillis()
+                ),
+                MoodColor(
+                    id = 2,
+                    mood = "Calm",
+                    color = "87CEEB",
+                    isFavorite = false,
+                    dateStamp = System.currentTimeMillis()
+                ),
+                MoodColor(
+                    id = 3,
+                    mood = "Energetic",
+                    color = "FF6347",
+                    isFavorite = false,
+                    dateStamp = System.currentTimeMillis()
+                )
             )
 
-            // Existing mood colors
+            // Mood colors with unified MoodColorRow (compact mode)
             moodColors.forEach { moodColor ->
-                val color = getColorSafe(moodColor.color)
                 DropdownMenuItem(
                     onClick = { },
                     text = {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            // Color indicator - prominent circle with border
-                            Box(
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .background(color, CircleShape)
-                                    .border(
-                                        width = 1.dp,
-                                        color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                        shape = CircleShape
-                                    )
-                            )
-                            Spacer(modifier = Modifier.width(12.dp))
-                            Text(
-                                text = moodColor.mood,
-                                style = MaterialTheme.typography.bodyLarge,
-                                modifier = Modifier.weight(1f)
-                            )
-                            Spacer(modifier = Modifier.width(8.dp))
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    imageVector = Icons.Default.Edit,
-                                    contentDescription = stringResource(R.string.edit_mood_color_button),
-                                    tint = MaterialTheme.colorScheme.primary
-                                )
-                            }
-                            IconButton(onClick = { }) {
-                                Icon(
-                                    imageVector = Icons.Default.Cancel,
-                                    contentDescription = stringResource(R.string.delete_custom_mood_color),
-                                    tint = MaterialTheme.colorScheme.error
-                                )
-                            }
-                        }
+                        MoodColorRow(
+                            moodColor = moodColor,
+                            onToggleFavorite = { },
+                            onEdit = { },
+                            compact = true
+                        )
                     }
                 )
             }
-
-            // Normal + Add button (no highlight when moods exist)
-            DropdownMenuItem(
-                onClick = { },
-                text = {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AddCircle,
-                            contentDescription = stringResource(R.string.add_custom_mood_color),
-                            tint = MaterialTheme.colorScheme.primary
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text(
-                            text = stringResource(R.string.add_custom_mood_color),
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
-                }
-            )
         }
     }
 }

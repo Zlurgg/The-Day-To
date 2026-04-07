@@ -148,7 +148,7 @@ val journalModule = module {
             getEntryByDateUseCase = get(),
             addEntryUseCase = AddEntryUseCase(repository = get(), moodColorRepository = get()),
             getMoodColors = get(),
-            deleteMoodColor = get(),
+            setMoodColorFavorite = get(),
             addMoodColorUseCase = get(),
             getMoodColorUseCase = get(),
             updateMoodColorUseCase = get(),
