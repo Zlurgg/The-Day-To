@@ -15,6 +15,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -136,7 +137,11 @@ fun EditMoodColorDialog(
                         }
                     }
 
-                    colorPickerController.selectByColor(initialColor, fromUser = false)
+                    // Use composite key to handle both existing and new mood colors
+                    // Resets when editing a different mood color or when add dialog reopens
+                    LaunchedEffect(moodColor.id, moodColor.color) {
+                        colorPickerController.selectByColor(initialColor, fromUser = false)
+                    }
 
                     HsvColorPicker(
                         modifier = Modifier

@@ -354,9 +354,30 @@ private fun EditorScreenNewEntryPreview() {
         EditorScreen(
             uiState = EditorUiState(
                 moodColors = listOf(
-                    MoodColor("Cheerful", "FFF59D", false, System.currentTimeMillis(), 1),
-                    MoodColor("Calm", "4A148C", false, System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "4CAF50", false, System.currentTimeMillis(), 3)
+                    MoodColor(
+                        mood = "Cheerful",
+                        color = "FFF59D",
+                        isDeleted = false,
+                        isFavorite = false,
+                        dateStamp = System.currentTimeMillis(),
+                        id = 1
+                    ),
+                    MoodColor(
+                        mood = "Calm",
+                        color = "4A148C",
+                        isDeleted = false,
+                        isFavorite = false,
+                        dateStamp = System.currentTimeMillis(),
+                        id = 2
+                    ),
+                    MoodColor(
+                        mood = "Motivated",
+                        color = "4CAF50",
+                        isDeleted = false,
+                        isFavorite = false,
+                        dateStamp = System.currentTimeMillis(),
+                        id = 3
+                    )
                 )
             ),
             onAction = {},
@@ -380,9 +401,9 @@ private fun EditorScreenEditEntryPreview() {
                 isContentHintVisible = false,
                 currentEntryId = 1,
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", false, System.currentTimeMillis(), 1),
-                    MoodColor("Peaceful", "2196F3", false, System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "FF9800", false, System.currentTimeMillis(), 3)
+                    MoodColor("Happy", "4CAF50", false, false, System.currentTimeMillis(), 1),
+                    MoodColor("Peaceful", "2196F3", false, false, System.currentTimeMillis(), 2),
+                    MoodColor("Motivated", "FF9800", false, false, System.currentTimeMillis(), 3)
                 )
             ),
             onAction = {},
@@ -403,7 +424,7 @@ private fun EditorScreenLoadingPreview() {
                 entryContent = "Sample content",
                 isLoading = true,
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", false, System.currentTimeMillis(), 1)
+                    MoodColor("Happy", "4CAF50", false, false, System.currentTimeMillis(), 1)
                 )
             ),
             onAction = {},
