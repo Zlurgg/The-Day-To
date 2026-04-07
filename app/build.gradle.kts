@@ -33,7 +33,7 @@ android {
         applicationId = "uk.co.zlurgg.thedayto"
         minSdk = 27
         targetSdk = 36
-        versionCode = 12
+        versionCode = 13
         versionName = "1.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -64,7 +64,6 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isMinifyEnabled = true
             isShrinkResources = true
-            ndk.debugSymbolLevel = "FULL"
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
