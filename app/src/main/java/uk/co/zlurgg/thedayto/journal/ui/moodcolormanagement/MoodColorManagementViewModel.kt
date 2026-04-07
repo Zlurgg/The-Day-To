@@ -2,265 +2,168 @@ package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.journal.domain.model.InvalidMoodColorException
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
-import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorWithCount
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorConstants
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorEvent
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.revertOptimisticFavorite
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.withOptimisticFavorite
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
-import java.time.Instant
 
 /**
  * ViewModel for the Mood Color Management screen.
  * Handles loading mood colors with entry counts, and CRUD operations.
  */
 class MoodColorManagementViewModel(
-    private val moodColorManagementUseCases: MoodColorManagementUseCases,
+    private val useCases: MoodColorManagementUseCases,
     private val syncScheduler: SyncScheduler
 ) : ViewModel() {
 
-    // Single source of truth for UI state
-    private val _uiState = MutableStateFlow(MoodColorManagementUiState())
-    val uiState = _uiState.asStateFlow()
+    private val _state = MutableStateFlow(MoodColorManagementUiState())
+    val state = _state.asStateFlow()
 
-    // One-time UI events
-    private val _uiEvents = MutableSharedFlow<MoodColorManagementUiEvent>()
-    val uiEvents = _uiEvents.asSharedFlow()
-
-    private var getMoodColorsJob: Job? = null
+    private val _events = MutableSharedFlow<MoodColorEvent>()
+    val events = _events.asSharedFlow()
 
     init {
-        loadMoodColors(_uiState.value.sortOrder)
+        // Observe sorted mood colors - Room Flow auto-updates on any write
+        useCases.getSortedMoodColors()
+            .onStart { _state.update { it.copy(isLoading = true) } }
+            .onEach { sorted ->
+                _state.update { it.copy(moodColors = sorted, isLoading = false) }
+            }
+            .catch { e ->
+                Timber.e(e, "Failed to load mood colors")
+                _state.update { it.copy(isLoading = false) }
+            }
+            .launchIn(viewModelScope)
     }
 
     fun onAction(action: MoodColorManagementAction) {
         when (action) {
-            is MoodColorManagementAction.ToggleSortOrder -> {
-                if (_uiState.value.sortOrder::class == action.order::class &&
-                    _uiState.value.sortOrder.orderType == action.order.orderType
-                ) {
-                    return
+            is MoodColorManagementAction.AddMoodColor -> showAddDialog()
+            is MoodColorManagementAction.EditMoodColor -> showEditDialog(action.moodColor)
+            is MoodColorManagementAction.SaveMoodColor -> save(action.moodColor)
+            is MoodColorManagementAction.RequestDeleteMoodColor ->
+                showDeleteConfirmation(action.moodColor)
+            is MoodColorManagementAction.ConfirmDelete -> confirmDelete()
+            is MoodColorManagementAction.DismissDeleteDialog -> dismissDeleteDialog()
+            is MoodColorManagementAction.ToggleFavorite ->
+                toggleFavorite(action.id, action.currentValue)
+            is MoodColorManagementAction.DismissDialog -> dismissDialog()
+            is MoodColorManagementAction.ClearError -> clearError()
+        }
+    }
+
+    private fun showAddDialog() {
+        _state.update { it.copy(editingMoodColor = MoodColor.empty()) }
+    }
+
+    private fun showEditDialog(moodColor: MoodColor) {
+        _state.update { it.copy(editingMoodColor = moodColor) }
+    }
+
+    private fun dismissDialog() {
+        _state.update { it.copy(editingMoodColor = null, dialogError = null) }
+    }
+
+    private fun clearError() {
+        _state.update { it.copy(dialogError = null) }
+    }
+
+    private fun save(moodColor: MoodColor) {
+        viewModelScope.launch {
+            when (val result = useCases.saveMoodColor(moodColor)) {
+                is Result.Success -> {
+                    _state.update { it.copy(editingMoodColor = null, dialogError = null) }
+                    syncScheduler.requestImmediateSync()
                 }
-                loadMoodColors(action.order)
-            }
-
-            is MoodColorManagementAction.DeleteMoodColor -> {
-                viewModelScope.launch {
-                    try {
-                        val moodColorId = action.moodColor.id
-                        if (moodColorId == null) {
-                            Timber.w("Cannot delete mood color with null ID: ${action.moodColor.mood}")
-                            _uiEvents.emit(
-                                MoodColorManagementUiEvent.ShowSnackbar(
-                                    message = "Cannot delete: mood color not saved"
-                                )
-                            )
-                            return@launch
-                        }
-                        moodColorManagementUseCases.deleteMoodColor(moodColorId)
-                        syncScheduler.requestImmediateSync()
-                        _uiState.update { it.copy(recentlyDeletedMoodColor = action.moodColor) }
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "\"${action.moodColor.mood}\" deleted",
-                                actionLabel = "Undo"
-                            )
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to delete mood color")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "Failed to delete: ${e.message}"
-                            )
-                        )
-                    }
+                is Result.Error -> {
+                    _state.update { it.copy(dialogError = result.error) }
                 }
-            }
-
-            is MoodColorManagementAction.RestoreMoodColor -> {
-                viewModelScope.launch {
-                    val deletedMoodColor = _uiState.value.recentlyDeletedMoodColor ?: return@launch
-                    try {
-                        // Re-add the mood color (AddMoodColorUseCase handles restoration)
-                        moodColorManagementUseCases.addMoodColor(deletedMoodColor)
-                        syncScheduler.requestImmediateSync()
-                        _uiState.update { it.copy(recentlyDeletedMoodColor = null) }
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "\"${deletedMoodColor.mood}\" restored"
-                            )
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to restore mood color")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "Failed to restore: ${e.message}"
-                            )
-                        )
-                    }
-                }
-            }
-
-            is MoodColorManagementAction.ClearRecentlyDeleted -> {
-                _uiState.update { it.copy(recentlyDeletedMoodColor = null) }
-            }
-
-            is MoodColorManagementAction.ShowAddMoodColorDialog -> {
-                _uiState.update { it.copy(showAddMoodColorDialog = true) }
-            }
-
-            is MoodColorManagementAction.DismissAddMoodColorDialog -> {
-                _uiState.update { it.copy(showAddMoodColorDialog = false) }
-            }
-
-            is MoodColorManagementAction.SaveNewMoodColor -> {
-                viewModelScope.launch {
-                    try {
-                        val newMoodColor = MoodColor(
-                            mood = action.mood,
-                            color = action.colorHex,
-                            dateStamp = Instant.now().epochSecond
-                        )
-                        moodColorManagementUseCases.addMoodColor(newMoodColor)
-                        syncScheduler.requestImmediateSync()
-                        _uiState.update { it.copy(showAddMoodColorDialog = false) }
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "\"${action.mood}\" created"
-                            )
-                        )
-                    } catch (e: InvalidMoodColorException) {
-                        Timber.w(e, "Invalid mood color")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = e.message ?: "Invalid mood color"
-                            )
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to create mood color")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "Failed to create: ${e.message}"
-                            )
-                        )
-                    }
-                }
-            }
-
-            is MoodColorManagementAction.ShowEditMoodColorDialog -> {
-                _uiState.update { it.copy(editingMoodColor = action.moodColor) }
-            }
-
-            is MoodColorManagementAction.DismissEditMoodColorDialog -> {
-                _uiState.update { it.copy(editingMoodColor = null) }
-            }
-
-            is MoodColorManagementAction.SaveEditedMoodColor -> {
-                viewModelScope.launch {
-                    try {
-                        val originalMood = _uiState.value.editingMoodColor
-
-                        // Update name if changed
-                        if (originalMood != null && originalMood.mood != action.newMood) {
-                            Timber.d("Updating mood name: ${originalMood.mood} -> ${action.newMood}")
-                            moodColorManagementUseCases.updateMoodColorName(
-                                action.moodColorId,
-                                action.newMood
-                            )
-                        }
-
-                        // Update color
-                        moodColorManagementUseCases.updateMoodColor(action.moodColorId, action.newColorHex)
-                        syncScheduler.requestImmediateSync()
-
-                        _uiState.update { it.copy(editingMoodColor = null) }
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "\"${action.newMood}\" updated"
-                            )
-                        )
-                        Timber.i("Successfully updated mood color: ${action.newMood}")
-                    } catch (e: InvalidMoodColorException) {
-                        Timber.w(e, "Invalid mood color update")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = e.message ?: "Invalid mood"
-                            )
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Failed to update mood color")
-                        _uiEvents.emit(
-                            MoodColorManagementUiEvent.ShowSnackbar(
-                                message = "Failed to update: ${e.message}"
-                            )
-                        )
-                    }
-                }
-            }
-
-            is MoodColorManagementAction.RetryLoadMoodColors -> {
-                _uiState.update { it.copy(loadError = null) }
-                loadMoodColors(_uiState.value.sortOrder)
-            }
-
-            is MoodColorManagementAction.DismissLoadError -> {
-                _uiState.update { it.copy(loadError = null) }
             }
         }
     }
 
-    /**
-     * Load mood colors combined with entry counts.
-     * Uses combine to merge mood colors flow with entry counts flow.
-     */
-    private fun loadMoodColors(sortOrder: MoodColorOrder) {
-        getMoodColorsJob?.cancel()
-        _uiState.update { it.copy(isLoading = true, sortOrder = sortOrder) }
+    private fun showDeleteConfirmation(moodColor: MoodColor) {
+        _state.update { it.copy(pendingDelete = moodColor) }
+    }
 
-        getMoodColorsJob = combine(
-            moodColorManagementUseCases.getMoodColors(sortOrder),
-            moodColorManagementUseCases.getMoodColorEntryCounts()
-        ) { moodColors, entryCounts ->
-            moodColors.map { moodColor ->
-                MoodColorWithCount(
-                    moodColor = moodColor,
-                    entryCount = entryCounts[moodColor.id] ?: 0
-                )
+    private fun confirmDelete() {
+        val moodColor = _state.value.pendingDelete ?: return
+        val id = moodColor.id ?: return
+        viewModelScope.launch {
+            when (val result = useCases.deleteMoodColor(id)) {
+                is Result.Success -> {
+                    _state.update { it.copy(pendingDelete = null) }
+                    syncScheduler.requestImmediateSync()
+                }
+                is Result.Error -> {
+                    _state.update { it.copy(pendingDelete = null) }
+                    _events.emit(MoodColorEvent.ShowError(result.error))
+                }
             }
         }
-            .onEach { moodColorsWithCount ->
-                _uiState.update {
-                    it.copy(
-                        moodColorsWithCount = moodColorsWithCount,
-                        isLoading = false,
-                        loadError = null
-                    )
+    }
+
+    private fun dismissDeleteDialog() {
+        _state.update { it.copy(pendingDelete = null) }
+    }
+
+    private fun toggleFavorite(id: Int, currentValue: Boolean) {
+        val newValue = !currentValue
+
+        // Store original value for potential rollback
+        // Don't overwrite if already pending (preserves true original)
+        _state.update { state ->
+            state.copy(
+                moodColors = state.moodColors.withOptimisticFavorite(id, newValue),
+                pendingFavorites = if (id in state.pendingFavorites) {
+                    state.pendingFavorites // Keep true original
+                } else {
+                    state.pendingFavorites + (id to currentValue)
+                }
+            )
+        }
+
+        viewModelScope.launch {
+            // Delay reordering for smooth animation
+            delay(MoodColorConstants.REORDER_DELAY_MS)
+
+            when (val result = useCases.setFavorite(id, newValue)) {
+                is Result.Success -> {
+                    _state.update {
+                        it.copy(pendingFavorites = it.pendingFavorites - id)
+                    }
+                    syncScheduler.requestImmediateSync()
+                }
+                is Result.Error -> {
+                    // Revert using stored original value
+                    val originalValue = _state.value.pendingFavorites[id] ?: currentValue
+                    _state.update { state ->
+                        state.copy(
+                            moodColors = state.moodColors.revertOptimisticFavorite(id, originalValue),
+                            pendingFavorites = state.pendingFavorites - id
+                        )
+                    }
+                    _events.emit(MoodColorEvent.ShowError(result.error))
                 }
             }
-            .catch { exception ->
-                Timber.e(exception, "Failed to load mood colors")
-                _uiState.update {
-                    it.copy(
-                        isLoading = false,
-                        loadError = exception.message ?: "Failed to load mood colors"
-                    )
-                }
-            }
-            .launchIn(viewModelScope)
+        }
     }
 }

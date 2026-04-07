@@ -1,6 +1,5 @@
 package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement
 
-import app.cash.turbine.test
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -15,21 +14,19 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
+import io.mockk.mockk
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEntryCountsUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
-import io.mockk.mockk
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetSortedMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.RestoreMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 
@@ -37,11 +34,11 @@ import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
  * Unit tests for MoodColorManagementViewModel.
  *
  * Tests cover:
- * - Initialization (load mood colors with entry counts)
- * - Sorting (Date/Mood, Ascending/Descending)
+ * - Initialization (load mood colors sorted by favorites + usage)
  * - Delete with undo functionality
  * - Add new mood color
  * - Edit mood color
+ * - Toggle favorite
  * - Error handling
  *
  * Following Google's best practices: ViewModels tested with fake repositories.
@@ -70,15 +67,18 @@ class MoodColorManagementViewModelTest {
     }
 
     private fun createViewModel(): MoodColorManagementViewModel {
+        val validateUseCase = ValidateMoodColorUseCase(fakeMoodColorRepository)
         val useCases = MoodColorManagementUseCases(
-            getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
-            addMoodColor = AddMoodColorUseCase(fakeMoodColorRepository),
-            updateMoodColor = UpdateMoodColorUseCase(fakeMoodColorRepository),
-            updateMoodColorName = UpdateMoodColorNameUseCase(fakeMoodColorRepository),
+            getSortedMoodColors = GetSortedMoodColorsUseCase(fakeMoodColorRepository, fakeEntryRepository),
+            saveMoodColor = SaveMoodColorUseCase(validateUseCase, fakeMoodColorRepository),
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
-            getMoodColorEntryCounts = GetMoodColorEntryCountsUseCase(fakeEntryRepository)
+            restoreMoodColor = RestoreMoodColorUseCase(fakeMoodColorRepository),
+            setFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository)
         )
-        return MoodColorManagementViewModel(useCases, mockSyncScheduler)
+        return MoodColorManagementViewModel(
+            useCases = useCases,
+            syncScheduler = mockSyncScheduler
+        )
     }
 
     // ============================================================
@@ -88,8 +88,8 @@ class MoodColorManagementViewModelTest {
     @Test
     fun `init - loads mood colors with entry counts`() = runTest {
         // Given: Mood colors and entries exist
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1, dateStamp = 1000L)
-        val mood2 = TestDataBuilders.createMoodColor(mood = "Sad", id = 2, dateStamp = 2000L)
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
+        val mood2 = TestDataBuilders.createMoodColor(mood = "Sad", id = 2)
         fakeMoodColorRepository.insertMoodColor(mood1)
         fakeMoodColorRepository.insertMoodColor(mood2)
 
@@ -103,11 +103,11 @@ class MoodColorManagementViewModelTest {
         viewModel = createViewModel()
 
         // Then: Should load mood colors with correct counts
-        val state = viewModel.uiState.value
-        assertEquals("Should have 2 mood colors", 2, state.moodColorsWithCount.size)
+        val state = viewModel.state.value
+        assertEquals("Should have 2 mood colors", 2, state.moodColors.size)
 
-        val happyMood = state.moodColorsWithCount.find { it.moodColor.mood == "Happy" }
-        val sadMood = state.moodColorsWithCount.find { it.moodColor.mood == "Sad" }
+        val happyMood = state.moodColors.find { it.moodColor.mood == "Happy" }
+        val sadMood = state.moodColors.find { it.moodColor.mood == "Sad" }
 
         assertNotNull("Happy mood should exist", happyMood)
         assertNotNull("Sad mood should exist", sadMood)
@@ -123,79 +123,38 @@ class MoodColorManagementViewModelTest {
         viewModel = createViewModel()
 
         // Then: Should have empty list
-        val state = viewModel.uiState.value
-        assertTrue("Should be empty", state.moodColorsWithCount.isEmpty())
+        val state = viewModel.state.value
+        assertTrue("Should be empty", state.moodColors.isEmpty())
         assertFalse("Should not be loading", state.isLoading)
     }
 
     @Test
-    fun `init - default sort order is Date Descending`() = runTest {
-        // Given: Nothing special
+    fun `init - sorts by favorites first then by usage count`() = runTest {
+        // Given: Mood colors with different favorites and entry counts
+        val mood1 = TestDataBuilders.createMoodColor(mood = "LowUsage", id = 1, isFavorite = false)
+        val mood2 = TestDataBuilders.createMoodColor(mood = "HighUsage", id = 2, isFavorite = false)
+        val mood3 = TestDataBuilders.createMoodColor(mood = "Favorite", id = 3, isFavorite = true)
+        fakeMoodColorRepository.insertMoodColor(mood1)
+        fakeMoodColorRepository.insertMoodColor(mood2)
+        fakeMoodColorRepository.insertMoodColor(mood3)
+
+        // Add entries: 1 for LowUsage, 5 for HighUsage, 2 for Favorite
+        fakeEntryRepository.insertEntry(TestDataBuilders.createEntry(moodColorId = 1, id = 1))
+        repeat(5) { index ->
+            fakeEntryRepository.insertEntry(TestDataBuilders.createEntry(moodColorId = 2, id = 10 + index))
+        }
+        repeat(2) { index ->
+            fakeEntryRepository.insertEntry(TestDataBuilders.createEntry(moodColorId = 3, id = 20 + index))
+        }
 
         // When: Creating ViewModel
         viewModel = createViewModel()
 
-        // Then: Default sort order should be Date Descending
-        val state = viewModel.uiState.value
-        assertTrue("Should be Date order", state.sortOrder is MoodColorOrder.Date)
-        assertTrue("Should be Descending", state.sortOrder.orderType is OrderType.Descending)
-    }
-
-    // ============================================================
-    // Sorting Tests
-    // ============================================================
-
-    @Test
-    fun `toggleSortOrder - changes to Mood Ascending`() = runTest {
-        // Given: ViewModel with mood colors
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Zebra", id = 1, dateStamp = 1000L)
-        val mood2 = TestDataBuilders.createMoodColor(mood = "Apple", id = 2, dateStamp = 2000L)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        fakeMoodColorRepository.insertMoodColor(mood2)
-        viewModel = createViewModel()
-
-        // When: Changing to Mood Ascending
-        viewModel.onAction(MoodColorManagementAction.ToggleSortOrder(MoodColorOrder.Mood(OrderType.Ascending)))
-
-        // Then: Sort order should change and list should be sorted A-Z
-        val state = viewModel.uiState.value
-        assertTrue("Should be Mood order", state.sortOrder is MoodColorOrder.Mood)
-        assertTrue("Should be Ascending", state.sortOrder.orderType is OrderType.Ascending)
-        assertEquals("First should be Apple", "Apple", state.moodColorsWithCount[0].moodColor.mood)
-        assertEquals("Second should be Zebra", "Zebra", state.moodColorsWithCount[1].moodColor.mood)
-    }
-
-    @Test
-    fun `toggleSortOrder - changes to Date Ascending`() = runTest {
-        // Given: ViewModel with mood colors created at different times
-        val mood1 = TestDataBuilders.createMoodColor(mood = "First", id = 1, dateStamp = 1000L)
-        val mood2 = TestDataBuilders.createMoodColor(mood = "Second", id = 2, dateStamp = 2000L)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        fakeMoodColorRepository.insertMoodColor(mood2)
-        viewModel = createViewModel()
-
-        // When: Changing to Date Ascending
-        viewModel.onAction(MoodColorManagementAction.ToggleSortOrder(MoodColorOrder.Date(OrderType.Ascending)))
-
-        // Then: Should be sorted oldest first
-        val state = viewModel.uiState.value
-        assertTrue("Should be Date order", state.sortOrder is MoodColorOrder.Date)
-        assertTrue("Should be Ascending", state.sortOrder.orderType is OrderType.Ascending)
-        assertEquals("First should be oldest", "First", state.moodColorsWithCount[0].moodColor.mood)
-    }
-
-    @Test
-    fun `toggleSortOrder - same order does nothing`() = runTest {
-        // Given: ViewModel with default order (Date Descending)
-        viewModel = createViewModel()
-        val initialState = viewModel.uiState.value
-
-        // When: Setting same order again
-        viewModel.onAction(MoodColorManagementAction.ToggleSortOrder(MoodColorOrder.Date(OrderType.Descending)))
-
-        // Then: State should remain the same (no unnecessary reload)
-        val finalState = viewModel.uiState.value
-        assertEquals("Sort order should be same", initialState.sortOrder::class, finalState.sortOrder::class)
+        // Then: Should be sorted: Favorite first, then by usage
+        val state = viewModel.state.value
+        assertEquals("First should be Favorite (isFavorite=true)", "Favorite", state.moodColors[0].moodColor.mood)
+        assertEquals("Second should be HighUsage (5 entries)", "HighUsage", state.moodColors[1].moodColor.mood)
+        assertEquals("Third should be LowUsage (1 entry)", "LowUsage", state.moodColors[2].moodColor.mood)
     }
 
     // ============================================================
@@ -203,7 +162,7 @@ class MoodColorManagementViewModelTest {
     // ============================================================
 
     @Test
-    fun `deleteMoodColor - removes from list and shows snackbar`() = runTest {
+    fun `deleteMoodColor - removes from list and shows undo snackbar`() = runTest {
         // Given: ViewModel with mood colors
         val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
         val mood2 = TestDataBuilders.createMoodColor(mood = "Sad", id = 2)
@@ -211,363 +170,190 @@ class MoodColorManagementViewModelTest {
         fakeMoodColorRepository.insertMoodColor(mood2)
         viewModel = createViewModel()
 
-        // Collect events before action
-        viewModel.uiEvents.test {
-            // When: Deleting Happy
-            viewModel.onAction(MoodColorManagementAction.DeleteMoodColor(mood1))
+        // When: Requesting delete (opens confirmation dialog)
+        viewModel.onAction(MoodColorManagementAction.RequestDeleteMoodColor(mood1))
 
-            // Then: Should emit snackbar event
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should mention deleted mood", snackbarEvent.message.contains("Happy"))
-            assertEquals("Should have Undo action", "Undo", snackbarEvent.actionLabel)
+        // Then: Pending delete should be set (dialog shown)
+        var state = viewModel.state.value
+        assertNotNull("Pending delete should be set", state.pendingDelete)
+        assertEquals("Pending delete should be Happy", "Happy", state.pendingDelete?.mood)
 
-            cancelAndIgnoreRemainingEvents()
-        }
+        // And: Mood should still be in list (not deleted yet)
+        assertEquals("Should have 2 mood colors", 2, state.moodColors.size)
 
-        // Then: Mood should be removed from list
-        val state = viewModel.uiState.value
-        assertEquals("Should have 1 mood color left", 1, state.moodColorsWithCount.size)
-        assertEquals("Remaining should be Sad", "Sad", state.moodColorsWithCount[0].moodColor.mood)
+        // When: Confirming delete
+        viewModel.onAction(MoodColorManagementAction.ConfirmDelete)
+        testDispatcher.scheduler.advanceUntilIdle()
 
-        // And: Recently deleted should be set
-        assertNotNull("Recently deleted should be set", state.recentlyDeletedMoodColor)
-        assertEquals("Recently deleted should be Happy", "Happy", state.recentlyDeletedMoodColor?.mood)
+        // Then: Mood should be removed from list (soft deleted)
+        state = viewModel.state.value
+        assertEquals("Should have 1 mood color left", 1, state.moodColors.size)
+        assertEquals("Remaining should be Sad", "Sad", state.moodColors[0].moodColor.mood)
+
+        // And: Pending delete should be cleared
+        assertNull("Pending delete should be null", state.pendingDelete)
     }
 
     @Test
-    fun `restoreMoodColor - restores deleted mood and shows snackbar`() = runTest {
-        // Given: ViewModel with a deleted mood color
+    fun `dismissDeleteDialog - cancels deletion`() = runTest {
+        // Given: ViewModel with delete confirmation dialog open
         val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
         fakeMoodColorRepository.insertMoodColor(mood1)
         viewModel = createViewModel()
 
-        // Collect events - must start before actions to capture SharedFlow emissions
-        viewModel.uiEvents.test {
-            // Delete the mood first
-            viewModel.onAction(MoodColorManagementAction.DeleteMoodColor(mood1))
+        // Open delete dialog
+        viewModel.onAction(MoodColorManagementAction.RequestDeleteMoodColor(mood1))
+        assertNotNull("Should have pending delete", viewModel.state.value.pendingDelete)
 
-            // Should get delete snackbar
-            val deleteEvent = awaitItem()
-            assertTrue("Should be delete snackbar", (deleteEvent as MoodColorManagementUiEvent.ShowSnackbar).message.contains("deleted"))
+        // When: Dismissing dialog
+        viewModel.onAction(MoodColorManagementAction.DismissDeleteDialog)
 
-            // When: Restoring
-            viewModel.onAction(MoodColorManagementAction.RestoreMoodColor)
-
-            // Then: Should emit restored snackbar
-            val restoreEvent = awaitItem()
-            assertTrue("Should be snackbar event", restoreEvent is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = restoreEvent as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should mention restored", snackbarEvent.message.contains("restored"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // Then: Recently deleted should be cleared
-        val state = viewModel.uiState.value
-        assertNull("Recently deleted should be null", state.recentlyDeletedMoodColor)
-    }
-
-    @Test
-    fun `clearRecentlyDeleted - clears the recently deleted mood`() = runTest {
-        // Given: ViewModel with a deleted mood color
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.DeleteMoodColor(mood1))
-
-        // Verify it was set
-        assertNotNull("Should have recently deleted", viewModel.uiState.value.recentlyDeletedMoodColor)
-
-        // When: Clearing
-        viewModel.onAction(MoodColorManagementAction.ClearRecentlyDeleted)
-
-        // Then: Should be cleared
-        assertNull("Should be null", viewModel.uiState.value.recentlyDeletedMoodColor)
+        // Then: Pending delete should be cleared and mood still exists
+        val state = viewModel.state.value
+        assertNull("Pending delete should be null", state.pendingDelete)
+        assertEquals("Should still have 1 mood color", 1, state.moodColors.size)
+        assertEquals("Should be Happy", "Happy", state.moodColors[0].moodColor.mood)
     }
 
     // ============================================================
-    // Add Mood Color Dialog Tests
+    // Add/Edit Mood Color Dialog Tests
     // ============================================================
 
     @Test
-    fun `showAddMoodColorDialog - sets dialog state to true`() = runTest {
+    fun `addMoodColor - opens dialog with empty mood color`() = runTest {
         // Given: ViewModel
         viewModel = createViewModel()
-        assertFalse("Initially should be false", viewModel.uiState.value.showAddMoodColorDialog)
+        assertNull("Initially should be null", viewModel.state.value.editingMoodColor)
 
-        // When: Showing dialog
-        viewModel.onAction(MoodColorManagementAction.ShowAddMoodColorDialog)
+        // When: Adding mood color
+        viewModel.onAction(MoodColorManagementAction.AddMoodColor)
 
-        // Then: Should be true
-        assertTrue("Should be true", viewModel.uiState.value.showAddMoodColorDialog)
+        // Then: Should have editing mood with null id (new)
+        val editing = viewModel.state.value.editingMoodColor
+        assertNotNull("Should have editing mood", editing)
+        assertNull("Id should be null (new mood)", editing?.id)
     }
 
     @Test
-    fun `dismissAddMoodColorDialog - sets dialog state to false`() = runTest {
-        // Given: ViewModel with dialog open
-        viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowAddMoodColorDialog)
-
-        // When: Dismissing
-        viewModel.onAction(MoodColorManagementAction.DismissAddMoodColorDialog)
-
-        // Then: Should be false
-        assertFalse("Should be false", viewModel.uiState.value.showAddMoodColorDialog)
-    }
-
-    @Test
-    fun `saveNewMoodColor - creates mood and shows snackbar`() = runTest {
-        // Given: ViewModel
-        viewModel = createViewModel()
-
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Saving new mood
-            viewModel.onAction(MoodColorManagementAction.SaveNewMoodColor("Excited", "FF5722"))
-
-            // Then: Should emit snackbar
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should mention created", snackbarEvent.message.contains("created"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // Then: Dialog should be closed
-        assertFalse("Dialog should be closed", viewModel.uiState.value.showAddMoodColorDialog)
-
-        // And: Mood should be in list
-        val state = viewModel.uiState.value
-        assertTrue("Should contain Excited", state.moodColorsWithCount.any { it.moodColor.mood == "Excited" })
-    }
-
-    @Test
-    fun `saveNewMoodColor - with empty mood shows error`() = runTest {
-        // Given: ViewModel
-        viewModel = createViewModel()
-
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Saving with empty mood name
-            viewModel.onAction(MoodColorManagementAction.SaveNewMoodColor("", "FF5722"))
-
-            // Then: Should emit error snackbar
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Should be error message", snackbarEvent.message.contains("blank") || snackbarEvent.message.contains("empty") || snackbarEvent.message.contains("Invalid"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    // ============================================================
-    // Edit Mood Color Dialog Tests
-    // ============================================================
-
-    @Test
-    fun `showEditMoodColorDialog - sets editing mood color`() = runTest {
+    fun `editMoodColor - opens dialog with existing mood color`() = runTest {
         // Given: ViewModel with mood colors
         val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
         fakeMoodColorRepository.insertMoodColor(mood1)
         viewModel = createViewModel()
 
-        assertNull("Initially should be null", viewModel.uiState.value.editingMoodColor)
+        assertNull("Initially should be null", viewModel.state.value.editingMoodColor)
 
-        // When: Showing edit dialog
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
+        // When: Editing
+        viewModel.onAction(MoodColorManagementAction.EditMoodColor(mood1))
 
         // Then: Editing mood should be set
-        val state = viewModel.uiState.value
+        val state = viewModel.state.value
         assertNotNull("Should have editing mood", state.editingMoodColor)
         assertEquals("Should be Happy", "Happy", state.editingMoodColor?.mood)
     }
 
     @Test
-    fun `dismissEditMoodColorDialog - clears editing mood color`() = runTest {
+    fun `dismissDialog - clears editing mood color`() = runTest {
         // Given: ViewModel with edit dialog open
         val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
         fakeMoodColorRepository.insertMoodColor(mood1)
         viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
+        viewModel.onAction(MoodColorManagementAction.EditMoodColor(mood1))
 
         // When: Dismissing
-        viewModel.onAction(MoodColorManagementAction.DismissEditMoodColorDialog)
+        viewModel.onAction(MoodColorManagementAction.DismissDialog)
 
         // Then: Should be null
-        assertNull("Should be null", viewModel.uiState.value.editingMoodColor)
+        assertNull("Should be null", viewModel.state.value.editingMoodColor)
     }
 
     @Test
-    fun `saveEditedMoodColor - updates color and shows snackbar`() = runTest {
-        // Given: ViewModel with mood color
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
-        fakeMoodColorRepository.insertMoodColor(mood1)
+    fun `saveMoodColor - creates new mood and closes dialog`() = runTest {
+        // Given: ViewModel
         viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
 
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Saving edited color (keeping same name)
-            viewModel.onAction(
-                MoodColorManagementAction.SaveEditedMoodColor(
-                    moodColorId = 1,
-                    newMood = "Happy",
-                    newColorHex = "FF5722"
-                )
-            )
-
-            // Then: Should emit snackbar
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should mention updated", snackbarEvent.message.contains("updated"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
+        // When: Saving new mood
+        val newMood = MoodColor.empty().copy(mood = "Excited", color = "FF5722")
+        viewModel.onAction(MoodColorManagementAction.SaveMoodColor(newMood))
 
         // Then: Dialog should be closed
-        assertNull("Editing mood should be null", viewModel.uiState.value.editingMoodColor)
+        assertNull("Editing should be null", viewModel.state.value.editingMoodColor)
 
-        // And: Color should be updated in list
-        val state = viewModel.uiState.value
-        val updatedMood = state.moodColorsWithCount.find { it.moodColor.mood == "Happy" }
-        assertEquals("Color should be updated", "FF5722", updatedMood?.moodColor?.color)
+        // And: Mood should be in list
+        val state = viewModel.state.value
+        assertTrue("Should contain Excited", state.moodColors.any { it.moodColor.mood == "Excited" })
     }
 
     @Test
-    fun `saveEditedMoodColor - updates mood name and color`() = runTest {
-        // Given: ViewModel with mood color
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
-
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Saving with new name and color
-            viewModel.onAction(
-                MoodColorManagementAction.SaveEditedMoodColor(
-                    moodColorId = 1,
-                    newMood = "Joyful",
-                    newColorHex = "FF5722"
-                )
-            )
-
-            // Then: Should emit snackbar with new name
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should contain new name", snackbarEvent.message.contains("Joyful"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // Then: Name and color should be updated in list
-        val state = viewModel.uiState.value
-        val updatedMood = state.moodColorsWithCount.find { it.moodColor.id == 1 }
-        assertEquals("Name should be updated", "Joyful", updatedMood?.moodColor?.mood)
-        assertEquals("Color should be updated", "FF5722", updatedMood?.moodColor?.color)
-    }
-
-    @Test
-    fun `saveEditedMoodColor - shows error for duplicate name`() = runTest {
-        // Given: ViewModel with two mood colors
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
-        val mood2 = TestDataBuilders.createMoodColor(mood = "Sad", color = "2196F3", id = 2)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        fakeMoodColorRepository.insertMoodColor(mood2)
-        viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood2))
-
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Trying to rename Sad to Happy (duplicate)
-            viewModel.onAction(
-                MoodColorManagementAction.SaveEditedMoodColor(
-                    moodColorId = 2,
-                    newMood = "Happy",
-                    newColorHex = "2196F3"
-                )
-            )
-
-            // Then: Should emit error snackbar
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue("Message should mention exists", snackbarEvent.message.contains("exists"))
-
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // And: Original name should be preserved
-        val sadMood = fakeMoodColorRepository.getMoodColorById(2).getOrNull()
-        assertEquals("Name should be unchanged", "Sad", sadMood?.mood)
-    }
-
-    @Test
-    fun `saveEditedMoodColor - shows error for blank name`() = runTest {
-        // Given: ViewModel with mood color
-        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", color = "4CAF50", id = 1)
-        fakeMoodColorRepository.insertMoodColor(mood1)
-        viewModel = createViewModel()
-        viewModel.onAction(MoodColorManagementAction.ShowEditMoodColorDialog(mood1))
-
-        // Collect events
-        viewModel.uiEvents.test {
-            // When: Trying to save with blank name
-            viewModel.onAction(
-                MoodColorManagementAction.SaveEditedMoodColor(
-                    moodColorId = 1,
-                    newMood = "   ",
-                    newColorHex = "4CAF50"
-                )
-            )
-
-            // Then: Should emit error snackbar
-            val event = awaitItem()
-            assertTrue("Should be snackbar event", event is MoodColorManagementUiEvent.ShowSnackbar)
-            val snackbarEvent = event as MoodColorManagementUiEvent.ShowSnackbar
-            assertTrue(
-                "Message should mention empty or invalid",
-                snackbarEvent.message.contains("empty") || snackbarEvent.message.contains("Invalid")
-            )
-
-            cancelAndIgnoreRemainingEvents()
-        }
-    }
-
-    // ============================================================
-    // Error Handling Tests
-    // ============================================================
-
-    @Test
-    fun `retryLoadMoodColors - clears error and reloads`() = runTest {
+    fun `saveMoodColor - shows error for blank name`() = runTest {
         // Given: ViewModel
         viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.AddMoodColor)
 
-        // When: Retrying (simulates error recovery)
-        viewModel.onAction(MoodColorManagementAction.RetryLoadMoodColors)
+        // When: Saving with blank name
+        val badMood = MoodColor.empty().copy(mood = "", color = "FF5722")
+        viewModel.onAction(MoodColorManagementAction.SaveMoodColor(badMood))
 
-        // Then: Error should be null and not loading
-        val state = viewModel.uiState.value
-        assertNull("Error should be null", state.loadError)
-        assertFalse("Should not be loading", state.isLoading)
+        // Then: Dialog should still be open with error
+        val state = viewModel.state.value
+        assertNotNull("Dialog should still be open", state.editingMoodColor)
+        assertEquals("Should have BlankName error", MoodColorError.BlankName, state.dialogError)
     }
 
     @Test
-    fun `dismissLoadError - clears error state`() = runTest {
-        // Given: ViewModel
+    fun `saveMoodColor - shows error for duplicate name`() = runTest {
+        // Given: ViewModel with existing mood color
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1)
+        fakeMoodColorRepository.insertMoodColor(mood1)
         viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.AddMoodColor)
 
-        // When: Dismissing error
-        viewModel.onAction(MoodColorManagementAction.DismissLoadError)
+        // When: Saving with duplicate name
+        val duplicate = MoodColor.empty().copy(mood = "Happy", color = "FF5722")
+        viewModel.onAction(MoodColorManagementAction.SaveMoodColor(duplicate))
+
+        // Then: Should have DuplicateName error
+        val state = viewModel.state.value
+        assertEquals("Should have DuplicateName error", MoodColorError.DuplicateName, state.dialogError)
+    }
+
+    @Test
+    fun `clearError - clears dialog error`() = runTest {
+        // Given: ViewModel with error
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.AddMoodColor)
+        val badMood = MoodColor.empty().copy(mood = "", color = "FF5722")
+        viewModel.onAction(MoodColorManagementAction.SaveMoodColor(badMood))
+
+        // Verify error exists
+        assertNotNull("Should have error", viewModel.state.value.dialogError)
+
+        // When: Clearing error
+        viewModel.onAction(MoodColorManagementAction.ClearError)
 
         // Then: Error should be null
-        assertNull("Error should be null", viewModel.uiState.value.loadError)
+        assertNull("Error should be null", viewModel.state.value.dialogError)
+    }
+
+    // ============================================================
+    // Toggle Favorite Tests
+    // ============================================================
+
+    @Test
+    fun `toggleFavorite - updates favorite state optimistically`() = runTest {
+        // Given: ViewModel with non-favorite mood color
+        val mood1 = TestDataBuilders.createMoodColor(mood = "Happy", id = 1, isFavorite = false)
+        fakeMoodColorRepository.insertMoodColor(mood1)
+        viewModel = createViewModel()
+
+        // Verify initial state
+        assertFalse("Initially not favorite", viewModel.state.value.moodColors[0].moodColor.isFavorite)
+
+        // When: Toggling favorite
+        viewModel.onAction(MoodColorManagementAction.ToggleFavorite(id = 1, currentValue = false))
+
+        // Then: Should be favorite optimistically
+        assertTrue("Should be favorite now", viewModel.state.value.moodColors[0].moodColor.isFavorite)
     }
 
     // ============================================================
@@ -584,8 +370,8 @@ class MoodColorManagementViewModelTest {
         viewModel = createViewModel()
 
         // Then: Entry count should be 0
-        val state = viewModel.uiState.value
-        val unusedMood = state.moodColorsWithCount.find { it.moodColor.mood == "Unused" }
+        val state = viewModel.state.value
+        val unusedMood = state.moodColors.find { it.moodColor.mood == "Unused" }
         assertEquals("Should have 0 entries", 0, unusedMood?.entryCount)
     }
 
@@ -599,8 +385,8 @@ class MoodColorManagementViewModelTest {
         viewModel = createViewModel()
 
         // Verify initial count
-        var state = viewModel.uiState.value
-        assertEquals("Initial count should be 1", 1, state.moodColorsWithCount[0].entryCount)
+        var state = viewModel.state.value
+        assertEquals("Initial count should be 1", 1, state.moodColors[0].entryCount)
 
         // When: Adding another entry
         fakeEntryRepository.insertEntry(TestDataBuilders.createEntry(moodColorId = 1, id = 2))
@@ -609,7 +395,7 @@ class MoodColorManagementViewModelTest {
         testDispatcher.scheduler.advanceUntilIdle()
 
         // Then: Count should update to 2
-        state = viewModel.uiState.value
-        assertEquals("Updated count should be 2", 2, state.moodColorsWithCount[0].entryCount)
+        state = viewModel.state.value
+        assertEquals("Updated count should be 2", 2, state.moodColors[0].entryCount)
     }
 }

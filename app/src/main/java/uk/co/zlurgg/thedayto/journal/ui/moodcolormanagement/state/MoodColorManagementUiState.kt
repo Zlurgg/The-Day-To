@@ -1,10 +1,9 @@
 package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state
 
-import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
 
 /**
  * UI state for the Mood Color Management screen.
@@ -12,22 +11,10 @@ import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
  */
 @Stable
 data class MoodColorManagementUiState(
-    val moodColorsWithCount: List<MoodColorWithCount> = emptyList(),
-    val sortOrder: MoodColorOrder = MoodColorOrder.Date(OrderType.Descending),
-    val isLoading: Boolean = false,
-    val loadError: String? = null,
-    val recentlyDeletedMoodColor: MoodColor? = null,
-
-    // Dialog state
-    val showAddMoodColorDialog: Boolean = false,
-    val editingMoodColor: MoodColor? = null
-)
-
-/**
- * Wrapper for MoodColor with the count of entries using this mood.
- */
-@Immutable
-data class MoodColorWithCount(
-    val moodColor: MoodColor,
-    val entryCount: Int
+    val moodColors: List<MoodColorWithCount> = emptyList(),
+    val isLoading: Boolean = true,
+    val editingMoodColor: MoodColor? = null,
+    val dialogError: MoodColorError? = null,
+    val pendingDelete: MoodColor? = null,
+    val pendingFavorites: Map<Int, Boolean> = emptyMap()
 )

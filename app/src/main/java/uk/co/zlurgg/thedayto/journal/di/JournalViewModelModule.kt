@@ -39,7 +39,7 @@ val journalViewModelModule = module {
     // MoodColorManagement ViewModel
     viewModel {
         MoodColorManagementViewModel(
-            moodColorManagementUseCases = get(),
+            useCases = get(),
             syncScheduler = get()
         )
     }

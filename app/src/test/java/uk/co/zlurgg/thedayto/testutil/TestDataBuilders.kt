@@ -19,6 +19,7 @@ object TestDataBuilders {
         mood: String = "Happy",
         color: String = "4CAF50",
         isDeleted: Boolean = false,
+        isFavorite: Boolean = false,
         dateStamp: Long = System.currentTimeMillis(),
         id: Int? = 1
     ): MoodColor {
@@ -26,6 +27,7 @@ object TestDataBuilders {
             mood = mood,
             color = color,
             isDeleted = isDeleted,
+            isFavorite = isFavorite,
             dateStamp = dateStamp,
             id = id
         )

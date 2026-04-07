@@ -1,29 +1,23 @@
 package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement
 
 import android.content.res.Configuration
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -33,44 +27,40 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SwipeToDismissBox
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberSwipeToDismissBoxState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.core.graphics.toColorInt
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
-import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingVeryLarge
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingXXSmall
-import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
-import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodColorPickerDialog
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.MoodColorSortSection
+import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.DeleteMoodColorConfirmDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
-import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorWithCount
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorConstants
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorEvent
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorRow
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -80,74 +70,55 @@ fun MoodColorManagementScreenRoot(
     onNavigateBack: () -> Unit,
     viewModel: MoodColorManagementViewModel = koinViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
-    // Handle one-time UI events
-    LaunchedEffect(key1 = true) {
-        viewModel.uiEvents.collect { event ->
+    // Handle one-time UI events (errors only)
+    LaunchedEffect(Unit) {
+        viewModel.events.collect { event ->
             when (event) {
-                is MoodColorManagementUiEvent.ShowSnackbar -> {
-                    // Handle undo action or clear deleted entry on dismiss (only if actionLabel was "Undo")
-                    if (event.actionLabel == "Undo") {
-                        val result = snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.actionLabel,
-                            withDismissAction = false,
-                            duration = SnackbarDuration.Short
-                        )
-                        when (result) {
-                            SnackbarResult.ActionPerformed -> {
-                                viewModel.onAction(MoodColorManagementAction.RestoreMoodColor)
-                            }
-                            SnackbarResult.Dismissed -> {
-                                viewModel.onAction(MoodColorManagementAction.ClearRecentlyDeleted)
-                            }
-                        }
-                    } else {
-                        snackbarHostState.showSnackbar(
-                            message = event.message,
-                            actionLabel = event.actionLabel,
-                            withDismissAction = false,
-                            duration = SnackbarDuration.Short
-                        )
-                    }
+                is MoodColorEvent.ShowUndoSnackbar -> {
+                    // No longer used - we use confirmation dialog instead
+                }
+                is MoodColorEvent.ShowError -> {
+                    snackbarHostState.showSnackbar(
+                        message = MoodColorErrorFormatter.format(context, event.error)
+                    )
                 }
             }
         }
     }
 
-    // Add mood color dialog
-    MoodColorPickerDialog(
-        showDialog = uiState.showAddMoodColorDialog,
-        onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissAddMoodColorDialog) },
-        onSave = { mood, colorHex ->
-            viewModel.onAction(MoodColorManagementAction.SaveNewMoodColor(mood, colorHex))
-        }
-    )
+    // Delete confirmation dialog
+    state.pendingDelete?.let { moodColor ->
+        DeleteMoodColorConfirmDialog(
+            moodColor = moodColor,
+            onConfirm = { viewModel.onAction(MoodColorManagementAction.ConfirmDelete) },
+            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissDeleteDialog) }
+        )
+    }
 
-    // Edit mood color dialog
-    uiState.editingMoodColor?.let { moodColor ->
+    // Edit dialog (also used for add when editingMoodColor.id is null)
+    state.editingMoodColor?.let { moodColor ->
         EditMoodColorDialog(
             moodColor = moodColor,
             showDialog = true,
-            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissEditMoodColorDialog) },
+            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissDialog) },
             onSave = { newMood, newColorHex ->
-                moodColor.id?.let { id ->
-                    viewModel.onAction(
-                        MoodColorManagementAction.SaveEditedMoodColor(
-                            moodColorId = id,
-                            newMood = newMood,
-                            newColorHex = newColorHex
-                        )
+                viewModel.onAction(
+                    MoodColorManagementAction.SaveMoodColor(
+                        moodColor.copy(mood = newMood, color = newColorHex)
                     )
-                }
-            }
+                )
+            },
+            externalError = state.dialogError?.let { MoodColorErrorFormatter.format(context, it) },
+            onErrorCleared = { viewModel.onAction(MoodColorManagementAction.ClearError) }
         )
     }
 
     MoodColorManagementScreen(
-        uiState = uiState,
+        state = state,
         onAction = viewModel::onAction,
         onNavigateBack = onNavigateBack,
         snackbarHostState = snackbarHostState
@@ -160,7 +131,7 @@ fun MoodColorManagementScreenRoot(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun MoodColorManagementScreen(
-    uiState: MoodColorManagementUiState,
+    state: MoodColorManagementUiState,
     onAction: (MoodColorManagementAction) -> Unit,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState,
@@ -197,7 +168,7 @@ private fun MoodColorManagementScreen(
             FloatingActionButton(
                 onClick = {
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                    onAction(MoodColorManagementAction.ShowAddMoodColorDialog)
+                    onAction(MoodColorManagementAction.AddMoodColor)
                 },
                 containerColor = MaterialTheme.colorScheme.primaryContainer
             ) {
@@ -214,35 +185,15 @@ private fun MoodColorManagementScreen(
                 .fillMaxSize()
                 .padding(paddingValues)
         ) {
-            // Error banner
-            if (uiState.loadError != null) {
-                LoadErrorBanner(
-                    errorMessage = uiState.loadError,
-                    onRetry = { onAction(MoodColorManagementAction.RetryLoadMoodColors) },
-                    onDismiss = { onAction(MoodColorManagementAction.DismissLoadError) }
-                )
-            }
-
-            // Sort section (hide during loading)
-            if (!uiState.isLoading) {
-                MoodColorSortSection(
-                    modifier = Modifier.padding(horizontal = paddingMedium, vertical = paddingSmall),
-                    moodColorOrder = uiState.sortOrder,
-                    onOrderChange = { order ->
-                        onAction(MoodColorManagementAction.ToggleSortOrder(order))
-                    }
-                )
-            }
-
             // Loading state
-            if (uiState.isLoading) {
+            if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator()
                 }
-            } else if (uiState.moodColorsWithCount.isEmpty() && uiState.loadError == null) {
+            } else if (state.moodColors.isEmpty()) {
                 // Empty state
                 Box(
                     modifier = Modifier
@@ -267,24 +218,41 @@ private fun MoodColorManagementScreen(
                     }
                 }
             } else {
-                // Mood color list
+                // Mood color list with swipe to delete
                 LazyColumn(
                     contentPadding = PaddingValues(paddingMedium),
                     verticalArrangement = Arrangement.spacedBy(paddingSmall)
                 ) {
                     items(
-                        items = uiState.moodColorsWithCount,
-                        key = { it.moodColor.id ?: it.moodColor.mood }
+                        items = state.moodColors,
+                        key = { it.moodColor.id ?: 0 }
                     ) { moodColorWithCount ->
-                        MoodColorCard(
+                        SwipeToDeleteMoodColorCard(
                             moodColorWithCount = moodColorWithCount,
                             onEdit = {
-                                onAction(MoodColorManagementAction.ShowEditMoodColorDialog(moodColorWithCount.moodColor))
+                                onAction(MoodColorManagementAction.EditMoodColor(moodColorWithCount.moodColor))
                             },
                             onDelete = {
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                onAction(MoodColorManagementAction.DeleteMoodColor(moodColorWithCount.moodColor))
-                            }
+                                onAction(
+                                    MoodColorManagementAction.RequestDeleteMoodColor(
+                                        moodColorWithCount.moodColor
+                                    )
+                                )
+                            },
+                            onToggleFavorite = {
+                                moodColorWithCount.moodColor.id?.let { id ->
+                                    onAction(
+                                        MoodColorManagementAction.ToggleFavorite(
+                                            id = id,
+                                            currentValue = moodColorWithCount.moodColor.isFavorite
+                                        )
+                                    )
+                                }
+                            },
+                            isDeleteEnabled = !state.isLoading,
+                            pendingDelete = state.pendingDelete,
+                            modifier = Modifier.animateItem()
                         )
                     }
                 }
@@ -293,90 +261,77 @@ private fun MoodColorManagementScreen(
     }
 }
 
-/**
- * Card displaying a mood color with entry count and actions.
- */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun MoodColorCard(
+private fun SwipeToDeleteMoodColorCard(
     moodColorWithCount: MoodColorWithCount,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
+    onToggleFavorite: () -> Unit,
+    isDeleteEnabled: Boolean,
+    pendingDelete: MoodColor?,
     modifier: Modifier = Modifier
 ) {
-    val moodColor = moodColorWithCount.moodColor
-    val color = try {
-        Color("#${moodColor.color}".toColorInt())
-    } catch (_: Exception) {
-        MaterialTheme.colorScheme.primary
+    val dismissState = rememberSwipeToDismissBoxState()
+
+    LaunchedEffect(dismissState.currentValue) {
+        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+            onDelete()
+        }
     }
 
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = UiConstants.ENTRY_CARD_ELEVATION_DEFAULT)
+    // Reset swipe position when user cancels the delete dialog
+    LaunchedEffect(pendingDelete) {
+        if (pendingDelete == null &&
+            dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
+        ) {
+            dismissState.reset()
+        }
+    }
+
+    SwipeToDismissBox(
+        state = dismissState,
+        backgroundContent = {
+            // Only show background when actively swiping (prevents red corners showing)
+            val direction = dismissState.dismissDirection
+            if (direction == SwipeToDismissBoxValue.EndToStart) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.error)
+                        .padding(horizontal = paddingMedium),
+                    contentAlignment = Alignment.CenterEnd
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Delete,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.onError
+                    )
+                }
+            }
+        },
+        enableDismissFromStartToEnd = false,
+        enableDismissFromEndToStart = isDeleteEnabled,
+        modifier = modifier
     ) {
-        Row(
+        Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable(onClick = onEdit)
-                .padding(paddingMedium),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Color indicator
-            Box(
-                modifier = Modifier
-                    .size(paddingVeryLarge)
-                    .clip(CircleShape)
-                    .background(color)
-                    .border(
-                        width = paddingXXSmall,
-                        color = MaterialTheme.colorScheme.outline,
-                        shape = CircleShape
-                    )
+                .animateContentSize(),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = MoodColorConstants.CARD_ELEVATION_DEFAULT,
+                pressedElevation = MoodColorConstants.CARD_ELEVATION_PRESSED
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
             )
-
-            Spacer(modifier = Modifier.width(paddingMedium))
-
-            // Mood name and entry count
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = moodColor.mood,
-                    style = MaterialTheme.typography.titleMedium,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
-                )
-                Text(
-                    text = if (moodColorWithCount.entryCount == 1) {
-                        stringResource(R.string.entry_count_one)
-                    } else {
-                        stringResource(R.string.entry_count_many, moodColorWithCount.entryCount)
-                    },
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
-
-            // Edit button
-            IconButton(onClick = onEdit) {
-                Icon(
-                    imageVector = Icons.Default.Edit,
-                    contentDescription = stringResource(R.string.edit_mood_color),
-                    tint = MaterialTheme.colorScheme.primary
-                )
-            }
-
-            // Delete button
-            IconButton(onClick = onDelete) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete_mood_color),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
+        ) {
+            MoodColorRow(
+                moodColorWithCount = moodColorWithCount,
+                onToggleFavorite = onToggleFavorite,
+                onEdit = onEdit,
+                showEntryCount = true
+            )
         }
     }
 }
@@ -389,13 +344,14 @@ private fun MoodColorCard(
 private fun MoodColorManagementScreenPreview() {
     TheDayToTheme {
         MoodColorManagementScreen(
-            uiState = MoodColorManagementUiState(
-                moodColorsWithCount = listOf(
+            state = MoodColorManagementUiState(
+                moodColors = listOf(
                     MoodColorWithCount(
                         moodColor = MoodColor(
                             id = 1,
                             mood = "Happy",
                             color = "FFD700",
+                            isFavorite = true,
                             dateStamp = 0
                         ),
                         entryCount = 15
@@ -405,6 +361,7 @@ private fun MoodColorManagementScreenPreview() {
                             id = 2,
                             mood = "Sad",
                             color = "4169E1",
+                            isFavorite = false,
                             dateStamp = 0
                         ),
                         entryCount = 3
@@ -414,11 +371,13 @@ private fun MoodColorManagementScreenPreview() {
                             id = 3,
                             mood = "Excited",
                             color = "FF6347",
+                            isFavorite = false,
                             dateStamp = 0
                         ),
                         entryCount = 1
                     )
-                )
+                ),
+                isLoading = false
             ),
             onAction = {},
             onNavigateBack = {},
@@ -432,7 +391,7 @@ private fun MoodColorManagementScreenPreview() {
 private fun MoodColorManagementScreenEmptyPreview() {
     TheDayToTheme {
         MoodColorManagementScreen(
-            uiState = MoodColorManagementUiState(),
+            state = MoodColorManagementUiState(isLoading = false),
             onAction = {},
             onNavigateBack = {},
             snackbarHostState = SnackbarHostState()

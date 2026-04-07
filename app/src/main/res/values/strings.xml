@@ -37,6 +37,18 @@
     <string name="tap_plus_to_add">Tap + to create your first mood color</string>
     <string name="entry_count_one">1 entry</string>
     <string name="entry_count_many">%d entries</string>
+    <string name="add_to_favorites">Add to favorites</string>
+    <string name="remove_from_favorites">Remove from favorites</string>
+    <string name="mood_color_deleted">Mood color deleted</string>
+    <string name="error_blank_name">Name cannot be empty</string>
+    <string name="error_name_too_long">Name must be 50 characters or less</string>
+    <string name="error_duplicate_name">A mood with this name already exists</string>
+    <string name="error_invalid_color">Invalid color format</string>
+    <string name="error_database">Something went wrong. Please try again.</string>
+    <plurals name="entry_count">
+        <item quantity="one">%d entry</item>
+        <item quantity="other">%d entries</item>
+    </plurals>
 
     <!-- Add edit daily entry -->
     <string name="back">Back</string>
@@ -96,6 +108,10 @@
     <string name="delete_entry_dialog_title">Delete Entry</string>
     <string name="delete_entry_dialog_message">Delete your %1$s entry from %2$s?</string>
     <string name="delete_confirm_button">Delete</string>
+
+    <!-- Delete Mood Color Confirmation Dialog -->
+    <string name="delete_mood_color_dialog_title">Delete Mood Color</string>
+    <string name="delete_mood_color_dialog_message">Delete \"%1$s\"? Entries using this mood will keep their color.</string>
 
     <!-- Welcome Dialog -->
     <string name="welcome_dialog_title">Welcome to The Day To</string>
