@@ -18,6 +18,7 @@ import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
+import uk.co.zlurgg.thedayto.journal.domain.model.sortedByFavorite
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
@@ -254,8 +255,8 @@ class EditorViewModel(
                 moodColorDelegate.handleToggleMoodColorSection()
             is EditorAction.SaveMoodColor ->
                 moodColorDelegate.handleSaveMoodColor(action.mood, action.colorHex)
-            is EditorAction.DeleteMoodColor ->
-                moodColorDelegate.handleDeleteMoodColor(action.moodColor)
+            is EditorAction.ToggleMoodColorFavorite ->
+                moodColorDelegate.handleToggleFavorite(action.moodColor)
             is EditorAction.EditMoodColor ->
                 moodColorDelegate.handleEditMoodColor(action.moodColor)
             is EditorAction.UpdateMoodColor ->
@@ -425,7 +426,8 @@ class EditorViewModel(
             )
         )
             .onEach { moodColors ->
-                _uiState.update { it.copy(moodColors = moodColors) }
+                // Sort by favorites first for the dropdown
+                _uiState.update { it.copy(moodColors = moodColors.sortedByFavorite()) }
             }
             .launchIn(viewModelScope)
     }

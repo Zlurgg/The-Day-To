@@ -9,3 +9,10 @@ fun List<MoodColorWithCount>.sortedByFavoriteAndUsage(): List<MoodColorWithCount
         compareByDescending<MoodColorWithCount> { it.moodColor.isFavorite }
             .thenByDescending { it.entryCount }
     )
+
+/**
+ * Sort mood colors by favorites first (for contexts without entry counts).
+ * Used in Editor dropdown where entry counts aren't displayed.
+ */
+fun List<MoodColor>.sortedByFavorite(): List<MoodColor> =
+    sortedByDescending { it.isFavorite }
