@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import uk.co.zlurgg.thedayto.base.DatabaseTest
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -29,10 +30,12 @@ import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 class EntryRepositoryTest : DatabaseTest() {
 
     private lateinit var repository: EntryRepositoryImpl
+    private lateinit var fakePreferencesRepository: FakePreferencesRepository
 
     @Before
     fun setupRepository() {
-        repository = EntryRepositoryImpl(entryDao)
+        fakePreferencesRepository = FakePreferencesRepository()
+        repository = EntryRepositoryImpl(entryDao, fakePreferencesRepository, pendingSyncDeletionDao)
     }
 
     // ============================================================
@@ -179,7 +182,7 @@ class EntryRepositoryTest : DatabaseTest() {
         assertNotNull("Entry should exist before delete", beforeDelete)
 
         // When: Deleting the entry
-        repository.deleteEntry(entry)
+        repository.deleteEntry(1)
 
         // Then: Entry should be removed
         val afterDelete = repository.getEntryById(1).getOrNull()

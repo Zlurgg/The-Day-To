@@ -9,6 +9,7 @@ import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.dao.MoodColorDao
 import uk.co.zlurgg.thedayto.notification.data.local.NotificationSettingsDao
+import uk.co.zlurgg.thedayto.sync.data.dao.PendingSyncDeletionDao
 
 /**
  * Base class for Room database instrumented tests.
@@ -34,6 +35,7 @@ abstract class DatabaseTest {
     protected lateinit var entryDao: EntryDao
     protected lateinit var moodColorDao: MoodColorDao
     protected lateinit var notificationSettingsDao: NotificationSettingsDao
+    protected lateinit var pendingSyncDeletionDao: PendingSyncDeletionDao
 
     @Before
     fun createDb() {
@@ -48,6 +50,7 @@ abstract class DatabaseTest {
         entryDao = database.entryDao
         moodColorDao = database.moodColorDao
         notificationSettingsDao = database.notificationSettingsDao
+        pendingSyncDeletionDao = database.pendingSyncDeletionDao
     }
 
     @After
