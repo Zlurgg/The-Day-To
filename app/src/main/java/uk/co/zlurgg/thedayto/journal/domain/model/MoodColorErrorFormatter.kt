@@ -12,6 +12,7 @@ object MoodColorErrorFormatter {
         MoodColorError.NameTooLong -> context.getString(R.string.error_name_too_long)
         MoodColorError.InvalidColor -> context.getString(R.string.error_invalid_color)
         MoodColorError.DuplicateName -> context.getString(R.string.error_duplicate_name)
+        MoodColorError.LimitReached -> context.getString(R.string.error_limit_reached)
         MoodColorError.NotFound -> context.getString(R.string.error_database)
         MoodColorError.DatabaseError -> context.getString(R.string.error_database)
     }

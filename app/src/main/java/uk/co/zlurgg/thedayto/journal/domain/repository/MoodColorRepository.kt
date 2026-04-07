@@ -25,6 +25,7 @@ interface MoodColorRepository {
     suspend fun deleteMoodColor(id: Int): EmptyResult<DataError.Local>
     suspend fun getMoodColorById(id: Int): Result<MoodColor?, DataError.Local>
     suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local>
+    suspend fun getActiveCount(): Result<Int, DataError.Local>
     fun getMoodColors(): Flow<List<MoodColor>>
     suspend fun updateMoodColor(moodColor: MoodColor): EmptyResult<DataError.Local>
     suspend fun setFavorite(id: Int, isFavorite: Boolean): EmptyResult<DataError.Local>

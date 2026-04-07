@@ -57,6 +57,12 @@ class MoodColorRepositoryImpl(
         }
     }
 
+    override suspend fun getActiveCount(): Result<Int, DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.getActiveCount()
+        }
+    }
+
     override fun getMoodColors(): Flow<List<MoodColor>> {
         return dao.getMoodColors().map { entities ->
             entities.map { it.toDomain() }

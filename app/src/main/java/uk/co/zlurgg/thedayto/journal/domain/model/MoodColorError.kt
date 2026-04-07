@@ -9,6 +9,7 @@ sealed interface MoodColorError : uk.co.zlurgg.thedayto.core.domain.error.Error 
     data object NameTooLong : MoodColorError
     data object InvalidColor : MoodColorError
     data object DuplicateName : MoodColorError
+    data object LimitReached : MoodColorError
     data object NotFound : MoodColorError
     data object DatabaseError : MoodColorError
 }
