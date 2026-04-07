@@ -15,6 +15,10 @@ object MoodColorConstants {
     val COLOR_CIRCLE_SIZE_SMALL: Dp = 32.dp
     val COLOR_CIRCLE_SIZE_LARGE: Dp = 44.dp
 
+    // Favorite star sizes (slightly smaller than color circle)
+    val FAVORITE_ICON_SIZE: Dp = 28.dp
+    val FAVORITE_TOUCH_TARGET: Dp = 40.dp
+
     // Favorite icon animation
     const val ICON_SCALE_FAVORITE = 1f
     const val ICON_SCALE_UNFAVORITE = 0.8f
