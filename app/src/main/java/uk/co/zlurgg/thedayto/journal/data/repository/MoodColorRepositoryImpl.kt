@@ -80,6 +80,18 @@ class MoodColorRepositoryImpl(
         }
     }
 
+    override suspend fun setFavorite(id: Int, isFavorite: Boolean): EmptyResult<DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.updateFavorite(id, isFavorite, System.currentTimeMillis())
+        }
+    }
+
+    override suspend fun restore(id: Int): EmptyResult<DataError.Local> {
+        return ErrorMapper.safeSuspendCall(TAG) {
+            dao.restore(id, System.currentTimeMillis())
+        }
+    }
+
     companion object {
         private const val TAG = "MoodColorRepository"
     }

@@ -70,6 +70,28 @@ class FakeMoodColorRepository : MoodColorRepository {
         return Result.Success(Unit)
     }
 
+    override suspend fun setFavorite(id: Int, isFavorite: Boolean): EmptyResult<DataError.Local> {
+        val moodColor = _moodColors.value.find { it.id == id }
+        if (moodColor != null) {
+            val currentList = _moodColors.value.toMutableList()
+            currentList.removeIf { it.id == id }
+            currentList.add(moodColor.copy(isFavorite = isFavorite))
+            _moodColors.value = currentList
+        }
+        return Result.Success(Unit)
+    }
+
+    override suspend fun restore(id: Int): EmptyResult<DataError.Local> {
+        val moodColor = _moodColors.value.find { it.id == id }
+        if (moodColor != null) {
+            val currentList = _moodColors.value.toMutableList()
+            currentList.removeIf { it.id == id }
+            currentList.add(moodColor.copy(isDeleted = false))
+            _moodColors.value = currentList
+        }
+        return Result.Success(Unit)
+    }
+
     /**
      * Helper method to reset the repository to its initial state.
      * Useful for cleaning up between tests.
@@ -100,11 +122,46 @@ class FakeMoodColorRepository : MoodColorRepository {
      */
     fun addDefaultMoods() {
         val defaults = listOf(
-            MoodColor("Happy", "4CAF50", false, System.currentTimeMillis(), 1),
-            MoodColor("Sad", "2196F3", false, System.currentTimeMillis(), 2),
-            MoodColor("Angry", "F44336", false, System.currentTimeMillis(), 3),
-            MoodColor("Calm", "9C27B0", false, System.currentTimeMillis(), 4),
-            MoodColor("Anxious", "FF9800", false, System.currentTimeMillis(), 5)
+            MoodColor(
+                mood = "Happy",
+                color = "4CAF50",
+                isDeleted = false,
+                isFavorite = false,
+                dateStamp = System.currentTimeMillis(),
+                id = 1
+            ),
+            MoodColor(
+                mood = "Sad",
+                color = "2196F3",
+                isDeleted = false,
+                isFavorite = false,
+                dateStamp = System.currentTimeMillis(),
+                id = 2
+            ),
+            MoodColor(
+                mood = "Angry",
+                color = "F44336",
+                isDeleted = false,
+                isFavorite = false,
+                dateStamp = System.currentTimeMillis(),
+                id = 3
+            ),
+            MoodColor(
+                mood = "Calm",
+                color = "9C27B0",
+                isDeleted = false,
+                isFavorite = false,
+                dateStamp = System.currentTimeMillis(),
+                id = 4
+            ),
+            MoodColor(
+                mood = "Anxious",
+                color = "FF9800",
+                isDeleted = false,
+                isFavorite = false,
+                dateStamp = System.currentTimeMillis(),
+                id = 5
+            )
         )
         _moodColors.value = defaults
         nextId = 6

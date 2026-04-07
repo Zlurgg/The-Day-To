@@ -19,6 +19,7 @@ data class MoodColorEntity(
     val moodNormalized: String,    // Lowercase for uniqueness (e.g., "happy")
     val color: String,
     val isDeleted: Boolean = false,
+    val isFavorite: Boolean = false,
     val dateStamp: Long,
     @PrimaryKey(autoGenerate = true) val id: Int? = null,
     val syncId: String? = null,

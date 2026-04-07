@@ -28,6 +28,12 @@ interface MoodColorDao {
     @Query("UPDATE mood_color SET isDeleted = 1 WHERE id = :id")
     suspend fun deleteMoodColor(id: Int)
 
+    @Query("UPDATE mood_color SET isFavorite = :isFavorite, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun updateFavorite(id: Int, isFavorite: Boolean, updatedAt: Long)
+
+    @Query("UPDATE mood_color SET isDeleted = 0, updatedAt = :updatedAt WHERE id = :id")
+    suspend fun restore(id: Int, updatedAt: Long)
+
     @Update
     suspend fun updateMoodColor(moodColor: MoodColorEntity)
 

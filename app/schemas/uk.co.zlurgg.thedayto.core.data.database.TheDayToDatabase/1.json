@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "fe32f5ef64717f442f252a2c51542e63",
+    "identityHash": "adc4f9b18ef5d29df614008995797dcc",
     "entities": [
       {
         "tableName": "entry",
@@ -129,7 +129,7 @@
       },
       {
         "tableName": "mood_color",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mood` TEXT NOT NULL, `moodNormalized` TEXT NOT NULL, `color` TEXT NOT NULL, `isDeleted` INTEGER NOT NULL, `dateStamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT, `syncId` TEXT, `userId` TEXT, `updatedAt` INTEGER, `syncStatus` TEXT NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`mood` TEXT NOT NULL, `moodNormalized` TEXT NOT NULL, `color` TEXT NOT NULL, `isDeleted` INTEGER NOT NULL, `isFavorite` INTEGER NOT NULL, `dateStamp` INTEGER NOT NULL, `id` INTEGER PRIMARY KEY AUTOINCREMENT, `syncId` TEXT, `userId` TEXT, `updatedAt` INTEGER, `syncStatus` TEXT NOT NULL)",
         "fields": [
           {
             "fieldPath": "mood",
@@ -152,6 +152,12 @@
           {
             "fieldPath": "isDeleted",
             "columnName": "isDeleted",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isFavorite",
+            "columnName": "isFavorite",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -359,7 +365,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'fe32f5ef64717f442f252a2c51542e63')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'adc4f9b18ef5d29df614008995797dcc')"
     ]
   }
 }

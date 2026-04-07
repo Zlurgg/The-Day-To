@@ -9,6 +9,7 @@ fun MoodColorEntity.toDomain(): MoodColor {
         mood = mood,
         color = color,
         isDeleted = isDeleted,
+        isFavorite = isFavorite,
         dateStamp = dateStamp,
         id = id,
         syncId = syncId,
@@ -24,6 +25,7 @@ fun MoodColor.toEntity(): MoodColorEntity {
         moodNormalized = mood.trim().lowercase(),  // Normalize for uniqueness
         color = color,
         isDeleted = isDeleted,
+        isFavorite = isFavorite,
         dateStamp = dateStamp,
         id = id,
         syncId = syncId,

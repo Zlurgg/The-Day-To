@@ -65,6 +65,7 @@ object FirestoreMapper {
         "mood" to mood,
         "color" to color,
         "isDeleted" to isDeleted,
+        "isFavorite" to isFavorite,
         "dateStamp" to dateStamp,
         "updatedAt" to when {
             updatedAt == null || updatedAt == 0L -> Timestamp.now()
@@ -82,6 +83,7 @@ object FirestoreMapper {
             mood = getString("mood") ?: "",
             color = getString("color") ?: "",
             isDeleted = getBoolean("isDeleted") ?: false,
+            isFavorite = getBoolean("isFavorite") ?: false,
             dateStamp = getLong("dateStamp") ?: 0L,
             id = localId,
             syncId = id,
