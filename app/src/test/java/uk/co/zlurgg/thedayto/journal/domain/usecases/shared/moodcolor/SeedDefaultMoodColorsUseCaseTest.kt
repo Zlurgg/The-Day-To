@@ -139,6 +139,9 @@ class SeedDefaultMoodColorsUseCaseTest {
         override suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local> =
             Result.Success(null)
 
+        override suspend fun getActiveCount(): Result<Int, DataError.Local> =
+            Result.Success(0)
+
         override fun getMoodColors(): Flow<List<MoodColor>> = flowOf(emptyList())
 
         override suspend fun updateMoodColor(

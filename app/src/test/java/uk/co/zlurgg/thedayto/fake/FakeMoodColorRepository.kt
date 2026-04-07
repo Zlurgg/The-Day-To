@@ -56,6 +56,10 @@ class FakeMoodColorRepository : MoodColorRepository {
         )
     }
 
+    override suspend fun getActiveCount(): Result<Int, DataError.Local> {
+        return Result.Success(_moodColors.value.count { !it.isDeleted })
+    }
+
     override fun getMoodColors(): Flow<List<MoodColor>> {
         // Only return non-deleted mood colors (matches production behavior)
         // Use map to filter, maintains reactive behavior like Room

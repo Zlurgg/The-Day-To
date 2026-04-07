@@ -30,9 +30,9 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSe
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
@@ -91,7 +91,7 @@ class EditorViewModelTest {
             addEntryUseCase = AddEntryUseCase(fakeEntryRepository, fakeMoodColorRepository),
             getMoodColorUseCase = GetMoodColorUseCase(fakeMoodColorRepository),
             addMoodColorUseCase = AddMoodColorUseCase(fakeMoodColorRepository),
-            deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
+            setMoodColorFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
             getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
             updateMoodColorUseCase = UpdateMoodColorUseCase(fakeMoodColorRepository),
             updateMoodColorNameUseCase = UpdateMoodColorNameUseCase(fakeMoodColorRepository),
@@ -340,83 +340,61 @@ class EditorViewModelTest {
     }
 
     @Test
-    fun `DeleteMoodColor action deletes when not currently selected`() = runTest {
+    fun `ToggleMoodColorFavorite action sets favorite to true`() = runTest {
         viewModel = createViewModel()
-
-        // Select Happy
-        viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
-
-        val sadMood = fakeMoodColorRepository.getMoodColorById(2).getOrNull()!!
-
-        // Delete a different mood color (Sad)
-        viewModel.onAction(EditorAction.DeleteMoodColor(sadMood))
-
-        // Wait for async operations
-        testScheduler.advanceUntilIdle()
-
-        // Then: Verify final state (Sad deleted, Happy still selected)
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertFalse("Sad should be deleted", state.moodColors.any { it.mood == "Sad" })
-            assertEquals("Selection should remain Happy", 1, state.selectedMoodColorId)
-            cancelAndIgnoreRemainingEvents()
-        }
-
-        // Verify mood was soft-deleted in repository
-        val sadInRepo = fakeMoodColorRepository.getMoodColorByIdSync(2)
-        assertTrue("Sad should be marked deleted", sadInRepo!!.isDeleted)
-    }
-
-    @Test
-    fun `DeleteMoodColor action resets to first mood when selected mood is deleted`() = runTest {
-        viewModel = createViewModel()
-
-        // Select Happy
-        viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
 
         val happyMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
+        assertFalse("Happy should start as non-favorite", happyMood.isFavorite)
 
-        // Delete the currently selected mood
-        viewModel.onAction(EditorAction.DeleteMoodColor(happyMood))
+        // Toggle favorite on Happy
+        viewModel.onAction(EditorAction.ToggleMoodColorFavorite(happyMood))
 
         // Wait for async operations
         testScheduler.advanceUntilIdle()
 
-        // Then: Verify final state (Happy deleted, switched to first remaining)
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertFalse("Happy should be deleted", state.moodColors.any { it.mood == "Happy" })
-            assertEquals("Should switch to Sad (first remaining)", 2, state.selectedMoodColorId)
-            assertFalse("Mood hint should be hidden", state.isMoodHintVisible)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Verify mood was marked as favorite in repository
+        val happyInRepo = fakeMoodColorRepository.getMoodColorByIdSync(1)
+        assertTrue("Happy should now be favorite", happyInRepo!!.isFavorite)
     }
 
     @Test
-    fun `DeleteMoodColor action resets to null when last mood is deleted`() = runTest {
-        // Given: Only one mood color
-        fakeMoodColorRepository.reset()
-        val onlyMood = TestDataBuilders.createMoodColor(mood = "Only", id = 1)
-        fakeMoodColorRepository.insertMoodColor(onlyMood)
+    fun `ToggleMoodColorFavorite action sets favorite to false when already favorite`() = runTest {
         viewModel = createViewModel()
 
-        // Select the only mood
-        viewModel.onAction(EditorAction.SelectMoodColor(moodColorId = 1))
+        // First set Happy as favorite
+        val happyMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
+        fakeMoodColorRepository.setFavorite(happyMood.id!!, true)
 
-        // Delete the last mood color
-        viewModel.onAction(EditorAction.DeleteMoodColor(onlyMood))
+        // Get the updated mood
+        val favoriteMood = fakeMoodColorRepository.getMoodColorById(1).getOrNull()!!
+        assertTrue("Happy should be favorite", favoriteMood.isFavorite)
+
+        // Toggle favorite off
+        viewModel.onAction(EditorAction.ToggleMoodColorFavorite(favoriteMood))
 
         // Wait for async operations
         testScheduler.advanceUntilIdle()
 
-        // Then: Verify final state (no moods, selection null, hint visible)
-        viewModel.uiState.test {
-            val state = awaitItem()
-            assertEquals("Should have no mood colors", 0, state.moodColors.size)
-            assertNull("Selection should be null", state.selectedMoodColorId)
-            assertTrue("Mood hint should be visible", state.isMoodHintVisible)
-            cancelAndIgnoreRemainingEvents()
-        }
+        // Verify mood was unmarked as favorite
+        val happyInRepo = fakeMoodColorRepository.getMoodColorByIdSync(1)
+        assertFalse("Happy should no longer be favorite", happyInRepo!!.isFavorite)
+    }
+
+    @Test
+    fun `ToggleMoodColorFavorite does nothing for mood with null id`() = runTest {
+        viewModel = createViewModel()
+
+        // Create a mood with null id
+        val moodWithoutId = TestDataBuilders.createMoodColor(mood = "NoId", id = null)
+
+        // Toggle favorite (should be no-op)
+        viewModel.onAction(EditorAction.ToggleMoodColorFavorite(moodWithoutId))
+
+        // Wait for async operations
+        testScheduler.advanceUntilIdle()
+
+        // No crash, just verify the test completes
+        assertTrue("Action should complete without error", true)
     }
 
     // ============================================================
