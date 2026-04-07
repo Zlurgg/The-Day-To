@@ -24,6 +24,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
+import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
@@ -51,6 +52,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
@@ -59,7 +61,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
-import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
@@ -106,7 +108,10 @@ fun EditorScreenRoot(
         uiState = uiState,
         onAction = viewModel::onAction,
         showBackButton = showBackButton,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
+        onNavigateToMoodColorManagement = {
+            navController.navigate(MoodColorManagementRoute)
+        }
     )
 
     // Show editor tutorial dialog for first-time users
@@ -126,6 +131,7 @@ private fun EditorScreen(
     onAction: (EditorAction) -> Unit,
     showBackButton: Boolean,
     snackbarHostState: SnackbarHostState,
+    onNavigateToMoodColorManagement: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
@@ -136,17 +142,27 @@ private fun EditorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .systemBarsPadding()
+                    .padding(horizontal = paddingSmall),
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 if (showBackButton) {
                     IconButton(
-                        onClick = { onAction(EditorAction.RequestNavigateBack) },
-                        modifier = Modifier.padding(paddingMedium)
+                        onClick = { onAction(EditorAction.RequestNavigateBack) }
                     ) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                IconButton(
+                    onClick = onNavigateToMoodColorManagement
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Palette,
+                        contentDescription = stringResource(R.string.manage_mood_colors)
+                    )
                 }
             }
         },
@@ -251,8 +267,8 @@ private fun EditorScreen(
                 onMoodSelected = { moodColorId ->
                     onAction(EditorAction.SelectMoodColor(moodColorId))
                 },
-                onDeleteMoodColor = { moodColor ->
-                    onAction(EditorAction.DeleteMoodColor(moodColor))
+                onToggleFavorite = { moodColor ->
+                    onAction(EditorAction.ToggleMoodColorFavorite(moodColor))
                 },
                 onEditMoodColor = { moodColor ->
                     onAction(EditorAction.EditMoodColor(moodColor))
@@ -382,7 +398,8 @@ private fun EditorScreenNewEntryPreview() {
             ),
             onAction = {},
             showBackButton = false,
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            onNavigateToMoodColorManagement = {}
         )
     }
 }
@@ -408,7 +425,8 @@ private fun EditorScreenEditEntryPreview() {
             ),
             onAction = {},
             showBackButton = true,
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            onNavigateToMoodColorManagement = {}
         )
     }
 }
@@ -429,7 +447,8 @@ private fun EditorScreenLoadingPreview() {
             ),
             onAction = {},
             showBackButton = true,
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
+            onNavigateToMoodColorManagement = {}
         )
     }
 }
