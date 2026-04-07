@@ -1,5 +1,6 @@
-package uk.co.zlurgg.thedayto.journal.ui.editor.components
+package uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,17 +22,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
-import android.content.res.Configuration
-import androidx.compose.ui.tooling.preview.Preview
-import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
 /**
  * Material3 dialog for creating custom mood-color combinations.
@@ -43,7 +43,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
  * @param modifier Optional modifier for the dialog
  */
 @Composable
-fun MoodColorPickerDialog(
+fun AddMoodColorDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onSave: (mood: String, colorHex: String) -> Unit,
@@ -155,9 +155,9 @@ fun MoodColorPickerDialog(
 @Preview(name = "Light Mode", showBackground = true)
 @Preview(name = "Dark Mode", uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
-private fun MoodColorPickerDialogPreview() {
+private fun AddMoodColorDialogPreview() {
     TheDayToTheme {
-        MoodColorPickerDialog(
+        AddMoodColorDialog(
             showDialog = true,
             onDismiss = {},
             onSave = { _, _ -> }

@@ -1,4 +1,4 @@
-package uk.co.zlurgg.thedayto.journal.ui.editor.components
+package uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor
 
 import android.content.res.Configuration
 import androidx.compose.foundation.Canvas
@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
@@ -23,7 +24,6 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.shape.CircleShape
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
@@ -38,7 +38,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
  * @param size Button diameter (default 40.dp for Material touch target)
  */
 @Composable
-fun ColorWheelAddButton(
+fun ColorWheelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     size: Dp = 40.dp
@@ -51,7 +51,7 @@ fun ColorWheelAddButton(
         Color(0xFF0000FF), // Blue
         Color(0xFF4B0082), // Indigo
         Color(0xFF9400D3), // Violet
-        Color(0xFFFF0000)  // Back to red to complete the circle
+        Color(0xFFFF0000) // Back to red to complete the circle
     )
 
     Box(
@@ -92,19 +92,19 @@ fun ColorWheelAddButton(
     }
 }
 
-@Preview(name = "Color Wheel Add Button - Light", showBackground = true)
-@Preview(name = "Color Wheel Add Button - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
+@Preview(name = "Color Wheel Button - Light", showBackground = true)
+@Preview(name = "Color Wheel Button - Dark", uiMode = Configuration.UI_MODE_NIGHT_YES, showBackground = true)
 @Composable
-private fun ColorWheelAddButtonPreview() {
+private fun ColorWheelButtonPreview() {
     TheDayToTheme {
-        ColorWheelAddButton(onClick = {})
+        ColorWheelButton(onClick = {})
     }
 }
 
-@Preview(name = "Color Wheel Add Button - Large", showBackground = true)
+@Preview(name = "Color Wheel Button - Large", showBackground = true)
 @Composable
-private fun ColorWheelAddButtonLargePreview() {
+private fun ColorWheelButtonLargePreview() {
     TheDayToTheme {
-        ColorWheelAddButton(onClick = {}, size = 56.dp)
+        ColorWheelButton(onClick = {}, size = 56.dp)
     }
 }

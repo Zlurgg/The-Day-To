@@ -54,7 +54,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
-import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditMoodColorDialog
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.DeleteMoodColorConfirmDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
