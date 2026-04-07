@@ -5,15 +5,6 @@
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.VIBRATE" />
-    <!--
-        REQUEST_INSTALL_PACKAGES: Required for in-app updates via GitHub Releases.
-        This app is distributed outside Play Store, so users can download and install
-        APK updates directly. The install is always user-initiated (user clicks "Download"
-        in update dialog, then confirms via Android's package installer).
-    -->
-    <uses-permission
-        android:name="android.permission.REQUEST_INSTALL_PACKAGES"
-        tools:ignore="RequestInstallPackagesPermission,RequestInstallPackagesPolicy" />
 
     <application
         android:name=".app.TheDayToApplication"
@@ -54,17 +45,6 @@
                     android:pathPrefix="/editor" />
             </intent-filter>
         </activity>
-
-        <!-- FileProvider for APK installation -->
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="${applicationId}.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
 
         <!-- Receiver for timezone changes to reschedule notifications -->
         <receiver
