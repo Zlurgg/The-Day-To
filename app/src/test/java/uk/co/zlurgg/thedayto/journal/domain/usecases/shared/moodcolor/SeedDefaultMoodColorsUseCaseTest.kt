@@ -144,5 +144,13 @@ class SeedDefaultMoodColorsUseCaseTest {
         override suspend fun updateMoodColor(
             moodColor: MoodColor
         ): EmptyResult<DataError.Local> = Result.Success(Unit)
+
+        override suspend fun setFavorite(
+            id: Int,
+            isFavorite: Boolean
+        ): EmptyResult<DataError.Local> = Result.Success(Unit)
+
+        override suspend fun restore(id: Int): EmptyResult<DataError.Local> =
+            Result.Success(Unit)
     }
 }

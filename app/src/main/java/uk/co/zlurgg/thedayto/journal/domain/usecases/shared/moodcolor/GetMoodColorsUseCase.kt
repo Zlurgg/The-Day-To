@@ -3,9 +3,9 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
-import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
+import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 
 class GetMoodColorsUseCase(
     private val repository: MoodColorRepository

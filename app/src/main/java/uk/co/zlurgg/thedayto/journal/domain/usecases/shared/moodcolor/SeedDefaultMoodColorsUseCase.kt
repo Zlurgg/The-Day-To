@@ -63,6 +63,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Happy",
                 color = "FFA726",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_happy",
                 updatedAt = 0L
@@ -70,6 +71,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Sad",
                 color = "1565C0",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_sad",
                 updatedAt = 0L
@@ -77,6 +79,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "In Love",
                 color = "EC407A",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_in_love",
                 updatedAt = 0L
@@ -84,6 +87,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Calm",
                 color = "66BB6A",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_calm",
                 updatedAt = 0L
@@ -91,6 +95,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Excited",
                 color = "FFEB3B",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_excited",
                 updatedAt = 0L
@@ -98,6 +103,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Anxious",
                 color = "8E24AA",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_anxious",
                 updatedAt = 0L
@@ -105,6 +111,7 @@ class SeedDefaultMoodColorsUseCase(
             MoodColor(
                 mood = "Grateful",
                 color = "26A69A",
+                isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_grateful",
                 updatedAt = 0L

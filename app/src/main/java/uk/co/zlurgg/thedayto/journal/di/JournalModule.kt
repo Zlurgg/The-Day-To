@@ -15,8 +15,8 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckFirstLaunchUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
@@ -34,9 +34,14 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetSortedMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.RestoreMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
@@ -82,6 +87,11 @@ val journalModule = module {
     single { UpdateMoodColorUseCase(repository = get()) }
     single { UpdateMoodColorNameUseCase(repository = get()) }
     single { DeleteMoodColorUseCase(repository = get()) }
+    single { RestoreMoodColorUseCase(repository = get()) }
+    single { SetMoodColorFavoriteUseCase(repository = get()) }
+    single { ValidateMoodColorUseCase(repository = get()) }
+    single { SaveMoodColorUseCase(validate = get(), repository = get()) }
+    single { GetSortedMoodColorsUseCase(moodColorRepository = get(), entryRepository = get()) }
     single {
         SeedDefaultMoodColorsUseCase(
             moodColorRepository = get(),
@@ -162,12 +172,11 @@ val journalModule = module {
 
     single {
         MoodColorManagementUseCases(
-            getMoodColors = get(),
-            addMoodColor = get(),
-            updateMoodColor = get(),
-            updateMoodColorName = get(),
+            getSortedMoodColors = get(),
+            saveMoodColor = get(),
             deleteMoodColor = get(),
-            getMoodColorEntryCounts = get()
+            restoreMoodColor = get(),
+            setFavorite = get()
         )
     }
 }
