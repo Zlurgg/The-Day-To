@@ -439,7 +439,7 @@ private fun CalendarMonthGrid(
                                                         .border(
                                                             CalendarConstants.TODAY_BORDER_WIDTH,
                                                             MaterialTheme.colorScheme.primary,
-                                                            CircleShape
+                                                            RoundedCornerShape(10.dp)
                                                         )
                                                         .clickable {
                                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
