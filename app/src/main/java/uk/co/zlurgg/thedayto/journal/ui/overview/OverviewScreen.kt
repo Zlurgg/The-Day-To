@@ -6,8 +6,6 @@ import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -24,11 +22,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FloatingActionButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
@@ -42,9 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
@@ -254,7 +246,6 @@ private fun OverviewScreen(
     modifier: Modifier = Modifier
 ) {
     val currentDate = LocalDate.now()
-    val haptic = LocalHapticFeedback.current
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
@@ -264,32 +255,7 @@ private fun OverviewScreen(
                 modifier = Modifier.padding(paddingMedium)
             )
         },
-        floatingActionButton = {
-            // Only show FAB when today's entry is missing with smooth animation
-            AnimatedVisibility(
-                visible = !uiState.hasTodayEntry,
-                enter = scaleIn(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy,
-                        stiffness = Spring.StiffnessMedium
-                    )
-                ) + fadeIn(),
-                exit = scaleOut() + fadeOut()
-            ) {
-                FloatingActionButton(
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        onAction(OverviewAction.CreateNewEntry)
-                    },
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.create_today_entry)
-                    )
-                }
-            }
-        },
+        floatingActionButton = {},
         modifier = modifier,
         topBar = {
             Row(
@@ -355,20 +321,29 @@ private fun OverviewScreen(
                     modifier = Modifier.fillMaxWidth()
                 )
 
-                Spacer(modifier = Modifier.height(paddingMedium))
+                // Entries list section - hidden for past months with no entries
+                val isCurrentMonth = uiState.displayedMonth == currentDate.monthValue &&
+                        uiState.displayedYear == currentDate.year
+                val showEntriesSection = uiState.entries.isNotEmpty() ||
+                        (isCurrentMonth && !uiState.hasTodayEntry)
 
-                // Entries list section with sorting (entries already filtered at database level)
-                EntriesListSection(
-                    entries = uiState.entries,
-                    entryOrder = uiState.entryOrder,
-                    onOrderChange = { onAction(OverviewAction.Order(it)) },
-                    onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
-                    onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
-                    isLoading = uiState.isLoading,
-                    entryPendingDelete = uiState.entryToDelete,
-                    onCreateEntry = { onNavigateToEntry(null, null) },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                if (showEntriesSection) {
+                    Spacer(modifier = Modifier.height(paddingMedium))
+
+                    EntriesListSection(
+                        entries = uiState.entries,
+                        entryOrder = uiState.entryOrder,
+                        onOrderChange = { onAction(OverviewAction.Order(it)) },
+                        onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
+                        onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
+                        isLoading = uiState.isLoading,
+                        isCurrentMonth = isCurrentMonth,
+                        hasTodayEntry = uiState.hasTodayEntry,
+                        entryPendingDelete = uiState.entryToDelete,
+                        onCreateEntry = { onNavigateToEntry(null, null) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
             }
         }
         )

@@ -12,6 +12,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
@@ -34,12 +36,17 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
 /**
  * Section displaying the list of journal entries with sorting controls.
- * Shows empty state when no entries exist for the selected month.
- * Supports swipe-to-delete with confirmation dialog.
+ *
+ * Display logic:
+ * - Current month, no entries, no today entry: prompt card only (no sort chips)
+ * - Current month, has entries, no today entry: prompt card at top + sort chips + entries
+ * - Has entries with today entry: sort chips + entries
+ * - Past month, no entries: not rendered (caller hides the section)
  *
  * @param isLoading Disables swipe gestures during delete operations to prevent race conditions
  */
@@ -51,45 +58,61 @@ fun EntriesListSection(
     onEntryClick: (entryId: Int?) -> Unit,
     onDeleteEntry: (EntryWithMoodColor) -> Unit,
     isLoading: Boolean,
+    isCurrentMonth: Boolean,
+    hasTodayEntry: Boolean,
     entryPendingDelete: EntryWithMoodColor?,
     modifier: Modifier = Modifier,
     onCreateEntry: () -> Unit = {},
 ) {
     val haptic = LocalHapticFeedback.current
+    val showPromptCard = isCurrentMonth && !hasTodayEntry
 
-    Column(modifier = modifier) {
-        // Entry sorting controls
-        EntrySortSection(
-            modifier = Modifier.padding(vertical = paddingSmall),
-            entryOrder = entryOrder,
-            onOrderChange = onOrderChange
+    Card(
+        modifier = modifier,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = UiConstants.STATS_CARD_ELEVATION
         )
+    ) {
+    Column(modifier = Modifier.padding(paddingMedium)) {
+        // Sort chips only when there are entries to sort
+        if (entries.isNotEmpty()) {
+            EntrySortSection(
+                modifier = Modifier.padding(vertical = paddingSmall),
+                entryOrder = entryOrder,
+                onOrderChange = onOrderChange
+            )
+            Spacer(modifier = Modifier.height(paddingSmall))
+        }
 
-        Spacer(modifier = Modifier.height(paddingSmall))
+        // Prompt card for creating today's entry
+        if (showPromptCard) {
+            CreateEntryPromptCard(
+                onClick = onCreateEntry
+            )
+            if (entries.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(paddingMedium))
+            }
+        }
 
-        // Show empty state if no entries, otherwise show list
-        if (entries.isEmpty()) {
-            EmptyState(onCreateEntry = onCreateEntry)
-        } else {
-            // Create local mutable state list from Flow entries
-            // Recreated when entries change (remember key)
+        // Entry list
+        if (entries.isNotEmpty()) {
             val localEntries = remember(entries) {
                 entries.toMutableStateList()
             }
 
-            // Render entries with swipe-to-delete (confirmation dialog)
             localEntries.forEach { entry ->
                 key(entry.id) {
                     val dismissState = rememberSwipeToDismissBoxState()
 
-                    // Trigger delete dialog when swipe completes
                     LaunchedEffect(dismissState.currentValue) {
                         if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
                             onDeleteEntry(entry)
                         }
                     }
 
-                    // Reset swipe position when user cancels the delete dialog
                     LaunchedEffect(entryPendingDelete) {
                         if (entryPendingDelete == null &&
                             dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
@@ -101,7 +124,6 @@ fun EntriesListSection(
                     SwipeToDismissBox(
                         state = dismissState,
                         backgroundContent = {
-                            // Only show background when actively swiping
                             val direction = dismissState.dismissDirection
                             if (direction == SwipeToDismissBoxValue.EndToStart) {
                                 Box(
@@ -120,7 +142,7 @@ fun EntriesListSection(
                             }
                         },
                         enableDismissFromStartToEnd = false,
-                        enableDismissFromEndToStart = !isLoading  // Disable swipe during operations
+                        enableDismissFromEndToStart = !isLoading
                     ) {
                         EntryItem(
                             entry = entry,
@@ -136,6 +158,7 @@ fun EntriesListSection(
                 Spacer(modifier = Modifier.height(paddingMedium))
             }
         }
+    }
     }
 }
 
@@ -168,14 +191,16 @@ private fun EntriesListSectionPreview() {
             onEntryClick = {},
             onDeleteEntry = {},
             isLoading = false,
+            isCurrentMonth = true,
+            hasTodayEntry = true,
             entryPendingDelete = null
         )
     }
 }
 
-@Preview(name = "Empty State", showBackground = true)
+@Preview(name = "Prompt Card Only", showBackground = true)
 @Composable
-private fun EntriesListSectionEmptyPreview() {
+private fun EntriesListSectionPromptOnlyPreview() {
     TheDayToTheme {
         EntriesListSection(
             entries = emptyList(),
@@ -184,6 +209,35 @@ private fun EntriesListSectionEmptyPreview() {
             onEntryClick = {},
             onDeleteEntry = {},
             isLoading = false,
+            isCurrentMonth = true,
+            hasTodayEntry = false,
+            entryPendingDelete = null
+        )
+    }
+}
+
+@Preview(name = "Prompt Card With Entries", showBackground = true)
+@Composable
+private fun EntriesListSectionPromptWithEntriesPreview() {
+    TheDayToTheme {
+        EntriesListSection(
+            entries = listOf(
+                EntryWithMoodColor(
+                    id = 1,
+                    moodColorId = 1,
+                    moodName = "Happy",
+                    moodColor = "4CAF50",
+                    content = "Yesterday was great!",
+                    dateStamp = System.currentTimeMillis() - 86400000
+                )
+            ),
+            entryOrder = EntryOrder.Date(OrderType.Descending),
+            onOrderChange = {},
+            onEntryClick = {},
+            onDeleteEntry = {},
+            isLoading = false,
+            isCurrentMonth = true,
+            hasTodayEntry = false,
             entryPendingDelete = null
         )
     }
