@@ -6,6 +6,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.Orientation
@@ -15,6 +16,8 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -26,6 +29,7 @@ import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Home
@@ -49,6 +53,8 @@ import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
@@ -60,6 +66,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarConstants
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
 import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
@@ -132,14 +139,15 @@ private fun CalendarContent(
     val firstDayOfWeek = date.withDayOfMonth(1).dayOfWeek.value
     val emptyCellsAtStart = firstDayOfWeek - 1
     val totalCells = emptyCellsAtStart + daysInMonth
-    Column(modifier = Modifier.fillMaxWidth()) {
-        // Filter entries for current month/year
-        val filteredEntries = entries.filter { entry ->
-            date.monthValue == DateFormatter.formatMonthValue(entry.dateStamp) &&
-                    date.year == DateFormatter.formatYear(entry.dateStamp)
-        }
 
-        // Month statistics summary
+    // Filter entries for current month/year
+    val filteredEntries = entries.filter { entry ->
+        date.monthValue == DateFormatter.formatMonthValue(entry.dateStamp) &&
+                date.year == DateFormatter.formatYear(entry.dateStamp)
+    }
+
+    Column(modifier = Modifier.fillMaxWidth()) {
+        // Month statistics summary (own card)
         MonthStatistics(
             entries = filteredEntries,
             daysInMonth = daysInMonth,
@@ -148,6 +156,22 @@ private fun CalendarContent(
                 .fillMaxWidth()
                 .padding(bottom = paddingMedium)
         )
+
+        // Calendar card (month header + grid)
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = UiConstants.STATS_CARD_ELEVATION
+            )
+        ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = paddingSmall)
+        ) {
 
         // Month/Year header with home button
         MonthYearHeader(
@@ -175,13 +199,7 @@ private fun CalendarContent(
             )
         }
 
-        // Day-of-week labels
-        DayOfWeekHeader(
-            daySize = daySize,
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        // Calendar grid with infinite pager
+        // Calendar grid with infinite pager (includes day-of-week labels as first row)
         CalendarMonthGrid(
             date = date,
             currentDate = currentDate,
@@ -192,6 +210,8 @@ private fun CalendarContent(
             onDateChange = { date = it },
             onDateClick = onDateClick
         )
+    }
+    }
     }
 }
 
@@ -350,6 +370,23 @@ private fun CalendarMonthGrid(
                         verticalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_ROW_SPACING),
                         maxItemsInEachRow = CalendarConstants.DAYS_IN_WEEK
                     ) {
+                        // Day-of-week labels as first row in the grid
+                        val daysOfWeek = listOf("M", "T", "W", "T", "F", "S", "S")
+                        daysOfWeek.forEach { day ->
+                            Box(
+                                modifier = Modifier.size(daySize),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = day,
+                                    style = MaterialTheme.typography.labelSmall,
+                                    fontWeight = FontWeight.Bold,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    textAlign = TextAlign.Center
+                                )
+                            }
+                        }
+
                         repeat(totalCells) { index ->
                             // Check if this is an empty cell before the first day
                             if (index < emptyCellsAtStart) {
@@ -391,6 +428,10 @@ private fun CalendarMonthGrid(
                                     Box(
                                         modifier = Modifier
                                             .size(daySize)
+                                            .background(
+                                                color = MaterialTheme.colorScheme.surface,
+                                                shape = RoundedCornerShape(10.dp)
+                                            )
                                             .semantics { contentDescription = emptyDayDescription }
                                             .then(
                                                 when {
