@@ -323,7 +323,7 @@ private fun SwipeToDeleteMoodColorCard(
                 pressedElevation = MoodColorConstants.CARD_ELEVATION_PRESSED
             ),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainerLow
+                containerColor = MaterialTheme.colorScheme.surfaceVariant
             )
         ) {
             MoodColorRow(
