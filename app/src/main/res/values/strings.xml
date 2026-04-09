@@ -31,6 +31,7 @@
     <string name="empty_mood_list_message">No mood colors yet. Tap the + button to create one!</string>
     <string name="add_mood_color_button_description">Create new mood color</string>
     <string name="manage_mood_colors">Manage Mood Colors</string>
+
     <string name="add_mood_color">Add mood color</string>
     <string name="delete_mood_color">Delete mood color</string>
     <string name="no_mood_colors">No mood colors yet</string>

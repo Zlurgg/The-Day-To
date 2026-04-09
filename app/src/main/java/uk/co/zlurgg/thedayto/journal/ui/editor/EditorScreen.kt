@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -28,6 +29,8 @@ import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -142,7 +145,7 @@ private fun EditorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .systemBarsPadding()
-                    .padding(horizontal = paddingSmall),
+                    .padding(horizontal = paddingMedium, vertical = paddingSmall),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (showBackButton) {
@@ -156,12 +159,22 @@ private fun EditorScreen(
                     }
                 }
                 Spacer(modifier = Modifier.weight(1f))
-                IconButton(
-                    onClick = onNavigateToMoodColorManagement
+                FilledTonalButton(
+                    onClick = onNavigateToMoodColorManagement,
+                    colors = ButtonDefaults.filledTonalButtonColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    )
                 ) {
                     Icon(
                         imageVector = Icons.Default.Palette,
-                        contentDescription = stringResource(R.string.manage_mood_colors)
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(paddingSmall))
+                    Text(
+                        text = stringResource(R.string.manage_mood_colors),
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
             }
