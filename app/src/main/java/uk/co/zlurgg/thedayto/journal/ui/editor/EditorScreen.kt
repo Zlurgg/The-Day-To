@@ -30,6 +30,8 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -60,6 +62,7 @@ import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
@@ -243,82 +246,100 @@ private fun EditorScreen(
                 }
             }
 
-            // Date display (clickable to open date picker)
-            Row(
-                modifier = Modifier.clickable {
-                    onAction(EditorAction.ToggleDatePicker)
-                },
-                horizontalArrangement = Arrangement.spacedBy(paddingSmall),
-                verticalAlignment = Alignment.CenterVertically
+            // Entry card - date, mood, and content
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 80.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant
+                ),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 1.dp
+                )
             ) {
-                Icon(
-                    imageVector = Icons.Default.CalendarToday,
-                    contentDescription = stringResource(R.string.pick_a_date),
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(24.dp)
-                )
-                Text(
-                    text = DateFormatter.formatDate(uiState.entryDate),
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                Icon(
-                    imageVector = Icons.Default.ArrowDropDown,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(paddingMedium))
+                Column(
+                    modifier = Modifier.padding(paddingMedium)
+                ) {
+                    // Date display (clickable to open date picker)
+                    Row(
+                        modifier = Modifier.clickable {
+                            onAction(EditorAction.ToggleDatePicker)
+                        },
+                        horizontalArrangement = Arrangement.spacedBy(paddingSmall),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CalendarToday,
+                            contentDescription = stringResource(R.string.pick_a_date),
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+                        Text(
+                            text = DateFormatter.formatDate(uiState.entryDate),
+                            style = MaterialTheme.typography.displaySmall,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        Icon(
+                            imageVector = Icons.Default.ArrowDropDown,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.height(paddingMedium))
 
-            // Mood Selection
-            MoodItem(
-                selectedMoodColorId = uiState.selectedMoodColorId,
-                moodColors = uiState.moodColors,
-                hint = uiState.moodHint,
-                showMoodColorDialog = uiState.isMoodColorSectionVisible,
-                onMoodSelected = { moodColorId ->
-                    onAction(EditorAction.SelectMoodColor(moodColorId))
-                },
-                onToggleFavorite = { moodColor ->
-                    onAction(EditorAction.ToggleMoodColorFavorite(moodColor))
-                },
-                onEditMoodColor = { moodColor ->
-                    onAction(EditorAction.EditMoodColor(moodColor))
-                },
-                onToggleMoodColorDialog = {
-                    onAction(EditorAction.ToggleMoodColorSection)
-                },
-                onSaveMoodColor = { mood, colorHex ->
-                    onAction(EditorAction.SaveMoodColor(mood, colorHex))
+                    // Mood Selection
+                    MoodItem(
+                        selectedMoodColorId = uiState.selectedMoodColorId,
+                        moodColors = uiState.moodColors,
+                        hint = uiState.moodHint,
+                        showMoodColorDialog = uiState.isMoodColorSectionVisible,
+                        onMoodSelected = { moodColorId ->
+                            onAction(EditorAction.SelectMoodColor(moodColorId))
+                        },
+                        onToggleFavorite = { moodColor ->
+                            onAction(EditorAction.ToggleMoodColorFavorite(moodColor))
+                        },
+                        onEditMoodColor = { moodColor ->
+                            onAction(EditorAction.EditMoodColor(moodColor))
+                        },
+                        onToggleMoodColorDialog = {
+                            onAction(EditorAction.ToggleMoodColorSection)
+                        },
+                        onSaveMoodColor = { mood, colorHex ->
+                            onAction(EditorAction.SaveMoodColor(mood, colorHex))
+                        }
+                    )
+
+                    // Show validation error if present
+                    uiState.moodError?.let { errorMessage ->
+                        Text(
+                            text = errorMessage,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.error,
+                            modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(paddingMedium))
+
+                    // Content
+                    ContentItem(
+                        content = uiState.entryContent,
+                        hint = uiState.contentHint,
+                        isHintVisible = uiState.isContentHintVisible,
+                        onContentChange = { content ->
+                            onAction(EditorAction.EnteredContent(content))
+                        },
+                        onFocusChange = { focusState ->
+                            onAction(EditorAction.ChangeContentFocus(focusState))
+                        },
+                        modifier = Modifier.weight(1f)
+                    )
                 }
-            )
-
-            // Show validation error if present
-            uiState.moodError?.let { errorMessage ->
-                Text(
-                    text = errorMessage,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall)
-                )
             }
-
-            Spacer(modifier = Modifier.height(paddingMedium))
-
-            // Content
-            ContentItem(
-                content = uiState.entryContent,
-                hint = uiState.contentHint,
-                isHintVisible = uiState.isContentHintVisible,
-                onContentChange = { content ->
-                    onAction(EditorAction.EnteredContent(content))
-                },
-                onFocusChange = { focusState ->
-                    onAction(EditorAction.ChangeContentFocus(focusState))
-                },
-                modifier = Modifier.weight(1f)
-            )
         }
     }
 
