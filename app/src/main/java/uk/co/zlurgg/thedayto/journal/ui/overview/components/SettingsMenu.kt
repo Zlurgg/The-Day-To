@@ -4,12 +4,10 @@ import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.HelpOutline
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -32,9 +30,7 @@ fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
     onShowHelp: () -> Unit,
     onShowAbout: () -> Unit,
-    onNavigateToStats: () -> Unit,
-    onNavigateToMoodColorManagement: () -> Unit,
-    onNavigateToAccount: () -> Unit
+    onNavigateToMoodColorManagement: () -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -51,36 +47,6 @@ fun SettingsMenu(
             onDismissRequest = { expanded = false },
             modifier = Modifier.align(Alignment.TopEnd)
         ) {
-            // Account (at top)
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.account_title)) },
-                onClick = {
-                    expanded = false
-                    onNavigateToAccount()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = stringResource(R.string.icon_description_account)
-                    )
-                }
-            )
-
-            // Statistics
-            DropdownMenuItem(
-                text = { Text(stringResource(R.string.statistics)) },
-                onClick = {
-                    expanded = false
-                    onNavigateToStats()
-                },
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Default.BarChart,
-                        contentDescription = stringResource(R.string.icon_description_statistics)
-                    )
-                }
-            )
-
             // Mood Color Management
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.manage_mood_colors)) },
@@ -153,9 +119,7 @@ private fun SettingsMenuPreview() {
             onOpenNotificationSettings = {},
             onShowHelp = {},
             onShowAbout = {},
-            onNavigateToStats = {},
-            onNavigateToMoodColorManagement = {},
-            onNavigateToAccount = {}
+            onNavigateToMoodColorManagement = {}
         )
     }
 }

@@ -23,7 +23,11 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -272,15 +276,19 @@ private fun OverviewScreen(
                     color = MaterialTheme.colorScheme.onSurface,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
+                    modifier = Modifier.weight(1f)
                 )
+                IconButton(onClick = onNavigateToAccount) {
+                    Icon(
+                        imageVector = Icons.Default.Person,
+                        contentDescription = stringResource(R.string.icon_description_account)
+                    )
+                }
                 SettingsMenu(
                     onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
                     onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                     onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
-                    onNavigateToStats = onNavigateToStats,
-                    onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
-                    onNavigateToAccount = onNavigateToAccount
+                    onNavigateToMoodColorManagement = onNavigateToMoodColorManagement
                 )
             }
         },
