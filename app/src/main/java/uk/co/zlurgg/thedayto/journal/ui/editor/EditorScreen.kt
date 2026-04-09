@@ -23,6 +23,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
 import androidx.compose.material.icons.filled.Palette
@@ -165,9 +166,10 @@ private fun EditorScreen(
                 Spacer(modifier = Modifier.weight(1f))
                 FilledTonalButton(
                     onClick = onNavigateToMoodColorManagement,
+                    shape = MaterialTheme.shapes.small,
                     colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 ) {
                     Icon(
@@ -179,6 +181,12 @@ private fun EditorScreen(
                     Text(
                         text = stringResource(R.string.manage_mood_colors),
                         style = MaterialTheme.typography.labelLarge
+                    )
+                    Spacer(modifier = Modifier.width(paddingExtraSmall))
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                        contentDescription = null,
+                        modifier = Modifier.size(EditorUiConstants.MANAGE_BUTTON_ICON_SIZE)
                     )
                 }
             }
