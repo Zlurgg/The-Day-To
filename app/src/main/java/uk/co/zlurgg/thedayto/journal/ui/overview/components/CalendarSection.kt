@@ -430,7 +430,7 @@ private fun CalendarMonthGrid(
                                             .size(daySize)
                                             .background(
                                                 color = MaterialTheme.colorScheme.surface,
-                                                shape = RoundedCornerShape(10.dp)
+                                                shape = RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS)
                                             )
                                             .semantics { contentDescription = emptyDayDescription }
                                             .then(
@@ -439,7 +439,7 @@ private fun CalendarMonthGrid(
                                                         .border(
                                                             CalendarConstants.TODAY_BORDER_WIDTH,
                                                             MaterialTheme.colorScheme.primary,
-                                                            RoundedCornerShape(10.dp)
+                                                            RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS)
                                                         )
                                                         .clickable {
                                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)

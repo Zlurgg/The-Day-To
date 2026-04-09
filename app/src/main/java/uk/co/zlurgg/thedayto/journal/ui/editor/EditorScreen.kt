@@ -67,6 +67,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorUiConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
@@ -172,7 +173,7 @@ private fun EditorScreen(
                     Icon(
                         imageVector = Icons.Default.Palette,
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(EditorUiConstants.MANAGE_BUTTON_ICON_SIZE)
                     )
                     Spacer(modifier = Modifier.width(paddingSmall))
                     Text(
@@ -251,12 +252,12 @@ private fun EditorScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
-                    .padding(bottom = 80.dp),
+                    .padding(bottom = EditorUiConstants.ENTRY_CARD_FAB_CLEARANCE),
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.surfaceVariant
                 ),
                 elevation = CardDefaults.cardElevation(
-                    defaultElevation = 1.dp
+                    defaultElevation = EditorUiConstants.ENTRY_CARD_ELEVATION
                 )
             ) {
                 Column(
@@ -274,7 +275,7 @@ private fun EditorScreen(
                             imageVector = Icons.Default.CalendarToday,
                             contentDescription = stringResource(R.string.pick_a_date),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE)
                         )
                         Text(
                             text = DateFormatter.formatDate(uiState.entryDate),
@@ -285,7 +286,7 @@ private fun EditorScreen(
                             imageVector = Icons.Default.ArrowDropDown,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE)
                         )
                     }
                     Spacer(modifier = Modifier.height(paddingMedium))

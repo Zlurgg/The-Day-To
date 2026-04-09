@@ -23,6 +23,9 @@ object CalendarConstants {
     // Day of week header
     val DAY_HEADER_BOTTOM_PADDING: Dp = 4.dp
 
+    // Day cell shape
+    val DAY_CORNER_RADIUS: Dp = 10.dp
+
     // Borders
     val TODAY_BORDER_WIDTH: Dp = 2.dp
 
