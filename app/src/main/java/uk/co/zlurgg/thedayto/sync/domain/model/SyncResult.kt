@@ -10,7 +10,7 @@ data class SyncResult(
     val moodColorsDownloaded: Int = 0,
     val notificationSettingsUploaded: Int = 0,
     val notificationSettingsDownloaded: Int = 0,
-    val conflictsResolved: Int = 0
+    val conflictsResolved: Int = 0,
 ) {
     val totalUploaded: Int
         get() = entriesUploaded + moodColorsUploaded + notificationSettingsUploaded

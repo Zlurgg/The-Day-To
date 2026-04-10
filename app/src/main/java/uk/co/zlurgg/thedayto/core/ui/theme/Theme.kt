@@ -80,7 +80,7 @@ private val DarkColors = darkColorScheme(
 fun TheDayToTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
     useDynamicColor: Boolean = false,  // Disabled by default to use our custom theme
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val colors = when {
@@ -97,6 +97,6 @@ fun TheDayToTheme(
         colorScheme = colors,
         content = content,
         typography = typography,
-        shapes = shapes
+        shapes = shapes,
     )
 }

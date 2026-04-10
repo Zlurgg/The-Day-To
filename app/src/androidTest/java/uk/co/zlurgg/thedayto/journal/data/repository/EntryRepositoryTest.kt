@@ -73,7 +73,7 @@ class EntryRepositoryTest : DatabaseTest() {
             mood = "Sad",
             color = "2196F3",
             isDeleted = true,
-            id = 1
+            id = 1,
         )
         moodColorDao.insertMoodColor(deletedMood.toEntity())
 
@@ -123,7 +123,7 @@ class EntryRepositoryTest : DatabaseTest() {
             moodColorId = 1,
             content = "Birthday!",
             dateStamp = specificDate,
-            id = 1
+            id = 1,
         )
         entryDao.insertEntry(entry.toEntity())
 

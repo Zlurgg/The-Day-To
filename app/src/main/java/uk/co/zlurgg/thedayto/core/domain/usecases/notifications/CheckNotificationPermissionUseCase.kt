@@ -9,7 +9,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  * On API < 33, always returns true (permission not required).
  */
 class CheckNotificationPermissionUseCase(
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
 ) {
     operator fun invoke(): Boolean {
         return notificationScheduler.hasNotificationPermission()

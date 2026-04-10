@@ -26,5 +26,5 @@ data class OverviewUseCases(
     val checkNotificationPermission: CheckNotificationPermissionUseCase,
     val checkSystemNotificationsEnabled: CheckSystemNotificationsEnabledUseCase,
     val shouldShowPermissionRationale: ShouldShowPermissionRationaleUseCase,
-    val setupDailyNotification: SetupDailyNotificationUseCase
+    val setupDailyNotification: SetupDailyNotificationUseCase,
 )

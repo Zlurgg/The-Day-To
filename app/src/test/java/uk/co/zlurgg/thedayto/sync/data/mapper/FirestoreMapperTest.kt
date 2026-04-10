@@ -32,7 +32,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.PENDING_SYNC
+            syncStatus = SyncStatus.PENDING_SYNC,
         )
         val remote = Entry(
             moodColorId = 1,
@@ -42,7 +42,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 6000L, // Remote is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -63,7 +63,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
         val remote = Entry(
             moodColorId = 1,
@@ -73,7 +73,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 6000L, // Remote is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -96,7 +96,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 7000L, // Local is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
         val remote = Entry(
             moodColorId = 1,
@@ -106,7 +106,7 @@ class FirestoreMapperTest {
             syncId = "sync_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -129,7 +129,7 @@ class FirestoreMapperTest {
             syncId = "seed_entry",
             userId = "user_1",
             updatedAt = 0L, // Seed indicator
-            syncStatus = SyncStatus.PENDING_SYNC
+            syncStatus = SyncStatus.PENDING_SYNC,
         )
         val remote = Entry(
             moodColorId = 1,
@@ -139,7 +139,7 @@ class FirestoreMapperTest {
             syncId = "seed_entry",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -166,7 +166,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.PENDING_SYNC
+            syncStatus = SyncStatus.PENDING_SYNC,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -177,7 +177,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 6000L, // Remote is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -199,7 +199,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.PENDING_DELETE
+            syncStatus = SyncStatus.PENDING_DELETE,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -210,7 +210,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 6000L, // Remote is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -232,7 +232,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -243,7 +243,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 6000L, // Remote is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -267,7 +267,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 7000L, // Local is newer
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -278,7 +278,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -302,7 +302,7 @@ class FirestoreMapperTest {
             syncId = "seed_happy",
             userId = "user_1",
             updatedAt = 0L, // Seed indicator
-            syncStatus = SyncStatus.PENDING_SYNC
+            syncStatus = SyncStatus.PENDING_SYNC,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -313,7 +313,7 @@ class FirestoreMapperTest {
             syncId = "seed_happy",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -336,7 +336,7 @@ class FirestoreMapperTest {
             syncId = "seed_sad",
             userId = "user_1",
             updatedAt = -1L, // Negative value also indicates seed
-            syncStatus = SyncStatus.LOCAL_ONLY
+            syncStatus = SyncStatus.LOCAL_ONLY,
         )
         val remote = MoodColor(
             mood = "Sad",
@@ -347,7 +347,7 @@ class FirestoreMapperTest {
             syncId = "seed_sad",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -370,7 +370,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L,
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
         val remote = MoodColor(
             mood = "Happy",
@@ -381,7 +381,7 @@ class FirestoreMapperTest {
             syncId = "mood_123",
             userId = "user_1",
             updatedAt = 5000L, // Equal timestamp
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
 
         // When: Resolving conflict
@@ -406,7 +406,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.PENDING_SYNC.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
         val remote = NotificationSettingsEntity(
             userId = "user_1",
@@ -415,7 +415,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 6000L // Remote is newer
+            updatedAt = 6000L, // Remote is newer
         )
 
         // When: Resolving conflict
@@ -435,7 +435,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.PENDING_DELETE.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
         val remote = NotificationSettingsEntity(
             userId = "user_1",
@@ -444,7 +444,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 6000L // Remote is newer
+            updatedAt = 6000L, // Remote is newer
         )
 
         // When: Resolving conflict
@@ -464,7 +464,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
         val remote = NotificationSettingsEntity(
             userId = "user_remote", // Different userId from remote
@@ -473,7 +473,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 6000L // Remote is newer
+            updatedAt = 6000L, // Remote is newer
         )
 
         // When: Resolving conflict
@@ -497,7 +497,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 7000L // Local is newer
+            updatedAt = 7000L, // Local is newer
         )
         val remote = NotificationSettingsEntity(
             userId = "user_1",
@@ -506,7 +506,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
 
         // When: Resolving conflict
@@ -529,7 +529,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
         val remote = NotificationSettingsEntity(
             userId = "user_1",
@@ -538,7 +538,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 5000L // Equal timestamp
+            updatedAt = 5000L, // Equal timestamp
         )
 
         // When: Resolving conflict
@@ -560,7 +560,7 @@ class FirestoreMapperTest {
             minute = 0,
             syncId = "settings_123",
             syncStatus = SyncStatus.LOCAL_ONLY.name,
-            updatedAt = 5000L
+            updatedAt = 5000L,
         )
         val remote = NotificationSettingsEntity(
             userId = "user_1",
@@ -569,7 +569,7 @@ class FirestoreMapperTest {
             minute = 30,
             syncId = "settings_123",
             syncStatus = SyncStatus.SYNCED.name,
-            updatedAt = 6000L
+            updatedAt = 6000L,
         )
 
         // When: Resolving conflict

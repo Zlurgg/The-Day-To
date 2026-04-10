@@ -8,7 +8,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
  * Used by the Mood Color Management screen to show usage statistics.
  */
 class GetMoodColorEntryCountsUseCase(
-    private val repository: EntryRepository
+    private val repository: EntryRepository,
 ) {
     /**
      * @return Flow of map (moodColorId to entryCount)

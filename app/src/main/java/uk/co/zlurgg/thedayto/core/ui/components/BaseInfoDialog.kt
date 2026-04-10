@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.core.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,10 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import android.content.res.Configuration
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 
 /**
  * Reusable base dialog for informational content
@@ -38,7 +38,7 @@ fun BaseInfoDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
     scrollable: Boolean = false,
-    content: @Composable ColumnScope.() -> Unit
+    content: @Composable ColumnScope.() -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -46,7 +46,7 @@ fun BaseInfoDialog(
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineMedium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         },
         text = {
@@ -55,21 +55,21 @@ fun BaseInfoDialog(
                     .fillMaxWidth()
                     .then(
                         if (scrollable) Modifier.verticalScroll(rememberScrollState())
-                        else Modifier
+                        else Modifier,
                     ),
-                content = content
+                content = content,
             )
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(
                     text = buttonText,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
         },
         containerColor = MaterialTheme.colorScheme.surface,
-        modifier = modifier.padding(paddingMedium)
+        modifier = modifier.padding(paddingMedium),
     )
 }
 
@@ -81,11 +81,11 @@ private fun BaseInfoDialogPreview() {
         BaseInfoDialog(
             title = "Sample Dialog",
             buttonText = "Got It",
-            onDismiss = {}
+            onDismiss = {},
         ) {
             Text(
                 text = "This is sample content for the dialog preview.",
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }

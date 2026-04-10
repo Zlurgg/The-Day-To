@@ -34,7 +34,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
  */
 fun CoroutineScope.launchDebouncedLoading(
     delayMs: Long = TimeConstants.LOADING_DEBOUNCE_MS,
-    updateLoadingState: (Boolean) -> Unit
+    updateLoadingState: (Boolean) -> Unit,
 ): Job {
     return launch {
         delay(delayMs)

@@ -48,12 +48,14 @@ class TheDayToApplication : Application() {
      * Uses ExistingWorkPolicy.KEEP to avoid canceling in-progress sync.
      */
     private fun setupAppLifecycleSync() {
-        ProcessLifecycleOwner.get().lifecycle.addObserver(object : DefaultLifecycleObserver {
-            override fun onStop(owner: LifecycleOwner) {
-                Timber.d("App going to background, triggering sync")
-                val syncScheduler: SyncScheduler = get(SyncScheduler::class.java)
-                syncScheduler.requestImmediateSync()
-            }
-        })
+        ProcessLifecycleOwner.get().lifecycle.addObserver(
+            object : DefaultLifecycleObserver {
+                override fun onStop(owner: LifecycleOwner) {
+                    Timber.d("App going to background, triggering sync")
+                    val syncScheduler: SyncScheduler = get(SyncScheduler::class.java)
+                    syncScheduler.requestImmediateSync()
+                }
+            },
+        )
     }
 }

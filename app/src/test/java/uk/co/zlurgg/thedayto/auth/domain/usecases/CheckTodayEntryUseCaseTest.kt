@@ -37,7 +37,7 @@ class CheckTodayEntryUseCaseTest {
             moodColorId = 1,
             content = "Test entry",
             dateStamp = todayStart,
-            id = 1
+            id = 1,
         )
         fakeEntryRepository.insertEntry(entry)
 

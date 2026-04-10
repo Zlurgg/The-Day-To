@@ -21,7 +21,7 @@ object TestDataBuilders {
         isDeleted: Boolean = false,
         isFavorite: Boolean = false,
         dateStamp: Long = System.currentTimeMillis(),
-        id: Int? = 1
+        id: Int? = 1,
     ): MoodColor {
         return MoodColor(
             mood = mood,
@@ -29,7 +29,7 @@ object TestDataBuilders {
             isDeleted = isDeleted,
             isFavorite = isFavorite,
             dateStamp = dateStamp,
-            id = id
+            id = id,
         )
     }
 
@@ -40,13 +40,13 @@ object TestDataBuilders {
         moodColorId: Int = 1,
         content: String = "Test entry content",
         dateStamp: Long = getTodayEpoch(),
-        id: Int? = 1
+        id: Int? = 1,
     ): Entry {
         return Entry(
             moodColorId = moodColorId,
             content = content,
             dateStamp = dateStamp,
-            id = id
+            id = id,
         )
     }
 
@@ -59,7 +59,7 @@ object TestDataBuilders {
         moodColor: String = "4CAF50",
         content: String = "Test entry content",
         dateStamp: Long = getTodayEpoch(),
-        id: Int? = 1
+        id: Int? = 1,
     ): EntryWithMoodColor {
         return EntryWithMoodColor(
             id = id,
@@ -67,7 +67,7 @@ object TestDataBuilders {
             moodName = moodName,
             moodColor = moodColor,
             content = content,
-            dateStamp = dateStamp
+            dateStamp = dateStamp,
         )
     }
 
@@ -82,7 +82,7 @@ object TestDataBuilders {
             createMoodColor(
                 mood = moods[i % moods.size],
                 color = colors[i % colors.size],
-                id = i
+                id = i,
             )
         }
     }
@@ -96,7 +96,7 @@ object TestDataBuilders {
                 moodColorId = moodColorId,
                 content = "Test entry $i",
                 dateStamp = getTodayEpoch() - (i * 86400L), // One day apart
-                id = i
+                id = i,
             )
         }
     }
@@ -108,7 +108,7 @@ object TestDataBuilders {
         count: Int,
         moodColorId: Int = 1,
         moodName: String = "Happy",
-        moodColor: String = "4CAF50"
+        moodColor: String = "4CAF50",
     ): List<EntryWithMoodColor> {
         return (1..count).map { i ->
             createEntryWithMoodColor(
@@ -117,7 +117,7 @@ object TestDataBuilders {
                 moodColor = moodColor,
                 content = "Test entry $i",
                 dateStamp = getTodayEpoch() - (i * 86400L), // One day apart
-                id = i
+                id = i,
             )
         }
     }
@@ -151,6 +151,6 @@ object TestDataBuilders {
         createMoodColor(mood = "Sad", color = "2196F3", id = 2),
         createMoodColor(mood = "Angry", color = "F44336", id = 3),
         createMoodColor(mood = "Calm", color = "9C27B0", id = 4),
-        createMoodColor(mood = "Anxious", color = "FF9800", id = 5)
+        createMoodColor(mood = "Anxious", color = "FF9800", id = 5),
     )
 }

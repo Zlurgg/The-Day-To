@@ -8,10 +8,10 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 
 class GetMoodColorsUseCase(
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     operator fun invoke(
-        moodColorOrder: MoodColorOrder = MoodColorOrder.Date(OrderType.Descending)
+        moodColorOrder: MoodColorOrder = MoodColorOrder.Date(OrderType.Descending),
     ): Flow<List<MoodColor>> {
         return repository.getMoodColors().map { moodColors ->
             when (moodColorOrder.orderType) {

@@ -7,5 +7,5 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.stats
 data class StatsUseCases(
     val calculateTotalStats: CalculateTotalStatsUseCase,
     val calculateMoodDistribution: CalculateMoodDistributionUseCase,
-    val calculateMonthlyBreakdown: CalculateMonthlyBreakdownUseCase
+    val calculateMonthlyBreakdown: CalculateMonthlyBreakdownUseCase,
 )

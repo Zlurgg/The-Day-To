@@ -31,7 +31,7 @@ class NotificationSettingsRepositoryImplTest {
         mockMigrationService = mockk(relaxed = true)
         repository = NotificationSettingsRepositoryImpl(
             dao = fakeDao,
-            migrationService = mockMigrationService
+            migrationService = mockMigrationService,
         )
     }
 
@@ -148,8 +148,8 @@ class NotificationSettingsRepositoryImplTest {
                 minute = 99, // Invalid
                 syncId = "test-id",
                 syncStatus = "SYNCED",
-                updatedAt = 0
-            )
+                updatedAt = 0,
+            ),
         )
 
         // When
@@ -272,7 +272,7 @@ class NotificationSettingsRepositoryImplTest {
         hour: Int = 9,
         minute: Int = 0,
         syncId: String = "test-sync-id",
-        syncStatus: String = "SYNCED"
+        syncStatus: String = "SYNCED",
     ) = NotificationSettingsEntity(
         userId = userId,
         enabled = enabled,
@@ -280,7 +280,7 @@ class NotificationSettingsRepositoryImplTest {
         minute = minute,
         syncId = syncId,
         syncStatus = syncStatus,
-        updatedAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis(),
     )
 
     private fun createCorruptEntity(userId: String) = NotificationSettingsEntity(
@@ -290,6 +290,6 @@ class NotificationSettingsRepositoryImplTest {
         minute = 0,
         syncId = "test-sync-id",
         syncStatus = "SYNCED",
-        updatedAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis(),
     )
 }

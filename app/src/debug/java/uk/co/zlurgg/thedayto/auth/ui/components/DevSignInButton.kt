@@ -39,20 +39,20 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 fun DevSignInButton(
     onClick: () -> Unit,
     showButton: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
         visible = showButton,
         enter = fadeIn(animationSpec = tween(600)) +
-                slideInVertically(
-                    initialOffsetY = { 60 },
-                    animationSpec = tween(600)
-                ),
-        modifier = modifier
+            slideInVertically(
+                initialOffsetY = { 60 },
+                animationSpec = tween(600),
+            ),
+        modifier = modifier,
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             Spacer(modifier = Modifier.height(paddingSmall))
 
@@ -62,32 +62,32 @@ fun DevSignInButton(
                     .fillMaxWidth(0.85f)
                     .height(56.dp),
                 colors = CardDefaults.elevatedCardColors(
-                    containerColor = MaterialTheme.colorScheme.tertiaryContainer
+                    containerColor = MaterialTheme.colorScheme.tertiaryContainer,
                 ),
                 elevation = CardDefaults.elevatedCardElevation(
                     defaultElevation = 4.dp,
-                    pressedElevation = 2.dp
-                )
+                    pressedElevation = 2.dp,
+                ),
             ) {
                 Row(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = paddingMedium),
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = Icons.Default.BugReport,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.onTertiaryContainer,
-                        modifier = Modifier.size(24.dp)
+                        modifier = Modifier.size(24.dp),
                     )
                     Spacer(modifier = Modifier.width(paddingSmall))
                     Text(
                         text = "Dev Sign-In (Emulator)",
                         style = MaterialTheme.typography.titleSmall,
                         fontWeight = FontWeight.Medium,
-                        color = MaterialTheme.colorScheme.onTertiaryContainer
+                        color = MaterialTheme.colorScheme.onTertiaryContainer,
                     )
                 }
             }
@@ -96,7 +96,7 @@ fun DevSignInButton(
                 text = "test@example.com / password123",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(top = paddingSmall)
+                modifier = Modifier.padding(top = paddingSmall),
             )
         }
     }
@@ -108,7 +108,7 @@ private fun DevSignInButtonPreview() {
     TheDayToTheme {
         DevSignInButton(
             onClick = { },
-            showButton = true
+            showButton = true,
         )
     }
 }
@@ -116,14 +116,14 @@ private fun DevSignInButtonPreview() {
 @Preview(
     name = "Dark Mode",
     showBackground = true,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun DevSignInButtonDarkPreview() {
     TheDayToTheme(useDarkTheme = true) {
         DevSignInButton(
             onClick = { },
-            showButton = true
+            showButton = true,
         )
     }
 }

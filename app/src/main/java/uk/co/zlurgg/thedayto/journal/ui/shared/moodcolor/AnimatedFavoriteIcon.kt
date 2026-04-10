@@ -35,7 +35,7 @@ fun AnimatedFavoriteIcon(
     isFavorite: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    moodName: String? = null
+    moodName: String? = null,
 ) {
     val scale by animateFloatAsState(
         targetValue = if (isFavorite) ICON_SCALE_FAVORITE else ICON_SCALE_UNFAVORITE,
@@ -43,9 +43,9 @@ fun AnimatedFavoriteIcon(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             // Medium stiffness settles faster than Low so rapid taps don't
             // restart a still-settling spring and produce visible jitter.
-            stiffness = Spring.StiffnessMedium
+            stiffness = Spring.StiffnessMedium,
         ),
-        label = "favorite_scale"
+        label = "favorite_scale",
     )
 
     val tint by animateColorAsState(
@@ -55,7 +55,7 @@ fun AnimatedFavoriteIcon(
             MaterialTheme.colorScheme.onSurfaceVariant
         },
         animationSpec = tween(durationMillis = FAVORITE_ANIMATION_DURATION_MS),
-        label = "favorite_tint"
+        label = "favorite_tint",
     )
 
     // Use detailed content description when mood name is provided
@@ -66,7 +66,7 @@ fun AnimatedFavoriteIcon(
             } else {
                 R.string.add_to_favorites_desc
             },
-            moodName
+            moodName,
         )
     } else {
         stringResource(
@@ -74,7 +74,7 @@ fun AnimatedFavoriteIcon(
                 R.string.remove_from_favorites
             } else {
                 R.string.add_to_favorites
-            }
+            },
         )
     }
 
@@ -87,9 +87,9 @@ fun AnimatedFavoriteIcon(
                 indication = ripple(bounded = false, radius = FAVORITE_TOUCH_TARGET / 2),
                 onClick = onClick,
                 role = Role.Button,
-                onClickLabel = contentDescription
+                onClickLabel = contentDescription,
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = if (isFavorite) {
@@ -101,7 +101,7 @@ fun AnimatedFavoriteIcon(
             tint = tint,
             modifier = Modifier
                 .size(FAVORITE_ICON_SIZE)
-                .scale(scale)
+                .scale(scale),
         )
     }
 }

@@ -26,7 +26,7 @@ object AuthErrorMapper {
     @Suppress("TooGenericExceptionCaught")
     suspend inline fun <T> safeAuthCall(
         tag: String = "AuthErrorMapper",
-        action: () -> T
+        action: () -> T,
     ): Result<T, DataError.Auth> {
         return try {
             Result.Success(action())
@@ -50,6 +50,7 @@ object AuthErrorMapper {
                 when {
                     e.message?.contains("network", ignoreCase = true) == true ->
                         DataError.Auth.NETWORK_ERROR
+
                     else -> DataError.Auth.FAILED
                 }
             }

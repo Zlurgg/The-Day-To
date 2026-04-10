@@ -15,11 +15,11 @@ import uk.co.zlurgg.thedayto.core.domain.result.onSuccess
  */
 class DevSignInUseCase(
     private val devAuthService: DevAuthService,
-    private val authStateRepository: AuthStateRepository
+    private val authStateRepository: AuthStateRepository,
 ) {
     suspend operator fun invoke(
         email: String,
-        password: String
+        password: String,
     ): Result<UserData, DataError.Auth> {
         return devAuthService.signInWithEmailPassword(email, password)
             .onSuccess {

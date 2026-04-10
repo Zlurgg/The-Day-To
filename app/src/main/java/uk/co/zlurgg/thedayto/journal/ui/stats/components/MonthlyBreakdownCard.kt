@@ -28,30 +28,30 @@ import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsUiState
 @Composable
 fun MonthlyBreakdownCard(
     monthlyBreakdown: List<StatsUiState.MonthStats>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(StatsConstants.CARD_PADDING),
-            verticalArrangement = Arrangement.spacedBy(StatsConstants.MONTHLY_ITEM_SPACING)
+            verticalArrangement = Arrangement.spacedBy(StatsConstants.MONTHLY_ITEM_SPACING),
         ) {
             StatsCardHeader(
                 icon = Icons.Default.CalendarMonth,
-                title = stringResource(R.string.stats_monthly_breakdown_title)
+                title = stringResource(R.string.stats_monthly_breakdown_title),
             )
 
             if (monthlyBreakdown.isEmpty()) {
                 Text(
                     text = stringResource(R.string.stats_no_monthly_data),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 monthlyBreakdown.forEach { monthStats ->
@@ -66,22 +66,22 @@ fun MonthlyBreakdownCard(
 private fun MonthStatsItem(monthStats: StatsUiState.MonthStats) {
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(4.dp)
+        verticalArrangement = Arrangement.spacedBy(4.dp),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = "${monthStats.month} ${monthStats.year}",
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
             Text(
                 text = "${monthStats.entryCount} entries (${monthStats.completionRate}%)",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
         LinearProgressIndicator(
@@ -101,8 +101,8 @@ private fun MonthlyBreakdownCardPreview() {
                 StatsUiState.MonthStats("November", 2024, 11, 10, 33),
                 StatsUiState.MonthStats("October", 2024, 10, 23, 74),
                 StatsUiState.MonthStats("September", 2024, 9, 28, 93),
-                StatsUiState.MonthStats("August", 2024, 8, 19, 61)
-            )
+                StatsUiState.MonthStats("August", 2024, 8, 19, 61),
+            ),
         )
     }
 }

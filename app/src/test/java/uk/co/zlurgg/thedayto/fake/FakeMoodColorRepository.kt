@@ -52,7 +52,7 @@ class FakeMoodColorRepository : MoodColorRepository {
     override suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local> {
         // Case-insensitive lookup (matches production behavior)
         return Result.Success(
-            _moodColors.value.find { it.mood.trim().lowercase() == mood.trim().lowercase() }
+            _moodColors.value.find { it.mood.trim().lowercase() == mood.trim().lowercase() },
         )
     }
 
@@ -132,7 +132,7 @@ class FakeMoodColorRepository : MoodColorRepository {
                 isDeleted = false,
                 isFavorite = false,
                 dateStamp = System.currentTimeMillis(),
-                id = 1
+                id = 1,
             ),
             MoodColor(
                 mood = "Sad",
@@ -140,7 +140,7 @@ class FakeMoodColorRepository : MoodColorRepository {
                 isDeleted = false,
                 isFavorite = false,
                 dateStamp = System.currentTimeMillis(),
-                id = 2
+                id = 2,
             ),
             MoodColor(
                 mood = "Angry",
@@ -148,7 +148,7 @@ class FakeMoodColorRepository : MoodColorRepository {
                 isDeleted = false,
                 isFavorite = false,
                 dateStamp = System.currentTimeMillis(),
-                id = 3
+                id = 3,
             ),
             MoodColor(
                 mood = "Calm",
@@ -156,7 +156,7 @@ class FakeMoodColorRepository : MoodColorRepository {
                 isDeleted = false,
                 isFavorite = false,
                 dateStamp = System.currentTimeMillis(),
-                id = 4
+                id = 4,
             ),
             MoodColor(
                 mood = "Anxious",
@@ -164,8 +164,8 @@ class FakeMoodColorRepository : MoodColorRepository {
                 isDeleted = false,
                 isFavorite = false,
                 dateStamp = System.currentTimeMillis(),
-                id = 5
-            )
+                id = 5,
+            ),
         )
         _moodColors.value = defaults
         nextId = 6

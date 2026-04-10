@@ -43,7 +43,7 @@ data class OverviewUiState(
     val showNotificationSettingsDialog: Boolean = false,
 
     // Navigation state
-    val navigationTarget: OverviewNavigationTarget? = null
+    val navigationTarget: OverviewNavigationTarget? = null,
 )
 
 sealed interface OverviewNavigationTarget {

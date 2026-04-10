@@ -74,7 +74,7 @@ interface MoodColorDao {
         SELECT * FROM mood_color
         WHERE syncStatus = 'PENDING_SYNC'
            OR syncStatus = 'PENDING_DELETE'
-        """
+        """,
     )
     suspend fun getMoodColorsPendingSync(): List<MoodColorEntity>
 
@@ -106,14 +106,14 @@ interface MoodColorDao {
         UPDATE mood_color
         SET syncId = :syncId, userId = :userId, syncStatus = :syncStatus
         WHERE id = :id AND updatedAt = :expectedUpdatedAt
-        """
+        """,
     )
     suspend fun updateSyncFields(
         id: Int,
         syncId: String,
         userId: String,
         syncStatus: String,
-        expectedUpdatedAt: Long
+        expectedUpdatedAt: Long,
     ): Int
 
     /**

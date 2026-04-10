@@ -30,7 +30,7 @@ class SyncSettingsViewModel(
     private val syncUseCases: SyncUseCases,
     private val accountUseCases: AccountUseCases,
     private val syncScheduler: SyncScheduler,
-    private val notificationAuthUseCase: NotificationAuthUseCase
+    private val notificationAuthUseCase: NotificationAuthUseCase,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(SyncSettingsState())
@@ -54,7 +54,7 @@ class SyncSettingsViewModel(
                         userEmail = user?.username,
                         lastSyncTimestamp = lastSync,
                         isDevSignInAvailable = accountUseCases.devSignIn?.isAvailable() == true,
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
 
@@ -64,7 +64,7 @@ class SyncSettingsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to load account state"
+                        error = "Failed to load account state",
                     )
                 }
             }
@@ -109,11 +109,12 @@ class SyncSettingsViewModel(
                 is Result.Success -> {
                     handleSignInSuccess()
                 }
+
                 is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             isSigningIn = false,
-                            error = ErrorFormatter.format(result.error, "sign in")
+                            error = ErrorFormatter.format(result.error, "sign in"),
                         )
                     }
                     Timber.w("Sign in failed: ${result.error}")
@@ -137,11 +138,12 @@ class SyncSettingsViewModel(
                 is Result.Success -> {
                     handleSignInSuccess()
                 }
+
                 is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             isSigningIn = false,
-                            error = ErrorFormatter.format(result.error, "dev sign in")
+                            error = ErrorFormatter.format(result.error, "dev sign in"),
                         )
                     }
                     Timber.w("Dev sign in failed: ${result.error}")
@@ -179,7 +181,7 @@ class SyncSettingsViewModel(
                 isSigningIn = false,
                 userEmail = user.username,
                 lastSyncTimestamp = lastSync,
-                shouldNavigateBack = true
+                shouldNavigateBack = true,
             )
         }
         Timber.i("Sign in successful: %s", user.username)
@@ -217,7 +219,7 @@ class SyncSettingsViewModel(
                     isUserSignedIn = false,
                     userEmail = null,
                     isLoading = false,
-                    shouldNavigateBack = true
+                    shouldNavigateBack = true,
                 )
             }
             Timber.i("Sign out successful")
@@ -258,23 +260,27 @@ class SyncSettingsViewModel(
                                 deletionProgress = null,
                                 isUserSignedIn = false,
                                 userEmail = null,
-                                shouldNavigateBack = true
+                                shouldNavigateBack = true,
                             )
                         }
                         Timber.i("Account deletion completed")
                     }
+
                     is DeletionProgress.RequiresReAuth -> {
                         _uiState.update {
                             it.copy(deletionProgress = null, showReAuthDialog = true)
                         }
                     }
+
                     is DeletionProgress.Failed -> {
                         _uiState.update {
                             it.copy(deletionProgress = null, error = progress.message)
                         }
                         Timber.w("Account deletion failed: %s", progress.message)
                     }
-                    else -> { /* Progress update - no action needed */ }
+
+                    else -> { /* Progress update - no action needed */
+                    }
                 }
             }
         }
@@ -293,11 +299,12 @@ class SyncSettingsViewModel(
                     _uiState.update { it.copy(isLoading = false) }
                     onDeleteAccountConfirmed() // Retry deletion
                 }
+
                 is Result.Error -> {
                     _uiState.update {
                         it.copy(
                             isLoading = false,
-                            error = ErrorFormatter.format(result.error, "re-authenticate")
+                            error = ErrorFormatter.format(result.error, "re-authenticate"),
                         )
                     }
                     Timber.w("Re-authentication failed: %s", result.error)

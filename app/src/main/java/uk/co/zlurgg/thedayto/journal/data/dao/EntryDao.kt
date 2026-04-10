@@ -16,13 +16,15 @@ interface EntryDao {
     @Query("SELECT * FROM entry")
     fun getEntries(): Flow<List<EntryEntity>>
 
-    @Query("""
+    @Query(
+        """
         SELECT e.id, e.moodColorId, e.content, e.dateStamp,
                mc.mood as moodName, mc.color as moodColor
         FROM entry e
         INNER JOIN mood_color mc ON e.moodColorId = mc.id
         ORDER BY e.dateStamp DESC
-    """)
+    """,
+    )
     fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColorEntity>>
 
     /**
@@ -35,38 +37,44 @@ interface EntryDao {
      * @param endEpoch End of the range (exclusive) - epoch seconds
      * @return Flow of entries with mood colors within the date range, ordered by date descending
      */
-    @Query("""
+    @Query(
+        """
         SELECT e.id, e.moodColorId, e.content, e.dateStamp,
                mc.mood as moodName, mc.color as moodColor
         FROM entry e
         INNER JOIN mood_color mc ON e.moodColorId = mc.id
         WHERE e.dateStamp >= :startEpoch AND e.dateStamp < :endEpoch
         ORDER BY e.dateStamp DESC
-    """)
+    """,
+    )
     fun getEntriesForMonth(startEpoch: Long, endEpoch: Long): Flow<List<EntryWithMoodColorEntity>>
 
     @Query("SELECT * FROM entry WHERE id = :id")
     suspend fun getEntryById(id: Int): EntryEntity?
 
-    @Query("""
+    @Query(
+        """
         SELECT e.id, e.moodColorId, e.content, e.dateStamp,
                mc.mood as moodName, mc.color as moodColor
         FROM entry e
         INNER JOIN mood_color mc ON e.moodColorId = mc.id
         WHERE e.id = :id
-    """)
+    """,
+    )
     suspend fun getEntryWithMoodColorById(id: Int): EntryWithMoodColorEntity?
 
     @Query("SELECT * FROM entry WHERE dateStamp = :date")
     suspend fun getEntryByDate(date: Long): EntryEntity?
 
-    @Query("""
+    @Query(
+        """
         SELECT e.id, e.moodColorId, e.content, e.dateStamp,
                mc.mood as moodName, mc.color as moodColor
         FROM entry e
         INNER JOIN mood_color mc ON e.moodColorId = mc.id
         WHERE e.dateStamp = :date
-    """)
+    """,
+    )
     suspend fun getEntryWithMoodColorByDate(date: Long): EntryWithMoodColorEntity?
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -94,11 +102,13 @@ interface EntryDao {
      *
      * @return Flow of pairs (moodColorId to entryCount)
      */
-    @Query("""
+    @Query(
+        """
         SELECT moodColorId, COUNT(*) as entryCount
         FROM entry
         GROUP BY moodColorId
-    """)
+    """,
+    )
     fun getMoodColorEntryCounts(): Flow<List<MoodColorEntryCount>>
 
     // ==================== Sync Queries ====================
@@ -127,17 +137,19 @@ interface EntryDao {
      * Only updates if entry hasn't been modified since upload started (updatedAt matches).
      * Returns number of rows updated (0 if entry was modified, 1 if updated).
      */
-    @Query("""
+    @Query(
+        """
         UPDATE entry
         SET syncId = :syncId, userId = :userId, syncStatus = :syncStatus
         WHERE id = :id AND updatedAt = :expectedUpdatedAt
-    """)
+    """,
+    )
     suspend fun updateSyncFields(
         id: Int,
         syncId: String,
         userId: String,
         syncStatus: String,
-        expectedUpdatedAt: Long
+        expectedUpdatedAt: Long,
     ): Int
 
     /**
@@ -189,5 +201,5 @@ interface EntryDao {
  */
 data class MoodColorEntryCount(
     val moodColorId: Int,
-    val entryCount: Int
+    val entryCount: Int,
 )

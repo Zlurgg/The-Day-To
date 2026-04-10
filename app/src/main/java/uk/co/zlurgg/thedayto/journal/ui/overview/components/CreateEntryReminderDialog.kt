@@ -21,20 +21,20 @@ import uk.co.zlurgg.thedayto.R
 @Composable
 fun CreateEntryReminderDialog(
     onDismiss: () -> Unit,
-    onCreateEntry: () -> Unit
+    onCreateEntry: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = {
             Text(
                 text = stringResource(R.string.entry_reminder_title),
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         },
         text = {
             Text(
                 text = stringResource(R.string.entry_reminder_message),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         },
         confirmButton = {
@@ -46,7 +46,7 @@ fun CreateEntryReminderDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.not_now))
             }
-        }
+        },
     )
 }
 
@@ -56,7 +56,7 @@ private fun CreateEntryReminderDialogPreview() {
     MaterialTheme {
         CreateEntryReminderDialog(
             onDismiss = {},
-            onCreateEntry = {}
+            onCreateEntry = {},
         )
     }
 }

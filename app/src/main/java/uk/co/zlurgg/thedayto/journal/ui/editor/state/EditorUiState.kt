@@ -46,7 +46,7 @@ data class EditorUiState(
     val isLoading: Boolean = false,
 
     // Navigation state
-    val shouldNavigateBack: Boolean = false
+    val shouldNavigateBack: Boolean = false,
 ) {
     /**
      * Indicates whether the entry can be saved.

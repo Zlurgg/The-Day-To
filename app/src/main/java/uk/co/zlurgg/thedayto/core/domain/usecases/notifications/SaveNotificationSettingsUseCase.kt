@@ -18,7 +18,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 class SaveNotificationSettingsUseCase(
     private val settingsRepository: NotificationSettingsRepository,
     private val scheduler: NotificationScheduler,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(enabled: Boolean, hour: Int, minute: Int): EmptyResult<DataError.Local> {
         require(hour in MIN_HOUR..MAX_HOUR) { "Hour must be $MIN_HOUR-$MAX_HOUR, got: $hour" }

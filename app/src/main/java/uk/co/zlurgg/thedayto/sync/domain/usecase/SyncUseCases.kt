@@ -10,5 +10,5 @@ data class SyncUseCases(
     val observeSyncState: ObserveSyncStateUseCase,
     val getLastSyncTimestamp: GetLastSyncTimestampUseCase,
     val prepareForSync: PrepareForSyncUseCase,
-    val setSyncEnabled: SetSyncEnabledUseCase
+    val setSyncEnabled: SetSyncEnabledUseCase,
 )

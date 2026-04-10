@@ -35,7 +35,7 @@ import uk.co.zlurgg.thedayto.R
 fun DeleteAccountConfirmDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var confirmText by remember { mutableStateOf("") }
 
@@ -45,7 +45,7 @@ fun DeleteAccountConfirmDialog(
             Icon(
                 imageVector = Icons.Default.Warning,
                 contentDescription = null,
-                tint = MaterialTheme.colorScheme.error
+                tint = MaterialTheme.colorScheme.error,
             )
         },
         title = {
@@ -61,7 +61,7 @@ fun DeleteAccountConfirmDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 Text(
                     text = stringResource(R.string.delete_account_warning_permanent),
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
@@ -69,7 +69,7 @@ fun DeleteAccountConfirmDialog(
                     onValueChange = { confirmText = it },
                     label = { Text(stringResource(R.string.delete_account_confirm_hint)) },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         },
@@ -78,8 +78,8 @@ fun DeleteAccountConfirmDialog(
                 onClick = onConfirm,
                 enabled = confirmText == "DELETE",
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.error
-                )
+                    containerColor = MaterialTheme.colorScheme.error,
+                ),
             ) {
                 Text(stringResource(R.string.delete_account_button))
             }
@@ -89,6 +89,6 @@ fun DeleteAccountConfirmDialog(
                 Text(stringResource(R.string.cancel))
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }

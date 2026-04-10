@@ -27,7 +27,7 @@ class DeleteAccountUseCase(
     private val authRepository: AuthRepository,
     private val syncRepository: SyncRepository,
     private val localDataClearer: LocalDataClearer,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
 ) {
     operator fun invoke(): Flow<DeletionProgress> = flow {
         emit(DeletionProgress.Starting)
@@ -47,7 +47,9 @@ class DeleteAccountUseCase(
                 emit(DeletionProgress.Failed("Failed to delete cloud data. Please try again."))
                 return@flow
             }
-            is Result.Success -> { /* continue */ }
+
+            is Result.Success -> { /* continue */
+            }
         }
 
         // 4. Delete Firebase Auth account
@@ -60,13 +62,15 @@ class DeleteAccountUseCase(
                     // Firestore already deleted - inform user
                     emit(
                         DeletionProgress.Failed(
-                            "Cloud data deleted but account deletion failed. Please try again."
-                        )
+                            "Cloud data deleted but account deletion failed. Please try again.",
+                        ),
                     )
                 }
                 return@flow
             }
-            is Result.Success -> { /* continue */ }
+
+            is Result.Success -> { /* continue */
+            }
         }
 
         // 5. Clear local data

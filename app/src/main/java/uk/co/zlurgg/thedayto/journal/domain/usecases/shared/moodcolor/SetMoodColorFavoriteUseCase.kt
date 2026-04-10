@@ -6,7 +6,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
 class SetMoodColorFavoriteUseCase(
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     suspend operator fun invoke(id: Int, isFavorite: Boolean): EmptyResult<MoodColorError> {
         return when (repository.setFavorite(id, isFavorite)) {

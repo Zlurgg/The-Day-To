@@ -4,8 +4,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.core.graphics.toColorInt
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_light_onSurface
 import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_dark_onSurface
+import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_light_onSurface
 
 // Static text colors that match our theme's onSurface values
 // These don't change with light/dark mode - they're determined solely by background luminance

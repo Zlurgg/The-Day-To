@@ -19,7 +19,7 @@ import java.time.LocalDate
  * @param context Application context for accessing SharedPreferences
  */
 class PreferencesRepositoryImpl(
-    context: Context
+    context: Context,
 ) : PreferencesRepository {
 
     private val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)

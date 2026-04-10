@@ -9,7 +9,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.sortedByFavoriteAndUsage
  */
 fun List<MoodColorWithCount>.withOptimisticFavorite(
     id: Int,
-    newValue: Boolean
+    newValue: Boolean,
 ): List<MoodColorWithCount> = map { mc ->
     if (mc.moodColor.id == id) {
         mc.copy(moodColor = mc.moodColor.copy(isFavorite = newValue))
@@ -23,7 +23,7 @@ fun List<MoodColorWithCount>.withOptimisticFavorite(
  */
 fun List<MoodColorWithCount>.revertOptimisticFavorite(
     id: Int,
-    originalValue: Boolean
+    originalValue: Boolean,
 ): List<MoodColorWithCount> = map { mc ->
     if (mc.moodColor.id == id) {
         mc.copy(moodColor = mc.moodColor.copy(isFavorite = originalValue))

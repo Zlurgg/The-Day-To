@@ -27,8 +27,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
 
@@ -51,38 +51,38 @@ fun MonthStatistics(
             .semantics { contentDescription = statsDescription }
             .clickable(onClick = onStatsClick),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = UiConstants.STATS_CARD_ELEVATION
-        )
+            defaultElevation = UiConstants.STATS_CARD_ELEVATION,
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
                     horizontal = UiConstants.STATS_CARD_PADDING_HORIZONTAL,
-                    vertical = UiConstants.STATS_CARD_PADDING_VERTICAL
+                    vertical = UiConstants.STATS_CARD_PADDING_VERTICAL,
                 ),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.SpaceAround,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 StatItem(
                     label = stringResource(R.string.stats_entries_label),
-                    value = entryCount.toString()
+                    value = entryCount.toString(),
                 )
                 StatItem(
                     label = stringResource(R.string.stats_days_logged_label),
-                    value = "$completionPercentage%"
+                    value = "$completionPercentage%",
                 )
                 StatItem(
                     label = stringResource(R.string.stats_days_in_month_label),
-                    value = daysInMonth.toString()
+                    value = daysInMonth.toString(),
                 )
             }
 
@@ -92,7 +92,7 @@ fun MonthStatistics(
                 imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                 contentDescription = stringResource(R.string.view_more_stats),
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
         }
     }
@@ -101,21 +101,21 @@ fun MonthStatistics(
 @Composable
 private fun StatItem(
     label: String,
-    value: String
+    value: String,
 ) {
     Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = value,
             style = MaterialTheme.typography.headlineSmall,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
         Text(
             text = label,
             style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
@@ -127,11 +127,32 @@ private fun MonthStatisticsPreview() {
     TheDayToTheme {
         MonthStatistics(
             entries = listOf(
-                EntryWithMoodColor(id = 1, moodColorId = 1, moodName = "Happy", moodColor = "4CAF50", content = "Great!", dateStamp = 1L),
-                EntryWithMoodColor(id = 2, moodColorId = 2, moodName = "Sad", moodColor = "F44336", content = "Not good", dateStamp = 2L),
-                EntryWithMoodColor(id = 3, moodColorId = 3, moodName = "Neutral", moodColor = "FFC107", content = "Ok", dateStamp = 3L)
+                EntryWithMoodColor(
+                    id = 1,
+                    moodColorId = 1,
+                    moodName = "Happy",
+                    moodColor = "4CAF50",
+                    content = "Great!",
+                    dateStamp = 1L,
+                ),
+                EntryWithMoodColor(
+                    id = 2,
+                    moodColorId = 2,
+                    moodName = "Sad",
+                    moodColor = "F44336",
+                    content = "Not good",
+                    dateStamp = 2L,
+                ),
+                EntryWithMoodColor(
+                    id = 3,
+                    moodColorId = 3,
+                    moodName = "Neutral",
+                    moodColor = "FFC107",
+                    content = "Ok",
+                    dateStamp = 3L,
+                ),
             ),
-            daysInMonth = 31
+            daysInMonth = 31,
         )
     }
 }
@@ -142,7 +163,7 @@ private fun MonthStatisticsEmptyPreview() {
     TheDayToTheme {
         MonthStatistics(
             entries = emptyList(),
-            daysInMonth = 30
+            daysInMonth = 30,
         )
     }
 }

@@ -17,7 +17,7 @@ object GreetingConstants {
         "Morning",
         "Hello sunshine",
         "Fresh start today",
-        "New possibilities"
+        "New possibilities",
     )
 
     /**
@@ -29,7 +29,7 @@ object GreetingConstants {
         "Afternoon",
         "Afternoon check-in",
         "Keep going",
-        "Midday vibes"
+        "Midday vibes",
     )
 
     /**
@@ -41,7 +41,7 @@ object GreetingConstants {
         "How was your day",
         "Winding down",
         "Evening wrap-up",
-        "Day's end"
+        "Day's end",
     )
 
     /**
@@ -53,6 +53,6 @@ object GreetingConstants {
         "Late night vibes",
         "Time to unwind",
         "End of the day",
-        "Rest well soon"
+        "Rest well soon",
     )
 }

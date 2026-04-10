@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.rememberSwipeToDismissBoxState
@@ -23,7 +24,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -72,7 +72,7 @@ fun EntriesListSection(
                 EntrySortSection(
                     modifier = Modifier.padding(vertical = paddingSmall),
                     entryOrder = entryOrder,
-                    onOrderChange = onOrderChange
+                    onOrderChange = onOrderChange,
                 )
                 Spacer(modifier = Modifier.height(paddingSmall))
             }
@@ -80,7 +80,7 @@ fun EntriesListSection(
             // Prompt card for creating today's entry
             if (showPromptCard) {
                 CreateEntryPromptCard(
-                    onClick = onCreateEntry
+                    onClick = onCreateEntry,
                 )
                 if (entries.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(paddingMedium))
@@ -121,18 +121,18 @@ fun EntriesListSection(
                                             .fillMaxSize()
                                             .background(MaterialTheme.colorScheme.error)
                                             .padding(horizontal = paddingMedium),
-                                        contentAlignment = Alignment.CenterEnd
+                                        contentAlignment = Alignment.CenterEnd,
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.Delete,
                                             contentDescription = stringResource(R.string.delete_entry),
-                                            tint = MaterialTheme.colorScheme.onError
+                                            tint = MaterialTheme.colorScheme.onError,
                                         )
                                     }
                                 }
                             },
                             enableDismissFromStartToEnd = false,
-                            enableDismissFromEndToStart = !isLoading
+                            enableDismissFromEndToStart = !isLoading,
                         ) {
                             EntryItem(
                                 entry = entry,
@@ -141,7 +141,7 @@ fun EntriesListSection(
                                     .clickable {
                                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                         onEntryClick(entry.id)
-                                    }
+                                    },
                             )
                         }
                     }
@@ -165,7 +165,7 @@ private fun EntriesListSectionPreview() {
                     moodName = "Happy",
                     moodColor = "4CAF50",
                     content = "Had a great day!",
-                    dateStamp = System.currentTimeMillis()
+                    dateStamp = System.currentTimeMillis(),
                 ),
                 EntryWithMoodColor(
                     id = 2,
@@ -173,8 +173,8 @@ private fun EntriesListSectionPreview() {
                     moodName = "Productive",
                     moodColor = "2196F3",
                     content = "Got a lot done today",
-                    dateStamp = System.currentTimeMillis() - 86400000
-                )
+                    dateStamp = System.currentTimeMillis() - 86400000,
+                ),
             ),
             entryOrder = EntryOrder.Date(OrderType.Descending),
             onOrderChange = {},
@@ -183,7 +183,7 @@ private fun EntriesListSectionPreview() {
             isLoading = false,
             isCurrentMonth = true,
             hasTodayEntry = true,
-            entryPendingDelete = null
+            entryPendingDelete = null,
         )
     }
 }
@@ -201,7 +201,7 @@ private fun EntriesListSectionPromptOnlyPreview() {
             isLoading = false,
             isCurrentMonth = true,
             hasTodayEntry = false,
-            entryPendingDelete = null
+            entryPendingDelete = null,
         )
     }
 }
@@ -218,8 +218,8 @@ private fun EntriesListSectionPromptWithEntriesPreview() {
                     moodName = "Happy",
                     moodColor = "4CAF50",
                     content = "Yesterday was great!",
-                    dateStamp = System.currentTimeMillis() - 86400000
-                )
+                    dateStamp = System.currentTimeMillis() - 86400000,
+                ),
             ),
             entryOrder = EntryOrder.Date(OrderType.Descending),
             onOrderChange = {},
@@ -228,7 +228,7 @@ private fun EntriesListSectionPromptWithEntriesPreview() {
             isLoading = false,
             isCurrentMonth = true,
             hasTodayEntry = false,
-            entryPendingDelete = null
+            entryPendingDelete = null,
         )
     }
 }

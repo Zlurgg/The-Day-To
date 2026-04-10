@@ -14,7 +14,7 @@ import uk.co.zlurgg.thedayto.journal.ui.stats.state.StatsUiState
 
 class StatsViewModel(
     private val getEntriesUseCase: GetEntriesUseCase,
-    private val statsUseCases: StatsUseCases
+    private val statsUseCases: StatsUseCases,
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(StatsUiState())
@@ -39,7 +39,7 @@ class StatsViewModel(
                             it.copy(
                                 isEmpty = true,
                                 isLoading = false,
-                                error = null
+                                error = null,
                             )
                         }
                         return@collect
@@ -59,7 +59,7 @@ class StatsViewModel(
                                 StatsUiState.MoodCount(
                                     mood = mood.mood,
                                     color = mood.color,
-                                    count = mood.count
+                                    count = mood.count,
                                 )
                             },
                             monthlyBreakdown = monthlyBreakdown.map { month ->
@@ -68,12 +68,12 @@ class StatsViewModel(
                                     year = month.year,
                                     monthValue = month.monthValue,
                                     entryCount = month.entryCount,
-                                    completionRate = month.completionRate
+                                    completionRate = month.completionRate,
                                 )
                             },
                             isEmpty = false,
                             isLoading = false,
-                            error = null
+                            error = null,
                         )
                     }
 
@@ -84,7 +84,7 @@ class StatsViewModel(
                 _uiState.update {
                     it.copy(
                         isLoading = false,
-                        error = "Failed to load statistics. Please try again."
+                        error = "Failed to load statistics. Please try again.",
                     )
                 }
             }

@@ -19,8 +19,8 @@ import androidx.room.PrimaryKey
 @Entity(
     tableName = "pending_sync_deletion",
     indices = [
-        Index(value = ["collection", "syncId"], unique = true)
-    ]
+        Index(value = ["collection", "syncId"], unique = true),
+    ],
 )
 data class PendingSyncDeletionEntity(
     @PrimaryKey(autoGenerate = true)
@@ -28,7 +28,7 @@ data class PendingSyncDeletionEntity(
     val syncId: String,
     val collection: String,
     val userId: String,
-    val createdAt: Long = System.currentTimeMillis()
+    val createdAt: Long = System.currentTimeMillis(),
 ) {
     companion object {
         const val COLLECTION_ENTRIES = "entries"

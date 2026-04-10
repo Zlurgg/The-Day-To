@@ -27,7 +27,7 @@ val syncModule = module {
             entryDao = get(),
             moodColorDao = get(),
             pendingSyncDeletionDao = get(),
-            notificationSyncService = get()
+            notificationSyncService = get(),
         )
     }
 
@@ -36,31 +36,31 @@ val syncModule = module {
         PerformSyncUseCase(
             authRepository = get(),
             preferencesRepository = get(),
-            syncRepository = get()
+            syncRepository = get(),
         )
     }
 
     single {
         ObserveSyncStateUseCase(
-            syncRepository = get()
+            syncRepository = get(),
         )
     }
 
     single {
         GetLastSyncTimestampUseCase(
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
     single {
         PrepareForSyncUseCase(
-            syncRepository = get()
+            syncRepository = get(),
         )
     }
 
     single {
         SetSyncEnabledUseCase(
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
@@ -71,20 +71,20 @@ val syncModule = module {
             observeSyncState = get(),
             getLastSyncTimestamp = get(),
             prepareForSync = get(),
-            setSyncEnabled = get()
+            setSyncEnabled = get(),
         )
     }
 
     // Auth UseCases for account management
     single {
         GetSignedInUserUseCase(
-            authRepository = get()
+            authRepository = get(),
         )
     }
 
     single {
         ReauthenticateUseCase(
-            authRepository = get()
+            authRepository = get(),
         )
     }
 
@@ -96,7 +96,7 @@ val syncModule = module {
             signOut = get(),
             reauthenticate = get(),
             deleteAccount = get(),
-            devSignIn = getOrNull()
+            devSignIn = getOrNull(),
         )
     }
 
@@ -109,7 +109,7 @@ val syncModule = module {
             syncUseCases = get(),
             accountUseCases = get(),
             syncScheduler = get(),
-            notificationAuthUseCase = get()
+            notificationAuthUseCase = get(),
         )
     }
 }

@@ -66,7 +66,7 @@ interface NotificationSettingsDao {
         UPDATE notification_settings
         SET lastNotifiedDateEpoch = :dateEpoch, syncStatus = 'PENDING_SYNC'
         WHERE userId = :userId
-        """
+        """,
     )
     suspend fun updateLastNotifiedDate(userId: String, dateEpoch: Long)
 

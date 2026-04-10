@@ -30,7 +30,7 @@ class SignInUseCaseTest {
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = "https://example.com/profile.jpg"
+        profilePictureUrl = "https://example.com/profile.jpg",
     )
 
     private val mockCredentialProvider: suspend () -> Result<GoogleCredential, DataError.Auth> = {

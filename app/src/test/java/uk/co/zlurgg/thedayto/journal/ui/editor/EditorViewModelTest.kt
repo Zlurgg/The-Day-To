@@ -86,7 +86,7 @@ class EditorViewModelTest {
     private fun createViewModel(): EditorViewModel {
         val saveMoodColorUseCase = SaveMoodColorUseCase(
             validate = ValidateMoodColorUseCase(fakeMoodColorRepository),
-            repository = fakeMoodColorRepository
+            repository = fakeMoodColorRepository,
         )
         val editorUseCases = EditorUseCases(
             getEntryUseCase = GetEntryUseCase(fakeEntryRepository),
@@ -97,7 +97,7 @@ class EditorViewModelTest {
             saveMoodColor = saveMoodColorUseCase,
             setMoodColorFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),
-            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository)
+            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository),
         )
         val syncScheduler = mockk<SyncScheduler>(relaxed = true)
         return EditorViewModel(editorUseCases, syncScheduler, savedStateHandle)
@@ -336,7 +336,7 @@ class EditorViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should be ShowMoodColorError event",
-                event is EditorUiEvent.ShowMoodColorError
+                event is EditorUiEvent.ShowMoodColorError,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -565,7 +565,7 @@ class EditorViewModelTest {
             val state = awaitItem()
             assertTrue(
                 "Mood hint should be from TODAY_PROMPTS",
-                EditorPromptConstants.TODAY_PROMPTS.contains(state.moodHint)
+                EditorPromptConstants.TODAY_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -586,7 +586,7 @@ class EditorViewModelTest {
             val state = awaitItem()
             assertTrue(
                 "Mood hint should be from PAST_PROMPTS for past date",
-                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -608,7 +608,7 @@ class EditorViewModelTest {
             val state = awaitItem()
             assertTrue(
                 "Mood hint should be from FUTURE_PROMPTS for future date",
-                EditorPromptConstants.FUTURE_PROMPTS.contains(state.moodHint)
+                EditorPromptConstants.FUTURE_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -629,7 +629,7 @@ class EditorViewModelTest {
             assertEquals("Entry date should be set", pastDate, state.entryDate)
             assertTrue(
                 "Mood hint should be from PAST_PROMPTS",
-                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -645,7 +645,7 @@ class EditorViewModelTest {
             moodColorId = 1,
             content = "Old entry",
             dateStamp = pastDate,
-            id = 1
+            id = 1,
         )
         fakeEntryRepository.insertEntry(entry)
 
@@ -659,7 +659,7 @@ class EditorViewModelTest {
             val state = awaitItem()
             assertTrue(
                 "Mood hint should be from PAST_PROMPTS for past entry",
-                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint)
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -774,11 +774,13 @@ class EditorViewModelTest {
 
         // When: Mood color is updated (collect events first)
         viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.UpdateMoodColor(
-                moodColorId = originalMood.id!!,
-                newMood = originalMood.mood, // Keep same name
-                newColorHex = newColor
-            ))
+            viewModel.onAction(
+                EditorAction.UpdateMoodColor(
+                    moodColorId = originalMood.id!!,
+                    newMood = originalMood.mood, // Keep same name
+                    newColorHex = newColor,
+                ),
+            )
 
             // Then: Success event should be emitted
             val event = awaitItem()
@@ -813,11 +815,13 @@ class EditorViewModelTest {
 
         // When: Mood name and color are updated
         viewModel.uiEvents.test {
-            viewModel.onAction(EditorAction.UpdateMoodColor(
-                moodColorId = originalMood.id!!,
-                newMood = newMood,
-                newColorHex = newColor
-            ))
+            viewModel.onAction(
+                EditorAction.UpdateMoodColor(
+                    moodColorId = originalMood.id!!,
+                    newMood = newMood,
+                    newColorHex = newColor,
+                ),
+            )
 
             // Then: Success event should be emitted with new name
             val event = awaitItem()
@@ -837,11 +841,13 @@ class EditorViewModelTest {
         viewModel = createViewModel()
 
         // When: Updating with invalid ID
-        viewModel.onAction(EditorAction.UpdateMoodColor(
-            moodColorId = 999, // Non-existent
-            newMood = "Test",
-            newColorHex = "FF0000"
-        ))
+        viewModel.onAction(
+            EditorAction.UpdateMoodColor(
+                moodColorId = 999, // Non-existent
+                newMood = "Test",
+                newColorHex = "FF0000",
+            ),
+        )
 
         // Then: Typed NotFound error should be set in state (inline error display)
         testScheduler.advanceUntilIdle()
@@ -1013,7 +1019,7 @@ class EditorViewModelTest {
             id = 123,
             moodColorId = 1,
             content = "Original content",
-            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
         )
         fakeEntryRepository.insertEntry(testEntry)
 
@@ -1040,7 +1046,7 @@ class EditorViewModelTest {
             id = 123,
             moodColorId = 1,
             content = "Original content",
-            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+            dateStamp = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
         )
         fakeEntryRepository.insertEntry(testEntry)
 
@@ -1079,8 +1085,10 @@ class EditorViewModelTest {
         viewModel.uiState.test {
             val state = awaitItem()
             assertTrue("Load error should be set", state.loadError != null)
-            assertTrue("Error message should mention not found",
-                state.loadError?.contains("not found", ignoreCase = true) == true)
+            assertTrue(
+                "Error message should mention not found",
+                state.loadError?.contains("not found", ignoreCase = true) == true,
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1145,8 +1153,10 @@ class EditorViewModelTest {
         // Then: Should show error about missing entry ID
         viewModel.uiState.test {
             val state = awaitItem()
-            assertTrue("Should show error about cannot retry",
-                state.loadError?.contains("Cannot retry", ignoreCase = true) == true)
+            assertTrue(
+                "Should show error about cannot retry",
+                state.loadError?.contains("Cannot retry", ignoreCase = true) == true,
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1157,7 +1167,7 @@ class EditorViewModelTest {
         val testEntry = TestDataBuilders.createEntry(
             id = 123,
             moodColorId = 1,
-            content = "Test"
+            content = "Test",
         )
         fakeEntryRepository.insertEntry(testEntry)
 

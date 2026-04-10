@@ -37,7 +37,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
                 MoodColorPickerDialog(
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -75,7 +75,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
                     onSave = { mood, color ->
                         savedMood = mood
                         savedColor = color
-                    }
+                    },
                 )
             }
         }
@@ -104,7 +104,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
                 MoodColorPickerDialog(
                     showDialog = true,
                     onDismiss = { dismissCalled = true },
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -129,7 +129,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
                 MoodColorPickerDialog(
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }

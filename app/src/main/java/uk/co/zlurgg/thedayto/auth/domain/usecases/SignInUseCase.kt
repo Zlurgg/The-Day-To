@@ -19,10 +19,10 @@ import uk.co.zlurgg.thedayto.core.domain.result.onSuccess
  */
 class SignInUseCase(
     private val authRepository: AuthRepository,
-    private val authStateRepository: AuthStateRepository
+    private val authStateRepository: AuthStateRepository,
 ) {
     suspend operator fun invoke(
-        credentialProvider: CredentialProvider
+        credentialProvider: CredentialProvider,
     ): Result<UserData, DataError.Auth> {
         return authRepository.signIn(credentialProvider)
             .onSuccess {

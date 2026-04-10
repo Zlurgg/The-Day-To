@@ -46,30 +46,30 @@ fun StateMessagePanel(
     messageColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
     iconSize: Dp = paddingExtraLarge,
     iconSpacing: Dp = paddingMedium,
-    textSpacing: Dp = paddingSmall
+    textSpacing: Dp = paddingSmall,
 ) {
     Column(
         modifier = modifier.padding(paddingMedium),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
             modifier = Modifier.size(iconSize),
-            tint = iconTint
+            tint = iconTint,
         )
         Spacer(Modifier.height(iconSpacing))
         Text(
             text = title,
-            style = MaterialTheme.typography.headlineMedium
+            style = MaterialTheme.typography.headlineMedium,
         )
         Spacer(Modifier.height(textSpacing))
         Text(
             text = message,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = messageColor
+            color = messageColor,
         )
     }
 }

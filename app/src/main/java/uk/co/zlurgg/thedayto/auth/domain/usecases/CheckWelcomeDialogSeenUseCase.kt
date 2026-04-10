@@ -12,7 +12,7 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
  * @param preferencesRepository Repository for accessing welcome dialog state
  */
 class CheckWelcomeDialogSeenUseCase(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) {
     suspend operator fun invoke(): Boolean {
         return preferencesRepository.hasSeenWelcomeDialog()

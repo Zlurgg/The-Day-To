@@ -34,7 +34,7 @@ class EditMoodColorDialogTest : ComposeTest() {
         id = 1,
         mood = "Happy",
         color = "4CAF50",
-        dateStamp = System.currentTimeMillis()
+        dateStamp = System.currentTimeMillis(),
     )
 
     // ============================================================
@@ -49,7 +49,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -73,7 +73,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -97,7 +97,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -125,7 +125,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -162,7 +162,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = {},
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }
@@ -201,7 +201,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     onSave = { mood, color ->
                         savedMood = mood
                         savedColor = color
-                    }
+                    },
                 )
             }
         }
@@ -236,7 +236,7 @@ class EditMoodColorDialogTest : ComposeTest() {
                     moodColor = testMoodColor,
                     showDialog = true,
                     onDismiss = { dismissCalled = true },
-                    onSave = { _, _ -> }
+                    onSave = { _, _ -> },
                 )
             }
         }

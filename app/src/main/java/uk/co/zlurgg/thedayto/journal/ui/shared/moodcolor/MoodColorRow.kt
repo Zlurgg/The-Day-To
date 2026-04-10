@@ -45,7 +45,7 @@ fun MoodColorRow(
     onToggleFavorite: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
-    entryCount: Int? = null
+    entryCount: Int? = null,
 ) {
     val color = remember(moodColor.color) { getColorSafe(moodColor.color) }
     val circleSize = if (entryCount != null) COLOR_CIRCLE_SIZE_LARGE else COLOR_CIRCLE_SIZE_SMALL
@@ -57,15 +57,15 @@ fun MoodColorRow(
                 start = paddingExtraSmall,
                 end = paddingMedium,
                 top = paddingSmall,
-                bottom = paddingSmall
+                bottom = paddingSmall,
             ),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // Animated star toggle (favorite) with accessibility
         AnimatedFavoriteIcon(
             isFavorite = moodColor.isFavorite,
             onClick = onToggleFavorite,
-            moodName = moodColor.mood
+            moodName = moodColor.mood,
         )
 
         Spacer(modifier = Modifier.width(paddingExtraSmall))
@@ -76,17 +76,17 @@ fun MoodColorRow(
                 text = moodColor.mood,
                 style = MaterialTheme.typography.titleMedium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
             if (entryCount != null) {
                 Text(
                     text = pluralStringResource(
                         R.plurals.entry_count,
                         entryCount,
-                        entryCount
+                        entryCount,
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -97,7 +97,7 @@ fun MoodColorRow(
         EditableColorCircle(
             color = color,
             onClick = onEdit,
-            size = circleSize
+            size = circleSize,
         )
     }
 }
@@ -112,13 +112,13 @@ fun MoodColorRow(
     onToggleFavorite: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier,
-    showEntryCount: Boolean = false
+    showEntryCount: Boolean = false,
 ) {
     MoodColorRow(
         moodColor = moodColorWithCount.moodColor,
         onToggleFavorite = onToggleFavorite,
         onEdit = onEdit,
         modifier = modifier,
-        entryCount = if (showEntryCount) moodColorWithCount.entryCount else null
+        entryCount = if (showEntryCount) moodColorWithCount.entryCount else null,
     )
 }

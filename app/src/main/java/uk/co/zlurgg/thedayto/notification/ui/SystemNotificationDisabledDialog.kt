@@ -20,7 +20,7 @@ import uk.co.zlurgg.thedayto.R
 @Composable
 fun SystemNotificationDisabledDialog(
     onDismiss: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -39,6 +39,6 @@ fun SystemNotificationDisabledDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }

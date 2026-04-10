@@ -10,7 +10,7 @@ import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
  * Returns a Flow that emits sync state changes (Idle, Syncing, Success, Error).
  */
 class ObserveSyncStateUseCase(
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
 ) {
     operator fun invoke(): Flow<SyncState> = syncRepository.observeSyncState()
 }

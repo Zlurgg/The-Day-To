@@ -27,7 +27,7 @@ fun DeleteMoodColorConfirmDialog(
     moodColor: MoodColor,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -35,17 +35,17 @@ fun DeleteMoodColorConfirmDialog(
             Text(
                 text = stringResource(R.string.delete_mood_color_dialog_title),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         },
         text = {
             Text(
                 text = stringResource(
                     R.string.delete_mood_color_dialog_message,
-                    moodColor.mood
+                    moodColor.mood,
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         confirmButton = {
@@ -53,7 +53,7 @@ fun DeleteMoodColorConfirmDialog(
                 Text(
                     text = stringResource(R.string.delete_confirm_button),
                     color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         },
@@ -61,11 +61,11 @@ fun DeleteMoodColorConfirmDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = stringResource(R.string.cancel),
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -79,10 +79,10 @@ private fun DeleteMoodColorConfirmDialogPreview() {
                 id = 1,
                 mood = "Happy",
                 color = "4CAF50",
-                dateStamp = System.currentTimeMillis()
+                dateStamp = System.currentTimeMillis(),
             ),
             onConfirm = {},
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 }

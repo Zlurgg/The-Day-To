@@ -30,7 +30,7 @@ fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
     onShowHelp: () -> Unit,
     onShowAbout: () -> Unit,
-    onNavigateToMoodColorManagement: () -> Unit
+    onNavigateToMoodColorManagement: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
 
@@ -38,14 +38,14 @@ fun SettingsMenu(
         IconButton(onClick = { expanded = true }) {
             Icon(
                 imageVector = Icons.Default.MoreVert,
-                contentDescription = stringResource(R.string.settings)
+                contentDescription = stringResource(R.string.settings),
             )
         }
 
         DropdownMenu(
             expanded = expanded,
             onDismissRequest = { expanded = false },
-            modifier = Modifier.align(Alignment.TopEnd)
+            modifier = Modifier.align(Alignment.TopEnd),
         ) {
             // Mood Color Management
             DropdownMenuItem(
@@ -57,9 +57,9 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Palette,
-                        contentDescription = stringResource(R.string.manage_mood_colors)
+                        contentDescription = stringResource(R.string.manage_mood_colors),
                     )
-                }
+                },
             )
 
             // Notification Settings
@@ -72,9 +72,9 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Notifications,
-                        contentDescription = stringResource(R.string.icon_description_notifications)
+                        contentDescription = stringResource(R.string.icon_description_notifications),
                     )
-                }
+                },
             )
 
             // Help & Tutorial
@@ -87,9 +87,9 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.HelpOutline,
-                        contentDescription = stringResource(R.string.icon_description_help)
+                        contentDescription = stringResource(R.string.icon_description_help),
                     )
-                }
+                },
             )
 
             // About
@@ -102,9 +102,9 @@ fun SettingsMenu(
                 leadingIcon = {
                     Icon(
                         imageVector = Icons.Default.Info,
-                        contentDescription = stringResource(R.string.icon_description_about)
+                        contentDescription = stringResource(R.string.icon_description_about),
                     )
-                }
+                },
             )
         }
     }
@@ -119,7 +119,7 @@ private fun SettingsMenuPreview() {
             onOpenNotificationSettings = {},
             onShowHelp = {},
             onShowAbout = {},
-            onNavigateToMoodColorManagement = {}
+            onNavigateToMoodColorManagement = {},
         )
     }
 }

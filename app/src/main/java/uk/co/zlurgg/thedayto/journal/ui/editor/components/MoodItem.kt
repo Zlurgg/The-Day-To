@@ -6,11 +6,11 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -89,7 +89,7 @@ fun MoodItem(
     onEditMoodColor: (MoodColor) -> Unit,
     onToggleMoodColorDialog: () -> Unit,
     onSaveMoodColor: (mood: String, colorHex: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var mMoodFieldSize by remember { mutableStateOf(Size.Zero) }
     var mExpanded by remember { mutableStateOf(false) }
@@ -102,160 +102,160 @@ fun MoodItem(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         ExposedDropdownMenuBox(
             expanded = mExpanded,
             onExpandedChange = {
                 mExpanded = !mExpanded
             },
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) {
-        OutlinedTextField(
-            value = displayText,
-            onValueChange = { /* Read-only, changes via dropdown */ },
-            textStyle = MaterialTheme.typography.headlineSmall,
-            colors = OutlinedTextFieldDefaults.colors(
-                cursorColor = MaterialTheme.colorScheme.primary,
-                // Use primary color border when mood is selected, outline when not
-                focusedBorderColor = if (selectedMoodColorId != null) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                unfocusedBorderColor = if (selectedMoodColorId != null) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    MaterialTheme.colorScheme.outline
-                },
-                focusedLabelColor = MaterialTheme.colorScheme.primary,
-            ),
-            keyboardOptions = KeyboardOptions(
-                keyboardType = KeyboardType.Ascii,
-            ),
-            readOnly = true,
-            singleLine = true,
-            modifier = Modifier
-                .fillMaxWidth()
-                .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
-                .onGloballyPositioned { coordinates ->
-                    mMoodFieldSize = coordinates.size.toSize()
-                },
-            label = {
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = hint,
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                    Text(
-                        text = "*",
-                        color = MaterialTheme.colorScheme.error,
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-            },
-            leadingIcon = {
-                // Show color indicator when a mood is selected
-                selectedMoodColor?.let { mood ->
-                    Box(
-                        modifier = Modifier
-                            .size(24.dp)
-                            .background(getColorSafe(mood.color), CircleShape)
-                            .border(
-                                width = 1.dp,
-                                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
-                                shape = CircleShape
-                            )
-                    )
-                }
-            },
-            trailingIcon = {
-                ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded)
-            }
-        )
-        ExposedDropdownMenu(
-            expanded = mExpanded,
-            onDismissRequest = {
-                mExpanded = false
-            },
-            modifier = Modifier
-                .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
-                .heightIn(max = 300.dp) // Allow scroll for large mood lists
-        ) {
-            // Show empty state callout when no moods exist.
-            // Using a plain Column (not a disabled DropdownMenuItem) because the
-            // empty state isn't meant to be interactive — tapping it would just
-            // collapse the menu with no action.
-            if (moodColors.isEmpty()) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = paddingMedium,
-                            vertical = paddingLarge
-                        ),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Text(
-                        text = stringResource(R.string.empty_mood_list_title),
-                        style = MaterialTheme.typography.titleSmall,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    Spacer(modifier = Modifier.height(paddingSmall))
+            OutlinedTextField(
+                value = displayText,
+                onValueChange = { /* Read-only, changes via dropdown */ },
+                textStyle = MaterialTheme.typography.headlineSmall,
+                colors = OutlinedTextFieldDefaults.colors(
+                    cursorColor = MaterialTheme.colorScheme.primary,
+                    // Use primary color border when mood is selected, outline when not
+                    focusedBorderColor = if (selectedMoodColorId != null) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outline
+                    },
+                    unfocusedBorderColor = if (selectedMoodColorId != null) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        MaterialTheme.colorScheme.outline
+                    },
+                    focusedLabelColor = MaterialTheme.colorScheme.primary,
+                ),
+                keyboardOptions = KeyboardOptions(
+                    keyboardType = KeyboardType.Ascii,
+                ),
+                readOnly = true,
+                singleLine = true,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
+                    .onGloballyPositioned { coordinates ->
+                        mMoodFieldSize = coordinates.size.toSize()
+                    },
+                label = {
                     Row(
+                        horizontalArrangement = Arrangement.spacedBy(4.dp),
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(paddingSmall)
                     ) {
                         Text(
-                            text = stringResource(R.string.empty_mood_list_hint),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = hint,
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium,
                         )
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(16.dp)
+                        Text(
+                            text = "*",
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.labelMedium,
                         )
+                    }
+                },
+                leadingIcon = {
+                    // Show color indicator when a mood is selected
+                    selectedMoodColor?.let { mood ->
+                        Box(
+                            modifier = Modifier
+                                .size(24.dp)
+                                .background(getColorSafe(mood.color), CircleShape)
+                                .border(
+                                    width = 1.dp,
+                                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.3f),
+                                    shape = CircleShape,
+                                ),
+                        )
+                    }
+                },
+                trailingIcon = {
+                    ExposedDropdownMenuDefaults.TrailingIcon(expanded = mExpanded)
+                },
+            )
+            ExposedDropdownMenu(
+                expanded = mExpanded,
+                onDismissRequest = {
+                    mExpanded = false
+                },
+                modifier = Modifier
+                    .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
+                    .heightIn(max = 300.dp), // Allow scroll for large mood lists
+            ) {
+                // Show empty state callout when no moods exist.
+                // Using a plain Column (not a disabled DropdownMenuItem) because the
+                // empty state isn't meant to be interactive — tapping it would just
+                // collapse the menu with no action.
+                if (moodColors.isEmpty()) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(
+                                horizontal = paddingMedium,
+                                vertical = paddingLarge,
+                            ),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        Text(
+                            text = stringResource(R.string.empty_mood_list_title),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = MaterialTheme.colorScheme.onSurface,
+                        )
+                        Spacer(modifier = Modifier.height(paddingSmall))
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(paddingSmall),
+                        ) {
+                            Text(
+                                text = stringResource(R.string.empty_mood_list_hint),
+                                style = MaterialTheme.typography.bodySmall,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary,
+                                modifier = Modifier.size(16.dp),
+                            )
+                        }
                     }
                 }
-            }
 
-            // Mood colors with unified MoodColorRow.
-            // Zero out DropdownMenuItem's default 12dp horizontal padding so
-            // MoodColorRow's own start/end padding is the sole source. This keeps
-            // the star and edit circle visually close to the dropdown edges and
-            // matches the spacing used on the Management screen.
-            moodColors.forEach { moodColor ->
-                DropdownMenuItem(
-                    contentPadding = PaddingValues(horizontal = 0.dp),
-                    onClick = {
-                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                        moodColor.id?.let { onMoodSelected(it) }
-                        mExpanded = false
-                    },
-                    text = {
-                        MoodColorRow(
-                            moodColor = moodColor,
-                            onToggleFavorite = { onToggleFavorite(moodColor) },
-                            onEdit = {
-                                onEditMoodColor(moodColor)
-                                mExpanded = false
-                            }
-                        )
-                    }
-                )
+                // Mood colors with unified MoodColorRow.
+                // Zero out DropdownMenuItem's default 12dp horizontal padding so
+                // MoodColorRow's own start/end padding is the sole source. This keeps
+                // the star and edit circle visually close to the dropdown edges and
+                // matches the spacing used on the Management screen.
+                moodColors.forEach { moodColor ->
+                    DropdownMenuItem(
+                        contentPadding = PaddingValues(horizontal = 0.dp),
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            moodColor.id?.let { onMoodSelected(it) }
+                            mExpanded = false
+                        },
+                        text = {
+                            MoodColorRow(
+                                moodColor = moodColor,
+                                onToggleFavorite = { onToggleFavorite(moodColor) },
+                                onEdit = {
+                                    onEditMoodColor(moodColor)
+                                    mExpanded = false
+                                },
+                            )
+                        },
+                    )
+                }
             }
         }
-    }
 
         // Color wheel button - always visible for easy access to create new mood colors
         ColorWheelButton(
-            onClick = onToggleMoodColorDialog
+            onClick = onToggleMoodColorDialog,
         )
     }
 
@@ -266,7 +266,7 @@ fun MoodItem(
         onSave = { mood, colorHex ->
             onSaveMoodColor(mood, colorHex)
             // Note: Auto-selection is now handled by ViewModel after save completes
-        }
+        },
     )
 }
 
@@ -285,30 +285,30 @@ private fun EmptyDropdownContentPreview() {
                 .background(MaterialTheme.colorScheme.surface)
                 .padding(
                     horizontal = paddingMedium,
-                    vertical = paddingLarge
+                    vertical = paddingLarge,
                 ),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = stringResource(R.string.empty_mood_list_title),
                 style = MaterialTheme.typography.titleSmall,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(paddingSmall)
+                horizontalArrangement = Arrangement.spacedBy(paddingSmall),
             ) {
                 Text(
                     text = stringResource(R.string.empty_mood_list_hint),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
             }
         }
@@ -326,7 +326,7 @@ private fun DropdownWithMoodsPreview() {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(MaterialTheme.colorScheme.surface)
+                .background(MaterialTheme.colorScheme.surface),
         ) {
             val moodColors = listOf(
                 MoodColor(
@@ -334,22 +334,22 @@ private fun DropdownWithMoodsPreview() {
                     mood = "Happy",
                     color = "FFD700",
                     isFavorite = true,
-                    dateStamp = System.currentTimeMillis()
+                    dateStamp = System.currentTimeMillis(),
                 ),
                 MoodColor(
                     id = 2,
                     mood = "Calm",
                     color = "87CEEB",
                     isFavorite = false,
-                    dateStamp = System.currentTimeMillis()
+                    dateStamp = System.currentTimeMillis(),
                 ),
                 MoodColor(
                     id = 3,
                     mood = "Energetic",
                     color = "FF6347",
                     isFavorite = false,
-                    dateStamp = System.currentTimeMillis()
-                )
+                    dateStamp = System.currentTimeMillis(),
+                ),
             )
 
             // Mood colors with unified MoodColorRow
@@ -360,9 +360,9 @@ private fun DropdownWithMoodsPreview() {
                         MoodColorRow(
                             moodColor = moodColor,
                             onToggleFavorite = { },
-                            onEdit = { }
+                            onEdit = { },
                         )
-                    }
+                    },
                 )
             }
         }

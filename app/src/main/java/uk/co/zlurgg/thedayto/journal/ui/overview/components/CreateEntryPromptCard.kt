@@ -43,7 +43,7 @@ private val PlusIconSize = 24.dp
 @Composable
 fun CreateEntryPromptCard(
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
     val prompt = remember { OverviewPromptConstants.PROMPTS.random() }
@@ -59,40 +59,40 @@ fun CreateEntryPromptCard(
             },
         elevation = CardDefaults.cardElevation(
             defaultElevation = UiConstants.ENTRY_CARD_ELEVATION_DEFAULT,
-            pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED
+            pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED,
         ),
         colors = CardDefaults.cardColors(
-            containerColor = containerColor
-        )
+            containerColor = containerColor,
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(UiConstants.ENTRY_CARD_PADDING),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = prompt,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.SemiBold,
                 color = textColor,
-                modifier = Modifier.weight(1f, fill = false)
+                modifier = Modifier.weight(1f, fill = false),
             )
             Box(
                 modifier = Modifier
                     .size(PlusIconBackgroundSize)
                     .background(
                         color = MaterialTheme.colorScheme.primary,
-                        shape = CircleShape
+                        shape = CircleShape,
                     ),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
                     contentDescription = stringResource(R.string.create_today_entry),
                     tint = MaterialTheme.colorScheme.onPrimary,
-                    modifier = Modifier.size(PlusIconSize)
+                    modifier = Modifier.size(PlusIconSize),
                 )
             }
         }

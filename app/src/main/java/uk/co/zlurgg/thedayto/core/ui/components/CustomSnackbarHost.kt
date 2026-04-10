@@ -30,11 +30,11 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 @Composable
 fun CustomSnackbarHost(
     hostState: SnackbarHostState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     SnackbarHost(
         hostState = hostState,
-        modifier = modifier.padding(paddingSmall)
+        modifier = modifier.padding(paddingSmall),
     ) { data ->
         Snackbar(
             modifier = Modifier
@@ -44,12 +44,12 @@ fun CustomSnackbarHost(
                 data.visuals.actionLabel?.let { actionLabel ->
                     TextButton(
                         onClick = { data.performAction() },
-                        modifier = Modifier.padding(horizontal = paddingSmall)
+                        modifier = Modifier.padding(horizontal = paddingSmall),
                     ) {
                         Text(
                             text = actionLabel,
                             style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.inversePrimary
+                            color = MaterialTheme.colorScheme.inversePrimary,
                         )
                     }
                 }
@@ -58,12 +58,12 @@ fun CustomSnackbarHost(
             actionOnNewLine = false,
             shape = MaterialTheme.shapes.large,
             containerColor = MaterialTheme.colorScheme.inverseSurface,
-            contentColor = MaterialTheme.colorScheme.inverseOnSurface
+            contentColor = MaterialTheme.colorScheme.inverseOnSurface,
         ) {
             Text(
                 text = data.visuals.message,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(vertical = paddingExtraSmall)
+                modifier = Modifier.padding(vertical = paddingExtraSmall),
             )
         }
     }

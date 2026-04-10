@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.core.ui.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
@@ -7,11 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
-import android.content.res.Configuration
 import androidx.compose.ui.tooling.preview.Preview
+import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 
 /**
  * Welcome dialog for first-time users
@@ -27,31 +27,31 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
  */
 @Composable
 fun WelcomeDialog(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     BaseInfoDialog(
         title = stringResource(R.string.welcome_dialog_title),
         buttonText = stringResource(R.string.welcome_dialog_button),
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
     ) {
         Text(
             text = stringResource(R.string.welcome_dialog_subtitle),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.welcome_dialog_features_title),
-            content = stringResource(R.string.welcome_dialog_features_list)
+            content = stringResource(R.string.welcome_dialog_features_list),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.welcome_dialog_privacy_title),
-            content = stringResource(R.string.welcome_dialog_privacy_info)
+            content = stringResource(R.string.welcome_dialog_privacy_info),
         )
     }
 }
@@ -62,7 +62,7 @@ fun WelcomeDialog(
 private fun WelcomeDialogPreview() {
     TheDayToTheme {
         WelcomeDialog(
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 }

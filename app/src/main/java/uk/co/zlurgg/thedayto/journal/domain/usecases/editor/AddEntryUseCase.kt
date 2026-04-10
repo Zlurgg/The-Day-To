@@ -22,7 +22,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.ValidationResult
  */
 class AddEntryUseCase(
     private val repository: EntryRepository,
-    private val moodColorRepository: MoodColorRepository
+    private val moodColorRepository: MoodColorRepository,
 ) {
     @Throws(InvalidEntryException::class)
     suspend operator fun invoke(entry: Entry) {
@@ -56,7 +56,7 @@ class AddEntryUseCase(
 
         // Create sanitized entry
         val sanitizedEntry = entry.copy(
-            content = sanitizedContent
+            content = sanitizedContent,
         )
 
         repository.insertEntry(sanitizedEntry)

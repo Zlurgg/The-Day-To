@@ -21,9 +21,9 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker.Companion.NOTIFICATION_ID
-import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
 import java.time.LocalDateTime
@@ -44,7 +44,7 @@ class NotificationSchedulerImpl(
     private val context: Context,
     private val settingsRepository: NotificationSettingsRepository,
     private val authRepository: AuthRepository,
-    private val checkTodayEntryExists: CheckTodayEntryExistsUseCase
+    private val checkTodayEntryExists: CheckTodayEntryExistsUseCase,
 ) : NotificationScheduler {
 
     private val schedulerScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
@@ -54,9 +54,7 @@ class NotificationSchedulerImpl(
         schedulerScope.launch {
             try {
                 val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-                val settingsResult = settingsRepository.getSettings(userId)
-
-                val settings = when (settingsResult) {
+                val settings = when (val settingsResult = settingsRepository.getSettings(userId)) {
                     is Result.Success -> settingsResult.data
                     is Result.Error -> {
                         Timber.e("Failed to get notification settings: %s", settingsResult.error)
@@ -104,7 +102,7 @@ class NotificationSchedulerImpl(
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         } else {
             true
@@ -166,7 +164,7 @@ class NotificationSchedulerImpl(
             Timber.d(
                 "Scheduling periodic notification for %d:%s",
                 hour,
-                minute.toString().padStart(2, '0')
+                minute.toString().padStart(2, '0'),
             )
 
             val systemZone = ZoneId.systemDefault()
@@ -190,7 +188,7 @@ class NotificationSchedulerImpl(
                 "Initial delay: %ds (%dh %dm)",
                 initialDelay,
                 initialDelay / SECONDS_PER_HOUR,
-                (initialDelay % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE
+                (initialDelay % SECONDS_PER_HOUR) / SECONDS_PER_MINUTE,
             )
 
             val data = Data.Builder()
@@ -204,7 +202,7 @@ class NotificationSchedulerImpl(
             val notificationWorker = PeriodicWorkRequest.Builder(
                 NotificationWorker::class.java,
                 HOURS_PER_DAY.toLong(),
-                TimeUnit.HOURS
+                TimeUnit.HOURS,
             )
                 .setInputData(data)
                 .setInitialDelay(initialDelay, TimeUnit.SECONDS)
@@ -214,14 +212,14 @@ class NotificationSchedulerImpl(
             WorkManager.getInstance(context).enqueueUniquePeriodicWork(
                 NotificationWorker.NOTIFICATION_WORK,
                 ExistingPeriodicWorkPolicy.UPDATE,
-                notificationWorker
+                notificationWorker,
             )
 
             Timber.i(
                 "Periodic notification scheduled: first in %ds, then every 24h at %d:%s",
                 initialDelay,
                 hour,
-                minute.toString().padStart(2, '0')
+                minute.toString().padStart(2, '0'),
             )
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule periodic notification")

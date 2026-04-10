@@ -34,16 +34,16 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 fun SignInButton(
     onClick: () -> Unit,
     showButton: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
         visible = showButton,
         enter = fadeIn(animationSpec = tween(600)) +
-                slideInVertically(
-                    initialOffsetY = { 60 },
-                    animationSpec = tween(600)
-                ),
-        modifier = modifier
+            slideInVertically(
+                initialOffsetY = { 60 },
+                animationSpec = tween(600),
+            ),
+        modifier = modifier,
     ) {
         ElevatedCard(
             onClick = onClick,
@@ -51,32 +51,32 @@ fun SignInButton(
                 .fillMaxWidth(0.85f)
                 .height(64.dp),
             colors = CardDefaults.elevatedCardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ),
             elevation = CardDefaults.elevatedCardElevation(
                 defaultElevation = 6.dp,
-                pressedElevation = 2.dp
-            )
+                pressedElevation = 2.dp,
+            ),
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = paddingMedium),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.Login,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
                     text = stringResource(R.string.sign_in),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
         }

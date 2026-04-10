@@ -53,7 +53,7 @@ class FakeNotificationSyncService : NotificationSyncService {
 
     override suspend fun deleteRemote(
         syncId: String,
-        userId: String
+        userId: String,
     ): EmptyResult<DataError.Sync> {
         if (shouldFail) {
             return Result.Error(DataError.Sync.NETWORK_ERROR)

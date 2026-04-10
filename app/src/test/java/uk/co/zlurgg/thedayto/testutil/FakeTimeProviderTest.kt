@@ -47,14 +47,14 @@ class FakeTimeProviderTest {
         val utcProvider = FakeTimeProvider(
             fixedDate = fixedDate,
             fixedTime = fixedTime,
-            fixedZone = ZoneId.of("UTC")
+            fixedZone = ZoneId.of("UTC"),
         )
 
         // America/New_York (UTC-5): 12:00 -> instant at 17:00 UTC
         val nyProvider = FakeTimeProvider(
             fixedDate = fixedDate,
             fixedTime = fixedTime,
-            fixedZone = ZoneId.of("America/New_York")
+            fixedZone = ZoneId.of("America/New_York"),
         )
 
         // The NY instant should be 5 hours later than UTC instant
@@ -64,7 +64,7 @@ class FakeTimeProviderTest {
         // NY is UTC-5, so noon in NY is 17:00 UTC (5 hours later)
         assertEquals(
             utcInstant.plusSeconds(5 * 60 * 60),
-            nyInstant
+            nyInstant,
         )
     }
 
@@ -90,14 +90,14 @@ class FakeTimeProviderTest {
     fun `setTime changes fixed time`() {
         val provider = FakeTimeProvider(
             fixedDate = LocalDate.of(2024, 1, 1),
-            fixedTime = LocalTime.of(9, 0)
+            fixedTime = LocalTime.of(9, 0),
         )
 
         provider.setTime(LocalTime.of(18, 30))
 
         assertEquals(
             LocalDateTime.of(2024, 1, 1, 18, 30),
-            provider.now()
+            provider.now(),
         )
     }
 
@@ -106,7 +106,7 @@ class FakeTimeProviderTest {
         val provider = FakeTimeProvider(
             fixedDate = LocalDate.of(2024, 1, 1),
             fixedTime = LocalTime.of(12, 0),
-            fixedZone = ZoneId.of("UTC")
+            fixedZone = ZoneId.of("UTC"),
         )
 
         val utcInstant = provider.instant()
@@ -117,7 +117,7 @@ class FakeTimeProviderTest {
         // After changing to NY timezone, same local time maps to different instant
         assertEquals(
             utcInstant.plusSeconds(5 * 60 * 60),
-            nyInstant
+            nyInstant,
         )
     }
 }

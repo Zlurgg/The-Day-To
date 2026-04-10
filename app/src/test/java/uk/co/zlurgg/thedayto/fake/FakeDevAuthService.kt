@@ -18,7 +18,7 @@ class FakeDevAuthService : DevAuthService {
 
     override suspend fun signInWithEmailPassword(
         email: String,
-        password: String
+        password: String,
     ): Result<UserData, DataError.Auth> {
         return if (shouldReturnError) {
             Result.Error(authError)
@@ -27,8 +27,8 @@ class FakeDevAuthService : DevAuthService {
                 UserData(
                     userId = "dev_test_user",
                     username = "Dev Test User",
-                    profilePictureUrl = null
-                )
+                    profilePictureUrl = null,
+                ),
             )
         }
     }

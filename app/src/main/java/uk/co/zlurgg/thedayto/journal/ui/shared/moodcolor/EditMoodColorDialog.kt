@@ -81,12 +81,12 @@ fun EditMoodColorDialog(
             title = {
                 Text(
                     text = stringResource(titleRes),
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     // Combined error: external (duplicate name) takes priority over local (empty)
                     val displayError = externalError ?: moodError
@@ -107,7 +107,7 @@ fun EditMoodColorDialog(
                         label = {
                             Text(
                                 text = stringResource(R.string.mood),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         },
                         singleLine = true,
@@ -120,15 +120,16 @@ fun EditMoodColorDialog(
                                 displayError != null -> Text(
                                     text = displayError,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
+
                                 else -> Text(
                                     text = "${editedMood.length}/${InputValidation.MAX_MOOD_LENGTH}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-                        }
+                        },
                     )
 
                     Spacer(modifier = Modifier.height(paddingMedium))
@@ -156,7 +157,7 @@ fun EditMoodColorDialog(
                         initialColor = initialColor,
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
                             selectedColor = colorEnvelope.hexCode
-                        }
+                        },
                     )
                 }
             },
@@ -169,11 +170,11 @@ fun EditMoodColorDialog(
                         } else {
                             onSave(trimmedMood, selectedColor)
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = stringResource(R.string.save)
+                        contentDescription = stringResource(R.string.save),
                     )
                 }
             },
@@ -181,11 +182,11 @@ fun EditMoodColorDialog(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel)
+                        contentDescription = stringResource(R.string.cancel),
                     )
                 }
             },
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -200,11 +201,11 @@ private fun EditMoodColorDialogPreview() {
                 id = 1,
                 mood = "Happy",
                 color = "4CAF50",
-                dateStamp = System.currentTimeMillis()
+                dateStamp = System.currentTimeMillis(),
             ),
             showDialog = true,
             onDismiss = {},
-            onSave = { _, _ -> }
+            onSave = { _, _ -> },
         )
     }
 }

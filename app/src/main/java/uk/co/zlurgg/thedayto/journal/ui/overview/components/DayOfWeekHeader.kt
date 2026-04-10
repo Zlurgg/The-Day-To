@@ -23,7 +23,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarConstants
 @Composable
 fun DayOfWeekHeader(
     daySize: Dp,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val daysOfWeek = listOf("M", "T", "W", "T", "F", "S", "S")
 
@@ -34,21 +34,21 @@ fun DayOfWeekHeader(
                 start = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
                 end = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
                 top = 0.dp,
-                bottom = CalendarConstants.DAY_HEADER_BOTTOM_PADDING
+                bottom = CalendarConstants.DAY_HEADER_BOTTOM_PADDING,
             ),
-        horizontalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_DAY_SPACING)
+        horizontalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_DAY_SPACING),
     ) {
         daysOfWeek.forEach { day ->
             Box(
                 modifier = Modifier.size(daySize),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Text(
                     text = day,
                     style = MaterialTheme.typography.labelSmall,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             }
         }

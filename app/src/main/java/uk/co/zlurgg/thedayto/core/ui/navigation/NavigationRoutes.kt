@@ -14,7 +14,7 @@ data object OverviewRoute
 data class EditorRoute(
     val entryId: Int? = null,
     val entryDate: Long? = null,  // Epoch timestamp for pre-filling date when creating new entry
-    val showBackButton: Boolean = false
+    val showBackButton: Boolean = false,
 )
 
 @Serializable

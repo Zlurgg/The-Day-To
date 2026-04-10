@@ -13,7 +13,7 @@ import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
  */
 class SignOutUseCase(
     private val authRepository: AuthRepository,
-    private val authStateRepository: AuthStateRepository
+    private val authStateRepository: AuthStateRepository,
 ) {
     suspend operator fun invoke() {
         // Sign out from auth provider

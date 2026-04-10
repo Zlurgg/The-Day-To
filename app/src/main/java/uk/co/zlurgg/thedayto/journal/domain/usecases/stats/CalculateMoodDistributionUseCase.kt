@@ -14,7 +14,7 @@ class CalculateMoodDistributionUseCase {
                 MoodDistribution(
                     mood = mood,
                     color = moodEntries.first().moodColor,
-                    count = moodEntries.size
+                    count = moodEntries.size,
                 )
             }
             .sortedByDescending { it.count }
@@ -24,6 +24,6 @@ class CalculateMoodDistributionUseCase {
     data class MoodDistribution(
         val mood: String,
         val color: String,
-        val count: Int
+        val count: Int,
     )
 }

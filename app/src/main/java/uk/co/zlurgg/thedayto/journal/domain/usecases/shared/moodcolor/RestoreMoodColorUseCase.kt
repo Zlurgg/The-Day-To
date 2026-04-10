@@ -6,7 +6,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
 class RestoreMoodColorUseCase(
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     suspend operator fun invoke(id: Int): EmptyResult<MoodColorError> {
         return when (repository.restore(id)) {

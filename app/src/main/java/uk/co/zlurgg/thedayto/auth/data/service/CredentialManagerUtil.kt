@@ -36,7 +36,7 @@ object CredentialManagerUtil {
      */
     suspend fun getGoogleCredential(
         activity: Activity,
-        serverClientId: String
+        serverClientId: String,
     ): Result<GoogleCredential, DataError.Auth> {
         return AuthErrorMapper.safeAuthCall(TAG) {
             val credentialManager = CredentialManager.create(activity)
@@ -53,7 +53,7 @@ object CredentialManagerUtil {
 
             val response = credentialManager.getCredential(
                 request = request,
-                context = activity
+                context = activity,
             )
 
             extractGoogleCredential(response.credential)
@@ -71,6 +71,7 @@ object CredentialManagerUtil {
                     error("Unexpected credential type: ${credential.type}")
                 }
             }
+
             else -> {
                 Timber.e("$TAG: Unexpected credential class: ${credential::class.java.name}")
                 error("Unexpected credential class: ${credential::class.java.name}")

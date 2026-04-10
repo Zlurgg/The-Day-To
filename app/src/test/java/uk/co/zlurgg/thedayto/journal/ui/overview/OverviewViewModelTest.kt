@@ -20,9 +20,9 @@ import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.createFakeOverviewUseCases
-import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -74,7 +74,7 @@ class OverviewViewModelTest {
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
             notificationSettingsRepository = fakeNotificationSettingsRepository,
-            authRepository = fakeAuthRepository
+            authRepository = fakeAuthRepository,
         )
         viewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
     }
@@ -90,7 +90,7 @@ class OverviewViewModelTest {
         // Given: Set up notification preferences via new repository
         fakeNotificationSettingsRepository.setSettings(
             "anonymous",
-            NotificationSettings(enabled = true, hour = 14, minute = 30)
+            NotificationSettings(enabled = true, hour = 14, minute = 30),
         )
         fakeNotificationScheduler.hasPermission = true
 
@@ -99,7 +99,7 @@ class OverviewViewModelTest {
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
             notificationSettingsRepository = fakeNotificationSettingsRepository,
-            authRepository = fakeAuthRepository
+            authRepository = fakeAuthRepository,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -118,22 +118,22 @@ class OverviewViewModelTest {
         val freshNotificationRepo = FakeNotificationScheduler()
         assertFalse(
             "setupDailyNotification should not be called yet",
-            freshNotificationRepo.setupDailyNotificationCalled
+            freshNotificationRepo.setupDailyNotificationCalled,
         )
 
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationScheduler = freshNotificationRepo
+            notificationScheduler = freshNotificationRepo,
         )
 
         // When: ViewModel initializes
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
 
         // Then: setupDailyNotification should be called as fail-safe
         assertTrue(
             "setupDailyNotification should be called on init",
-            freshNotificationRepo.setupDailyNotificationCalled
+            freshNotificationRepo.setupDailyNotificationCalled,
         )
     }
 
@@ -158,7 +158,7 @@ class OverviewViewModelTest {
         fakeNotificationScheduler.hasPermission = false
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationScheduler = fakeNotificationScheduler
+            notificationScheduler = fakeNotificationScheduler,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -184,7 +184,7 @@ class OverviewViewModelTest {
         testScheduler.advanceUntilIdle()
         assertTrue(
             "Dialog should be shown",
-            viewModel.uiState.value.showNotificationSettingsDialog
+            viewModel.uiState.value.showNotificationSettingsDialog,
         )
 
         // When: User dismisses settings
@@ -194,7 +194,7 @@ class OverviewViewModelTest {
         // Then: Dialog should be hidden
         assertFalse(
             "Dialog should be hidden",
-            viewModel.uiState.value.showNotificationSettingsDialog
+            viewModel.uiState.value.showNotificationSettingsDialog,
         )
     }
 
@@ -203,7 +203,7 @@ class OverviewViewModelTest {
         // Given: Notifications are currently enabled
         fakeNotificationSettingsRepository.setSettings(
             "anonymous",
-            NotificationSettings(enabled = true, hour = 10, minute = 0)
+            NotificationSettings(enabled = true, hour = 10, minute = 0),
         )
 
         // Recreate ViewModel to pick up the settings
@@ -211,7 +211,7 @@ class OverviewViewModelTest {
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
             notificationSettingsRepository = fakeNotificationSettingsRepository,
-            authRepository = fakeAuthRepository
+            authRepository = fakeAuthRepository,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -221,28 +221,28 @@ class OverviewViewModelTest {
             OverviewAction.SaveNotificationSettings(
                 enabled = false,
                 hour = 10,
-                minute = 0
-            )
+                minute = 0,
+            ),
         )
         testScheduler.advanceUntilIdle()
 
         // Then: State should be updated
         assertFalse(
             "Notifications should be disabled",
-            testViewModel.uiState.value.notificationsEnabled
+            testViewModel.uiState.value.notificationsEnabled,
         )
 
         // And: Repository should have saved disabled state
         val savedSettings = fakeNotificationSettingsRepository.getSettingsDirectly("anonymous")
         assertFalse(
             "Repository should have enabled=false",
-            savedSettings?.enabled ?: true
+            savedSettings?.enabled ?: true,
         )
 
         // And: Notifications should be cancelled
         assertTrue(
             "Notifications should be cancelled",
-            fakeNotificationScheduler.cancelNotificationsCalled
+            fakeNotificationScheduler.cancelNotificationsCalled,
         )
     }
 
@@ -255,7 +255,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            notificationSettingsRepository = failingSettingsRepository
+            notificationSettingsRepository = failingSettingsRepository,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -266,8 +266,8 @@ class OverviewViewModelTest {
                 OverviewAction.SaveNotificationSettings(
                     enabled = true,
                     hour = 10,
-                    minute = 0
-                )
+                    minute = 0,
+                ),
             )
             testScheduler.advanceUntilIdle()
 
@@ -275,13 +275,13 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar,
             )
             val snackbarEvent =
                 event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
             assertTrue(
                 "Error message should contain failure text",
-                snackbarEvent.message.contains("Failed")
+                snackbarEvent.message.contains("Failed"),
             )
         }
     }
@@ -294,7 +294,7 @@ class OverviewViewModelTest {
         // When: ViewModel loads settings
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
-            notificationScheduler = fakeNotificationScheduler
+            notificationScheduler = fakeNotificationScheduler,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -302,7 +302,7 @@ class OverviewViewModelTest {
         // Then: State should reflect no permission
         assertFalse(
             "Should not have permission",
-            testViewModel.uiState.value.hasNotificationPermission
+            testViewModel.uiState.value.hasNotificationPermission,
         )
 
         // When: Permission is granted
@@ -313,7 +313,7 @@ class OverviewViewModelTest {
         // Then: State should reflect permission granted
         assertTrue(
             "Should have permission",
-            testViewModel.uiState.value.hasNotificationPermission
+            testViewModel.uiState.value.hasNotificationPermission,
         )
     }
 
@@ -331,8 +331,8 @@ class OverviewViewModelTest {
             OverviewAction.SaveNotificationSettings(
                 enabled = true,
                 hour = 8,
-                minute = 30
-            )
+                minute = 30,
+            ),
         )
         testScheduler.advanceUntilIdle()
 
@@ -340,7 +340,7 @@ class OverviewViewModelTest {
         // Verify notification was scheduled
         assertTrue(
             "Notification should be scheduled at 8:30",
-            fakeNotificationScheduler.isScheduledAt(8, 30)
+            fakeNotificationScheduler.isScheduledAt(8, 30),
         )
     }
 
@@ -375,14 +375,14 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show permanent denial dialog",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog,
             )
         }
 
         // And: Dialog should be closed
         assertFalse(
             "Settings dialog should be closed",
-            viewModel.uiState.value.showNotificationSettingsDialog
+            viewModel.uiState.value.showNotificationSettingsDialog,
         )
     }
 
@@ -397,16 +397,16 @@ class OverviewViewModelTest {
         assertEquals(
             "Should start with Date Descending",
             uk.co.zlurgg.thedayto.core.domain.util.OrderType.Descending,
-            initialState.entryOrder.orderType
+            initialState.entryOrder.orderType,
         )
 
         // When: User changes to Date Ascending
         viewModel.onAction(
             OverviewAction.Order(
                 uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder.Date(
-                    uk.co.zlurgg.thedayto.core.domain.util.OrderType.Ascending
-                )
-            )
+                    uk.co.zlurgg.thedayto.core.domain.util.OrderType.Ascending,
+                ),
+            ),
         )
         testScheduler.advanceUntilIdle()
 
@@ -415,7 +415,7 @@ class OverviewViewModelTest {
         assertEquals(
             "Should change to Date Ascending",
             uk.co.zlurgg.thedayto.core.domain.util.OrderType.Ascending,
-            newState.entryOrder.orderType
+            newState.entryOrder.orderType,
         )
     }
 
@@ -442,7 +442,7 @@ class OverviewViewModelTest {
         testScheduler.advanceUntilIdle()
         assertFalse(
             "Dialog should not be shown initially",
-            viewModel.uiState.value.showDeleteConfirmDialog
+            viewModel.uiState.value.showDeleteConfirmDialog,
         )
 
         val entry = TestDataBuilders.createEntryWithMoodColor(id = 1)
@@ -467,7 +467,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -486,7 +486,7 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar,
             )
             val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
             assertEquals("Message should be 'Entry deleted'", "Entry deleted", snackbarEvent.message)
@@ -514,7 +514,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -532,12 +532,12 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show snackbar",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar,
             )
             val snackbarEvent = event as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSnackbar
             assertTrue(
                 "Message should contain 'Failed'",
-                snackbarEvent.message.contains("Failed")
+                snackbarEvent.message.contains("Failed"),
             )
         }
 
@@ -555,7 +555,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -610,7 +610,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
 
         // When: ViewModel initializes (calls checkTodayEntry)
@@ -632,7 +632,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
 
         // When: ViewModel initializes
@@ -654,7 +654,7 @@ class OverviewViewModelTest {
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
-            entryRepository = fakeEntryRepo
+            entryRepository = fakeEntryRepo,
         )
         val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
         testScheduler.advanceUntilIdle()
@@ -688,7 +688,7 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should emit permission request",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.RequestNotificationPermission
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.RequestNotificationPermission,
             )
         }
     }
@@ -702,7 +702,7 @@ class OverviewViewModelTest {
         // Then: Tutorial dialog state should be true
         assertTrue(
             "Should show tutorial dialog via state",
-            viewModel.uiState.value.showTutorialDialog
+            viewModel.uiState.value.showTutorialDialog,
         )
     }
 
@@ -716,9 +716,10 @@ class OverviewViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(
             "Should have navigation target to editor",
-            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor,
         )
-        val navTarget = state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        val navTarget =
+            state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
         assertEquals("Entry ID should be null for new entry", null, navTarget.entryId)
     }
 
@@ -732,9 +733,10 @@ class OverviewViewModelTest {
         val state = viewModel.uiState.value
         assertTrue(
             "Should have navigation target to editor",
-            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+            state.navigationTarget is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor,
         )
-        val navTarget = state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
+        val navTarget =
+            state.navigationTarget as uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget.ToEditor
         assertEquals("Entry ID should be null for new entry", null, navTarget.entryId)
     }
 
@@ -764,8 +766,8 @@ class OverviewViewModelTest {
                 OverviewAction.SaveNotificationSettings(
                     enabled = true,
                     hour = 9,
-                    minute = 0
-                )
+                    minute = 0,
+                ),
             )
             testScheduler.advanceUntilIdle()
 
@@ -773,7 +775,7 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show system notification warning",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSystemNotificationWarning
+                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowSystemNotificationWarning,
             )
         }
 
@@ -790,7 +792,7 @@ class OverviewViewModelTest {
         val greeting = viewModel.uiState.value.greeting
         assertTrue(
             "Greeting should be set on init",
-            greeting.isNotEmpty()
+            greeting.isNotEmpty(),
         )
     }
 
@@ -801,13 +803,13 @@ class OverviewViewModelTest {
 
         val greeting = viewModel.uiState.value.greeting
         val allGreetings = uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.MORNING_GREETINGS +
-                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.AFTERNOON_GREETINGS +
-                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.EVENING_GREETINGS +
-                uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.NIGHT_GREETINGS
+            uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.AFTERNOON_GREETINGS +
+            uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.EVENING_GREETINGS +
+            uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants.NIGHT_GREETINGS
 
         assertTrue(
             "Greeting should be from valid greeting lists",
-            allGreetings.contains(greeting)
+            allGreetings.contains(greeting),
         )
     }
 
@@ -816,7 +818,7 @@ class OverviewViewModelTest {
     fun `onMonthChanged - updates displayed month and year`() = runTest {
         // Given: Initial state with current month/year
         testScheduler.advanceUntilIdle()
-        val initialState = viewModel.uiState.value
+        viewModel.uiState.value
 
         // When: Month is changed
         viewModel.onAction(OverviewAction.OnMonthChanged(month = 5, year = 2024))

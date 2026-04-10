@@ -18,14 +18,14 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.sync.DevCredentials
 
 class SignInViewModel(
-    private val signInUseCases: SignInUseCases
+    private val signInUseCases: SignInUseCases,
 ) : ViewModel() {
 
     // UI State
     private val _state = MutableStateFlow(
         SignInState(
-            isDevSignInAvailable = signInUseCases.devSignIn?.isAvailable() == true
-        )
+            isDevSignInAvailable = signInUseCases.devSignIn?.isAvailable() == true,
+        ),
     )
     val state = _state.asStateFlow()
 
@@ -77,6 +77,7 @@ class SignInViewModel(
                     // Always navigate to Overview
                     _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
                 }
+
                 is Result.Error -> {
                     // Sign-in failed
                     val errorMessage = ErrorFormatter.format(result.error, "sign in")
@@ -103,6 +104,7 @@ class SignInViewModel(
                     signInUseCases.seedDefaultMoodColors()
                     _state.update { it.copy(navigationTarget = SignInNavigationTarget.ToOverview) }
                 }
+
                 is Result.Error -> {
                     val errorMessage = ErrorFormatter.format(result.error, "dev sign in")
                     _state.update { it.copy(isSignInSuccessful = false, signInError = errorMessage) }

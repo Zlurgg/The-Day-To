@@ -37,7 +37,7 @@ class DeleteAccountUseCaseTest {
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = null
+        profilePictureUrl = null,
     )
 
     @Before
@@ -51,7 +51,7 @@ class DeleteAccountUseCaseTest {
             authRepository = fakeAuthRepository,
             syncRepository = fakeSyncRepository,
             localDataClearer = mockLocalDataClearer,
-            syncScheduler = mockSyncScheduler
+            syncScheduler = mockSyncScheduler,
         )
     }
 

@@ -37,26 +37,26 @@ fun LoadErrorBanner(
     errorMessage: String,
     onRetry: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.errorContainer,
-        shape = RoundedCornerShape(paddingSmall)
+        shape = RoundedCornerShape(paddingSmall),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(paddingMediumSmall),
             horizontalArrangement = Arrangement.spacedBy(paddingMediumSmall),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Error icon
             Icon(
                 imageVector = Icons.Default.Error,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.size(24.dp)
+                modifier = Modifier.size(24.dp),
             )
 
             // Error message
@@ -64,14 +64,14 @@ fun LoadErrorBanner(
                 text = errorMessage,
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onErrorContainer,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
             )
 
             // Retry button
             TextButton(onClick = onRetry) {
                 Text(
                     text = stringResource(R.string.retry),
-                    color = MaterialTheme.colorScheme.onErrorContainer
+                    color = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
 
@@ -80,7 +80,7 @@ fun LoadErrorBanner(
                 Icon(
                     imageVector = Icons.Default.Close,
                     contentDescription = stringResource(R.string.dismiss_error),
-                    tint = MaterialTheme.colorScheme.onErrorContainer
+                    tint = MaterialTheme.colorScheme.onErrorContainer,
                 )
             }
         }

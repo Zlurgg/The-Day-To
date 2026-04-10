@@ -5,5 +5,5 @@ import androidx.compose.runtime.Immutable
 @Immutable
 data class MoodColorWithCount(
     val moodColor: MoodColor,
-    val entryCount: Int
+    val entryCount: Int,
 )

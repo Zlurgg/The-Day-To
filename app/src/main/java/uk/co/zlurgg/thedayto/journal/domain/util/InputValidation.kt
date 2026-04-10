@@ -60,8 +60,9 @@ object InputValidation {
         return when {
             sanitized.isBlank() -> ValidationResult.Invalid("Mood cannot be empty")
             sanitized.length > MAX_MOOD_LENGTH -> ValidationResult.Invalid(
-                "Mood name is too long (max $MAX_MOOD_LENGTH characters)"
+                "Mood name is too long (max $MAX_MOOD_LENGTH characters)",
             )
+
             else -> ValidationResult.Valid(sanitized)
         }
     }
@@ -78,8 +79,9 @@ object InputValidation {
         return when {
             // Content can be empty (optional field)
             sanitized.length > MAX_CONTENT_LENGTH -> ValidationResult.Invalid(
-                "Note is too long (max $MAX_CONTENT_LENGTH characters)"
+                "Note is too long (max $MAX_CONTENT_LENGTH characters)",
             )
+
             else -> ValidationResult.Valid(sanitized)
         }
     }

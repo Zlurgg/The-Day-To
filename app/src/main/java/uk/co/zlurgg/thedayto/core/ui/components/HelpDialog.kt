@@ -22,45 +22,45 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
  */
 @Composable
 fun HelpDialog(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     BaseInfoDialog(
         title = stringResource(R.string.help_dialog_title),
         buttonText = stringResource(R.string.help_dialog_button),
         onDismiss = onDismiss,
-        scrollable = true
+        scrollable = true,
     ) {
         DialogContentSection(
             title = stringResource(R.string.help_dialog_creating_entries_title),
-            content = stringResource(R.string.help_dialog_creating_entries_content)
+            content = stringResource(R.string.help_dialog_creating_entries_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.help_dialog_mood_colors_title),
-            content = stringResource(R.string.help_dialog_mood_colors_content)
+            content = stringResource(R.string.help_dialog_mood_colors_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.help_dialog_calendar_title),
-            content = stringResource(R.string.help_dialog_calendar_content)
+            content = stringResource(R.string.help_dialog_calendar_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.help_dialog_notifications_title),
-            content = stringResource(R.string.help_dialog_notifications_content)
+            content = stringResource(R.string.help_dialog_notifications_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.help_dialog_editing_title),
-            content = stringResource(R.string.help_dialog_editing_content)
+            content = stringResource(R.string.help_dialog_editing_content),
         )
     }
 }

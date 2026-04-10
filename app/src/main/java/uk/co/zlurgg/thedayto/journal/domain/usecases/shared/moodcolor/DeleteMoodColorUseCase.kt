@@ -6,15 +6,14 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
 class DeleteMoodColorUseCase(
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     /**
      * Soft-deletes a mood color and returns it for undo support.
      */
     suspend operator fun invoke(id: Int): Result<MoodColor, MoodColorError> {
         // Get the item first (for undo)
-        val getResult = repository.getMoodColorById(id)
-        val moodColor = when (getResult) {
+        val moodColor = when (val getResult = repository.getMoodColorById(id)) {
             is Result.Success -> getResult.data ?: return Result.Error(MoodColorError.NotFound)
             is Result.Error -> return Result.Error(MoodColorError.DatabaseError)
         }

@@ -19,6 +19,6 @@ fun EntryWithMoodColor.toEntry(): Entry {
         moodColorId = moodColorId,
         content = content,
         dateStamp = dateStamp,
-        id = id
+        id = id,
     )
 }

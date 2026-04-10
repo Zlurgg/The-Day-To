@@ -7,12 +7,12 @@ import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorValidation
 
 class ValidateMoodColorUseCase(
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     suspend operator fun invoke(
         mood: String,
         color: String,
-        excludeId: Int? = null
+        excludeId: Int? = null,
     ): Result<Unit, MoodColorError> {
         if (mood.isBlank()) {
             return Result.Error(MoodColorError.BlankName)
@@ -32,6 +32,7 @@ class ValidateMoodColorUseCase(
             existing is Result.Error -> Result.Error(MoodColorError.DatabaseError)
             existing is Result.Success && existing.data != null && existing.data.id != excludeId ->
                 Result.Error(MoodColorError.DuplicateName)
+
             else -> Result.Success(Unit)
         }
     }

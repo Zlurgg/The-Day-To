@@ -56,10 +56,10 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.DeleteMoodColorConfirmDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorEvent
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorRow
@@ -77,7 +77,7 @@ private const val MOOD_COLOR_COUNTER_THRESHOLD = 40
 @Composable
 fun MoodColorManagementScreenRoot(
     onNavigateBack: () -> Unit,
-    viewModel: MoodColorManagementViewModel = koinViewModel()
+    viewModel: MoodColorManagementViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,9 +90,10 @@ fun MoodColorManagementScreenRoot(
                 is MoodColorEvent.ShowUndoSnackbar -> {
                     // No longer used - we use confirmation dialog instead
                 }
+
                 is MoodColorEvent.ShowError -> {
                     snackbarHostState.showSnackbar(
-                        message = MoodColorErrorFormatter.format(context, event.error)
+                        message = MoodColorErrorFormatter.format(context, event.error),
                     )
                 }
             }
@@ -104,7 +105,7 @@ fun MoodColorManagementScreenRoot(
         DeleteMoodColorConfirmDialog(
             moodColor = moodColor,
             onConfirm = { viewModel.onAction(MoodColorManagementAction.ConfirmDelete) },
-            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissDeleteDialog) }
+            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissDeleteDialog) },
         )
     }
 
@@ -117,12 +118,12 @@ fun MoodColorManagementScreenRoot(
             onSave = { newMood, newColorHex ->
                 viewModel.onAction(
                     MoodColorManagementAction.SaveMoodColor(
-                        moodColor.copy(mood = newMood, color = newColorHex)
-                    )
+                        moodColor.copy(mood = newMood, color = newColorHex),
+                    ),
                 )
             },
             externalError = state.dialogError?.let { MoodColorErrorFormatter.format(context, it) },
-            onErrorCleared = { viewModel.onAction(MoodColorManagementAction.ClearError) }
+            onErrorCleared = { viewModel.onAction(MoodColorManagementAction.ClearError) },
         )
     }
 
@@ -130,7 +131,7 @@ fun MoodColorManagementScreenRoot(
         state = state,
         onAction = viewModel::onAction,
         onNavigateBack = onNavigateBack,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -144,7 +145,7 @@ private fun MoodColorManagementScreen(
     onAction: (MoodColorManagementAction) -> Unit,
     onNavigateBack: () -> Unit,
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
 
@@ -154,14 +155,14 @@ private fun MoodColorManagementScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.manage_mood_colors),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.back),
                         )
                     }
                 },
@@ -173,12 +174,12 @@ private fun MoodColorManagementScreen(
                         val counterText = stringResource(
                             R.string.mood_color_count_format,
                             activeCount,
-                            SaveMoodColorUseCase.MAX_MOOD_COLORS
+                            SaveMoodColorUseCase.MAX_MOOD_COLORS,
                         )
                         val counterDescription = stringResource(
                             R.string.mood_color_count_description,
                             activeCount,
-                            SaveMoodColorUseCase.MAX_MOOD_COLORS
+                            SaveMoodColorUseCase.MAX_MOOD_COLORS,
                         )
                         Text(
                             text = counterText,
@@ -186,16 +187,16 @@ private fun MoodColorManagementScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .padding(end = paddingMedium)
-                                .semantics { contentDescription = counterDescription }
+                                .semantics { contentDescription = counterDescription },
                         )
                     }
-                }
+                },
             )
         },
         snackbarHost = {
             CustomSnackbarHost(
                 hostState = snackbarHostState,
-                modifier = Modifier.padding(paddingMedium)
+                modifier = Modifier.padding(paddingMedium),
             )
         },
         floatingActionButton = {
@@ -204,26 +205,26 @@ private fun MoodColorManagementScreen(
                     haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                     onAction(MoodColorManagementAction.AddMoodColor)
                 },
-                containerColor = MaterialTheme.colorScheme.primaryContainer
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
-                    contentDescription = stringResource(R.string.add_mood_color)
+                    contentDescription = stringResource(R.string.add_mood_color),
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             // Loading state
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
@@ -233,21 +234,21 @@ private fun MoodColorManagementScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingMedium),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Column(
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = stringResource(R.string.no_mood_colors),
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Spacer(modifier = Modifier.height(paddingSmall))
                         Text(
                             text = stringResource(R.string.tap_plus_to_add),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -255,11 +256,11 @@ private fun MoodColorManagementScreen(
                 // Mood color list with swipe to delete
                 LazyColumn(
                     contentPadding = PaddingValues(paddingMedium),
-                    verticalArrangement = Arrangement.spacedBy(paddingSmall)
+                    verticalArrangement = Arrangement.spacedBy(paddingSmall),
                 ) {
                     items(
                         items = state.moodColors,
-                        key = { it.moodColor.id ?: 0 }
+                        key = { it.moodColor.id ?: 0 },
                     ) { moodColorWithCount ->
                         SwipeToDeleteMoodColorCard(
                             moodColorWithCount = moodColorWithCount,
@@ -270,8 +271,8 @@ private fun MoodColorManagementScreen(
                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                 onAction(
                                     MoodColorManagementAction.RequestDeleteMoodColor(
-                                        moodColorWithCount.moodColor
-                                    )
+                                        moodColorWithCount.moodColor,
+                                    ),
                                 )
                             },
                             onToggleFavorite = {
@@ -279,14 +280,14 @@ private fun MoodColorManagementScreen(
                                     onAction(
                                         MoodColorManagementAction.ToggleFavorite(
                                             id = id,
-                                            currentValue = moodColorWithCount.moodColor.isFavorite
-                                        )
+                                            currentValue = moodColorWithCount.moodColor.isFavorite,
+                                        ),
                                     )
                                 }
                             },
                             isDeleteEnabled = !state.isLoading,
                             pendingDelete = state.pendingDelete,
-                            modifier = Modifier.animateItem()
+                            modifier = Modifier.animateItem(),
                         )
                     }
                 }
@@ -304,7 +305,7 @@ private fun SwipeToDeleteMoodColorCard(
     onToggleFavorite: () -> Unit,
     isDeleteEnabled: Boolean,
     pendingDelete: MoodColor?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val dismissState = rememberSwipeToDismissBoxState()
 
@@ -334,19 +335,19 @@ private fun SwipeToDeleteMoodColorCard(
                         .fillMaxSize()
                         .background(MaterialTheme.colorScheme.error)
                         .padding(horizontal = paddingMedium),
-                    contentAlignment = Alignment.CenterEnd
+                    contentAlignment = Alignment.CenterEnd,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Delete,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onError
+                        tint = MaterialTheme.colorScheme.onError,
                     )
                 }
             }
         },
         enableDismissFromStartToEnd = false,
         enableDismissFromEndToStart = isDeleteEnabled,
-        modifier = modifier
+        modifier = modifier,
     ) {
         JournalCard(
             modifier = Modifier
@@ -359,7 +360,7 @@ private fun SwipeToDeleteMoodColorCard(
                 moodColorWithCount = moodColorWithCount,
                 onToggleFavorite = onToggleFavorite,
                 onEdit = onEdit,
-                showEntryCount = true
+                showEntryCount = true,
             )
         }
     }
@@ -381,9 +382,9 @@ private fun MoodColorManagementScreenPreview() {
                             mood = "Happy",
                             color = "FFD700",
                             isFavorite = true,
-                            dateStamp = 0
+                            dateStamp = 0,
                         ),
-                        entryCount = 15
+                        entryCount = 15,
                     ),
                     MoodColorWithCount(
                         moodColor = MoodColor(
@@ -391,9 +392,9 @@ private fun MoodColorManagementScreenPreview() {
                             mood = "Sad",
                             color = "4169E1",
                             isFavorite = false,
-                            dateStamp = 0
+                            dateStamp = 0,
                         ),
-                        entryCount = 3
+                        entryCount = 3,
                     ),
                     MoodColorWithCount(
                         moodColor = MoodColor(
@@ -401,16 +402,16 @@ private fun MoodColorManagementScreenPreview() {
                             mood = "Excited",
                             color = "FF6347",
                             isFavorite = false,
-                            dateStamp = 0
+                            dateStamp = 0,
                         ),
-                        entryCount = 1
-                    )
+                        entryCount = 1,
+                    ),
                 ),
-                isLoading = false
+                isLoading = false,
             ),
             onAction = {},
             onNavigateBack = {},
-            snackbarHostState = SnackbarHostState()
+            snackbarHostState = SnackbarHostState(),
         )
     }
 }
@@ -423,7 +424,7 @@ private fun MoodColorManagementScreenEmptyPreview() {
             state = MoodColorManagementUiState(isLoading = false),
             onAction = {},
             onNavigateBack = {},
-            snackbarHostState = SnackbarHostState()
+            snackbarHostState = SnackbarHostState(),
         )
     }
 }

@@ -56,7 +56,7 @@ class SyncRepositoryImplTest {
             entryDao = mockEntryDao,
             moodColorDao = mockMoodColorDao,
             pendingSyncDeletionDao = mockPendingSyncDeletionDao,
-            notificationSyncService = mockNotificationSyncService
+            notificationSyncService = mockNotificationSyncService,
         )
     }
 
@@ -70,12 +70,12 @@ class SyncRepositoryImplTest {
         val entries = listOf(
             createTestEntry(id = 1, moodColorId = 10),
             createTestEntry(id = 2, moodColorId = 20),
-            createTestEntry(id = 3, moodColorId = 10) // Duplicate moodColorId
+            createTestEntry(id = 3, moodColorId = 10), // Duplicate moodColorId
         )
 
         val moodColorEntities = listOf(
             createMoodColorEntity(id = 10, syncId = "sync_10"),
-            createMoodColorEntity(id = 20, syncId = "sync_20")
+            createMoodColorEntity(id = 20, syncId = "sync_20"),
         )
 
         // Mock batch query to return mood colors
@@ -118,11 +118,11 @@ class SyncRepositoryImplTest {
         val entries = listOf(
             createTestEntry(id = 1, moodColorId = 10),
             createTestEntry(id = 2, moodColorId = 10),
-            createTestEntry(id = 3, moodColorId = 10)
+            createTestEntry(id = 3, moodColorId = 10),
         )
 
         val moodColorEntities = listOf(
-            createMoodColorEntity(id = 10, syncId = "sync_10")
+            createMoodColorEntity(id = 10, syncId = "sync_10"),
         )
 
         coEvery { mockMoodColorDao.getMoodColorsByIds(any()) } returns moodColorEntities
@@ -222,7 +222,7 @@ class SyncRepositoryImplTest {
         id: Int,
         moodColorId: Int,
         syncId: String? = "sync_$id",
-        syncStatus: SyncStatus = SyncStatus.PENDING_SYNC
+        syncStatus: SyncStatus = SyncStatus.PENDING_SYNC,
     ) = Entry(
         id = id,
         dateStamp = 1000L + id,
@@ -231,13 +231,13 @@ class SyncRepositoryImplTest {
         syncId = syncId,
         userId = testUserId,
         syncStatus = syncStatus,
-        updatedAt = 2000L
+        updatedAt = 2000L,
     )
 
     private fun createMoodColorEntity(
         id: Int,
         syncId: String,
-        mood: String = "Test Mood $id"
+        mood: String = "Test Mood $id",
     ) = MoodColorEntity(
         id = id,
         mood = mood,
@@ -248,6 +248,6 @@ class SyncRepositoryImplTest {
         syncStatus = SyncStatus.SYNCED.name,
         dateStamp = 1000L,
         updatedAt = 2000L,
-        isDeleted = false
+        isDeleted = false,
     )
 }

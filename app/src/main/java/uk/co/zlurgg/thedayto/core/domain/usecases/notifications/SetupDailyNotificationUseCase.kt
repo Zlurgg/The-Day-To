@@ -15,7 +15,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  * - Existing users with notifications ON: Ensures periodic work is scheduled
  */
 class SetupDailyNotificationUseCase(
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
 ) {
     operator fun invoke() {
         notificationScheduler.setupDailyNotification()

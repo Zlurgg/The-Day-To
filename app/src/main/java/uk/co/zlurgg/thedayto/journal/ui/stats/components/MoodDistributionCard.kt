@@ -31,30 +31,30 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 @Composable
 fun MoodDistributionCard(
     moodDistribution: List<StatsUiState.MoodCount>,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(StatsConstants.CARD_PADDING),
-            verticalArrangement = Arrangement.spacedBy(StatsConstants.MOOD_ITEM_SPACING)
+            verticalArrangement = Arrangement.spacedBy(StatsConstants.MOOD_ITEM_SPACING),
         ) {
             StatsCardHeader(
                 icon = Icons.Default.Mood,
-                title = stringResource(R.string.stats_mood_distribution_title)
+                title = stringResource(R.string.stats_mood_distribution_title),
             )
 
             if (moodDistribution.isEmpty()) {
                 Text(
                     text = stringResource(R.string.stats_no_mood_data),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 moodDistribution.forEach { moodCount ->
@@ -70,11 +70,11 @@ private fun MoodDistributionItem(moodCount: StatsUiState.MoodCount) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(StatsConstants.MOOD_ITEM_SPACING),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Color indicator
             Box(
@@ -82,19 +82,19 @@ private fun MoodDistributionItem(moodCount: StatsUiState.MoodCount) {
                     .size(StatsConstants.COLOR_INDICATOR_SIZE)
                     .background(
                         color = getColorSafe(moodCount.color, MaterialTheme.colorScheme.primary),
-                        shape = CircleShape
-                    )
+                        shape = CircleShape,
+                    ),
             )
             Text(
                 text = moodCount.mood,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
         Text(
             text = "${moodCount.count}×",
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -110,8 +110,8 @@ private fun MoodDistributionCardPreview() {
                 StatsUiState.MoodCount("Relaxed", "#2196F3", 28),
                 StatsUiState.MoodCount("Neutral", "#FFC107", 19),
                 StatsUiState.MoodCount("Sad", "#F44336", 12),
-                StatsUiState.MoodCount("Anxious", "#9C27B0", 8)
-            )
+                StatsUiState.MoodCount("Anxious", "#9C27B0", 8),
+            ),
         )
     }
 }

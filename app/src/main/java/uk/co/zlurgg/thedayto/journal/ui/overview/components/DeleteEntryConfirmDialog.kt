@@ -28,7 +28,7 @@ fun DeleteEntryConfirmDialog(
     entry: EntryWithMoodColor,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val formattedDate = DateFormatter.formatDate(entry.dateStamp)
 
@@ -38,7 +38,7 @@ fun DeleteEntryConfirmDialog(
             Text(
                 text = stringResource(R.string.delete_entry_dialog_title),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         },
         text = {
@@ -46,10 +46,10 @@ fun DeleteEntryConfirmDialog(
                 text = stringResource(
                     R.string.delete_entry_dialog_message,
                     entry.moodName,
-                    formattedDate
+                    formattedDate,
                 ),
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         confirmButton = {
@@ -57,7 +57,7 @@ fun DeleteEntryConfirmDialog(
                 Text(
                     text = stringResource(R.string.delete_confirm_button),
                     color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         },
@@ -65,11 +65,11 @@ fun DeleteEntryConfirmDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = stringResource(R.string.cancel),
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -85,10 +85,10 @@ private fun DeleteEntryConfirmDialogPreview() {
                 moodName = "Happy",
                 moodColor = "4CAF50",
                 content = "Had a great day!",
-                dateStamp = 1733011200L // Dec 1, 2024
+                dateStamp = 1733011200L, // Dec 1, 2024
             ),
             onConfirm = {},
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 }

@@ -14,6 +14,6 @@ object OverviewPromptConstants {
         "How's your day going?",
         "How are you doing?",
         "Ready to check in?",
-        "What's on your mind?"
+        "What's on your mind?",
     )
 }

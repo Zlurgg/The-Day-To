@@ -25,7 +25,7 @@ class SignOutUseCaseTest {
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = null
+        profilePictureUrl = null,
     )
 
     @Before

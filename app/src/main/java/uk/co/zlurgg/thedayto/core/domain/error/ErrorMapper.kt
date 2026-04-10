@@ -45,7 +45,7 @@ object ErrorMapper {
     @Suppress("TooGenericExceptionCaught")
     suspend inline fun <T> safeSuspendCall(
         tag: String = "ErrorMapper",
-        action: () -> T
+        action: () -> T,
     ): Result<T, DataError.Local> {
         return try {
             Result.Success(action())

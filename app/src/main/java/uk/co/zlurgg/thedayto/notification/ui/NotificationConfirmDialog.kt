@@ -22,7 +22,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 @Composable
 fun NotificationConfirmDialog(
     onDismiss: () -> Unit,
-    onChangeTime: () -> Unit
+    onChangeTime: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -41,7 +41,7 @@ fun NotificationConfirmDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.ok))
             }
-        }
+        },
     )
 }
 
@@ -52,7 +52,7 @@ private fun NotificationConfirmDialogPreview() {
     TheDayToTheme {
         NotificationConfirmDialog(
             onDismiss = {},
-            onChangeTime = {}
+            onChangeTime = {},
         )
     }
 }

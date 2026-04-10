@@ -29,7 +29,7 @@ class CalculateMonthlyBreakdownUseCase {
                     year = yearMonth.year,
                     monthValue = yearMonth.monthValue,
                     entryCount = monthEntries.size,
-                    completionRate = completionRate
+                    completionRate = completionRate,
                 )
             }
             .sortedByDescending { it.year * 100 + it.monthValue }
@@ -41,6 +41,6 @@ class CalculateMonthlyBreakdownUseCase {
         val year: Int,
         val monthValue: Int,
         val entryCount: Int,
-        val completionRate: Int
+        val completionRate: Int,
     )
 }

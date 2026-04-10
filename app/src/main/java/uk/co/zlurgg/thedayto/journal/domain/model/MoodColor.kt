@@ -23,7 +23,7 @@ data class MoodColor(
     val syncId: String? = null,
     val userId: String? = null,
     val updatedAt: Long? = null,
-    val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY
+    val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY,
 ) {
     companion object {
         /** Fallback color for a brand-new mood color when the user has no prior selection. */
@@ -38,7 +38,7 @@ data class MoodColor(
         fun empty(color: String = DEFAULT_EMPTY_COLOR) = MoodColor(
             mood = "",
             color = color,
-            dateStamp = System.currentTimeMillis()
+            dateStamp = System.currentTimeMillis(),
         )
     }
 }

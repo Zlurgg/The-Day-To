@@ -15,8 +15,8 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
-import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckEntryReminderShownTodayUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.CheckFirstLaunchUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.overview.DeleteEntryUseCase
@@ -39,8 +39,8 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodCo
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
 import uk.co.zlurgg.thedayto.journal.ui.util.CalendarHelper
@@ -57,14 +57,14 @@ val journalModule = module {
         EntryRepositoryImpl(
             dao = get<TheDayToDatabase>().entryDao,
             preferencesRepository = get(),
-            pendingSyncDeletionDao = get<TheDayToDatabase>().pendingSyncDeletionDao
+            pendingSyncDeletionDao = get<TheDayToDatabase>().pendingSyncDeletionDao,
         )
     }
 
     single<MoodColorRepository> {
         MoodColorRepositoryImpl(
             dao = get<TheDayToDatabase>().moodColorDao,
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
@@ -90,7 +90,7 @@ val journalModule = module {
         SeedDefaultMoodColorsUseCase(
             moodColorRepository = get(),
             preferencesRepository = get(),
-            timeProvider = get()
+            timeProvider = get(),
         )
     }
 
@@ -105,32 +105,32 @@ val journalModule = module {
             getEntryByDate = get(),
             updateEntryUseCase = UpdateEntryUseCase(repository = get()),
             checkEntryReminderShownToday = CheckEntryReminderShownTodayUseCase(
-                preferencesRepository = get()
+                preferencesRepository = get(),
             ),
             markEntryReminderShownToday = MarkEntryReminderShownTodayUseCase(
-                preferencesRepository = get()
+                preferencesRepository = get(),
             ),
             checkFirstLaunch = CheckFirstLaunchUseCase(preferencesRepository = get()),
             markFirstLaunchComplete = MarkFirstLaunchCompleteUseCase(preferencesRepository = get()),
             getNotificationSettings = GetNotificationSettingsUseCase(
                 settingsRepository = get(),
-                authRepository = get()
+                authRepository = get(),
             ),
             saveNotificationSettings = SaveNotificationSettingsUseCase(
                 settingsRepository = get(),
                 scheduler = get(),
-                authRepository = get()
+                authRepository = get(),
             ),
             checkNotificationPermission = CheckNotificationPermissionUseCase(
-                notificationScheduler = get()
+                notificationScheduler = get(),
             ),
             checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(
-                notificationScheduler = get()
+                notificationScheduler = get(),
             ),
             shouldShowPermissionRationale = ShouldShowPermissionRationaleUseCase(
-                notificationScheduler = get()
+                notificationScheduler = get(),
             ),
-            setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler = get())
+            setupDailyNotification = SetupDailyNotificationUseCase(notificationScheduler = get()),
         )
     }
 
@@ -146,7 +146,7 @@ val journalModule = module {
             saveMoodColor = get(),
             setMoodColorFavorite = get(),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
-            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(preferencesRepository = get())
+            markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(preferencesRepository = get()),
         )
     }
 
@@ -156,7 +156,7 @@ val journalModule = module {
         StatsUseCases(
             calculateTotalStats = CalculateTotalStatsUseCase(),
             calculateMoodDistribution = CalculateMoodDistributionUseCase(),
-            calculateMonthlyBreakdown = CalculateMonthlyBreakdownUseCase()
+            calculateMonthlyBreakdown = CalculateMonthlyBreakdownUseCase(),
         )
     }
 
@@ -168,7 +168,7 @@ val journalModule = module {
             saveMoodColor = get(),
             deleteMoodColor = get(),
             restoreMoodColor = get(),
-            setFavorite = get()
+            setFavorite = get(),
         )
     }
 }

@@ -109,7 +109,7 @@ class MoodColorRepositoryTest : DatabaseTest() {
             mood = "Sad",
             color = "2196F3",
             isDeleted = true,
-            id = 1
+            id = 1,
         )
         moodColorDao.insertMoodColor(deletedMood.toEntity())
 

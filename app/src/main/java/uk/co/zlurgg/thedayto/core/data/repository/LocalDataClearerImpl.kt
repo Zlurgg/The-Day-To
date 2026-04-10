@@ -18,7 +18,7 @@ class LocalDataClearerImpl(
     private val moodColorDao: MoodColorDao,
     private val notificationSettingsDao: NotificationSettingsDao,
     private val pendingSyncDeletionDao: PendingSyncDeletionDao,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) : LocalDataClearer {
 
     override suspend fun clearAllLocalData() {

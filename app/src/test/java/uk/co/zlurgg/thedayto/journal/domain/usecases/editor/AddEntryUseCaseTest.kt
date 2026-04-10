@@ -49,7 +49,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = "Had a great day!",
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -71,7 +71,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = "  Test content \u0000\u0001  ",  // Leading/trailing whitespace + control chars
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -90,7 +90,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = "",
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -111,7 +111,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = maxContent,
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -132,7 +132,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = content,
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -151,7 +151,8 @@ class AddEntryUseCaseTest {
         val today = System.currentTimeMillis()
         val yesterday = today - 86400000L // 1 day ago
         val entry1 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 1", dateStamp = today, id = null)
-        val entry2 = TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 2", dateStamp = yesterday, id = null)
+        val entry2 =
+            TestDataBuilders.createEntry(moodColorId = 1, content = "Entry 2", dateStamp = yesterday, id = null)
         addEntryUseCase(entry1)
         addEntryUseCase(entry2)
 
@@ -168,11 +169,13 @@ class AddEntryUseCaseTest {
         fakeMoodColorRepository.insertMoodColor(moodColor)
 
         val todayEpoch = TestDataBuilders.getTodayEpoch()
-        val entry1 = TestDataBuilders.createEntry(moodColorId = 1, content = "First entry", dateStamp = todayEpoch, id = null)
+        val entry1 =
+            TestDataBuilders.createEntry(moodColorId = 1, content = "First entry", dateStamp = todayEpoch, id = null)
         addEntryUseCase(entry1)
 
         // When: Attempting to add another entry for the same date
-        val entry2 = TestDataBuilders.createEntry(moodColorId = 1, content = "Second entry", dateStamp = todayEpoch, id = null)
+        val entry2 =
+            TestDataBuilders.createEntry(moodColorId = 1, content = "Second entry", dateStamp = todayEpoch, id = null)
 
         // Then: Should throw InvalidEntryException
         addEntryUseCase(entry2)
@@ -185,7 +188,8 @@ class AddEntryUseCaseTest {
         fakeMoodColorRepository.insertMoodColor(moodColor)
 
         val todayEpoch = TestDataBuilders.getTodayEpoch()
-        val entry = TestDataBuilders.createEntry(moodColorId = 1, content = "Original content", dateStamp = todayEpoch, id = 1)
+        val entry =
+            TestDataBuilders.createEntry(moodColorId = 1, content = "Original content", dateStamp = todayEpoch, id = 1)
         fakeEntryRepository.insertEntry(entry)
 
         // When: Updating the same entry (same id, same date)
@@ -209,7 +213,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             dateStamp = futureTimestamp,
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
@@ -230,14 +234,18 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = exactMaxContent,
-            id = null
+            id = null,
         )
         addEntryUseCase(entry)
 
         // Then: Entry should be created
         val entries = fakeEntryRepository.getEntriesSync()
         assertEquals("Should have 1 entry", 1, entries.size)
-        assertEquals("Content length should be exactly max", InputValidation.MAX_CONTENT_LENGTH, entries[0].content.length)
+        assertEquals(
+            "Content length should be exactly max",
+            InputValidation.MAX_CONTENT_LENGTH,
+            entries[0].content.length,
+        )
     }
 
     // ============================================================
@@ -262,7 +270,7 @@ class AddEntryUseCaseTest {
             mood = "Sad",
             color = "2196F3",
             isDeleted = true,
-            id = 1
+            id = 1,
         )
         fakeMoodColorRepository.insertMoodColor(deletedMood)
 
@@ -287,7 +295,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             dateStamp = -1L,
-            id = null
+            id = null,
         )
 
         // Then: Should throw InvalidEntryException
@@ -304,7 +312,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             dateStamp = 0L,
-            id = null
+            id = null,
         )
 
         // Then: Should throw InvalidEntryException
@@ -322,7 +330,7 @@ class AddEntryUseCaseTest {
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
             content = tooLongContent,
-            id = null
+            id = null,
         )
 
         // Then: Should throw InvalidEntryException

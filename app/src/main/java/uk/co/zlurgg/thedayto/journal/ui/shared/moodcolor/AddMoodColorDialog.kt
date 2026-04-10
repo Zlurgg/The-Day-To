@@ -47,7 +47,7 @@ fun AddMoodColorDialog(
     showDialog: Boolean,
     onDismiss: () -> Unit,
     onSave: (mood: String, colorHex: String) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (showDialog) {
         // Local state - resets each time dialog opens
@@ -60,12 +60,12 @@ fun AddMoodColorDialog(
             title = {
                 Text(
                     text = stringResource(R.string.create_new_mood_color),
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             },
             text = {
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     // Mood text field
                     OutlinedTextField(
@@ -81,7 +81,7 @@ fun AddMoodColorDialog(
                         label = {
                             Text(
                                 text = stringResource(R.string.mood),
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
                         },
                         singleLine = true,
@@ -94,16 +94,16 @@ fun AddMoodColorDialog(
                                 Text(
                                     text = error,
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.error
+                                    color = MaterialTheme.colorScheme.error,
                                 )
                             } else {
                                 Text(
                                     text = "${mood.length}/${InputValidation.MAX_MOOD_LENGTH}",
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
-                        }
+                        },
                     )
 
                     Spacer(modifier = Modifier.height(paddingMedium))
@@ -118,7 +118,7 @@ fun AddMoodColorDialog(
                         controller = colorPickerController,
                         onColorChanged = { colorEnvelope: ColorEnvelope ->
                             selectedColor = colorEnvelope.hexCode
-                        }
+                        },
                     )
                 }
             },
@@ -131,11 +131,11 @@ fun AddMoodColorDialog(
                         } else {
                             onSave(mood, selectedColor)
                         }
-                    }
+                    },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Check,
-                        contentDescription = stringResource(R.string.save_entry)
+                        contentDescription = stringResource(R.string.save_entry),
                     )
                 }
             },
@@ -143,11 +143,11 @@ fun AddMoodColorDialog(
                 IconButton(onClick = onDismiss) {
                     Icon(
                         imageVector = Icons.Default.Close,
-                        contentDescription = stringResource(R.string.cancel)
+                        contentDescription = stringResource(R.string.cancel),
                     )
                 }
             },
-            modifier = modifier
+            modifier = modifier,
         )
     }
 }
@@ -160,7 +160,7 @@ private fun AddMoodColorDialogPreview() {
         AddMoodColorDialog(
             showDialog = true,
             onDismiss = {},
-            onSave = { _, _ -> }
+            onSave = { _, _ -> },
         )
     }
 }

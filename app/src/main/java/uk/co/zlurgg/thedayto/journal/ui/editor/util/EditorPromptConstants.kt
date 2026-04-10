@@ -17,7 +17,7 @@ object EditorPromptConstants {
         "What's your mood today?",
         "How do you feel right now?",
         "What's your vibe today?",
-        "How's your day going?"
+        "How's your day going?",
     )
 
     /**
@@ -29,7 +29,7 @@ object EditorPromptConstants {
         "What was your mood?",
         "How were you doing?",
         "What was your vibe that day?",
-        "How did that day go?"
+        "How did that day go?",
     )
 
     /**
@@ -41,6 +41,6 @@ object EditorPromptConstants {
         "How might you feel?",
         "What's your expected mood?",
         "How do you expect to feel?",
-        "Planning your future mood?"
+        "Planning your future mood?",
     )
 }

@@ -27,28 +27,28 @@ fun WelcomeHeader(
     showWelcome: Boolean,
     showAppName: Boolean,
     showSubtitle: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(paddingMedium),
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier.fillMaxWidth(),
     ) {
         // Welcome text with fade-in animation
         AnimatedVisibility(
             visible = showWelcome,
             enter = fadeIn(animationSpec = tween(600)) +
-                    slideInVertically(
-                        initialOffsetY = { -40 },
-                        animationSpec = tween(600)
-                    )
+                slideInVertically(
+                    initialOffsetY = { -40 },
+                    animationSpec = tween(600),
+                ),
         ) {
             Text(
                 text = stringResource(R.string.welcome),
                 style = MaterialTheme.typography.displaySmall,
                 fontWeight = FontWeight.Light,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
 
@@ -56,31 +56,31 @@ fun WelcomeHeader(
         AnimatedVisibility(
             visible = showAppName,
             enter = fadeIn(animationSpec = tween(600)) +
-                    slideInVertically(
-                        initialOffsetY = { 40 },
-                        animationSpec = tween(600)
-                    )
+                slideInVertically(
+                    initialOffsetY = { 40 },
+                    animationSpec = tween(600),
+                ),
         ) {
             Text(
                 text = stringResource(R.string.app_name),
                 style = MaterialTheme.typography.displayLarge,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
         }
 
         // Subtitle/tagline
         AnimatedVisibility(
             visible = showSubtitle,
-            enter = fadeIn(animationSpec = tween(800))
+            enter = fadeIn(animationSpec = tween(800)),
         ) {
             Text(
                 text = "Track your daily mood journey",
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = paddingLarge)
+                modifier = Modifier.padding(horizontal = paddingLarge),
             )
         }
 

@@ -35,13 +35,15 @@ import java.time.ZoneOffset
 class EditorViewModel(
     private val editorUseCases: EditorUseCases,
     private val syncScheduler: SyncScheduler,
-    savedStateHandle: SavedStateHandle
+    savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     // Single source of truth for UI state
-    private val _uiState = MutableStateFlow(EditorUiState(
-        moodHint = EditorPromptConstants.TODAY_PROMPTS.random() // Default to today prompt
-    ))
+    private val _uiState = MutableStateFlow(
+        EditorUiState(
+            moodHint = EditorPromptConstants.TODAY_PROMPTS.random(), // Default to today prompt
+        ),
+    )
     val uiState = _uiState.asStateFlow()
 
     // One-time UI events
@@ -64,7 +66,7 @@ class EditorViewModel(
         uiState = _uiState,
         uiEvents = _uiEvents,
         scope = viewModelScope,
-        onSyncRequired = ::triggerSync
+        onSyncRequired = ::triggerSync,
     )
 
     init {
@@ -78,10 +80,12 @@ class EditorViewModel(
             if (entryDate != -1L) {
                 Timber.d("Setting entry date from navigation: $entryDate")
                 originalDate = entryDate
-                _uiState.update { it.copy(
-                    entryDate = entryDate,
-                    moodHint = getMoodHintForDate(entryDate)
-                ) }
+                _uiState.update {
+                    it.copy(
+                        entryDate = entryDate,
+                        moodHint = getMoodHintForDate(entryDate),
+                    )
+                }
             }
         }
 
@@ -143,7 +147,7 @@ class EditorViewModel(
                     _uiState.update { state ->
                         state.copy(
                             isLoading = false,
-                            loadError = "Entry not found. It may have been deleted."
+                            loadError = "Entry not found. It may have been deleted.",
                         )
                     }
                 }
@@ -153,7 +157,7 @@ class EditorViewModel(
                 _uiState.update { state ->
                     state.copy(
                         isLoading = false,
-                        loadError = "Failed to load entry: ${e.message ?: "Unknown error"}"
+                        loadError = "Failed to load entry: ${e.message ?: "Unknown error"}",
                     )
                 }
             }
@@ -202,7 +206,7 @@ class EditorViewModel(
                 entryContent = entry.content,
                 isMoodHintVisible = false,
                 isContentHintVisible = false,
-                moodHint = getMoodHintForDate(entry.dateStamp)
+                moodHint = getMoodHintForDate(entry.dateStamp),
             )
         }
     }
@@ -222,7 +226,7 @@ class EditorViewModel(
                 entryContent = "",
                 isMoodHintVisible = true,
                 isContentHintVisible = true,
-                moodHint = getMoodHintForDate(date)
+                moodHint = getMoodHintForDate(date),
             )
         }
     }
@@ -238,8 +242,8 @@ class EditorViewModel(
     private fun hasUnsavedChanges(): Boolean {
         val currentState = _uiState.value
         return currentState.selectedMoodColorId != originalMoodColorId ||
-                currentState.entryContent != originalContent ||
-                currentState.entryDate != originalDate
+            currentState.entryContent != originalContent ||
+            currentState.entryDate != originalDate
     }
 
     fun onAction(action: EditorAction) {
@@ -253,22 +257,29 @@ class EditorViewModel(
             // Mood color actions (delegated)
             is EditorAction.SelectMoodColor ->
                 moodColorDelegate.handleSelectMoodColor(action.moodColorId)
+
             is EditorAction.ToggleMoodColorSection ->
                 moodColorDelegate.handleToggleMoodColorSection()
+
             is EditorAction.SaveMoodColor ->
                 moodColorDelegate.handleSaveMoodColor(action.mood, action.colorHex)
+
             is EditorAction.ToggleMoodColorFavorite ->
                 moodColorDelegate.handleToggleFavorite(action.moodColor)
+
             is EditorAction.EditMoodColor ->
                 moodColorDelegate.handleEditMoodColor(action.moodColor)
+
             is EditorAction.UpdateMoodColor ->
                 moodColorDelegate.handleUpdateMoodColor(
                     action.moodColorId,
                     action.newMood,
-                    action.newColorHex
+                    action.newColorHex,
                 )
+
             is EditorAction.CloseEditMoodColorDialog ->
                 moodColorDelegate.handleCloseEditMoodColorDialog()
+
             is EditorAction.ClearEditMoodColorError ->
                 moodColorDelegate.handleClearEditMoodColorError()
 
@@ -305,7 +316,7 @@ class EditorViewModel(
                 Timber.e(e, "Failed to load entry for date: $date")
                 resetToBlankState(date)
                 _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = "Failed to load entry for this date")
+                    EditorUiEvent.ShowSnackbar(message = "Failed to load entry for this date"),
                 )
             }
         }
@@ -356,8 +367,8 @@ class EditorViewModel(
                         moodColorId = moodColorId,
                         content = state.entryContent,
                         dateStamp = state.entryDate,
-                        id = state.currentEntryId
-                    )
+                        id = state.currentEntryId,
+                    ),
                 )
                 loadingJob.cancel()
                 Timber.d("Successfully saved entry")
@@ -368,7 +379,7 @@ class EditorViewModel(
                 Timber.e(e, "Failed to save entry")
                 _uiState.update { it.copy(isLoading = false) }
                 _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save entry")
+                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save entry"),
                 )
             }
         }
@@ -423,7 +434,7 @@ class EditorViewModel(
     private fun loadMoodColors() {
         getMoodColorsJob?.cancel()
         getMoodColorsJob = editorUseCases.getMoodColors(
-            MoodColorOrder.Date(OrderType.Descending)
+            MoodColorOrder.Date(OrderType.Descending),
         )
             // Sort by favorites first for the dropdown, inside the flow pipeline
             // so distinctUntilChanged can short-circuit redundant Room re-emissions

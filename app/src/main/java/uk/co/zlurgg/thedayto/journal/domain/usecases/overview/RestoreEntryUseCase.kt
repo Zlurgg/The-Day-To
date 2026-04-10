@@ -8,7 +8,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
  * Used by OverviewViewModel for undo functionality.
  */
 class RestoreEntryUseCase(
-    private val repository: EntryRepository
+    private val repository: EntryRepository,
 ) {
     suspend operator fun invoke(entry: Entry) {
         repository.insertEntry(entry)

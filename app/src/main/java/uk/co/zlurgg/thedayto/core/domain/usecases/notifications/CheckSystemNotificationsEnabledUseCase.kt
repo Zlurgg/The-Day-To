@@ -21,7 +21,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  * @param notificationScheduler Scheduler for notification operations
  */
 class CheckSystemNotificationsEnabledUseCase(
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
 ) {
     /**
      * Check if notifications are enabled for this app in system settings.

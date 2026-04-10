@@ -33,18 +33,18 @@ fun createFakeOverviewUseCases(
     notificationScheduler: NotificationScheduler,
     notificationSettingsRepository: NotificationSettingsRepository = FakeNotificationSettingsRepository(),
     authRepository: AuthRepository = FakeAuthRepository(),
-    entryRepository: EntryRepository = FakeEntryRepository()
+    entryRepository: EntryRepository = FakeEntryRepository(),
 ): OverviewUseCases {
 
     // Create real notification use cases with fake dependencies
     val getNotificationSettings = GetNotificationSettingsUseCase(
         settingsRepository = notificationSettingsRepository,
-        authRepository = authRepository
+        authRepository = authRepository,
     )
     val saveNotificationSettings = SaveNotificationSettingsUseCase(
         settingsRepository = notificationSettingsRepository,
         scheduler = notificationScheduler,
-        authRepository = authRepository
+        authRepository = authRepository,
     )
     val checkNotificationPermission = CheckNotificationPermissionUseCase(notificationScheduler)
     val checkSystemNotificationsEnabled = CheckSystemNotificationsEnabledUseCase(notificationScheduler)
@@ -80,6 +80,6 @@ fun createFakeOverviewUseCases(
         checkNotificationPermission = checkNotificationPermission,
         checkSystemNotificationsEnabled = checkSystemNotificationsEnabled,
         shouldShowPermissionRationale = shouldShowPermissionRationale,
-        setupDailyNotification = setupDailyNotification
+        setupDailyNotification = setupDailyNotification,
     )
 }

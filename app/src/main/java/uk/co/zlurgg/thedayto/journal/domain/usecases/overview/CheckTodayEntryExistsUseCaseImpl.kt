@@ -24,7 +24,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
  */
 class CheckTodayEntryExistsUseCaseImpl(
     private val repository: EntryRepository,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
 ) : CheckTodayEntryExistsUseCase {
     /**
      * Check if an entry exists for today's date.

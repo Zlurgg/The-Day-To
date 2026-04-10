@@ -27,7 +27,7 @@ class FakeAuthRepository : AuthRepository {
     var signOutCalled = false
 
     override suspend fun signIn(
-        credentialProvider: CredentialProvider
+        credentialProvider: CredentialProvider,
     ): Result<UserData, DataError.Auth> {
         // In tests, we ignore the credentialProvider and use our configured behavior
         return if (shouldReturnError) {
@@ -36,7 +36,7 @@ class FakeAuthRepository : AuthRepository {
             val userData = UserData(
                 userId = "test_user_123",
                 username = "Test User",
-                profilePictureUrl = "https://example.com/profile.jpg"
+                profilePictureUrl = "https://example.com/profile.jpg",
             )
             currentUser = userData
             Result.Success(userData)
@@ -66,7 +66,7 @@ class FakeAuthRepository : AuthRepository {
     }
 
     override suspend fun reauthenticate(
-        credentialProvider: CredentialProvider
+        credentialProvider: CredentialProvider,
     ): EmptyResult<DataError.Auth> {
         return if (shouldReturnError) {
             Result.Error(authError)

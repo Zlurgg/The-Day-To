@@ -23,7 +23,7 @@ import java.util.UUID
 class EntryRepositoryImpl(
     private val dao: EntryDao,
     private val preferencesRepository: PreferencesRepository,
-    private val pendingSyncDeletionDao: PendingSyncDeletionDao
+    private val pendingSyncDeletionDao: PendingSyncDeletionDao,
 ) : EntryRepository {
     override fun getEntries(): Flow<List<Entry>> {
         return dao.getEntries().map { entities ->
@@ -103,7 +103,7 @@ class EntryRepositoryImpl(
                 syncId = entry.syncId ?: existingEntry?.syncId ?: UUID.randomUUID().toString(),
                 userId = entry.userId ?: existingEntry?.userId,
                 updatedAt = System.currentTimeMillis(),
-                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY
+                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY,
             )
             dao.insertEntry(entryWithSync.toEntity())
         }
@@ -120,8 +120,8 @@ class EntryRepositoryImpl(
                     PendingSyncDeletionEntity(
                         syncId = entry.syncId,
                         collection = PendingSyncDeletionEntity.COLLECTION_ENTRIES,
-                        userId = entry.userId
-                    )
+                        userId = entry.userId,
+                    ),
                 )
             }
             // Hard delete immediately - entry is gone from local DB
@@ -139,7 +139,7 @@ class EntryRepositoryImpl(
             val entryWithSync = entry.copy(
                 syncId = entry.syncId ?: existingEntry?.syncId ?: UUID.randomUUID().toString(),
                 updatedAt = System.currentTimeMillis(),
-                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else entry.syncStatus
+                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else entry.syncStatus,
             )
             dao.updateEntry(entryWithSync.toEntity())
         }

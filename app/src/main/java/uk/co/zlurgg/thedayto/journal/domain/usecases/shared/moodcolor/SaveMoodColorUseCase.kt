@@ -8,7 +8,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorValidation
 
 class SaveMoodColorUseCase(
     private val validate: ValidateMoodColorUseCase,
-    private val repository: MoodColorRepository
+    private val repository: MoodColorRepository,
 ) {
     companion object {
         const val MAX_MOOD_COLORS = 50
@@ -18,7 +18,7 @@ class SaveMoodColorUseCase(
         // Normalize color (strip alpha if 8-char ARGB) and trim whitespace from name
         val normalized = moodColor.copy(
             mood = moodColor.mood.trim(),
-            color = MoodColorValidation.normalizeHexColor(moodColor.color)
+            color = MoodColorValidation.normalizeHexColor(moodColor.color),
         )
 
         // For inserts, the moodNormalized column is UNIQUE in the DB, so a soft-deleted
@@ -46,7 +46,7 @@ class SaveMoodColorUseCase(
      * or null to indicate the caller should proceed with normal insert validation.
      */
     private suspend fun restoreIfSoftDeleted(
-        normalized: MoodColor
+        normalized: MoodColor,
     ): Result<MoodColor, MoodColorError>? {
         val existingByName = repository.getMoodColorByName(normalized.mood)
         if (existingByName is Result.Error) {
@@ -57,7 +57,7 @@ class SaveMoodColorUseCase(
 
         val restored = existing.copy(
             color = normalized.color,
-            isDeleted = false
+            isDeleted = false,
         )
         return when (repository.updateMoodColor(restored)) {
             is Result.Success -> Result.Success(restored)
@@ -77,7 +77,7 @@ class SaveMoodColorUseCase(
     }
 
     private suspend fun updateExisting(
-        normalized: MoodColor
+        normalized: MoodColor,
     ): Result<MoodColor, MoodColorError> {
         // Verify the row still exists; Room's @Update silently no-ops on missing IDs,
         // which would mask deletion races between devices.

@@ -30,7 +30,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 fun EntrySortSection(
     modifier: Modifier = Modifier,
     entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
-    onOrderChange: (EntryOrder) -> Unit
+    onOrderChange: (EntryOrder) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
     val isAscending = entryOrder.orderType is OrderType.Ascending
@@ -38,7 +38,7 @@ fun EntrySortSection(
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.Start,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // Sort by chips
         FilterChip(
@@ -47,7 +47,7 @@ fun EntrySortSection(
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onOrderChange(EntryOrder.Date(entryOrder.orderType))
             },
-            label = { Text(stringResource(R.string.date)) }
+            label = { Text(stringResource(R.string.date)) },
         )
         Spacer(modifier = Modifier.width(paddingSmall))
         FilterChip(
@@ -56,7 +56,7 @@ fun EntrySortSection(
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 onOrderChange(EntryOrder.Mood(entryOrder.orderType))
             },
-            label = { Text(stringResource(R.string.mood)) }
+            label = { Text(stringResource(R.string.mood)) },
         )
 
         Spacer(modifier = Modifier.weight(1f))
@@ -67,13 +67,13 @@ fun EntrySortSection(
                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                 val newOrderType = if (isAscending) OrderType.Descending else OrderType.Ascending
                 onOrderChange(entryOrder.copy(newOrderType))
-            }
+            },
         ) {
             Icon(
                 imageVector = if (isAscending) Icons.Default.ArrowUpward else Icons.Default.ArrowDownward,
                 contentDescription = stringResource(
-                    if (isAscending) R.string.sort_descending else R.string.sort_ascending
-                )
+                    if (isAscending) R.string.sort_descending else R.string.sort_ascending,
+                ),
             )
         }
     }
@@ -86,7 +86,7 @@ private fun EntrySortSectionDatePreview() {
     TheDayToTheme {
         EntrySortSection(
             entryOrder = EntryOrder.Date(OrderType.Descending),
-            onOrderChange = {}
+            onOrderChange = {},
         )
     }
 }
@@ -97,7 +97,7 @@ private fun EntrySortSectionMoodPreview() {
     TheDayToTheme {
         EntrySortSection(
             entryOrder = EntryOrder.Mood(OrderType.Ascending),
-            onOrderChange = {}
+            onOrderChange = {},
         )
     }
 }

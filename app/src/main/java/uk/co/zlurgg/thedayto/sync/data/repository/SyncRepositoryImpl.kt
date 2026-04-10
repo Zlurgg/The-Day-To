@@ -11,19 +11,19 @@ import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.journal.data.dao.EntryDao
 import uk.co.zlurgg.thedayto.journal.data.dao.MoodColorDao
-import uk.co.zlurgg.thedayto.sync.data.dao.PendingSyncDeletionDao
-import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
 import uk.co.zlurgg.thedayto.journal.data.mapper.toDomain
 import uk.co.zlurgg.thedayto.journal.data.mapper.toEntity
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.notification.domain.sync.NotificationSyncService
+import uk.co.zlurgg.thedayto.sync.data.dao.PendingSyncDeletionDao
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.getMoodColorSyncId
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.resolveEntryConflict
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.resolveMoodColorConflict
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.toEntry
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.toFirestoreMap
 import uk.co.zlurgg.thedayto.sync.data.mapper.FirestoreMapper.toMoodColor
+import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncResult
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
@@ -45,7 +45,7 @@ class SyncRepositoryImpl(
     private val entryDao: EntryDao,
     private val moodColorDao: MoodColorDao,
     private val pendingSyncDeletionDao: PendingSyncDeletionDao,
-    private val notificationSyncService: NotificationSyncService
+    private val notificationSyncService: NotificationSyncService,
 ) : SyncRepository {
 
     private val _syncState = MutableStateFlow<SyncState>(SyncState.Idle)
@@ -54,7 +54,7 @@ class SyncRepositoryImpl(
 
     override suspend fun uploadPendingEntries(
         entries: List<Entry>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync> = runCatching {
         var uploadedCount = 0
 
@@ -89,7 +89,7 @@ class SyncRepositoryImpl(
                         syncId = syncId,
                         userId = userId,
                         syncStatus = SyncStatus.SYNCED.name,
-                        expectedUpdatedAt = uploadedAt
+                        expectedUpdatedAt = uploadedAt,
                     )
                 }
             }
@@ -99,7 +99,7 @@ class SyncRepositoryImpl(
         uploadedCount
     }.fold(
         onSuccess = { Result.Success(it) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     /**
@@ -108,7 +108,7 @@ class SyncRepositoryImpl(
      */
     private suspend fun processPendingEntryDeletions(): Int {
         val pendingDeletions = pendingSyncDeletionDao.getByCollection(
-            PendingSyncDeletionEntity.COLLECTION_ENTRIES
+            PendingSyncDeletionEntity.COLLECTION_ENTRIES,
         )
         var deletedCount = 0
 
@@ -137,7 +137,7 @@ class SyncRepositoryImpl(
 
     override suspend fun uploadPendingMoodColors(
         moodColors: List<MoodColor>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync> = runCatching {
         var uploadedCount = 0
 
@@ -161,7 +161,7 @@ class SyncRepositoryImpl(
                         syncId = syncId,
                         userId = userId,
                         syncStatus = SyncStatus.SYNCED.name,
-                        expectedUpdatedAt = uploadedAt
+                        expectedUpdatedAt = uploadedAt,
                     )
                 }
             }
@@ -171,7 +171,7 @@ class SyncRepositoryImpl(
         uploadedCount
     }.fold(
         onSuccess = { Result.Success(it) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     override suspend fun downloadEntries(userId: String): Result<List<Entry>, DataError.Sync> =
@@ -196,7 +196,7 @@ class SyncRepositoryImpl(
                     Timber.w(
                         "Skipping entry %s: moodColorSyncId=%s not found locally",
                         doc.id,
-                        moodColorSyncId
+                        moodColorSyncId,
                     )
                     return@mapNotNull null
                 }
@@ -208,7 +208,7 @@ class SyncRepositoryImpl(
             }
         }.fold(
             onSuccess = { Result.Success(it) },
-            onFailure = { mapFirestoreException(it) }
+            onFailure = { mapFirestoreException(it) },
         )
 
     override suspend fun downloadMoodColors(userId: String): Result<List<MoodColor>, DataError.Sync> =
@@ -226,7 +226,7 @@ class SyncRepositoryImpl(
             }
         }.fold(
             onSuccess = { Result.Success(it) },
-            onFailure = { mapFirestoreException(it) }
+            onFailure = { mapFirestoreException(it) },
         )
 
     override suspend fun deleteEntry(syncId: String, userId: String): EmptyResult<DataError.Sync> =
@@ -240,12 +240,12 @@ class SyncRepositoryImpl(
                 .await()
         }.fold(
             onSuccess = { Result.Success(Unit) },
-            onFailure = { mapFirestoreException(it) }
+            onFailure = { mapFirestoreException(it) },
         )
 
     override suspend fun deleteMoodColor(
         syncId: String,
-        userId: String
+        userId: String,
     ): EmptyResult<DataError.Sync> = runCatching {
         firestore
             .collection(USERS_COLLECTION)
@@ -256,7 +256,7 @@ class SyncRepositoryImpl(
             .await()
     }.fold(
         onSuccess = { Result.Success(Unit) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     override suspend fun performFullSync(userId: String): Result<SyncResult, DataError.Sync> {
@@ -318,7 +318,7 @@ class SyncRepositoryImpl(
                 counts.moodColorsDownloaded,
                 counts.notificationSettingsUploaded,
                 counts.notificationSettingsDownloaded,
-                counts.conflictsResolved
+                counts.conflictsResolved,
             )
             counts.toSyncResult()
         }.fold(
@@ -330,7 +330,7 @@ class SyncRepositoryImpl(
                 val error = mapFirestoreException<SyncResult>(it)
                 _syncState.value = SyncState.Error((error as Result.Error).error)
                 error
-            }
+            },
         )
     }
 
@@ -388,7 +388,7 @@ class SyncRepositoryImpl(
         }
     }.fold(
         onSuccess = { Result.Success(Unit) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     override suspend fun markLocalDataForSync(): Int {
@@ -407,7 +407,7 @@ class SyncRepositoryImpl(
             "Adopted %d orphaned items (moodColors=%d, entries=%d)",
             total,
             moodColorsAdopted,
-            entriesAdopted
+            entriesAdopted,
         )
         return total
     }
@@ -420,7 +420,7 @@ class SyncRepositoryImpl(
             "Reset %d synced items to LOCAL_ONLY (moodColors=%d, entries=%d)",
             total,
             moodColorsReset,
-            entriesReset
+            entriesReset,
         )
         return total
     }
@@ -446,7 +446,7 @@ class SyncRepositoryImpl(
                 "Cleared data for user %s: entries=%d, moodColors=%d",
                 userId,
                 entriesDeleted,
-                moodColorsDeleted
+                moodColorsDeleted,
             )
         }
 
@@ -460,7 +460,7 @@ class SyncRepositoryImpl(
         Timber.i(
             "Cleared user data on sign-out: entries=%d, moodColors=%d",
             entriesDeleted,
-            moodColorsDeleted
+            moodColorsDeleted,
         )
         return total
     }
@@ -548,10 +548,12 @@ class SyncRepositoryImpl(
             is FirebaseFirestoreException -> mapFirebaseException(throwable)
             is java.net.UnknownHostException,
             is java.net.SocketTimeoutException,
-            is java.net.ConnectException -> {
+            is java.net.ConnectException,
+                -> {
                 logEmulatorHint()
                 DataError.Sync.NETWORK_ERROR
             }
+
             else -> DataError.Sync.UNKNOWN
         }
 
@@ -566,13 +568,14 @@ class SyncRepositoryImpl(
             logEmulatorHint()
             DataError.Sync.NETWORK_ERROR
         }
+
         else -> DataError.Sync.UNKNOWN
     }
 
     private fun logEmulatorHint() {
         Timber.w(
             "Firestore connection failed. If running locally, ensure Firebase emulator is started:\n" +
-                "  Run: scripts\\start-emulator.bat"
+                "  Run: scripts\\start-emulator.bat",
         )
     }
 
@@ -596,7 +599,7 @@ class SyncRepositoryImpl(
             moodColorsDownloaded = moodColorsDownloaded,
             notificationSettingsUploaded = notificationSettingsUploaded,
             notificationSettingsDownloaded = notificationSettingsDownloaded,
-            conflictsResolved = conflictsResolved
+            conflictsResolved = conflictsResolved,
         )
     }
 

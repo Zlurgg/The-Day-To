@@ -20,7 +20,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 @Composable
 fun PermissionPermanentlyDeniedDialog(
     onDismiss: () -> Unit,
-    onOpenSettings: () -> Unit
+    onOpenSettings: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -39,7 +39,7 @@ fun PermissionPermanentlyDeniedDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }
 
@@ -50,7 +50,7 @@ private fun PermissionPermanentlyDeniedDialogPreview() {
     TheDayToTheme {
         PermissionPermanentlyDeniedDialog(
             onDismiss = {},
-            onOpenSettings = {}
+            onOpenSettings = {},
         )
     }
 }

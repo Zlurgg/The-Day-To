@@ -15,8 +15,9 @@ sealed interface EditorAction {
     data class UpdateMoodColor(
         val moodColorId: Int,
         val newMood: String,
-        val newColorHex: String
+        val newColorHex: String,
     ) : EditorAction
+
     data object CloseEditMoodColorDialog : EditorAction
     data object ClearEditMoodColorError : EditorAction
     data object DismissEditorTutorial : EditorAction

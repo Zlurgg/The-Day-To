@@ -1,7 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
-import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
+import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
 sealed interface OverviewAction {
     data class Order(val entryOrder: EntryOrder) : OverviewAction

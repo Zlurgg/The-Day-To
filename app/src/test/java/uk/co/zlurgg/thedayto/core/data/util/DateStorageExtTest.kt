@@ -29,7 +29,7 @@ class DateStorageExtTest {
     fun `toLocalDate converts epoch back to LocalDate`() {
         assertEquals(
             LocalDate.of(2024, 1, 1),
-            1704067200L.toLocalDate()
+            1704067200L.toLocalDate(),
         )
     }
 
@@ -37,7 +37,7 @@ class DateStorageExtTest {
     fun `toLocalDate handles different epochs correctly`() {
         assertEquals(
             LocalDate.of(2024, 6, 15),
-            1718409600L.toLocalDate()
+            1718409600L.toLocalDate(),
         )
     }
 
@@ -61,7 +61,7 @@ class DateStorageExtTest {
             assertEquals(
                 "Roundtrip failed for $date",
                 date,
-                date.toStorageEpoch().toLocalDate()
+                date.toStorageEpoch().toLocalDate(),
             )
         }
     }

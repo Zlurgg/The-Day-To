@@ -16,5 +16,5 @@ data class MoodColorManagementUiState(
     val editingMoodColor: MoodColor? = null,
     val dialogError: MoodColorError? = null,
     val pendingDelete: MoodColor? = null,
-    val pendingFavorites: Map<Int, Boolean> = emptyMap()
+    val pendingFavorites: Map<Int, Boolean> = emptyMap(),
 )

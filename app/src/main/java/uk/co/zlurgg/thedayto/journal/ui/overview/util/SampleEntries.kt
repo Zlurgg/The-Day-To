@@ -22,7 +22,7 @@ object SampleEntries {
         moodName = "Cheerful",
         moodColor = "FFF59D", // Light yellow - will use dark text
         content = "Had a great day at work! Finished the new feature and got positive feedback from the team.",
-        dateStamp = currentMonth.withDayOfMonth(15).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        dateStamp = currentMonth.withDayOfMonth(15).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
     )
 
     val sampleEntry2 = EntryWithMoodColor(
@@ -31,7 +31,7 @@ object SampleEntries {
         moodName = "Calm",
         moodColor = "4A148C", // Dark purple - will use light text
         content = "Spent time reading in the park. The weather was perfect.",
-        dateStamp = currentMonth.withDayOfMonth(20).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        dateStamp = currentMonth.withDayOfMonth(20).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
     )
 
     val sampleEntry3 = EntryWithMoodColor(
@@ -40,7 +40,7 @@ object SampleEntries {
         moodName = "Motivated",
         moodColor = "4CAF50", // Medium green - will use dark text
         content = "Started learning Kotlin Compose. Excited about building modern Android apps!",
-        dateStamp = currentMonth.withDayOfMonth(25).atStartOfDay().toEpochSecond(ZoneOffset.UTC)
+        dateStamp = currentMonth.withDayOfMonth(25).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
     )
 
     val allSamples = listOf(sampleEntry1, sampleEntry2, sampleEntry3)

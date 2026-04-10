@@ -20,13 +20,13 @@ interface SyncRepository {
     /** Upload all pending local entries to Firestore */
     suspend fun uploadPendingEntries(
         entries: List<Entry>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync>
 
     /** Upload all pending local mood colors to Firestore */
     suspend fun uploadPendingMoodColors(
         moodColors: List<MoodColor>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync>
 
     /** Download all entries from Firestore for the given user */

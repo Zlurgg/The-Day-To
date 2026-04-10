@@ -21,7 +21,7 @@ data class Entry(
     val syncId: String? = null,
     val userId: String? = null,
     val updatedAt: Long? = null,
-    val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY
+    val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY,
 )
 
 class InvalidEntryException(message: String) : Exception(message)

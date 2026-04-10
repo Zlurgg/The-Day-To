@@ -53,10 +53,10 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
-import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.JournalCard
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
+import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
@@ -64,8 +64,6 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
-import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorUiConstants
-import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ManageMoodColorsCard
@@ -73,6 +71,8 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorUiConstants
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -84,7 +84,7 @@ import java.time.ZoneOffset
 fun EditorScreenRoot(
     navController: NavController,
     showBackButton: Boolean,
-    viewModel: EditorViewModel = koinViewModel()
+    viewModel: EditorViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -105,9 +105,10 @@ fun EditorScreenRoot(
                 is EditorUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
                 }
+
                 is EditorUiEvent.ShowMoodColorError -> {
                     snackbarHostState.showSnackbar(
-                        MoodColorErrorFormatter.format(context, event.error)
+                        MoodColorErrorFormatter.format(context, event.error),
                     )
                 }
             }
@@ -122,13 +123,13 @@ fun EditorScreenRoot(
         snackbarHostState = snackbarHostState,
         onNavigateToMoodColorManagement = {
             navController.navigate(MoodColorManagementRoute)
-        }
+        },
     )
 
     // Show editor tutorial dialog for first-time users
     if (uiState.showEditorTutorial) {
         EditorTutorialDialog(
-            onDismiss = { viewModel.onAction(EditorAction.DismissEditorTutorial) }
+            onDismiss = { viewModel.onAction(EditorAction.DismissEditorTutorial) },
         )
     }
 }
@@ -144,7 +145,7 @@ private fun EditorScreen(
     showBackButton: Boolean,
     snackbarHostState: SnackbarHostState,
     onNavigateToMoodColorManagement: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
     val context = LocalContext.current
@@ -155,21 +156,21 @@ private fun EditorScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.editor_title),
-                        style = MaterialTheme.typography.titleLarge
+                        style = MaterialTheme.typography.titleLarge,
                     )
                 },
                 navigationIcon = {
                     if (showBackButton) {
                         IconButton(
-                            onClick = { onAction(EditorAction.RequestNavigateBack) }
+                            onClick = { onAction(EditorAction.RequestNavigateBack) },
                         ) {
                             Icon(
                                 imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.back)
+                                contentDescription = stringResource(R.string.back),
                             )
                         }
                     }
-                }
+                },
             )
         },
         floatingActionButton = {
@@ -177,7 +178,7 @@ private fun EditorScreen(
             AnimatedVisibility(
                 visible = !uiState.isMoodColorSectionVisible,
                 enter = scaleIn() + fadeIn(),
-                exit = scaleOut() + fadeOut()
+                exit = scaleOut() + fadeOut(),
             ) {
                 FloatingActionButton(
                     onClick = {
@@ -188,13 +189,13 @@ private fun EditorScreen(
                         uiState.isLoading -> MaterialTheme.colorScheme.secondary
                         !uiState.canSave -> MaterialTheme.colorScheme.surfaceVariant
                         else -> MaterialTheme.colorScheme.primaryContainer
-                    }
+                    },
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(24.dp),
                             color = MaterialTheme.colorScheme.onSecondary,
-                            strokeWidth = 2.dp
+                            strokeWidth = 2.dp,
                         )
                     } else {
                         Icon(
@@ -203,7 +204,7 @@ private fun EditorScreen(
                             tint = if (uiState.canSave)
                                 MaterialTheme.colorScheme.onPrimaryContainer
                             else
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
                         )
                     }
                 }
@@ -212,25 +213,25 @@ private fun EditorScreen(
         snackbarHost = {
             CustomSnackbarHost(hostState = snackbarHostState)
         },
-        modifier = modifier.imePadding()
+        modifier = modifier.imePadding(),
     ) { padding ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(paddingMedium)
+                .padding(paddingMedium),
         ) {
             // Error banner (persistent for load failures) with slide-down animation
             AnimatedVisibility(
                 visible = uiState.loadError != null,
                 enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
+                exit = shrinkVertically() + fadeOut(),
             ) {
                 Column {
                     LoadErrorBanner(
                         errorMessage = uiState.loadError ?: "",
                         onRetry = { onAction(EditorAction.RetryLoadEntry) },
-                        onDismiss = { onAction(EditorAction.DismissLoadError) }
+                        onDismiss = { onAction(EditorAction.DismissLoadError) },
                     )
                     Spacer(modifier = Modifier.height(paddingMedium))
                 }
@@ -249,7 +250,7 @@ private fun EditorScreen(
                     .padding(bottom = EditorUiConstants.ENTRY_CARD_FAB_CLEARANCE),
             ) {
                 Column(
-                    modifier = Modifier.padding(paddingMedium)
+                    modifier = Modifier.padding(paddingMedium),
                 ) {
                     // Date display (clickable to open date picker)
                     Row(
@@ -257,24 +258,24 @@ private fun EditorScreen(
                             onAction(EditorAction.ToggleDatePicker)
                         },
                         horizontalArrangement = Arrangement.spacedBy(paddingSmall),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Icon(
                             imageVector = Icons.Default.CalendarToday,
                             contentDescription = stringResource(R.string.pick_a_date),
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE)
+                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE),
                         )
                         Text(
                             text = DateFormatter.formatDate(uiState.entryDate),
                             style = MaterialTheme.typography.displaySmall,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Icon(
                             imageVector = Icons.Default.ArrowDropDown,
                             contentDescription = null,
                             tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE)
+                            modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE),
                         )
                     }
                     Spacer(modifier = Modifier.height(paddingMedium))
@@ -299,7 +300,7 @@ private fun EditorScreen(
                         },
                         onSaveMoodColor = { mood, colorHex ->
                             onAction(EditorAction.SaveMoodColor(mood, colorHex))
-                        }
+                        },
                     )
 
                     // Show validation error if present
@@ -308,7 +309,7 @@ private fun EditorScreen(
                             text = errorMessage,
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall)
+                            modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall),
                         )
                     }
 
@@ -325,7 +326,7 @@ private fun EditorScreen(
                         onFocusChange = { focusState ->
                             onAction(EditorAction.ChangeContentFocus(focusState))
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
@@ -347,8 +348,8 @@ private fun EditorScreen(
                             EditorAction.UpdateMoodColor(
                                 moodColorId = id,
                                 newMood = newMood,
-                                newColorHex = newColorHex
-                            )
+                                newColorHex = newColorHex,
+                            ),
                         )
                     }
                 },
@@ -357,7 +358,7 @@ private fun EditorScreen(
                 },
                 onErrorCleared = {
                     onAction(EditorAction.ClearEditMoodColorError)
-                }
+                },
             )
         }
     }
@@ -374,7 +375,7 @@ private fun EditorScreen(
             onDateSelected = { selectedDate ->
                 val epochSeconds = selectedDate.atStartOfDay(ZoneOffset.UTC).toEpochSecond()
                 onAction(EditorAction.EnteredDate(epochSeconds))
-            }
+            },
         )
     }
 
@@ -382,7 +383,7 @@ private fun EditorScreen(
     if (uiState.showUnsavedChangesDialog) {
         UnsavedChangesDialog(
             onDiscard = { onAction(EditorAction.ConfirmDiscardChanges) },
-            onKeepEditing = { onAction(EditorAction.DismissUnsavedChangesDialog) }
+            onKeepEditing = { onAction(EditorAction.DismissUnsavedChangesDialog) },
         )
     }
 }
@@ -401,7 +402,7 @@ private fun EditorScreenNewEntryPreview() {
                         isDeleted = false,
                         isFavorite = false,
                         dateStamp = System.currentTimeMillis(),
-                        id = 1
+                        id = 1,
                     ),
                     MoodColor(
                         mood = "Calm",
@@ -409,7 +410,7 @@ private fun EditorScreenNewEntryPreview() {
                         isDeleted = false,
                         isFavorite = false,
                         dateStamp = System.currentTimeMillis(),
-                        id = 2
+                        id = 2,
                     ),
                     MoodColor(
                         mood = "Motivated",
@@ -417,14 +418,14 @@ private fun EditorScreenNewEntryPreview() {
                         isDeleted = false,
                         isFavorite = false,
                         dateStamp = System.currentTimeMillis(),
-                        id = 3
-                    )
-                )
+                        id = 3,
+                    ),
+                ),
             ),
             onAction = {},
             showBackButton = false,
             snackbarHostState = remember { SnackbarHostState() },
-            onNavigateToMoodColorManagement = {}
+            onNavigateToMoodColorManagement = {},
         )
     }
 }
@@ -445,13 +446,13 @@ private fun EditorScreenEditEntryPreview() {
                 moodColors = listOf(
                     MoodColor("Happy", "4CAF50", false, false, System.currentTimeMillis(), 1),
                     MoodColor("Peaceful", "2196F3", false, false, System.currentTimeMillis(), 2),
-                    MoodColor("Motivated", "FF9800", false, false, System.currentTimeMillis(), 3)
-                )
+                    MoodColor("Motivated", "FF9800", false, false, System.currentTimeMillis(), 3),
+                ),
             ),
             onAction = {},
             showBackButton = true,
             snackbarHostState = remember { SnackbarHostState() },
-            onNavigateToMoodColorManagement = {}
+            onNavigateToMoodColorManagement = {},
         )
     }
 }
@@ -467,13 +468,13 @@ private fun EditorScreenLoadingPreview() {
                 entryContent = "Sample content",
                 isLoading = true,
                 moodColors = listOf(
-                    MoodColor("Happy", "4CAF50", false, false, System.currentTimeMillis(), 1)
-                )
+                    MoodColor("Happy", "4CAF50", false, false, System.currentTimeMillis(), 1),
+                ),
             ),
             onAction = {},
             showBackButton = true,
             snackbarHostState = remember { SnackbarHostState() },
-            onNavigateToMoodColorManagement = {}
+            onNavigateToMoodColorManagement = {},
         )
     }
 }
@@ -486,7 +487,7 @@ private fun EditorScreenLoadingPreview() {
 @Composable
 private fun UnsavedChangesDialog(
     onDiscard: () -> Unit,
-    onKeepEditing: () -> Unit
+    onKeepEditing: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onKeepEditing,
@@ -505,7 +506,7 @@ private fun UnsavedChangesDialog(
             TextButton(onClick = onKeepEditing) {
                 Text(text = stringResource(R.string.keep_editing))
             }
-        }
+        },
     )
 }
 

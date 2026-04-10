@@ -31,7 +31,7 @@ class DevSignInUseCaseTest {
         fakeAuthStateRepository = FakeAuthStateRepository()
         devSignInUseCase = DevSignInUseCase(
             devAuthService = fakeDevAuthService,
-            authStateRepository = fakeAuthStateRepository
+            authStateRepository = fakeAuthStateRepository,
         )
     }
 

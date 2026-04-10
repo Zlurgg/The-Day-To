@@ -27,31 +27,31 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
  */
 @Composable
 fun OverviewTutorialDialog(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     BaseInfoDialog(
         title = stringResource(R.string.tutorial_dialog_title),
         buttonText = stringResource(R.string.tutorial_dialog_button),
-        onDismiss = onDismiss
+        onDismiss = onDismiss,
     ) {
         Text(
             text = stringResource(R.string.tutorial_dialog_subtitle),
             style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.tutorial_dialog_quick_start_title),
-            content = stringResource(R.string.tutorial_dialog_quick_start_content)
+            content = stringResource(R.string.tutorial_dialog_quick_start_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.tutorial_dialog_tips_title),
-            content = stringResource(R.string.tutorial_dialog_tips_content)
+            content = stringResource(R.string.tutorial_dialog_tips_content),
         )
     }
 }

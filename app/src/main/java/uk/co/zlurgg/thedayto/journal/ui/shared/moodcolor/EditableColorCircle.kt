@@ -29,7 +29,7 @@ fun EditableColorCircle(
     color: Color,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = COLOR_CIRCLE_SIZE_SMALL
+    size: Dp = COLOR_CIRCLE_SIZE_SMALL,
 ) {
     Box(
         modifier = modifier
@@ -38,7 +38,7 @@ fun EditableColorCircle(
             .background(color)
             .border(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = BORDER_ALPHA), CircleShape)
             .clickable(onClick = onClick),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Icon(
             imageVector = Icons.Default.Edit,
@@ -48,7 +48,7 @@ fun EditableColorCircle(
             } else {
                 Color.White.copy(alpha = EDIT_ICON_ALPHA_ON_DARK)
             },
-            modifier = Modifier.size(size * 0.5f)
+            modifier = Modifier.size(size * 0.5f),
         )
     }
 }

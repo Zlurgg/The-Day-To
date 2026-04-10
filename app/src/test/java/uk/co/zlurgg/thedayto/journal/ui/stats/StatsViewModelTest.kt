@@ -18,8 +18,8 @@ import org.junit.Test
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateTotalStatsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.StatsUseCases
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -68,7 +68,7 @@ class StatsViewModelTest {
         val statsUseCases = StatsUseCases(
             calculateTotalStats = CalculateTotalStatsUseCase(),
             calculateMoodDistribution = CalculateMoodDistributionUseCase(),
-            calculateMonthlyBreakdown = CalculateMonthlyBreakdownUseCase()
+            calculateMonthlyBreakdown = CalculateMonthlyBreakdownUseCase(),
         )
         return StatsViewModel(getEntriesUseCase, statsUseCases)
     }
@@ -84,7 +84,7 @@ class StatsViewModelTest {
 
         // Then: Initial state should have isLoading = true
         viewModel.uiState.test {
-            val state = awaitItem()
+            awaitItem()
             // Note: With UnconfinedTestDispatcher, loading completes immediately
             // So we can't catch the loading state. This is expected behavior.
             cancelAndIgnoreRemainingEvents()
@@ -122,7 +122,7 @@ class StatsViewModelTest {
         val entry = TestDataBuilders.createEntry(
             id = 1,
             moodColorId = 1,
-            dateStamp = TestDataBuilders.getTodayEpoch()
+            dateStamp = TestDataBuilders.getTodayEpoch(),
         )
         fakeEntryRepository.insertEntry(entry)
 
@@ -153,18 +153,18 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(
                 id = 1,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDaysAgoEpoch(30) // 30 days ago
+                dateStamp = TestDataBuilders.getDaysAgoEpoch(30), // 30 days ago
             ),
             TestDataBuilders.createEntry(
                 id = 2,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDaysAgoEpoch(15) // 15 days ago
+                dateStamp = TestDataBuilders.getDaysAgoEpoch(15), // 15 days ago
             ),
             TestDataBuilders.createEntry(
                 id = 3,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getTodayEpoch() // Today
-            )
+                dateStamp = TestDataBuilders.getTodayEpoch(), // Today
+            ),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -179,7 +179,7 @@ class StatsViewModelTest {
             assertNotNull("First entry date should be set", state.firstEntryDate)
             assertTrue(
                 "Average entries per month should be positive",
-                state.averageEntriesPerMonth > 0f
+                state.averageEntriesPerMonth > 0f,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -202,18 +202,18 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(
                 id = 1,
                 moodColorId = 1, // Happy
-                dateStamp = TestDataBuilders.getDaysAgoEpoch(2)
+                dateStamp = TestDataBuilders.getDaysAgoEpoch(2),
             ),
             TestDataBuilders.createEntry(
                 id = 2,
                 moodColorId = 1, // Happy
-                dateStamp = TestDataBuilders.getDaysAgoEpoch(1)
+                dateStamp = TestDataBuilders.getDaysAgoEpoch(1),
             ),
             TestDataBuilders.createEntry(
                 id = 3,
                 moodColorId = 2, // Sad
-                dateStamp = TestDataBuilders.getTodayEpoch()
-            )
+                dateStamp = TestDataBuilders.getTodayEpoch(),
+            ),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -261,7 +261,7 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(id = 4, moodColorId = 2),
             // Anxious: 2 entries
             TestDataBuilders.createEntry(id = 5, moodColorId = 3),
-            TestDataBuilders.createEntry(id = 6, moodColorId = 3)
+            TestDataBuilders.createEntry(id = 6, moodColorId = 3),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -304,19 +304,19 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(
                 id = 1,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15)
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15),
             ),
             TestDataBuilders.createEntry(
                 id = 2,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 20)
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 20),
             ),
             // February 2024
             TestDataBuilders.createEntry(
                 id = 3,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 2, 10)
-            )
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 2, 10),
+            ),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -335,7 +335,7 @@ class StatsViewModelTest {
             assertEquals("January should have 2 entries", 2, jan2024!!.entryCount)
             assertTrue(
                 "January completion rate should be calculated",
-                jan2024.completionRate > 0
+                jan2024.completionRate > 0,
             )
 
             val feb2024 = state.monthlyBreakdown.find { it.monthValue == 2 && it.year == 2024 }
@@ -357,18 +357,18 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(
                 id = 1,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15) // Jan 2024
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15), // Jan 2024
             ),
             TestDataBuilders.createEntry(
                 id = 2,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 10) // Mar 2024
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 10), // Mar 2024
             ),
             TestDataBuilders.createEntry(
                 id = 3,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 2, 5) // Feb 2024
-            )
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 2, 5), // Feb 2024
+            ),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -409,7 +409,7 @@ class StatsViewModelTest {
         val entries = listOf(
             TestDataBuilders.createEntry(id = 1, moodColorId = 1),
             TestDataBuilders.createEntry(id = 2, moodColorId = 1),
-            TestDataBuilders.createEntry(id = 3, moodColorId = 1)
+            TestDataBuilders.createEntry(id = 3, moodColorId = 1),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 
@@ -438,18 +438,18 @@ class StatsViewModelTest {
             TestDataBuilders.createEntry(
                 id = 1,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 5)
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 5),
             ),
             TestDataBuilders.createEntry(
                 id = 2,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15)
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15),
             ),
             TestDataBuilders.createEntry(
                 id = 3,
                 moodColorId = 1,
-                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 25)
-            )
+                dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 25),
+            ),
         )
         entries.forEach { fakeEntryRepository.insertEntry(it) }
 

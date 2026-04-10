@@ -25,7 +25,7 @@ object FirestoreMapper {
         "moodColorSyncId" to moodColorSyncId,
         "content" to content,
         "dateStamp" to dateStamp,
-        "updatedAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, ZERO_NANOSECONDS) } ?: Timestamp.now())
+        "updatedAt" to (updatedAt?.let { Timestamp(it / MILLIS_PER_SECOND, ZERO_NANOSECONDS) } ?: Timestamp.now()),
     )
 
     /**
@@ -34,7 +34,7 @@ object FirestoreMapper {
      */
     fun DocumentSnapshot.toEntry(
         moodColorId: Int,
-        localId: Int? = null
+        localId: Int? = null,
     ): Entry? {
         if (!exists()) return null
 
@@ -46,7 +46,7 @@ object FirestoreMapper {
             syncId = id,
             userId = reference.parent.parent?.id,
             updatedAt = getTimestamp("updatedAt")?.seconds?.times(MILLIS_PER_SECOND),
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
     }
 
@@ -70,7 +70,7 @@ object FirestoreMapper {
         "updatedAt" to when {
             updatedAt == null || updatedAt == 0L -> Timestamp.now()
             else -> Timestamp(updatedAt / MILLIS_PER_SECOND, ZERO_NANOSECONDS)
-        }
+        },
     )
 
     /**
@@ -89,7 +89,7 @@ object FirestoreMapper {
             syncId = id,
             userId = reference.parent.parent?.id,
             updatedAt = getTimestamp("updatedAt")?.seconds?.times(MILLIS_PER_SECOND),
-            syncStatus = SyncStatus.SYNCED
+            syncStatus = SyncStatus.SYNCED,
         )
     }
 
@@ -166,7 +166,7 @@ object FirestoreMapper {
         "hour" to hour,
         "minute" to minute,
         "updatedAt" to Timestamp(updatedAt / MILLIS_PER_SECOND, ZERO_NANOSECONDS),
-        "lastNotifiedDateEpoch" to lastNotifiedDateEpoch
+        "lastNotifiedDateEpoch" to lastNotifiedDateEpoch,
     )
 
     /**
@@ -186,7 +186,7 @@ object FirestoreMapper {
             syncId = id,
             syncStatus = SyncStatus.SYNCED.name,
             updatedAt = getTimestamp("updatedAt")?.seconds?.times(MILLIS_PER_SECOND) ?: 0L,
-            lastNotifiedDateEpoch = getLong("lastNotifiedDateEpoch") ?: 0L
+            lastNotifiedDateEpoch = getLong("lastNotifiedDateEpoch") ?: 0L,
         )
     }
 
@@ -200,7 +200,7 @@ object FirestoreMapper {
      */
     fun resolveNotificationSettingsConflict(
         local: NotificationSettingsEntity,
-        remote: NotificationSettingsEntity
+        remote: NotificationSettingsEntity,
     ): NotificationSettingsEntity {
         val localTime = local.updatedAt
         val remoteTime = remote.updatedAt

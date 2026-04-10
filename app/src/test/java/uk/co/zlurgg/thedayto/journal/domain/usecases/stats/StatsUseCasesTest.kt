@@ -43,16 +43,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 15),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 10),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 7, 20),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating total stats
@@ -69,16 +69,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 15),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 2, 1),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating total stats
@@ -107,8 +107,8 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 6, 1),
-                id = 1
-            )
+                id = 1,
+            ),
         )
 
         // When: Calculating total stats
@@ -126,16 +126,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2022, 1, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2023, 6, 15),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 12, 25),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating total stats
@@ -171,7 +171,7 @@ class StatsUseCasesTest {
             TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 1),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 2),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Sad", moodColor = "2196F3", id = 3),
-            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 4)
+            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 4),
         )
 
         // When: Calculating mood distribution
@@ -191,13 +191,13 @@ class StatsUseCasesTest {
             TestDataBuilders.createEntryWithMoodColor(
                 moodName = "Happy",
                 moodColor = "4CAF50",  // Current color from join (green)
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 moodName = "Happy",
                 moodColor = "4CAF50",  // Same current color
-                id = 2
-            )
+                id = 2,
+            ),
         )
 
         // When: Calculating distribution
@@ -219,7 +219,7 @@ class StatsUseCasesTest {
             TestDataBuilders.createEntryWithMoodColor(moodName = "Calm", moodColor = "9C27B0", id = 3),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 4),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Sad", moodColor = "2196F3", id = 5),
-            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 6)
+            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 6),
         )
 
         // When: Calculating distribution
@@ -253,7 +253,7 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 1),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 2),
-            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 3)
+            TestDataBuilders.createEntryWithMoodColor(moodName = "Happy", moodColor = "4CAF50", id = 3),
         )
 
         // When: Calculating distribution
@@ -274,7 +274,7 @@ class StatsUseCasesTest {
             TestDataBuilders.createEntryWithMoodColor(moodName = "Calm", id = 3),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Anxious", id = 4),
             TestDataBuilders.createEntryWithMoodColor(moodName = "Tired", id = 5),
-            TestDataBuilders.createEntryWithMoodColor(moodName = "Excited", id = 6)
+            TestDataBuilders.createEntryWithMoodColor(moodName = "Excited", id = 6),
         )
 
         // When: Calculating distribution with limit of 3
@@ -294,16 +294,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 15),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 6, 1),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating monthly breakdown
@@ -319,16 +319,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 15),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 31),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating monthly breakdown
@@ -360,16 +360,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 15),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 30),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating breakdown
@@ -387,7 +387,7 @@ class StatsUseCasesTest {
         val entries = (1..30).map { day ->
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 4, day),
-                id = day
+                id = day,
             )
         }
 
@@ -407,16 +407,16 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 1, 1),
-                id = 1
+                id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 5, 1),
-                id = 2
+                id = 2,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 dateStamp = TestDataBuilders.getDateEpoch(2024, 3, 1),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // When: Calculating breakdown
@@ -436,8 +436,8 @@ class StatsUseCasesTest {
             listOf(
                 TestDataBuilders.createEntryWithMoodColor(
                     dateStamp = TestDataBuilders.getDateEpoch(2024, month, 1),
-                    id = month
-                )
+                    id = month,
+                ),
             )
         }
 

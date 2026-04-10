@@ -15,7 +15,7 @@ import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettings
  */
 class GetNotificationSettingsUseCase(
     private val settingsRepository: NotificationSettingsRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(): Result<NotificationSettings, DataError.Local> {
         val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID

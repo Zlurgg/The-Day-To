@@ -36,7 +36,7 @@ import kotlin.random.Random
 class OverviewViewModel(
     private val overviewUseCases: OverviewUseCases,
     private val syncScheduler: SyncScheduler,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -148,10 +148,11 @@ class OverviewViewModel(
                             notificationsEnabled = settings.enabled,
                             notificationHour = settings.hour,
                             notificationMinute = settings.minute,
-                            hasNotificationPermission = hasPermission
+                            hasNotificationPermission = hasPermission,
                         )
                     }
                 }
+
                 is Result.Error -> {
                     Timber.e("Failed to load notification settings: %s", settingsResult.error)
                 }
@@ -179,7 +180,7 @@ class OverviewViewModel(
         _uiState.update {
             it.copy(
                 hasNotificationPermission = true,
-                notificationsEnabled = true  // Auto-toggle ON in dialog
+                notificationsEnabled = true,  // Auto-toggle ON in dialog
             )
         }
         Timber.d("Notification permission granted")
@@ -208,7 +209,7 @@ class OverviewViewModel(
                 _uiState.update {
                     it.copy(
                         hasNotificationPermission = false,
-                        notificationsEnabled = false  // Reset toggle to OFF
+                        notificationsEnabled = false,  // Reset toggle to OFF
                     )
                 }
             }
@@ -232,7 +233,7 @@ class OverviewViewModel(
                 _uiState.update {
                     it.copy(
                         displayedMonth = action.month,
-                        displayedYear = action.year
+                        displayedYear = action.year,
                     )
                 }
                 // Fetch entries for the new month
@@ -244,7 +245,7 @@ class OverviewViewModel(
                 _uiState.update {
                     it.copy(
                         showDeleteConfirmDialog = true,
-                        entryToDelete = action.entry
+                        entryToDelete = action.entry,
                     )
                 }
             }
@@ -272,13 +273,14 @@ class OverviewViewModel(
                             syncScheduler.requestImmediateSync()
                             _uiEvents.emit(OverviewUiEvent.ShowSnackbar("Entry deleted"))
                         }
+
                         is Result.Error -> {
                             Timber.e("Failed to delete entry: $entryId")
                             loadingJob.cancel()
                             _uiState.update { it.copy(isLoading = false) }
                             val errorMessage = ErrorFormatter.format(result.error, "delete entry")
                             _uiEvents.emit(
-                                OverviewUiEvent.ShowSnackbar(message = errorMessage)
+                                OverviewUiEvent.ShowSnackbar(message = errorMessage),
                             )
                         }
                     }
@@ -323,14 +325,15 @@ class OverviewViewModel(
                                     notificationsEnabled = settings.enabled,
                                     notificationHour = settings.hour,
                                     notificationMinute = settings.minute,
-                                    hasNotificationPermission = hasPermission
+                                    hasNotificationPermission = hasPermission,
                                 )
                             }
                         }
+
                         is Result.Error -> {
                             Timber.e("Failed to load notification settings: %s", settingsResult.error)
                             _uiEvents.emit(
-                                OverviewUiEvent.ShowSnackbar("Failed to load notification settings")
+                                OverviewUiEvent.ShowSnackbar("Failed to load notification settings"),
                             )
                         }
                     }
@@ -358,7 +361,7 @@ class OverviewViewModel(
                     val saveResult = overviewUseCases.saveNotificationSettings(
                         action.enabled,
                         action.hour,
-                        action.minute
+                        action.minute,
                     )
 
                     when (saveResult) {
@@ -368,7 +371,7 @@ class OverviewViewModel(
                                     notificationsEnabled = action.enabled,
                                     notificationHour = action.hour,
                                     notificationMinute = action.minute,
-                                    showNotificationSettingsDialog = false
+                                    showNotificationSettingsDialog = false,
                                 )
                             }
 
@@ -381,12 +384,13 @@ class OverviewViewModel(
                             }
                             _uiEvents.emit(OverviewUiEvent.ShowSnackbar(message))
                         }
+
                         is Result.Error -> {
                             Timber.e("Failed to save notification settings: %s", saveResult.error)
                             _uiEvents.emit(
                                 OverviewUiEvent.ShowSnackbar(
-                                    message = "Failed to save notification settings"
-                                )
+                                    message = "Failed to save notification settings",
+                                ),
                             )
                         }
                     }
@@ -429,7 +433,8 @@ class OverviewViewModel(
             }
 
             is OverviewAction.CreateTodayEntry,
-            is OverviewAction.CreateNewEntry -> {
+            is OverviewAction.CreateNewEntry,
+                -> {
                 _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
             }
         }
@@ -455,24 +460,27 @@ class OverviewViewModel(
         getEntriesJob = overviewUseCases.getEntriesForMonth(
             month = currentState.displayedMonth,
             year = currentState.displayedYear,
-            entryOrder = entryOrder
+            entryOrder = entryOrder,
         )
             .onEach { entries ->
                 _uiState.update {
                     it.copy(
                         entries = entries,
                         entryOrder = entryOrder,
-                        loadError = null  // Clear any previous errors
+                        loadError = null,  // Clear any previous errors
                     )
                 }
                 // Re-check today's entry whenever entries change (in case user created/deleted today's entry)
                 updateHasTodayEntry()
             }
             .catch { exception ->
-                Timber.e(exception, "Failed to load entries for month ${currentState.displayedMonth}/${currentState.displayedYear}")
+                Timber.e(
+                    exception,
+                    "Failed to load entries for month ${currentState.displayedMonth}/${currentState.displayedYear}",
+                )
                 _uiState.update {
                     it.copy(
-                        loadError = exception.message ?: "Failed to load entries"
+                        loadError = exception.message ?: "Failed to load entries",
                     )
                 }
             }
@@ -495,7 +503,7 @@ class OverviewViewModel(
             it.copy(
                 hasTodayEntry = hasTodayEntry,
                 // Dismiss reminder dialog if entry now exists
-                showEntryReminderDialog = if (hasTodayEntry) false else it.showEntryReminderDialog
+                showEntryReminderDialog = if (hasTodayEntry) false else it.showEntryReminderDialog,
             )
         }
     }

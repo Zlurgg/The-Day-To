@@ -27,7 +27,7 @@ val debugModule = module {
                 "Firestore Emulator configured at %s:%d. " +
                     "If not running, start with: scripts\\start-emulator.bat",
                 BuildConfig.FIREBASE_EMULATOR_HOST,
-                FIRESTORE_EMULATOR_PORT
+                FIRESTORE_EMULATOR_PORT,
             )
         } catch (e: IllegalStateException) {
             Timber.d("Firebase Firestore Emulator already connected")

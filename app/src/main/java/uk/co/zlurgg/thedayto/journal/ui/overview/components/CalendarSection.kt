@@ -83,7 +83,7 @@ fun CalendarSection(
     modifier: Modifier = Modifier,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
     onStatsClick: () -> Unit = {},
-    onMonthChanged: (month: Int, year: Int) -> Unit = { _, _ -> }
+    onMonthChanged: (month: Int, year: Int) -> Unit = { _, _ -> },
 ) {
     BoxWithConstraints(modifier = modifier) {
         // Calculate day size to ensure 7 days always fit in available width
@@ -98,7 +98,7 @@ fun CalendarSection(
         // Enforce WCAG 2.5.5 minimum touch target (48dp) and maximum size
         val daySize = calculatedDaySize.coerceIn(
             minimumValue = CalendarConstants.DEFAULT_DAY_SIZE_MIN,
-            maximumValue = CalendarConstants.DEFAULT_DAY_SIZE_MAX
+            maximumValue = CalendarConstants.DEFAULT_DAY_SIZE_MAX,
         )
 
         CalendarContent(
@@ -107,7 +107,7 @@ fun CalendarSection(
             daySize = daySize,
             onStatsClick = onStatsClick,
             onDateClick = onDateClick,
-            onMonthChanged = onMonthChanged
+            onMonthChanged = onMonthChanged,
         )
     }
 }
@@ -122,7 +122,7 @@ private fun CalendarContent(
     daySize: Dp,
     onStatsClick: () -> Unit,
     onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
-    onMonthChanged: (month: Int, year: Int) -> Unit
+    onMonthChanged: (month: Int, year: Int) -> Unit,
 ) {
     var date by remember { mutableStateOf(currentDate) }
     var showMonthYearPicker by remember { mutableStateOf(false) }
@@ -141,7 +141,7 @@ private fun CalendarContent(
     // Filter entries for current month/year
     val filteredEntries = entries.filter { entry ->
         date.monthValue == DateFormatter.formatMonthValue(entry.dateStamp) &&
-                date.year == DateFormatter.formatYear(entry.dateStamp)
+            date.year == DateFormatter.formatYear(entry.dateStamp)
     }
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -152,7 +152,7 @@ private fun CalendarContent(
             onStatsClick = onStatsClick,
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = paddingMedium)
+                .padding(bottom = paddingMedium),
         )
 
         // Calendar card (month header + grid)
@@ -160,7 +160,7 @@ private fun CalendarContent(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = paddingSmall)
+                    .padding(top = paddingSmall),
             ) {
                 // Month/Year header with home button
                 MonthYearHeader(
@@ -170,21 +170,21 @@ private fun CalendarContent(
                     onHeaderClick = { showMonthYearPicker = true },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(paddingSmall)
+                        .padding(paddingSmall),
                 )
 
                 // Month/Year picker dialog
                 AnimatedVisibility(
                     visible = showMonthYearPicker,
                     enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
+                    exit = fadeOut() + scaleOut(),
                 ) {
                     MonthYearPickerDialog(
                         currentDate = date,
                         onDismiss = { showMonthYearPicker = false },
                         onDateSelected = { newDate ->
                             date = newDate
-                        }
+                        },
                     )
                 }
 
@@ -197,7 +197,7 @@ private fun CalendarContent(
                     totalCells = totalCells,
                     daySize = daySize,
                     onDateChange = { date = it },
-                    onDateClick = onDateClick
+                    onDateClick = onDateClick,
                 )
             }
         }
@@ -214,16 +214,16 @@ private fun MonthYearHeader(
     currentDate: LocalDate,
     onHomeClick: () -> Unit,
     onHeaderClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(4.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
         ) {
             // Home button - always visible, disabled when on current month
             val isCurrentMonth =
@@ -231,7 +231,7 @@ private fun MonthYearHeader(
 
             IconButton(
                 onClick = onHomeClick,
-                enabled = !isCurrentMonth
+                enabled = !isCurrentMonth,
             ) {
                 Icon(
                     imageVector = Icons.Filled.Home,
@@ -240,30 +240,30 @@ private fun MonthYearHeader(
                         MaterialTheme.colorScheme.onSurface.copy(alpha = 0.38f)
                     } else {
                         MaterialTheme.colorScheme.primary
-                    }
+                    },
                 )
             }
 
             // Month/Year text (clickable for picker)
             Row(
                 modifier = Modifier.clickable { onHeaderClick() },
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
                     text = date.year.toString(),
                     style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Icon(
                     imageVector = Icons.Filled.ArrowDropDown,
                     contentDescription = stringResource(R.string.select_month_and_year),
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -283,7 +283,7 @@ private fun CalendarMonthGrid(
     totalCells: Int,
     daySize: Dp,
     onDateChange: (LocalDate) -> Unit,
-    onDateClick: (entryId: Int?, entryDate: Long?) -> Unit
+    onDateClick: (entryId: Int?, entryDate: Long?) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
 
@@ -309,7 +309,7 @@ private fun CalendarMonthGrid(
             val pagerState = rememberPagerState(
                 initialPage = initialPage,
                 initialPageOffsetFraction = 0f,
-                pageCount = { maxPageIndex + 1 }
+                pageCount = { maxPageIndex + 1 },
             )
 
             LaunchedEffect(pagerState) {
@@ -342,7 +342,7 @@ private fun CalendarMonthGrid(
                 flingBehavior = PagerDefaults.flingBehavior(state = pagerState),
                 pageNestedScrollConnection = PagerDefaults.pageNestedScrollConnection(
                     pagerState,
-                    Orientation.Horizontal
+                    Orientation.Horizontal,
                 ),
                 pageContent = { _ ->
                     // Use FlowRow instead of LazyVerticalGrid to avoid nested scroll issues
@@ -353,25 +353,25 @@ private fun CalendarMonthGrid(
                                 start = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
                                 end = CalendarConstants.CALENDAR_HORIZONTAL_PADDING,
                                 top = 0.dp,
-                                bottom = CalendarConstants.CALENDAR_BOTTOM_PADDING
+                                bottom = CalendarConstants.CALENDAR_BOTTOM_PADDING,
                             ),
                         horizontalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_DAY_SPACING),
                         verticalArrangement = Arrangement.spacedBy(CalendarConstants.CALENDAR_ROW_SPACING),
-                        maxItemsInEachRow = CalendarConstants.DAYS_IN_WEEK
+                        maxItemsInEachRow = CalendarConstants.DAYS_IN_WEEK,
                     ) {
                         // Day-of-week labels as first row in the grid
                         val daysOfWeek = listOf("M", "T", "W", "T", "F", "S", "S")
                         daysOfWeek.forEach { day ->
                             Box(
                                 modifier = Modifier.size(daySize),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Text(
                                     text = day,
                                     style = MaterialTheme.typography.labelSmall,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
                             }
                         }
@@ -387,7 +387,7 @@ private fun CalendarMonthGrid(
                                 val entryDate = LocalDate.of(
                                     date.year,
                                     date.monthValue,
-                                    dayNumber
+                                    dayNumber,
                                 ).toStorageEpoch()
                                 val entry = entries.find { it.dateStamp == entryDate }
 
@@ -399,7 +399,7 @@ private fun CalendarMonthGrid(
                                             .clickable {
                                                 haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                                                 onDateClick(entry.id, null)
-                                            }
+                                            },
                                     )
                                 } else {
                                     // No entry for this date - determine if clickable
@@ -419,7 +419,7 @@ private fun CalendarMonthGrid(
                                             .size(daySize)
                                             .background(
                                                 color = MaterialTheme.colorScheme.surface,
-                                                shape = RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS)
+                                                shape = RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS),
                                             )
                                             .semantics { contentDescription = emptyDayDescription }
                                             .then(
@@ -428,7 +428,7 @@ private fun CalendarMonthGrid(
                                                         .border(
                                                             CalendarConstants.TODAY_BORDER_WIDTH,
                                                             MaterialTheme.colorScheme.primary,
-                                                            RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS)
+                                                            RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS),
                                                         )
                                                         .clickable {
                                                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
@@ -442,9 +442,9 @@ private fun CalendarMonthGrid(
                                                         }
 
                                                     else -> Modifier  // Future dates not clickable
-                                                }
+                                                },
                                             ),
-                                        contentAlignment = Alignment.Center
+                                        contentAlignment = Alignment.Center,
                                     ) {
                                         Text(
                                             modifier = Modifier.alpha(
@@ -452,20 +452,20 @@ private fun CalendarMonthGrid(
                                                     isToday -> CalendarConstants.DayAlpha.TODAY
                                                     isPast -> CalendarConstants.DayAlpha.PAST
                                                     else -> CalendarConstants.DayAlpha.FUTURE
-                                                }
+                                                },
                                             ),
                                             text = "$dayNumber",
                                             style = MaterialTheme.typography.headlineMedium,
                                             color = if (isToday) MaterialTheme.colorScheme.primary
                                             else MaterialTheme.colorScheme.onSurface,
-                                            overflow = TextOverflow.Ellipsis
+                                            overflow = TextOverflow.Ellipsis,
                                         )
                                     }
                                 }
                             }
                         }
                     }
-                }
+                },
             )
         } // Close key(date) block
     }
@@ -480,7 +480,7 @@ private fun CalendarSectionPreview() {
             entries = SampleEntries.allSamples,
             currentDate = LocalDate.now(),
             onDateClick = { _, _ -> },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }
@@ -494,7 +494,7 @@ private fun CalendarSectionEmptyPreview() {
             entries = emptyList(),
             currentDate = LocalDate.now(),
             onDateClick = { _, _ -> },
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         )
     }
 }

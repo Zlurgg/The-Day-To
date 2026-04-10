@@ -16,7 +16,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
  * @return EmptyResult with success or DataError.Auth on failure
  */
 class ReauthenticateUseCase(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
     suspend operator fun invoke(credentialProvider: CredentialProvider): EmptyResult<DataError.Auth> =
         authRepository.reauthenticate(credentialProvider)

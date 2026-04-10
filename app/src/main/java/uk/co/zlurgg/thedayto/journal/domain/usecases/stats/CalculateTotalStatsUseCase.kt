@@ -15,7 +15,7 @@ class CalculateTotalStatsUseCase {
         if (entries.isEmpty()) {
             return TotalStats(
                 firstEntryDate = null,
-                averageEntriesPerMonth = 0f
+                averageEntriesPerMonth = 0f,
             )
         }
 
@@ -24,7 +24,7 @@ class CalculateTotalStatsUseCase {
 
         return TotalStats(
             firstEntryDate = firstDate,
-            averageEntriesPerMonth = averagePerMonth
+            averageEntriesPerMonth = averagePerMonth,
         )
     }
 
@@ -50,6 +50,6 @@ class CalculateTotalStatsUseCase {
 
     data class TotalStats(
         val firstEntryDate: LocalDate?,
-        val averageEntriesPerMonth: Float
+        val averageEntriesPerMonth: Float,
     )
 }

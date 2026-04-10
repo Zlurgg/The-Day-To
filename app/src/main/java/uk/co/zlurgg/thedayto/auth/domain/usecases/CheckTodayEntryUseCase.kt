@@ -12,7 +12,7 @@ import java.time.ZoneOffset
  * Returns the timestamp if entry exists, null otherwise.
  */
 class CheckTodayEntryUseCase(
-    private val entryRepository: EntryRepository
+    private val entryRepository: EntryRepository,
 ) {
     suspend operator fun invoke(): Long? {
         val todayStart = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC)

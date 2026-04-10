@@ -23,7 +23,7 @@ import java.util.UUID
  */
 class NotificationSyncServiceImpl(
     private val firestore: FirebaseFirestore,
-    private val settingsDao: NotificationSettingsDao
+    private val settingsDao: NotificationSettingsDao,
 ) : NotificationSyncService {
 
     override suspend fun uploadPending(userId: String): Result<Int, DataError.Sync> = runCatching {
@@ -43,15 +43,15 @@ class NotificationSyncServiceImpl(
         settingsDao.upsert(
             pending.copy(
                 syncId = syncId,
-                syncStatus = SyncStatus.SYNCED.name
-            )
+                syncStatus = SyncStatus.SYNCED.name,
+            ),
         )
 
         Timber.d("Uploaded notification settings for user %s", userId)
         1
     }.fold(
         onSuccess = { Result.Success(it) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     override suspend fun download(userId: String): Result<NotificationSettings?, DataError.Sync> =
@@ -94,12 +94,12 @@ class NotificationSyncServiceImpl(
             finalEntity.toDomain()
         }.fold(
             onSuccess = { Result.Success(it) },
-            onFailure = { mapFirestoreException(it) }
+            onFailure = { mapFirestoreException(it) },
         )
 
     override suspend fun deleteRemote(
         syncId: String,
-        userId: String
+        userId: String,
     ): EmptyResult<DataError.Sync> = runCatching {
         firestore
             .collection(USERS_COLLECTION)
@@ -112,7 +112,7 @@ class NotificationSyncServiceImpl(
         Timber.d("Deleted notification settings from Firestore: syncId=%s", syncId)
     }.fold(
         onSuccess = { Result.Success(Unit) },
-        onFailure = { mapFirestoreException(it) }
+        onFailure = { mapFirestoreException(it) },
     )
 
     private fun <T> mapFirestoreException(throwable: Throwable): Result<T, DataError.Sync> {
@@ -122,7 +122,8 @@ class NotificationSyncServiceImpl(
             is FirebaseFirestoreException -> mapFirebaseException(throwable)
             is java.net.UnknownHostException,
             is java.net.SocketTimeoutException,
-            is java.net.ConnectException -> DataError.Sync.NETWORK_ERROR
+            is java.net.ConnectException,
+                -> DataError.Sync.NETWORK_ERROR
 
             else -> DataError.Sync.UNKNOWN
         }

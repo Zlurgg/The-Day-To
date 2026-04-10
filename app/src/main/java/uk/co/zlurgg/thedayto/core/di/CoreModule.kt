@@ -44,7 +44,7 @@ val coreModule = module {
             moodColorDao = get(),
             notificationSettingsDao = get(),
             pendingSyncDeletionDao = get(),
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
@@ -60,7 +60,7 @@ val coreModule = module {
             context = androidContext(),
             settingsRepository = get(),
             authRepository = get(),
-            checkTodayEntryExists = get()
+            checkTodayEntryExists = get(),
         )
     }
 }

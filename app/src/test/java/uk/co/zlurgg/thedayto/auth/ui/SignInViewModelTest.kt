@@ -17,7 +17,6 @@ import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
 import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckSignInStatusUseCase
-import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckTodayEntryUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.CheckWelcomeDialogSeenUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DevSignInUseCase
@@ -26,6 +25,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
+import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
 import uk.co.zlurgg.thedayto.fake.FakeDevAuthService
@@ -102,11 +102,11 @@ class SignInViewModelTest {
             seedDefaultMoodColors = SeedDefaultMoodColorsUseCase(
                 fakeMoodColorRepository,
                 fakePreferencesRepository,
-                fakeTimeProvider
+                fakeTimeProvider,
             ),
             checkWelcomeDialogSeen = CheckWelcomeDialogSeenUseCase(fakePreferencesRepository),
             markWelcomeDialogSeen = MarkWelcomeDialogSeenUseCase(fakePreferencesRepository),
-            devSignIn = devSignInUseCase
+            devSignIn = devSignInUseCase,
         )
         return SignInViewModel(signInUseCases)
     }
@@ -162,7 +162,7 @@ class SignInViewModelTest {
         // And: Preference should be marked as seen
         assertTrue(
             "Welcome dialog seen preference should be true",
-            fakePreferencesRepository.hasSeenWelcomeDialog()
+            fakePreferencesRepository.hasSeenWelcomeDialog(),
         )
     }
 
@@ -186,7 +186,7 @@ class SignInViewModelTest {
             assertEquals("Error should be null", null, state.signInError)
             assertTrue(
                 "Should have navigation target to overview",
-                state.navigationTarget is SignInNavigationTarget.ToOverview
+                state.navigationTarget is SignInNavigationTarget.ToOverview,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -227,7 +227,7 @@ class SignInViewModelTest {
             assertTrue("Should show error snackbar", event is SignInUiEvent.ShowSnackbar)
             assertTrue(
                 "Snackbar message should contain error text",
-                (event as SignInUiEvent.ShowSnackbar).message.isNotEmpty()
+                (event as SignInUiEvent.ShowSnackbar).message.isNotEmpty(),
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -274,7 +274,7 @@ class SignInViewModelTest {
         val testUser = UserData(
             userId = "test_123",
             username = "Test User",
-            profilePictureUrl = null
+            profilePictureUrl = null,
         )
         fakeAuthRepository.setSignedInUser(testUser)
         fakeAuthStateRepository.setSignedInState(true)
@@ -288,7 +288,7 @@ class SignInViewModelTest {
             val state = awaitItem()
             assertTrue(
                 "Should have navigation target to overview",
-                state.navigationTarget is SignInNavigationTarget.ToOverview
+                state.navigationTarget is SignInNavigationTarget.ToOverview,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -377,7 +377,7 @@ class SignInViewModelTest {
             assertEquals("Error should be null", null, state.signInError)
             assertTrue(
                 "Should have navigation target to overview",
-                state.navigationTarget is SignInNavigationTarget.ToOverview
+                state.navigationTarget is SignInNavigationTarget.ToOverview,
             )
             cancelAndIgnoreRemainingEvents()
         }
@@ -401,7 +401,7 @@ class SignInViewModelTest {
             assertTrue("Should show error snackbar", event is SignInUiEvent.ShowSnackbar)
             assertTrue(
                 "Snackbar message should contain error text",
-                (event as SignInUiEvent.ShowSnackbar).message.isNotEmpty()
+                (event as SignInUiEvent.ShowSnackbar).message.isNotEmpty(),
             )
             cancelAndIgnoreRemainingEvents()
         }

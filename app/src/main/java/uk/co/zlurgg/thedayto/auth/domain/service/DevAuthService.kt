@@ -20,7 +20,7 @@ interface DevAuthService {
      */
     suspend fun signInWithEmailPassword(
         email: String,
-        password: String
+        password: String,
     ): Result<UserData, DataError.Auth>
 
     /**

@@ -41,8 +41,8 @@ class GetEntriesForMonthUseCaseTest {
                 color = "FFA726",
                 isDeleted = false,
                 dateStamp = 0L,
-                id = 1
-            )
+                id = 1,
+            ),
         )
         moodColorRepository.insertMoodColor(
             MoodColor(
@@ -50,8 +50,8 @@ class GetEntriesForMonthUseCaseTest {
                 color = "1565C0",
                 isDeleted = false,
                 dateStamp = 0L,
-                id = 2
-            )
+                id = 2,
+            ),
         )
         moodColorRepository.insertMoodColor(
             MoodColor(
@@ -59,8 +59,8 @@ class GetEntriesForMonthUseCaseTest {
                 color = "66BB6A",
                 isDeleted = false,
                 dateStamp = 0L,
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // Add entries for January 2024
@@ -69,24 +69,24 @@ class GetEntriesForMonthUseCaseTest {
                 moodColorId = 1,
                 content = "Day 1",
                 dateStamp = dateToEpoch(2024, 1, 1),
-                id = 1
-            )
+                id = 1,
+            ),
         )
         entryRepository.insertEntry(
             Entry(
                 moodColorId = 2,
                 content = "Day 15",
                 dateStamp = dateToEpoch(2024, 1, 15),
-                id = 2
-            )
+                id = 2,
+            ),
         )
         entryRepository.insertEntry(
             Entry(
                 moodColorId = 3,
                 content = "Day 31",
                 dateStamp = dateToEpoch(2024, 1, 31),
-                id = 3
-            )
+                id = 3,
+            ),
         )
 
         // Add entry for February 2024 (should not be included in January query)
@@ -95,8 +95,8 @@ class GetEntriesForMonthUseCaseTest {
                 moodColorId = 1,
                 content = "Feb entry",
                 dateStamp = dateToEpoch(2024, 2, 1),
-                id = 4
-            )
+                id = 4,
+            ),
         )
     }
 
@@ -133,7 +133,7 @@ class GetEntriesForMonthUseCaseTest {
         useCase(
             month = 1,
             year = 2024,
-            entryOrder = EntryOrder.Date(OrderType.Ascending)
+            entryOrder = EntryOrder.Date(OrderType.Ascending),
         ).test {
             val entries = awaitItem()
 
@@ -175,7 +175,7 @@ class GetEntriesForMonthUseCaseTest {
         useCase(
             month = 1,
             year = 2024,
-            entryOrder = EntryOrder.Mood(OrderType.Ascending)
+            entryOrder = EntryOrder.Mood(OrderType.Ascending),
         ).test {
             val entries = awaitItem()
 
@@ -198,7 +198,7 @@ class GetEntriesForMonthUseCaseTest {
         useCase(
             month = 1,
             year = 2024,
-            entryOrder = EntryOrder.Mood(OrderType.Descending)
+            entryOrder = EntryOrder.Mood(OrderType.Descending),
         ).test {
             val entries = awaitItem()
 

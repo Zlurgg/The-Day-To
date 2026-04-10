@@ -37,7 +37,7 @@ import java.util.Locale
 fun MonthYearPickerDialog(
     currentDate: LocalDate,
     onDismiss: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
 ) {
     val haptic = LocalHapticFeedback.current
     var selectedYear by remember { mutableIntStateOf(currentDate.year) }
@@ -59,7 +59,7 @@ fun MonthYearPickerDialog(
         title = {
             Text(
                 text = stringResource(R.string.select_month_and_year),
-                style = MaterialTheme.typography.headlineSmall
+                style = MaterialTheme.typography.headlineSmall,
             )
         },
         text = {
@@ -68,13 +68,13 @@ fun MonthYearPickerDialog(
                 Text(
                     text = stringResource(R.string.month_picker_year_label),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = paddingExtraSmall)
+                    modifier = Modifier.padding(bottom = paddingExtraSmall),
                 )
                 LazyVerticalGrid(
                     columns = GridCells.Fixed(4),
                     horizontalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
                     verticalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
-                    modifier = Modifier.height(UiConstants.MONTH_PICKER_MONTH_HEIGHT)
+                    modifier = Modifier.height(UiConstants.MONTH_PICKER_MONTH_HEIGHT),
                 ) {
                     items(years) { year ->
                         FilterChip(
@@ -85,9 +85,9 @@ fun MonthYearPickerDialog(
                                     text = year.toString(),
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -98,7 +98,7 @@ fun MonthYearPickerDialog(
                 Text(
                     text = stringResource(R.string.month_picker_month_label),
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = paddingExtraSmall)
+                    modifier = Modifier.padding(bottom = paddingExtraSmall),
                 )
 
                 // Filter out future months when current year is selected
@@ -112,7 +112,7 @@ fun MonthYearPickerDialog(
                     columns = GridCells.Fixed(3),
                     horizontalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
                     verticalArrangement = Arrangement.spacedBy(UiConstants.MONTH_PICKER_ITEM_SPACING),
-                    modifier = Modifier.height(UiConstants.MONTH_PICKER_YEAR_HEIGHT)
+                    modifier = Modifier.height(UiConstants.MONTH_PICKER_YEAR_HEIGHT),
                 ) {
                     items(availableMonths) { month ->
                         FilterChip(
@@ -123,9 +123,9 @@ fun MonthYearPickerDialog(
                                     text = month.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.fillMaxWidth(),
-                                    textAlign = TextAlign.Center
+                                    textAlign = TextAlign.Center,
                                 )
-                            }
+                            },
                         )
                     }
                 }
@@ -138,7 +138,7 @@ fun MonthYearPickerDialog(
                     val newDate = LocalDate.of(selectedYear, selectedMonth, 1)
                     onDateSelected(newDate)
                     onDismiss()
-                }
+                },
             ) {
                 Text(stringResource(R.string.ok))
             }
@@ -147,6 +147,6 @@ fun MonthYearPickerDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }

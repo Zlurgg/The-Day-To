@@ -32,7 +32,7 @@ class FirebaseEmulatorAuthService : DevAuthService {
 
     override suspend fun signInWithEmailPassword(
         email: String,
-        password: String
+        password: String,
     ): Result<UserData, DataError.Auth> {
         return try {
             Timber.d("Dev sign-in attempt with email: %s", email)
@@ -51,8 +51,8 @@ class FirebaseEmulatorAuthService : DevAuthService {
                     UserData(
                         userId = user.uid,
                         username = user.displayName ?: DEV_USER_DISPLAY_NAME,
-                        profilePictureUrl = user.photoUrl?.toString()
-                    )
+                        profilePictureUrl = user.photoUrl?.toString(),
+                    ),
                 )
             } else {
                 Timber.e("Dev sign-in returned null user")
@@ -65,10 +65,13 @@ class FirebaseEmulatorAuthService : DevAuthService {
             val error = when {
                 e.message?.contains("network", ignoreCase = true) == true ->
                     DataError.Auth.NETWORK_ERROR
+
                 e.message?.contains("password", ignoreCase = true) == true ->
                     DataError.Auth.FAILED
+
                 e.message?.contains("user", ignoreCase = true) == true ->
                     DataError.Auth.NO_CREDENTIAL
+
                 else -> DataError.Auth.FAILED
             }
             Result.Error(error)

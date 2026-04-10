@@ -13,7 +13,7 @@ import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
  * @return UserData if user is signed in, null otherwise
  */
 class GetSignedInUserUseCase(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
     operator fun invoke(): UserData? = authRepository.getSignedInUser()
 }

@@ -83,7 +83,7 @@ inline fun <T, E : Error> Result<T, E>.getOrElse(onError: (E) -> T): T {
  */
 inline fun <T, E : Error, R> Result<T, E>.fold(
     onSuccess: (T) -> R,
-    onError: (E) -> R
+    onError: (E) -> R,
 ): R {
     return when (this) {
         is Result.Success -> onSuccess(data)

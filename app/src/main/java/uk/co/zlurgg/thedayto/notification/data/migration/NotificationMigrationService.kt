@@ -23,7 +23,7 @@ import java.util.UUID
 class NotificationMigrationService(
     private val dao: NotificationSettingsDao,
     private val legacyPrefs: SharedPreferences,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) {
     /**
      * Migrates notification settings from SharedPreferences to Room if needed.
@@ -59,7 +59,7 @@ class NotificationMigrationService(
             enabled,
             hour,
             minute,
-            userId
+            userId,
         )
 
         // Insert into Room
@@ -71,8 +71,8 @@ class NotificationMigrationService(
                 minute = minute,
                 syncId = UUID.randomUUID().toString(),
                 syncStatus = SyncStatus.PENDING_SYNC.name,
-                updatedAt = System.currentTimeMillis()
-            )
+                updatedAt = System.currentTimeMillis(),
+            ),
         )
 
         // Clean up SharedPreferences (safe to crash here - Room is source of truth)

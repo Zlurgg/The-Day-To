@@ -42,7 +42,7 @@ abstract class DatabaseTest {
         val context = ApplicationProvider.getApplicationContext<Context>()
         database = Room.inMemoryDatabaseBuilder(
             context,
-            TheDayToDatabase::class.java
+            TheDayToDatabase::class.java,
         )
             .allowMainThreadQueries() // For testing only - instrumented tests can run on main thread
             .build()

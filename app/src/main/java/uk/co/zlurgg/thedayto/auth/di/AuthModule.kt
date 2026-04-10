@@ -38,7 +38,7 @@ val authModule = module {
     single {
         SignInUseCase(
             authRepository = get(),
-            authStateRepository = get()
+            authStateRepository = get(),
         )
     }
 
@@ -46,7 +46,7 @@ val authModule = module {
     single {
         SignOutUseCase(
             authRepository = get(),
-            authStateRepository = get()
+            authStateRepository = get(),
         )
     }
 
@@ -56,21 +56,21 @@ val authModule = module {
             authRepository = get(),
             syncRepository = get(),
             localDataClearer = get(),
-            syncScheduler = get()
+            syncScheduler = get(),
         )
     }
 
     // Standalone CheckWelcomeDialogSeenUseCase - used by TheDayToApp
     single {
         CheckWelcomeDialogSeenUseCase(
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
     // Standalone MarkWelcomeDialogSeenUseCase - used by TheDayToApp
     single {
         MarkWelcomeDialogSeenUseCase(
-            preferencesRepository = get()
+            preferencesRepository = get(),
         )
     }
 
@@ -80,13 +80,13 @@ val authModule = module {
             signIn = get(),
             checkSignInStatus = CheckSignInStatusUseCase(
                 authRepository = get(),
-                authStateRepository = get()
+                authStateRepository = get(),
             ),
             checkTodayEntry = CheckTodayEntryUseCase(entryRepository = get()),
             seedDefaultMoodColors = get(),
             checkWelcomeDialogSeen = get(),
             markWelcomeDialogSeen = get(),
-            devSignIn = getOrNull()
+            devSignIn = getOrNull(),
         )
     }
 

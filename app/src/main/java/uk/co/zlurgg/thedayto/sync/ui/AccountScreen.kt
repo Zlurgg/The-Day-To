@@ -19,13 +19,13 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudSync
+import androidx.compose.material.icons.filled.DeleteForever
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -75,7 +75,7 @@ import java.util.Date
 fun AccountScreenRoot(
     viewModel: SyncSettingsViewModel = koinViewModel(),
     credentialProviderFactory: CredentialProviderFactory = koinInject(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -119,7 +119,7 @@ fun AccountScreenRoot(
                 viewModel.onReAuthCompleted(credentialProviderFactory.create(act, serverClientId))
             }
         },
-        onReAuthDismiss = viewModel::onReAuthDismissed
+        onReAuthDismiss = viewModel::onReAuthDismissed,
     )
 }
 
@@ -142,13 +142,13 @@ private fun AccountScreen(
     onDeletionProgressDismiss: () -> Unit,
     onReAuthConfirm: () -> Unit,
     onReAuthDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Delete Account Confirmation Dialog
     if (uiState.showDeleteConfirmDialog) {
         DeleteAccountConfirmDialog(
             onConfirm = onDeleteAccountConfirm,
-            onDismiss = onDeleteAccountCancel
+            onDismiss = onDeleteAccountCancel,
         )
     }
 
@@ -157,7 +157,7 @@ private fun AccountScreen(
         if (progress !is DeletionProgress.RequiresReAuth && progress !is DeletionProgress.Failed) {
             DeletionProgressDialog(
                 progress = progress,
-                onDismiss = onDeletionProgressDismiss
+                onDismiss = onDeletionProgressDismiss,
             )
         }
     }
@@ -177,7 +177,7 @@ private fun AccountScreen(
                 TextButton(onClick = onReAuthDismiss) {
                     Text(stringResource(R.string.cancel))
                 }
-            }
+            },
         )
     }
 
@@ -189,14 +189,14 @@ private fun AccountScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.sync_navigate_back)
+                            contentDescription = stringResource(R.string.sync_navigate_back),
                         )
                     }
-                }
+                },
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { paddingValues ->
         when {
             uiState.isLoading && !uiState.isUserSignedIn && !uiState.isSigningIn -> {
@@ -204,11 +204,12 @@ private fun AccountScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
             }
+
             else -> {
                 AccountContent(
                     uiState = uiState,
@@ -220,7 +221,7 @@ private fun AccountScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
-                        .verticalScroll(rememberScrollState())
+                        .verticalScroll(rememberScrollState()),
                 )
             }
         }
@@ -240,13 +241,13 @@ private fun AccountSection(
     onDevSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onDeleteAccountClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
     ) {
         if (isSignedIn) {
             // Signed in state
@@ -256,34 +257,34 @@ private fun AccountSection(
                         .fillMaxWidth()
                         .padding(paddingMedium),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Person,
                             contentDescription = null,
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.width(paddingMedium))
                         Column {
                             Text(
                                 text = userEmail ?: stringResource(R.string.sync_signed_in),
-                                style = MaterialTheme.typography.titleMedium
+                                style = MaterialTheme.typography.titleMedium,
                             )
                             Text(
                                 text = stringResource(R.string.sync_cloud_available),
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                     }
                     TextButton(onClick = onSignOutClick) {
                         Text(
                             text = stringResource(R.string.sign_out),
-                            color = MaterialTheme.colorScheme.error
+                            color = MaterialTheme.colorScheme.error,
                         )
                     }
                 }
@@ -294,13 +295,13 @@ private fun AccountSection(
                     onClick = onDeleteAccountClick,
                     modifier = Modifier.padding(horizontal = paddingSmall),
                     colors = ButtonDefaults.textButtonColors(
-                        contentColor = MaterialTheme.colorScheme.error
-                    )
+                        contentColor = MaterialTheme.colorScheme.error,
+                    ),
                 ) {
                     Icon(
                         imageVector = Icons.Default.DeleteForever,
                         contentDescription = null,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                     Spacer(modifier = Modifier.width(paddingSmall))
                     Text(stringResource(R.string.delete_account_label))
@@ -312,39 +313,39 @@ private fun AccountSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(paddingMedium),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Icon(
                     imageVector = Icons.Default.CloudSync,
                     contentDescription = null,
                     modifier = Modifier.size(48.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.height(paddingMedium))
                 Text(
                     text = stringResource(R.string.sync_sign_in_to_enable),
-                    style = MaterialTheme.typography.titleMedium
+                    style = MaterialTheme.typography.titleMedium,
                 )
                 Spacer(modifier = Modifier.height(paddingSmall))
                 Text(
                     text = stringResource(R.string.sync_sign_in_description),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(paddingMedium))
                 if (isSigningIn) {
                     CircularProgressIndicator(
-                        modifier = Modifier.size(48.dp)
+                        modifier = Modifier.size(48.dp),
                     )
                 } else {
                     SignInButton(
                         onClick = onSignInClick,
-                        showButton = true
+                        showButton = true,
                     )
                     if (isDevSignInAvailable) {
                         DevSignInButton(
                             onClick = onDevSignInClick,
-                            showButton = true
+                            showButton = true,
                         )
                     }
                 }
@@ -361,11 +362,11 @@ private fun AccountContent(
     onDevSignInClick: () -> Unit,
     onSignOutClick: () -> Unit,
     onDeleteAccountClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier.padding(paddingMedium),
-        verticalArrangement = Arrangement.spacedBy(paddingMedium)
+        verticalArrangement = Arrangement.spacedBy(paddingMedium),
     ) {
         // Account Section (sign-in/sign-out)
         AccountSection(
@@ -376,7 +377,7 @@ private fun AccountContent(
             onSignInClick = onSignInClick,
             onDevSignInClick = onDevSignInClick,
             onSignOutClick = onSignOutClick,
-            onDeleteAccountClick = onDeleteAccountClick
+            onDeleteAccountClick = onDeleteAccountClick,
         )
 
         // Show sync status when signed in (sync is auto-enabled)
@@ -384,7 +385,7 @@ private fun AccountContent(
             SyncStatusCard(
                 syncState = uiState.syncState,
                 lastSyncTimestamp = uiState.lastSyncTimestamp,
-                onSyncNowClicked = onSyncNowClicked
+                onSyncNowClicked = onSyncNowClicked,
             )
         }
 
@@ -398,22 +399,22 @@ private fun SyncStatusCard(
     syncState: SyncState,
     lastSyncTimestamp: Long?,
     onSyncNowClicked: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingMedium)
+                .padding(paddingMedium),
         ) {
             Text(
                 text = stringResource(R.string.sync_status_title),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(paddingSmall))
 
@@ -426,10 +427,10 @@ private fun SyncStatusCard(
                 Text(
                     text = stringResource(
                         R.string.sync_last_sync_format,
-                        formatTimestamp(timestamp)
+                        formatTimestamp(timestamp),
                     ),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
 
@@ -439,12 +440,12 @@ private fun SyncStatusCard(
             Button(
                 onClick = onSyncNowClicked,
                 enabled = syncState !is SyncState.Syncing,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Default.Sync,
                     contentDescription = null,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(18.dp),
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(stringResource(R.string.sync_now_button))
@@ -456,11 +457,11 @@ private fun SyncStatusCard(
 @Composable
 private fun SyncStateIndicator(
     syncState: SyncState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         when (syncState) {
             is SyncState.Idle -> {
@@ -468,62 +469,65 @@ private fun SyncStateIndicator(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
                     text = stringResource(R.string.sync_status_idle),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
+
             is SyncState.Syncing -> {
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(20.dp),
-                            strokeWidth = 2.dp
+                            strokeWidth = 2.dp,
                         )
                         Spacer(modifier = Modifier.width(paddingSmall))
                         Text(
                             text = stringResource(R.string.sync_status_syncing),
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodyMedium,
                         )
                     }
                     if (syncState.progress > 0f) {
                         Spacer(modifier = Modifier.height(paddingSmall))
                         LinearProgressIndicator(
                             progress = { syncState.progress },
-                            modifier = Modifier.fillMaxWidth()
+                            modifier = Modifier.fillMaxWidth(),
                         )
                     }
                 }
             }
+
             is SyncState.Success -> {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
                     text = stringResource(R.string.sync_status_success),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
+
             is SyncState.Error -> {
                 Icon(
                     imageVector = Icons.Default.Error,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
                 Spacer(modifier = Modifier.width(paddingSmall))
                 Text(
                     text = stringResource(R.string.sync_status_error),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         }
@@ -535,23 +539,23 @@ private fun SyncInfoCard(modifier: Modifier = Modifier) {
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceContainerLow
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLow,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(paddingMedium)
+                .padding(paddingMedium),
         ) {
             Text(
                 text = stringResource(R.string.sync_info_title),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(paddingSmall))
             Text(
                 text = stringResource(R.string.sync_info_content),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
@@ -573,7 +577,7 @@ private fun AccountScreenPreview() {
                 userEmail = "user@example.com",
                 syncState = SyncState.Success(SyncResult(2, 1, 3, 0)),
                 lastSyncTimestamp = System.currentTimeMillis(),
-                isLoading = false
+                isLoading = false,
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
@@ -586,7 +590,7 @@ private fun AccountScreenPreview() {
             onDeleteAccountCancel = {},
             onDeletionProgressDismiss = {},
             onReAuthConfirm = {},
-            onReAuthDismiss = {}
+            onReAuthDismiss = {},
         )
     }
 }
@@ -599,7 +603,7 @@ private fun AccountScreenNotSignedInPreview() {
             uiState = SyncSettingsState(
                 isUserSignedIn = false,
                 isDevSignInAvailable = true,
-                isLoading = false
+                isLoading = false,
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
@@ -612,7 +616,7 @@ private fun AccountScreenNotSignedInPreview() {
             onDeleteAccountCancel = {},
             onDeletionProgressDismiss = {},
             onReAuthConfirm = {},
-            onReAuthDismiss = {}
+            onReAuthDismiss = {},
         )
     }
 }
@@ -626,7 +630,7 @@ private fun AccountScreenSyncingPreview() {
                 isUserSignedIn = true,
                 userEmail = "user@example.com",
                 syncState = SyncState.Syncing(0.5f),
-                isLoading = false
+                isLoading = false,
             ),
             snackbarHostState = SnackbarHostState(),
             onNavigateBack = {},
@@ -639,7 +643,7 @@ private fun AccountScreenSyncingPreview() {
             onDeleteAccountCancel = {},
             onDeletionProgressDismiss = {},
             onReAuthConfirm = {},
-            onReAuthDismiss = {}
+            onReAuthDismiss = {},
         )
     }
 }

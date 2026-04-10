@@ -22,12 +22,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
@@ -54,13 +54,10 @@ import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
-import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.AccountRoute
+import uk.co.zlurgg.thedayto.core.ui.navigation.EditorRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.navigation.StatsRoute
-import uk.co.zlurgg.thedayto.notification.ui.NotificationSettingsDialog
-import uk.co.zlurgg.thedayto.notification.ui.PermissionPermanentlyDeniedDialog
-import uk.co.zlurgg.thedayto.notification.ui.SystemNotificationDisabledDialog
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -76,6 +73,9 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
+import uk.co.zlurgg.thedayto.notification.ui.NotificationSettingsDialog
+import uk.co.zlurgg.thedayto.notification.ui.PermissionPermanentlyDeniedDialog
+import uk.co.zlurgg.thedayto.notification.ui.SystemNotificationDisabledDialog
 import java.time.LocalDate
 
 /**
@@ -84,7 +84,7 @@ import java.time.LocalDate
 @Composable
 fun OverviewScreenRoot(
     navController: NavController,
-    viewModel: OverviewViewModel = koinViewModel()
+    viewModel: OverviewViewModel = koinViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -96,7 +96,7 @@ fun OverviewScreenRoot(
 
     // Permission launcher for Android 13+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+        contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         if (isGranted) {
             viewModel.onNotificationPermissionGranted()
@@ -111,7 +111,7 @@ fun OverviewScreenRoot(
             when (target) {
                 is OverviewNavigationTarget.ToEditor -> {
                     navController.navigate(
-                        EditorRoute(entryId = target.entryId, showBackButton = true)
+                        EditorRoute(entryId = target.entryId, showBackButton = true),
                     )
                 }
             }
@@ -128,9 +128,10 @@ fun OverviewScreenRoot(
                         message = event.message,
                         actionLabel = event.actionLabel,
                         withDismissAction = false,
-                        duration = SnackbarDuration.Short
+                        duration = SnackbarDuration.Short,
                     )
                 }
+
                 is OverviewUiEvent.RequestNotificationPermission -> {
                     // Request permission on Android 13+, otherwise just setup notifications
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -139,15 +140,19 @@ fun OverviewScreenRoot(
                         viewModel.onNotificationPermissionGranted()
                     }
                 }
+
                 is OverviewUiEvent.ShowHelpDialog -> {
                     showHelpDialog = true
                 }
+
                 is OverviewUiEvent.ShowAboutDialog -> {
                     showAboutDialog = true
                 }
+
                 is OverviewUiEvent.ShowSystemNotificationWarning -> {
                     showSystemNotificationDialog = true
                 }
+
                 is OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog -> {
                     showPermissionDeniedDialog = true
                 }
@@ -164,26 +169,26 @@ fun OverviewScreenRoot(
     AnimatedVisibility(
         visible = uiState.showTutorialDialog,
         enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut()
+        exit = fadeOut() + scaleOut(),
     ) {
         OverviewTutorialDialog(
             onDismiss = {
                 viewModel.onAction(OverviewAction.DismissTutorial)
-            }
+            },
         )
     }
 
     // Show help dialog from settings menu
     if (showHelpDialog) {
         HelpDialog(
-            onDismiss = { showHelpDialog = false }
+            onDismiss = { showHelpDialog = false },
         )
     }
 
     // Show about dialog from settings menu
     if (showAboutDialog) {
         AboutDialog(
-            onDismiss = { showAboutDialog = false }
+            onDismiss = { showAboutDialog = false },
         )
     }
 
@@ -194,7 +199,7 @@ fun OverviewScreenRoot(
             onOpenSettings = {
                 AndroidSystemUtils.openSystemNotificationSettings(context)
                 showSystemNotificationDialog = false
-            }
+            },
         )
     }
 
@@ -205,7 +210,7 @@ fun OverviewScreenRoot(
             onOpenSettings = {
                 AndroidSystemUtils.openAppSettings(context)
                 showPermissionDeniedDialog = false
-            }
+            },
         )
     }
 
@@ -218,8 +223,8 @@ fun OverviewScreenRoot(
                 EditorRoute(
                     entryId = entryId,
                     entryDate = entryDate,
-                    showBackButton = true
-                )
+                    showBackButton = true,
+                ),
             )
         },
         onNavigateToStats = {
@@ -231,7 +236,7 @@ fun OverviewScreenRoot(
         onNavigateToAccount = {
             navController.navigate(AccountRoute)
         },
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -247,113 +252,113 @@ private fun OverviewScreen(
     onNavigateToMoodColorManagement: () -> Unit,
     onNavigateToAccount: () -> Unit,
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val currentDate = LocalDate.now()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Scaffold(
             snackbarHost = {
-            CustomSnackbarHost(
-                hostState = snackbarHostState,
-                modifier = Modifier.padding(paddingMedium)
-            )
-        },
-        floatingActionButton = {},
-        modifier = modifier,
-        topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .systemBarsPadding()
-                    .padding(paddingSmall),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = uiState.greeting,
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                CustomSnackbarHost(
+                    hostState = snackbarHostState,
+                    modifier = Modifier.padding(paddingMedium),
                 )
-                IconButton(onClick = onNavigateToAccount) {
-                    Icon(
-                        imageVector = Icons.Default.Person,
-                        contentDescription = stringResource(R.string.icon_description_account)
-                    )
-                }
-                SettingsMenu(
-                    onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
-                    onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
-                    onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
-                    onNavigateToMoodColorManagement = onNavigateToMoodColorManagement
-                )
-            }
-        },
-        content = { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(padding)
-                    .verticalScroll(rememberScrollState())
-                    .padding(horizontal = paddingSmall)
-            ) {
-                // Error banner (persistent for load failures) with slide-down animation
-                AnimatedVisibility(
-                    visible = uiState.loadError != null,
-                    enter = fadeIn() + scaleIn(),
-                    exit = fadeOut() + scaleOut()
+            },
+            floatingActionButton = {},
+            modifier = modifier,
+            topBar = {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .systemBarsPadding()
+                        .padding(paddingSmall),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    LoadErrorBanner(
-                        errorMessage = uiState.loadError ?: "",
-                        onRetry = { onAction(OverviewAction.RetryLoadEntries) },
-                        onDismiss = { onAction(OverviewAction.DismissLoadError) }
+                    Text(
+                        text = uiState.greeting,
+                        style = MaterialTheme.typography.headlineMedium,
+                        color = MaterialTheme.colorScheme.onSurface,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f),
+                    )
+                    IconButton(onClick = onNavigateToAccount) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = stringResource(R.string.icon_description_account),
+                        )
+                    }
+                    SettingsMenu(
+                        onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
+                        onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
+                        onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
+                        onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
                     )
                 }
+            },
+            content = { padding ->
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding)
+                        .verticalScroll(rememberScrollState())
+                        .padding(horizontal = paddingSmall),
+                ) {
+                    // Error banner (persistent for load failures) with slide-down animation
+                    AnimatedVisibility(
+                        visible = uiState.loadError != null,
+                        enter = fadeIn() + scaleIn(),
+                        exit = fadeOut() + scaleOut(),
+                    ) {
+                        LoadErrorBanner(
+                            errorMessage = uiState.loadError ?: "",
+                            onRetry = { onAction(OverviewAction.RetryLoadEntries) },
+                            onDismiss = { onAction(OverviewAction.DismissLoadError) },
+                        )
+                    }
 
-                if (uiState.loadError != null) {
-                    Spacer(modifier = Modifier.height(paddingMedium))
-                }
+                    if (uiState.loadError != null) {
+                        Spacer(modifier = Modifier.height(paddingMedium))
+                    }
 
-                // Calendar section with month navigation
-                CalendarSection(
-                    entries = uiState.entries,
-                    currentDate = currentDate,
-                    onDateClick = onNavigateToEntry,
-                    onStatsClick = onNavigateToStats,
-                    onMonthChanged = { month, year ->
-                        onAction(OverviewAction.OnMonthChanged(month, year))
-                    },
-                    modifier = Modifier.fillMaxWidth()
-                )
+                    // Calendar section with month navigation
+                    CalendarSection(
+                        entries = uiState.entries,
+                        currentDate = currentDate,
+                        onDateClick = onNavigateToEntry,
+                        onStatsClick = onNavigateToStats,
+                        onMonthChanged = { month, year ->
+                            onAction(OverviewAction.OnMonthChanged(month, year))
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                    )
 
-                // Entries list section - hidden for past months with no entries
-                val isCurrentMonth = uiState.displayedMonth == currentDate.monthValue &&
+                    // Entries list section - hidden for past months with no entries
+                    val isCurrentMonth = uiState.displayedMonth == currentDate.monthValue &&
                         uiState.displayedYear == currentDate.year
-                val showEntriesSection = uiState.entries.isNotEmpty() ||
+                    val showEntriesSection = uiState.entries.isNotEmpty() ||
                         (isCurrentMonth && !uiState.hasTodayEntry)
 
-                if (showEntriesSection) {
-                    Spacer(modifier = Modifier.height(paddingMedium))
+                    if (showEntriesSection) {
+                        Spacer(modifier = Modifier.height(paddingMedium))
 
-                    EntriesListSection(
-                        entries = uiState.entries,
-                        entryOrder = uiState.entryOrder,
-                        onOrderChange = { onAction(OverviewAction.Order(it)) },
-                        onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
-                        onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
-                        isLoading = uiState.isLoading,
-                        isCurrentMonth = isCurrentMonth,
-                        hasTodayEntry = uiState.hasTodayEntry,
-                        entryPendingDelete = uiState.entryToDelete,
-                        onCreateEntry = { onNavigateToEntry(null, null) },
-                        modifier = Modifier.fillMaxWidth()
-                    )
+                        EntriesListSection(
+                            entries = uiState.entries,
+                            entryOrder = uiState.entryOrder,
+                            onOrderChange = { onAction(OverviewAction.Order(it)) },
+                            onEntryClick = { entryId -> onNavigateToEntry(entryId, null) },
+                            onDeleteEntry = { entry -> onAction(OverviewAction.RequestDeleteEntry(entry)) },
+                            isLoading = uiState.isLoading,
+                            isCurrentMonth = isCurrentMonth,
+                            hasTodayEntry = uiState.hasTodayEntry,
+                            entryPendingDelete = uiState.entryToDelete,
+                            onCreateEntry = { onNavigateToEntry(null, null) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
                 }
-            }
-        }
+            },
         )
 
         // Loading indicator overlay
@@ -361,11 +366,11 @@ private fun OverviewScreen(
             visible = uiState.isLoading,
             enter = fadeIn(),
             exit = fadeOut(),
-            modifier = Modifier.align(Alignment.BottomCenter)
+            modifier = Modifier.align(Alignment.BottomCenter),
         ) {
             CircularProgressIndicator(
                 modifier = Modifier.padding(paddingMedium),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
         }
     }
@@ -374,11 +379,11 @@ private fun OverviewScreen(
     AnimatedVisibility(
         visible = uiState.showEntryReminderDialog,
         enter = fadeIn() + scaleIn(),
-        exit = fadeOut() + scaleOut()
+        exit = fadeOut() + scaleOut(),
     ) {
         CreateEntryReminderDialog(
             onDismiss = { onAction(OverviewAction.DismissEntryReminder) },
-            onCreateEntry = { onAction(OverviewAction.CreateTodayEntry) }
+            onCreateEntry = { onAction(OverviewAction.CreateTodayEntry) },
         )
     }
 
@@ -393,7 +398,7 @@ private fun OverviewScreen(
             onRequestPermission = { onAction(OverviewAction.RequestNotificationPermission) },
             onSave = { enabled, hour, minute ->
                 onAction(OverviewAction.SaveNotificationSettings(enabled, hour, minute))
-            }
+            },
         )
     }
 
@@ -402,7 +407,7 @@ private fun OverviewScreen(
         DeleteEntryConfirmDialog(
             entry = uiState.entryToDelete,
             onConfirm = { onAction(OverviewAction.ConfirmDeleteEntry) },
-            onDismiss = { onAction(OverviewAction.CancelDeleteEntry) }
+            onDismiss = { onAction(OverviewAction.CancelDeleteEntry) },
         )
     }
 }
@@ -416,14 +421,14 @@ private fun OverviewScreenPreview() {
         OverviewScreen(
             uiState = OverviewUiState(
                 entries = SampleEntries.allSamples,
-                greeting = "Good morning"
+                greeting = "Good morning",
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }
@@ -436,14 +441,14 @@ private fun OverviewScreenSingleEntryPreview() {
         OverviewScreen(
             uiState = OverviewUiState(
                 entries = listOf(SampleEntries.sampleEntry1),
-                greeting = "Good afternoon"
+                greeting = "Good afternoon",
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }
@@ -456,14 +461,14 @@ private fun OverviewScreenEmptyPreview() {
         OverviewScreen(
             uiState = OverviewUiState(
                 entries = emptyList(),
-                greeting = "Good evening"
+                greeting = "Good evening",
             ),
             onAction = {},
             onNavigateToEntry = { _, _ -> },
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
-            snackbarHostState = remember { SnackbarHostState() }
+            snackbarHostState = remember { SnackbarHostState() },
         )
     }
 }

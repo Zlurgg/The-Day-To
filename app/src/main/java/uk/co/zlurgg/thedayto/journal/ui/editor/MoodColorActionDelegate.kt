@@ -25,14 +25,14 @@ class MoodColorActionDelegate(
     private val uiState: MutableStateFlow<EditorUiState>,
     private val uiEvents: MutableSharedFlow<EditorUiEvent>,
     private val scope: CoroutineScope,
-    private val onSyncRequired: () -> Unit
+    private val onSyncRequired: () -> Unit,
 ) {
     fun handleSelectMoodColor(moodColorId: Int) {
         uiState.update {
             it.copy(
                 selectedMoodColorId = moodColorId,
                 isMoodHintVisible = false,
-                moodError = null
+                moodError = null,
             )
         }
     }
@@ -47,7 +47,7 @@ class MoodColorActionDelegate(
             val newMoodColor = MoodColor(
                 mood = mood,
                 color = colorHex,
-                dateStamp = System.currentTimeMillis()
+                dateStamp = System.currentTimeMillis(),
             )
             when (val result = editorUseCases.saveMoodColor(newMoodColor)) {
                 is Result.Success -> {
@@ -59,10 +59,11 @@ class MoodColorActionDelegate(
                             isMoodColorSectionVisible = false,
                             selectedMoodColorId = savedId,
                             isMoodHintVisible = false,
-                            moodError = null
+                            moodError = null,
                         )
                     }
                 }
+
                 is Result.Error -> {
                     Timber.w("Failed to save mood color: %s, error=%s", mood, result.error)
                     uiEvents.emit(EditorUiEvent.ShowMoodColorError(result.error))
@@ -81,6 +82,7 @@ class MoodColorActionDelegate(
                 is Result.Success -> {
                     onSyncRequired()
                 }
+
                 is Result.Error -> {
                     Timber.w("Failed to toggle favorite for id=%d, error=%s", id, result.error)
                     uiEvents.emit(EditorUiEvent.ShowMoodColorError(result.error))
@@ -105,12 +107,12 @@ class MoodColorActionDelegate(
             val updated = original?.copy(
                 id = moodColorId,
                 mood = newMood,
-                color = newColorHex
+                color = newColorHex,
             ) ?: MoodColor(
                 id = moodColorId,
                 mood = newMood,
                 color = newColorHex,
-                dateStamp = System.currentTimeMillis()
+                dateStamp = System.currentTimeMillis(),
             )
             when (val result = editorUseCases.saveMoodColor(updated)) {
                 is Result.Success -> {
@@ -119,12 +121,13 @@ class MoodColorActionDelegate(
                         it.copy(
                             showEditMoodColorDialog = false,
                             editingMoodColor = null,
-                            editMoodColorError = null
+                            editMoodColorError = null,
                         )
                     }
                     Timber.i("Successfully updated mood color: %s", result.data.mood)
                     uiEvents.emit(EditorUiEvent.ShowSnackbar("\"${result.data.mood}\" updated"))
                 }
+
                 is Result.Error -> {
                     Timber.w("Failed to update mood color id=%d, error=%s", moodColorId, result.error)
                     uiState.update { it.copy(editMoodColorError = result.error) }
@@ -139,7 +142,7 @@ class MoodColorActionDelegate(
             it.copy(
                 showEditMoodColorDialog = false,
                 editingMoodColor = null,
-                editMoodColorError = null
+                editMoodColorError = null,
             )
         }
     }

@@ -35,7 +35,7 @@ fun TransparentHintTextField(
     singleLine: Boolean = false,
     onFocusChange: (FocusState) -> Unit,
     maxLength: Int? = null,
-    showCharacterCount: Boolean = false
+    showCharacterCount: Boolean = false,
 ) {
     var isFocused by remember { mutableStateOf(false) }
 
@@ -46,7 +46,7 @@ fun TransparentHintTextField(
                 .weight(0.8f)
                 .background(
                     color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
                 .border(
                     width = if (isFocused) 2.dp else 1.dp,
@@ -54,9 +54,9 @@ fun TransparentHintTextField(
                         MaterialTheme.colorScheme.primary
                     else
                         MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(12.dp),
                 )
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             BasicTextField(
                 value = text,
@@ -73,13 +73,13 @@ fun TransparentHintTextField(
                     .onFocusChanged { focusState ->
                         isFocused = focusState.isFocused
                         onFocusChange(focusState)
-                    }
+                    },
             )
             if (isHintVisible) {
                 Text(
                     text = hint,
                     style = textStyle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
                 )
             }
         }
@@ -93,7 +93,7 @@ fun TransparentHintTextField(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp, vertical = 4.dp),
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End,
             ) {
                 Text(
                     text = "${text.length}/$maxLength",
@@ -110,9 +110,9 @@ fun TransparentHintTextField(
                             } else {
                                 MaterialTheme.colorScheme.surface.copy(alpha = 0.5f)
                             },
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
                         )
-                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .padding(horizontal = 8.dp, vertical = 4.dp),
                 )
             }
         }

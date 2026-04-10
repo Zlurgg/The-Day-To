@@ -77,7 +77,7 @@ class SyncSettingsViewModelTest {
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = null
+        profilePictureUrl = null,
     )
 
     // Mock credential provider for tests
@@ -117,12 +117,12 @@ class SyncSettingsViewModelTest {
             performSync = PerformSyncUseCase(
                 authRepository = fakeAuthRepository,
                 preferencesRepository = fakePreferencesRepository,
-                syncRepository = fakeSyncRepository
+                syncRepository = fakeSyncRepository,
             ),
             observeSyncState = ObserveSyncStateUseCase(fakeSyncRepository),
             getLastSyncTimestamp = GetLastSyncTimestampUseCase(fakePreferencesRepository),
             prepareForSync = PrepareForSyncUseCase(fakeSyncRepository),
-            setSyncEnabled = SetSyncEnabledUseCase(fakePreferencesRepository)
+            setSyncEnabled = SetSyncEnabledUseCase(fakePreferencesRepository),
         )
 
         val accountUseCases = AccountUseCases(
@@ -134,9 +134,9 @@ class SyncSettingsViewModelTest {
                 authRepository = fakeAuthRepository,
                 syncRepository = fakeSyncRepository,
                 localDataClearer = mockLocalDataClearer,
-                syncScheduler = mockSyncScheduler
+                syncScheduler = mockSyncScheduler,
             ),
-            devSignIn = devSignInUseCase
+            devSignIn = devSignInUseCase,
         )
 
         return SyncSettingsViewModel(
@@ -146,8 +146,8 @@ class SyncSettingsViewModelTest {
             notificationAuthUseCase = NotificationAuthUseCase(
                 settingsRepository = fakeNotificationSettingsRepository,
                 notificationScheduler = fakeNotificationScheduler,
-                syncService = fakeNotificationSyncService
-            )
+                syncService = fakeNotificationSyncService,
+            ),
         )
     }
 
@@ -418,8 +418,8 @@ class SyncSettingsViewModelTest {
             uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings(
                 enabled = true,
                 hour = 8,
-                minute = 30
-            )
+                minute = 30,
+            ),
         )
         fakeAuthRepository.shouldReturnError = false
         viewModel = createViewModel()
@@ -447,8 +447,8 @@ class SyncSettingsViewModelTest {
             uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings(
                 enabled = true,
                 hour = 9,
-                minute = 0
-            )
+                minute = 0,
+            ),
         )
         viewModel = createViewModel()
 

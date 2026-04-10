@@ -11,7 +11,7 @@ import androidx.compose.ui.Modifier
 fun DevSignInButton(
     onClick: () -> Unit,
     showButton: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Empty - no dev sign-in in release builds
 }

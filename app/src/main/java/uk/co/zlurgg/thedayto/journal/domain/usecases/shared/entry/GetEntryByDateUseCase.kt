@@ -19,7 +19,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository
  * @param repository EntryRepository for data access
  */
 class GetEntryByDateUseCase(
-    private val repository: EntryRepository
+    private val repository: EntryRepository,
 ) {
     /**
      * Get entry for a specific date

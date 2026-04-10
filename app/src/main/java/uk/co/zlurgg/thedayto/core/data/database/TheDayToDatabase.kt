@@ -16,10 +16,10 @@ import uk.co.zlurgg.thedayto.sync.data.model.PendingSyncDeletionEntity
         EntryEntity::class,
         MoodColorEntity::class,
         PendingSyncDeletionEntity::class,
-        NotificationSettingsEntity::class
+        NotificationSettingsEntity::class,
     ],
     version = 1, // Release baseline - no production users yet
-    exportSchema = true
+    exportSchema = true,
 )
 abstract class TheDayToDatabase : RoomDatabase() {
     abstract val entryDao: EntryDao

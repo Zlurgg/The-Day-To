@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement
 
+import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -14,7 +15,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import io.mockk.mockk
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
@@ -73,11 +73,11 @@ class MoodColorManagementViewModelTest {
             saveMoodColor = SaveMoodColorUseCase(validateUseCase, fakeMoodColorRepository),
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             restoreMoodColor = RestoreMoodColorUseCase(fakeMoodColorRepository),
-            setFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository)
+            setFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
         )
         return MoodColorManagementViewModel(
             useCases = useCases,
-            syncScheduler = mockSyncScheduler
+            syncScheduler = mockSyncScheduler,
         )
     }
 

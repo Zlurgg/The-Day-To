@@ -37,7 +37,7 @@ class FakeNotificationSettingsDao : NotificationSettingsDao {
         settingsMap[userId]?.let {
             settingsMap[userId] = it.copy(
                 lastNotifiedDateEpoch = dateEpoch,
-                syncStatus = "PENDING_SYNC"
+                syncStatus = "PENDING_SYNC",
             )
         }
     }

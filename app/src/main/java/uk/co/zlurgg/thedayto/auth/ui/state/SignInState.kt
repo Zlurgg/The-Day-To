@@ -8,7 +8,7 @@ data class SignInState(
     val signInError: String? = null,
     val showWelcomeDialog: Boolean = false,
     val navigationTarget: SignInNavigationTarget? = null,
-    val isDevSignInAvailable: Boolean = false
+    val isDevSignInAvailable: Boolean = false,
 )
 
 sealed interface SignInNavigationTarget {

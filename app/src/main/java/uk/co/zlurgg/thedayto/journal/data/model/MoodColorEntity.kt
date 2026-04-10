@@ -11,8 +11,8 @@ import androidx.room.PrimaryKey
         Index(value = ["moodNormalized"], unique = true),  // Enforce case-insensitive uniqueness
         Index(value = ["syncId"], unique = true),
         Index(value = ["userId"]),
-        Index(value = ["syncStatus"])
-    ]
+        Index(value = ["syncStatus"]),
+    ],
 )
 data class MoodColorEntity(
     val mood: String,              // Original case for display (e.g., "Happy")
@@ -25,5 +25,5 @@ data class MoodColorEntity(
     val syncId: String? = null,
     val userId: String? = null,
     val updatedAt: Long? = null,
-    val syncStatus: String = "LOCAL_ONLY"
+    val syncStatus: String = "LOCAL_ONLY",
 )

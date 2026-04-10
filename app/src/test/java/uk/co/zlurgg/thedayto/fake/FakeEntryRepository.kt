@@ -20,7 +20,7 @@ import java.time.ZoneOffset
  * Can optionally accept a FakeMoodColorRepository to simulate proper JOIN behavior.
  */
 class FakeEntryRepository(
-    private val moodColorRepository: FakeMoodColorRepository? = null
+    private val moodColorRepository: FakeMoodColorRepository? = null,
 ) : EntryRepository {
 
     // In-memory storage for testing (use StateFlow to emit on changes like Room)
@@ -48,7 +48,7 @@ class FakeEntryRepository(
                     moodName = moodColor?.mood ?: "Test Mood",  // Use actual mood name from join
                     moodColor = moodColor?.color ?: "4CAF50",   // Use actual color from join
                     content = entry.content,
-                    dateStamp = entry.dateStamp
+                    dateStamp = entry.dateStamp,
                 )
             }
         }
@@ -71,7 +71,7 @@ class FakeEntryRepository(
                         moodName = moodColor?.mood ?: "Test Mood",
                         moodColor = moodColor?.color ?: "4CAF50",
                         content = entry.content,
-                        dateStamp = entry.dateStamp
+                        dateStamp = entry.dateStamp,
                     )
                 }
         }
@@ -105,8 +105,8 @@ class FakeEntryRepository(
                 moodName = moodColor?.mood ?: "Test Mood",
                 moodColor = moodColor?.color ?: "4CAF50",
                 content = entry.content,
-                dateStamp = entry.dateStamp
-            )
+                dateStamp = entry.dateStamp,
+            ),
         )
     }
 
@@ -128,8 +128,8 @@ class FakeEntryRepository(
                 moodName = moodColor?.mood ?: "Test Mood",
                 moodColor = moodColor?.color ?: "4CAF50",
                 content = entry.content,
-                dateStamp = entry.dateStamp
-            )
+                dateStamp = entry.dateStamp,
+            ),
         )
     }
 

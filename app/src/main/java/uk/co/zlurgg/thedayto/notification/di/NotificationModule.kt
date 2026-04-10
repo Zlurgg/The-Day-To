@@ -24,7 +24,7 @@ val notificationModule = module {
         NotificationMigrationService(
             dao = get(),
             legacyPrefs = get(qualifier = org.koin.core.qualifier.named("legacyNotificationPrefs")),
-            authRepository = get()
+            authRepository = get(),
         )
     }
 
@@ -32,7 +32,7 @@ val notificationModule = module {
     single<NotificationSettingsRepository> {
         NotificationSettingsRepositoryImpl(
             dao = get(),
-            migrationService = get()
+            migrationService = get(),
         )
     }
 
@@ -40,7 +40,7 @@ val notificationModule = module {
     single<NotificationSyncService> {
         NotificationSyncServiceImpl(
             firestore = get(),
-            settingsDao = get()
+            settingsDao = get(),
         )
     }
 
@@ -49,7 +49,7 @@ val notificationModule = module {
         NotificationAuthUseCase(
             settingsRepository = get(),
             notificationScheduler = get(),
-            syncService = get()
+            syncService = get(),
         )
     }
 }

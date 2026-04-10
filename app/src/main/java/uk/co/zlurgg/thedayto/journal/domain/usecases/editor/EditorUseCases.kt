@@ -19,5 +19,5 @@ data class EditorUseCases(
     val setMoodColorFavorite: SetMoodColorFavoriteUseCase,
     // Tutorial UseCases
     val checkEditorTutorialSeen: CheckEditorTutorialSeenUseCase,
-    val markEditorTutorialSeen: MarkEditorTutorialSeenUseCase
+    val markEditorTutorialSeen: MarkEditorTutorialSeenUseCase,
 )

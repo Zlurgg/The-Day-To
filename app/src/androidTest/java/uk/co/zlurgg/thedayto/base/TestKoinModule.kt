@@ -37,7 +37,7 @@ val testDatabaseModule = module {
     single {
         Room.inMemoryDatabaseBuilder(
             get<Context>(),
-            TheDayToDatabase::class.java
+            TheDayToDatabase::class.java,
         )
             .allowMainThreadQueries() // For testing only
             .build()

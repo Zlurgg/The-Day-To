@@ -23,7 +23,7 @@ import uk.co.zlurgg.thedayto.sync.domain.model.SyncStatus
  */
 class NotificationSettingsRepositoryImpl(
     private val dao: NotificationSettingsDao,
-    private val migrationService: NotificationMigrationService
+    private val migrationService: NotificationMigrationService,
 ) : NotificationSettingsRepository {
 
     private val migrationMutex = Mutex()
@@ -83,13 +83,13 @@ class NotificationSettingsRepositoryImpl(
                     userId = userId,
                     syncId = existing.syncId,
                     syncStatus = SyncStatus.PENDING_SYNC,
-                    updatedAt = System.currentTimeMillis()
+                    updatedAt = System.currentTimeMillis(),
                 )
             } else {
                 // New settings
                 NotificationSettingsEntity.fromDomain(
                     settings = settings,
-                    userId = userId
+                    userId = userId,
                 )
             }
 

@@ -16,7 +16,7 @@ import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
  * @param syncRepository Repository for sync operations
  */
 class PrepareForSyncUseCase(
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
 ) {
     /**
      * Prepare local data for sync.

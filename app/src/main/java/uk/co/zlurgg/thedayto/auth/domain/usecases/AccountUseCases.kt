@@ -12,5 +12,5 @@ data class AccountUseCases(
     val signOut: SignOutUseCase,
     val reauthenticate: ReauthenticateUseCase,
     val deleteAccount: DeleteAccountUseCase,
-    val devSignIn: DevSignInUseCase? = null
+    val devSignIn: DevSignInUseCase? = null,
 )

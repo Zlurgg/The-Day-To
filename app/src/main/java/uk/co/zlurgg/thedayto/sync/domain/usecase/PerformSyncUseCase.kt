@@ -16,7 +16,7 @@ import uk.co.zlurgg.thedayto.sync.domain.repository.SyncRepository
 class PerformSyncUseCase(
     private val authRepository: AuthRepository,
     private val preferencesRepository: PreferencesRepository,
-    private val syncRepository: SyncRepository
+    private val syncRepository: SyncRepository,
 ) {
     suspend operator fun invoke(): Result<SyncResult, DataError.Sync> {
         // Check if sync is enabled

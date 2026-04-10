@@ -36,7 +36,7 @@ abstract class ComposeTest : KoinTest {
      */
     protected fun waitUntil(
         timeoutMillis: Long = 5000L,
-        condition: () -> Boolean
+        condition: () -> Boolean,
     ) {
         composeTestRule.waitUntil(timeoutMillis) {
             condition()

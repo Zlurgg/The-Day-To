@@ -58,7 +58,7 @@ class FakeSyncRepository : SyncRepository {
 
     override suspend fun uploadPendingEntries(
         entries: List<Entry>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync> {
         uploadPendingEntriesCalled = true
         lastUserId = userId
@@ -71,7 +71,7 @@ class FakeSyncRepository : SyncRepository {
 
     override suspend fun uploadPendingMoodColors(
         moodColors: List<MoodColor>,
-        userId: String
+        userId: String,
     ): Result<Int, DataError.Sync> {
         uploadPendingMoodColorsCalled = true
         lastUserId = userId

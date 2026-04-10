@@ -11,7 +11,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
 class NoOpDevAuthService : DevAuthService {
     override suspend fun signInWithEmailPassword(
         email: String,
-        password: String
+        password: String,
     ): Result<UserData, DataError.Auth> = Result.Error(DataError.Auth.FAILED)
 
     override fun isAvailable(): Boolean = false

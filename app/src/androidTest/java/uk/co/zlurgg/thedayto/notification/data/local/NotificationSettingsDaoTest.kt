@@ -183,7 +183,7 @@ class NotificationSettingsDaoTest : DatabaseTest() {
         enabled: Boolean = true,
         hour: Int = 9,
         minute: Int = 0,
-        syncStatus: String = "LOCAL_ONLY"
+        syncStatus: String = "LOCAL_ONLY",
     ) = NotificationSettingsEntity(
         userId = userId,
         enabled = enabled,
@@ -191,6 +191,6 @@ class NotificationSettingsDaoTest : DatabaseTest() {
         minute = minute,
         syncId = "sync-$userId",
         syncStatus = syncStatus,
-        updatedAt = System.currentTimeMillis()
+        updatedAt = System.currentTimeMillis(),
     )
 }

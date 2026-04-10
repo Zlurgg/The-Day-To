@@ -21,7 +21,7 @@ import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
  * - Scaling efficiently as users accumulate entries over time
  */
 class GetEntriesForMonthUseCase(
-    private val repository: EntryRepository
+    private val repository: EntryRepository,
 ) {
     /**
      * Get entries for a specific month with optional sorting.
@@ -35,7 +35,7 @@ class GetEntriesForMonthUseCase(
     operator fun invoke(
         month: Int,
         year: Int,
-        entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending)
+        entryOrder: EntryOrder = EntryOrder.Date(OrderType.Descending),
     ): Flow<List<EntryWithMoodColor>> {
         require(month in MIN_MONTH..MAX_MONTH) { "Month must be between $MIN_MONTH and $MAX_MONTH, got: $month" }
         require(year > 0) { "Year must be positive, got: $year" }

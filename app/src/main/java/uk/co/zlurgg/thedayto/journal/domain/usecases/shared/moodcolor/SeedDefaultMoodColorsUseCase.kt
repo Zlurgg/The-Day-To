@@ -29,7 +29,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 class SeedDefaultMoodColorsUseCase(
     private val moodColorRepository: MoodColorRepository,
     private val preferencesRepository: PreferencesRepository,
-    private val timeProvider: TimeProvider
+    private val timeProvider: TimeProvider,
 ) {
     /**
      * Seed default mood colors on first launch only.
@@ -66,7 +66,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_happy",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "Sad",
@@ -74,7 +74,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_sad",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "In Love",
@@ -82,7 +82,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_in_love",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "Calm",
@@ -90,7 +90,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_calm",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "Excited",
@@ -98,7 +98,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_excited",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "Anxious",
@@ -106,7 +106,7 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_anxious",
-                updatedAt = 0L
+                updatedAt = 0L,
             ),
             MoodColor(
                 mood = "Grateful",
@@ -114,8 +114,8 @@ class SeedDefaultMoodColorsUseCase(
                 isFavorite = false,
                 dateStamp = timestamp,
                 syncId = "seed_grateful",
-                updatedAt = 0L
-            )
+                updatedAt = 0L,
+            ),
         )
 
         // Insert all default mood colors and track results

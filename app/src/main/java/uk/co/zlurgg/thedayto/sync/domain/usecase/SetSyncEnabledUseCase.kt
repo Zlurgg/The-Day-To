@@ -12,7 +12,7 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
  * @param enabled true to enable sync, false to disable
  */
 class SetSyncEnabledUseCase(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) {
     suspend operator fun invoke(enabled: Boolean) {
         preferencesRepository.setSyncEnabled(enabled)

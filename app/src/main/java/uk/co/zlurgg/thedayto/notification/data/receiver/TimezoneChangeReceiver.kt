@@ -34,7 +34,7 @@ class TimezoneChangeReceiver : BroadcastReceiver() {
                 .enqueueUniqueWork(
                     WORK_NAME,
                     ExistingWorkPolicy.REPLACE,
-                    workRequest
+                    workRequest,
                 )
         }
     }

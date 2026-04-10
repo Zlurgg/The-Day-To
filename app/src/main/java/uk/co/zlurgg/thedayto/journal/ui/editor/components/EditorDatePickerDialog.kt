@@ -36,7 +36,7 @@ private const val MIN_SELECTABLE_YEAR = 2020
 fun EditorDatePickerDialog(
     currentDate: LocalDate,
     onDismiss: () -> Unit,
-    onDateSelected: (LocalDate) -> Unit
+    onDateSelected: (LocalDate) -> Unit,
 ) {
     // Convert LocalDate to milliseconds for DatePicker (using UTC for consistency with app storage)
     val initialDateMillis = currentDate
@@ -57,7 +57,7 @@ fun EditorDatePickerDialog(
             override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                 return utcTimeMillis <= todayMillis
             }
-        }
+        },
     )
 
     DatePickerDialog(
@@ -73,7 +73,7 @@ fun EditorDatePickerDialog(
                     }
                     onDismiss()
                 },
-                enabled = datePickerState.selectedDateMillis != null
+                enabled = datePickerState.selectedDateMillis != null,
             ) {
                 Text(stringResource(R.string.ok))
             }
@@ -90,8 +90,8 @@ fun EditorDatePickerDialog(
             selectedDayContainerColor = MaterialTheme.colorScheme.primary,
             selectedDayContentColor = MaterialTheme.colorScheme.onPrimary,
             todayContentColor = MaterialTheme.colorScheme.primary,
-            todayDateBorderColor = MaterialTheme.colorScheme.primary
-        )
+            todayDateBorderColor = MaterialTheme.colorScheme.primary,
+        ),
     ) {
         DatePicker(state = datePickerState)
     }
@@ -104,7 +104,7 @@ private fun EditorDatePickerDialogPreview() {
         EditorDatePickerDialog(
             currentDate = LocalDate.now(),
             onDismiss = {},
-            onDateSelected = {}
+            onDateSelected = {},
         )
     }
 }

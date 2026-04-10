@@ -23,7 +23,7 @@ import java.time.ZoneId
 class FakeTimeProvider(
     private var fixedDate: LocalDate = LocalDate.of(2024, 1, 15),
     private var fixedTime: LocalTime = LocalTime.of(10, 30),
-    private var fixedZone: ZoneId = ZoneId.of("UTC")
+    private var fixedZone: ZoneId = ZoneId.of("UTC"),
 ) : TimeProvider {
 
     override fun today(): LocalDate = fixedDate

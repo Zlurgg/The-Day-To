@@ -29,7 +29,7 @@ import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
  */
 class MoodColorManagementViewModel(
     private val useCases: MoodColorManagementUseCases,
-    private val syncScheduler: SyncScheduler
+    private val syncScheduler: SyncScheduler,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(MoodColorManagementUiState())
@@ -67,10 +67,12 @@ class MoodColorManagementViewModel(
             is MoodColorManagementAction.SaveMoodColor -> save(action.moodColor)
             is MoodColorManagementAction.RequestDeleteMoodColor ->
                 showDeleteConfirmation(action.moodColor)
+
             is MoodColorManagementAction.ConfirmDelete -> confirmDelete()
             is MoodColorManagementAction.DismissDeleteDialog -> dismissDeleteDialog()
             is MoodColorManagementAction.ToggleFavorite ->
                 toggleFavorite(action.id, action.currentValue)
+
             is MoodColorManagementAction.DismissDialog -> dismissDialog()
             is MoodColorManagementAction.ClearError -> clearError()
         }
@@ -101,6 +103,7 @@ class MoodColorManagementViewModel(
                     _state.update { it.copy(editingMoodColor = null, dialogError = null) }
                     syncScheduler.requestImmediateSync()
                 }
+
                 is Result.Error -> {
                     _state.update { it.copy(dialogError = result.error) }
                 }
@@ -121,6 +124,7 @@ class MoodColorManagementViewModel(
                     _state.update { it.copy(pendingDelete = null) }
                     syncScheduler.requestImmediateSync()
                 }
+
                 is Result.Error -> {
                     _state.update { it.copy(pendingDelete = null) }
                     _events.emit(MoodColorEvent.ShowError(result.error))
@@ -145,7 +149,7 @@ class MoodColorManagementViewModel(
                     state.pendingFavorites // Keep true original
                 } else {
                     state.pendingFavorites + (id to currentValue)
-                }
+                },
             )
         }
 
@@ -157,13 +161,14 @@ class MoodColorManagementViewModel(
                     }
                     syncScheduler.requestImmediateSync()
                 }
+
                 is Result.Error -> {
                     // Revert using stored original value
                     val originalValue = _state.value.pendingFavorites[id] ?: currentValue
                     _state.update { state ->
                         state.copy(
                             moodColors = state.moodColors.revertOptimisticFavorite(id, originalValue),
-                            pendingFavorites = state.pendingFavorites - id
+                            pendingFavorites = state.pendingFavorites - id,
                         )
                     }
                     _events.emit(MoodColorEvent.ShowError(result.error))

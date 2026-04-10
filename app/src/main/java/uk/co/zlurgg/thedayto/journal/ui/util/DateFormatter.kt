@@ -36,7 +36,7 @@ object DateFormatter {
     fun formatMonth(epochSeconds: Long): String {
         return epochSeconds.toLocalDate().month.getDisplayName(
             TextStyle.FULL,
-            Locale.getDefault()
+            Locale.getDefault(),
         )
     }
 

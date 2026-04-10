@@ -17,7 +17,7 @@ import java.util.UUID
 
 class MoodColorRepositoryImpl(
     private val dao: MoodColorDao,
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) : MoodColorRepository {
 
     override suspend fun insertMoodColor(moodColor: MoodColor): Result<Long, DataError.Local> {
@@ -26,7 +26,7 @@ class MoodColorRepositoryImpl(
             val moodColorWithSync = moodColor.copy(
                 syncId = moodColor.syncId ?: UUID.randomUUID().toString(),
                 updatedAt = moodColor.updatedAt ?: System.currentTimeMillis(),
-                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY
+                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else SyncStatus.LOCAL_ONLY,
             )
             dao.insertMoodColor(moodColorWithSync.toEntity())
         }
@@ -38,7 +38,7 @@ class MoodColorRepositoryImpl(
             // so another reader can't catch the row in a half-deleted state.
             dao.softDeleteWithSync(
                 id = id,
-                markPendingDelete = preferencesRepository.isSyncEnabled()
+                markPendingDelete = preferencesRepository.isSyncEnabled(),
             )
         }
     }
@@ -78,7 +78,7 @@ class MoodColorRepositoryImpl(
                 syncId = moodColor.syncId ?: existingMoodColor?.syncId ?: UUID.randomUUID().toString(),
                 userId = moodColor.userId ?: existingMoodColor?.userId,
                 updatedAt = System.currentTimeMillis(),
-                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else moodColor.syncStatus
+                syncStatus = if (syncEnabled) SyncStatus.PENDING_SYNC else moodColor.syncStatus,
             )
             dao.updateMoodColor(moodColorWithSync.toEntity())
         }

@@ -9,7 +9,7 @@ import uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository
 
 class GetSortedMoodColorsUseCase(
     private val moodColorRepository: MoodColorRepository,
-    private val entryRepository: EntryRepository
+    private val entryRepository: EntryRepository,
 ) {
     /**
      * Returns mood colors sorted by: favorites first, then by usage count descending.
@@ -18,7 +18,7 @@ class GetSortedMoodColorsUseCase(
     operator fun invoke(): Flow<List<MoodColorWithCount>> {
         return combine(
             moodColorRepository.getMoodColors(),
-            entryRepository.getMoodColorEntryCounts()
+            entryRepository.getMoodColorEntryCounts(),
         ) { moodColors, counts ->
             moodColors
                 .map { mc -> MoodColorWithCount(mc, counts[mc.id] ?: 0) }

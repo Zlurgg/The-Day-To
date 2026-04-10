@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 fun SignOutDialog(
     onDismiss: () -> Unit,
     onConfirm: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -27,14 +27,14 @@ fun SignOutDialog(
             Text(
                 text = "Sign Out?",
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.SemiBold
+                fontWeight = FontWeight.SemiBold,
             )
         },
         text = {
             Text(
                 text = "Are you sure you want to sign out? You'll need to sign in again to access your entries.",
                 style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         },
         confirmButton = {
@@ -42,7 +42,7 @@ fun SignOutDialog(
                 Text(
                     text = "Sign Out",
                     color = MaterialTheme.colorScheme.error,
-                    fontWeight = FontWeight.SemiBold
+                    fontWeight = FontWeight.SemiBold,
                 )
             }
         },
@@ -50,10 +50,10 @@ fun SignOutDialog(
             TextButton(onClick = onDismiss) {
                 Text(
                     text = "Cancel",
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }

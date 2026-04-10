@@ -31,7 +31,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
  */
 @Composable
 fun AboutDialog(
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val uriHandler = LocalUriHandler.current
     val privacyUrl = stringResource(R.string.privacy_policy_url)
@@ -40,25 +40,25 @@ fun AboutDialog(
         title = stringResource(R.string.about_dialog_title),
         buttonText = stringResource(R.string.about_dialog_button),
         onDismiss = onDismiss,
-        scrollable = true
+        scrollable = true,
     ) {
         DialogContentSection(
             title = stringResource(R.string.about_dialog_version_title),
-            content = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME)
+            content = stringResource(R.string.about_dialog_version_info, BuildConfig.VERSION_NAME),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.about_dialog_description_title),
-            content = stringResource(R.string.about_dialog_description_content)
+            content = stringResource(R.string.about_dialog_description_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.about_dialog_privacy_title),
-            content = stringResource(R.string.about_dialog_privacy_content)
+            content = stringResource(R.string.about_dialog_privacy_content),
         )
 
         TextButton(onClick = { uriHandler.openUri(privacyUrl) }) {
@@ -69,21 +69,21 @@ fun AboutDialog(
 
         DialogContentSection(
             title = stringResource(R.string.about_dialog_open_source_title),
-            content = stringResource(R.string.about_dialog_open_source_content)
+            content = stringResource(R.string.about_dialog_open_source_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.about_dialog_credits_title),
-            content = stringResource(R.string.about_dialog_credits_content)
+            content = stringResource(R.string.about_dialog_credits_content),
         )
 
         Spacer(modifier = Modifier.height(paddingMedium))
 
         DialogContentSection(
             title = stringResource(R.string.about_dialog_license_title),
-            content = stringResource(R.string.about_dialog_license_content)
+            content = stringResource(R.string.about_dialog_license_content),
         )
     }
 }

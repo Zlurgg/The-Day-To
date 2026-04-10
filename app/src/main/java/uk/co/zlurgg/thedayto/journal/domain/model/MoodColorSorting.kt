@@ -7,7 +7,7 @@ package uk.co.zlurgg.thedayto.journal.domain.model
 fun List<MoodColorWithCount>.sortedByFavoriteAndUsage(): List<MoodColorWithCount> =
     sortedWith(
         compareByDescending<MoodColorWithCount> { it.moodColor.isFavorite }
-            .thenByDescending { it.entryCount }
+            .thenByDescending { it.entryCount },
     )
 
 /**

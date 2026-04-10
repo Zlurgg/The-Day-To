@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit
  * - Network restore sync (when connectivity returns)
  */
 class SyncScheduler(
-    private val context: Context
+    private val context: Context,
 ) {
     private val workManager: WorkManager by lazy { WorkManager.getInstance(context) }
 
@@ -39,20 +39,20 @@ class SyncScheduler(
 
         val periodicWorkRequest = PeriodicWorkRequestBuilder<SyncWorker>(
             PERIODIC_SYNC_INTERVAL_MINUTES,
-            TimeUnit.MINUTES
+            TimeUnit.MINUTES,
         )
             .setConstraints(constraints)
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
                 BACKOFF_DELAY_MINUTES,
-                TimeUnit.MINUTES
+                TimeUnit.MINUTES,
             )
             .build()
 
         workManager.enqueueUniquePeriodicWork(
             SyncWorker.WORK_NAME_PERIODIC,
             ExistingPeriodicWorkPolicy.KEEP, // Don't restart if already scheduled
-            periodicWorkRequest
+            periodicWorkRequest,
         )
 
         Timber.i("SyncScheduler: Periodic sync scheduled every %d minutes", PERIODIC_SYNC_INTERVAL_MINUTES)
@@ -84,14 +84,14 @@ class SyncScheduler(
             .setBackoffCriteria(
                 BackoffPolicy.EXPONENTIAL,
                 BACKOFF_DELAY_MINUTES,
-                TimeUnit.MINUTES
+                TimeUnit.MINUTES,
             )
             .build()
 
         workManager.enqueueUniqueWork(
             SyncWorker.WORK_NAME_IMMEDIATE,
             ExistingWorkPolicy.KEEP, // Don't cancel in-progress sync
-            immediateWorkRequest
+            immediateWorkRequest,
         )
 
         Timber.i("SyncScheduler: Immediate sync enqueued")

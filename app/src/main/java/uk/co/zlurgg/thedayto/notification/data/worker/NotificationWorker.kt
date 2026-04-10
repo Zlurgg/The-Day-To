@@ -76,7 +76,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
                 applicationContext,
                 0,
                 intent,
-                PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT,
             )
         }
 
@@ -106,7 +106,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
             NotificationChannel(
                 NOTIFICATION_CHANNEL,
                 NOTIFICATION_NAME,
-                NotificationManager.IMPORTANCE_HIGH
+                NotificationManager.IMPORTANCE_HIGH,
             )
 
         channel.enableLights(true)
@@ -127,7 +127,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     private fun createPendingIntent(context: Context): PendingIntent? {
         val startActivityIntent = Intent(
             Intent.ACTION_VIEW, NOTIFICATION_DEEP_LINK.toUri(),
-            context, MainActivity::class.java
+            context, MainActivity::class.java,
         )
         val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(startActivityIntent)

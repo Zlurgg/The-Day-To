@@ -1,14 +1,14 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.components
 
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusState
-import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
-import android.content.res.Configuration
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
 
 /**
  * Pure presenter component for content entry field.
@@ -33,7 +33,7 @@ fun ContentItem(
     isHintVisible: Boolean,
     onContentChange: (String) -> Unit,
     onFocusChange: (FocusState) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     TransparentHintTextField(
         text = content,
@@ -45,7 +45,7 @@ fun ContentItem(
         maxLength = InputValidation.MAX_CONTENT_LENGTH,
         showCharacterCount = true,
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
     )
 }
 
@@ -59,7 +59,7 @@ private fun ContentItemPreview() {
             hint = "How was your day?",
             isHintVisible = false,
             onContentChange = {},
-            onFocusChange = {}
+            onFocusChange = {},
         )
     }
 }
@@ -73,7 +73,7 @@ private fun ContentItemEmptyPreview() {
             hint = "How was your day?",
             isHintVisible = true,
             onContentChange = {},
-            onFocusChange = {}
+            onFocusChange = {},
         )
     }
 }

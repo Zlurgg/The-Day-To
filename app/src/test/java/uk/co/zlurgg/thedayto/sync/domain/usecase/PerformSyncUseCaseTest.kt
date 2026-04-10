@@ -33,7 +33,7 @@ class PerformSyncUseCaseTest {
     private val testUser = UserData(
         userId = "test_user_123",
         username = "Test User",
-        profilePictureUrl = null
+        profilePictureUrl = null,
     )
 
     @Before
@@ -45,7 +45,7 @@ class PerformSyncUseCaseTest {
         useCase = PerformSyncUseCase(
             authRepository = fakeAuthRepository,
             preferencesRepository = fakePreferencesRepository,
-            syncRepository = fakeSyncRepository
+            syncRepository = fakeSyncRepository,
         )
     }
 
@@ -98,7 +98,7 @@ class PerformSyncUseCaseTest {
         fakeAuthRepository.setSignedInUser(testUser)
         fakeSyncRepository.syncResult = SyncResult(
             entriesUploaded = 2,
-            entriesDownloaded = 3
+            entriesDownloaded = 3,
         )
 
         // When: Invoking use case

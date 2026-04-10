@@ -15,7 +15,7 @@ fun EntryEntity.toDomain(): Entry {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = syncStatus.toSyncStatusOrDefault()
+        syncStatus = syncStatus.toSyncStatusOrDefault(),
     )
 }
 
@@ -28,7 +28,7 @@ fun Entry.toEntity(): EntryEntity {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = syncStatus.name
+        syncStatus = syncStatus.name,
         // isDeleted defaults to false - entries are hard-deleted
     )
 }
@@ -40,6 +40,6 @@ fun EntryWithMoodColorEntity.toDomain(): EntryWithMoodColor {
         moodName = moodName,
         moodColor = moodColor,
         content = content,
-        dateStamp = dateStamp
+        dateStamp = dateStamp,
     )
 }

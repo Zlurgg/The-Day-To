@@ -13,5 +13,5 @@ data class SignInUseCases(
     val seedDefaultMoodColors: SeedDefaultMoodColorsUseCase,
     val checkWelcomeDialogSeen: CheckWelcomeDialogSeenUseCase,
     val markWelcomeDialogSeen: MarkWelcomeDialogSeenUseCase,
-    val devSignIn: DevSignInUseCase? = null
+    val devSignIn: DevSignInUseCase? = null,
 )

@@ -25,7 +25,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
  * - GoogleAuthUiClient: Firebase sign-in (needs Application context only)
  */
 class GoogleAuthUiClient(
-    private val context: Context
+    private val context: Context,
 ) {
     private val auth = FirebaseAuth.getInstance()
     private val credentialManager = CredentialManager.create(context)
@@ -48,7 +48,7 @@ class GoogleAuthUiClient(
             UserData(
                 userId = user.uid,
                 username = user.displayName,
-                profilePictureUrl = user.photoUrl?.toString()
+                profilePictureUrl = user.photoUrl?.toString(),
             )
         }
     }
@@ -59,7 +59,7 @@ class GoogleAuthUiClient(
     suspend fun signOut(): EmptyResult<DataError.Auth> {
         return AuthErrorMapper.safeAuthCall(TAG) {
             credentialManager.clearCredentialState(
-                ClearCredentialStateRequest()
+                ClearCredentialStateRequest(),
             )
             auth.signOut()
             Timber.d("User signed out successfully")
@@ -73,7 +73,7 @@ class GoogleAuthUiClient(
         UserData(
             userId = uid,
             username = displayName,
-            profilePictureUrl = photoUrl?.toString()
+            profilePictureUrl = photoUrl?.toString(),
         )
     }
 

@@ -13,7 +13,7 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
  * @param preferencesRepository Repository for storing preference data
  */
 class MarkFirstLaunchCompleteUseCase(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) {
     /**
      * Execute the use case

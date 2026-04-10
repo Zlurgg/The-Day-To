@@ -98,6 +98,7 @@ class AuthErrorMapperTest {
     @Test
     fun `safeAuthCall - action returning complex type returns Success`() = runTest {
         data class TestData(val id: Int, val name: String)
+
         val testData = TestData(123, "Test")
 
         val result = AuthErrorMapper.safeAuthCall {

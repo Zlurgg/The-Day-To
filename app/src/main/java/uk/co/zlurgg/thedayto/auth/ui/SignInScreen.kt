@@ -44,7 +44,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 fun SignInScreenRoot(
     viewModel: SignInViewModel = koinViewModel(),
     credentialProviderFactory: CredentialProviderFactory = koinInject(),
-    onNavigateToOverview: () -> Unit
+    onNavigateToOverview: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -90,7 +90,7 @@ fun SignInScreenRoot(
         },
         onDevSignInClick = { viewModel.devSignIn() },
         isDevSignInAvailable = state.isDevSignInAvailable,
-        snackbarHostState = snackbarHostState
+        snackbarHostState = snackbarHostState,
     )
 }
 
@@ -105,7 +105,7 @@ private fun SignInScreen(
     onDevSignInClick: () -> Unit,
     isDevSignInAvailable: Boolean,
     snackbarHostState: SnackbarHostState,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Show welcome dialog for first-time users
     if (showWelcomeDialog) {
@@ -114,7 +114,7 @@ private fun SignInScreen(
 
     Scaffold(
         snackbarHost = { CustomSnackbarHost(hostState = snackbarHostState) },
-        modifier = modifier
+        modifier = modifier,
     ) { innerPadding ->
         SignInScreenContent(
             onSignInClick = onSignInClick,
@@ -122,7 +122,7 @@ private fun SignInScreen(
             isDevSignInAvailable = isDevSignInAvailable,
             modifier = Modifier
                 .padding(innerPadding)
-                .fillMaxSize()
+                .fillMaxSize(),
         )
     }
 }
@@ -132,7 +132,7 @@ private fun SignInScreenContent(
     onSignInClick: () -> Unit,
     onDevSignInClick: () -> Unit,
     isDevSignInAvailable: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Animation states for staggered entrance
     var showWelcome by remember { mutableStateOf(false) }
@@ -153,39 +153,39 @@ private fun SignInScreenContent(
 
     Surface(
         modifier = modifier,
-        color = MaterialTheme.colorScheme.background
+        color = MaterialTheme.colorScheme.background,
     ) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .systemBarsPadding()
                 .padding(paddingLarge),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 WelcomeHeader(
                     showWelcome = showWelcome,
                     showAppName = showAppName,
-                    showSubtitle = showSubtitle
+                    showSubtitle = showSubtitle,
                 )
 
                 SignInButton(
                     onClick = onSignInClick,
-                    showButton = showButton
+                    showButton = showButton,
                 )
 
                 if (isDevSignInAvailable) {
                     DevSignInButton(
                         onClick = onDevSignInClick,
-                        showButton = showButton
+                        showButton = showButton,
                     )
                 }
 
                 SignInFooter(
-                    showButton = showButton
+                    showButton = showButton,
                 )
             }
         }
@@ -199,7 +199,7 @@ private fun SignInScreenContentPreview() {
         SignInScreenContent(
             onSignInClick = { },
             onDevSignInClick = { },
-            isDevSignInAvailable = true
+            isDevSignInAvailable = true,
         )
     }
 }
@@ -209,7 +209,7 @@ private fun SignInScreenContentPreview() {
     showBackground = true,
     widthDp = 360,
     heightDp = 640,
-    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES
+    uiMode = android.content.res.Configuration.UI_MODE_NIGHT_YES,
 )
 @Composable
 private fun SignInScreenContentDarkPreview() {
@@ -217,7 +217,7 @@ private fun SignInScreenContentDarkPreview() {
         SignInScreenContent(
             onSignInClick = { },
             onDevSignInClick = { },
-            isDevSignInAvailable = true
+            isDevSignInAvailable = true,
         )
     }
 }

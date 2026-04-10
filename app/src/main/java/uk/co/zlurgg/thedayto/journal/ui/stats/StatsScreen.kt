@@ -45,13 +45,13 @@ import java.time.LocalDate
 @Composable
 fun StatsScreenRoot(
     viewModel: StatsViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     StatsScreen(
         uiState = uiState,
-        onNavigateBack = onNavigateBack
+        onNavigateBack = onNavigateBack,
     )
 }
 
@@ -63,7 +63,7 @@ fun StatsScreenRoot(
 private fun StatsScreen(
     uiState: StatsUiState,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Scaffold(
         topBar = {
@@ -73,13 +73,13 @@ private fun StatsScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.stats_navigate_back)
+                            contentDescription = stringResource(R.string.stats_navigate_back),
                         )
                     }
-                }
+                },
             )
         },
-        modifier = modifier
+        modifier = modifier,
     ) { paddingValues ->
         when {
             uiState.error != null -> {
@@ -91,19 +91,21 @@ private fun StatsScreen(
                     messageColor = MaterialTheme.colorScheme.error,
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 )
             }
+
             uiState.isLoading -> {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator()
                 }
             }
+
             uiState.isEmpty -> {
                 StateMessagePanel(
                     icon = Icons.Default.BarChart,
@@ -111,16 +113,17 @@ private fun StatsScreen(
                     message = stringResource(R.string.stats_empty_message),
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(paddingValues)
+                        .padding(paddingValues),
                 )
             }
+
             else -> {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(paddingValues)
                         .padding(horizontal = paddingMedium),
-                    verticalArrangement = Arrangement.spacedBy(paddingMedium)
+                    verticalArrangement = Arrangement.spacedBy(paddingMedium),
                 ) {
                     item { Spacer(modifier = Modifier.height(0.dp)) } // Top spacing
 
@@ -128,19 +131,19 @@ private fun StatsScreen(
                         TotalStatsCard(
                             totalEntries = uiState.totalEntries,
                             firstEntryDate = uiState.firstEntryDate,
-                            averageEntriesPerMonth = uiState.averageEntriesPerMonth
+                            averageEntriesPerMonth = uiState.averageEntriesPerMonth,
                         )
                     }
 
                     item {
                         MoodDistributionCard(
-                            moodDistribution = uiState.moodDistribution
+                            moodDistribution = uiState.moodDistribution,
                         )
                     }
 
                     item {
                         MonthlyBreakdownCard(
-                            monthlyBreakdown = uiState.monthlyBreakdown
+                            monthlyBreakdown = uiState.monthlyBreakdown,
                         )
                     }
 
@@ -164,17 +167,17 @@ private fun StatsScreenPreview() {
                 moodDistribution = listOf(
                     StatsUiState.MoodCount("Happy", "#4CAF50", 34),
                     StatsUiState.MoodCount("Relaxed", "#2196F3", 28),
-                    StatsUiState.MoodCount("Neutral", "#FFC107", 19)
+                    StatsUiState.MoodCount("Neutral", "#FFC107", 19),
                 ),
                 monthlyBreakdown = listOf(
                     StatsUiState.MonthStats("November", 2024, 11, 10, 33),
                     StatsUiState.MonthStats("October", 2024, 10, 23, 74),
-                    StatsUiState.MonthStats("September", 2024, 9, 28, 93)
+                    StatsUiState.MonthStats("September", 2024, 9, 28, 93),
                 ),
                 isLoading = false,
-                isEmpty = false
+                isEmpty = false,
             ),
-            onNavigateBack = {}
+            onNavigateBack = {},
         )
     }
 }
@@ -185,7 +188,7 @@ private fun StatsScreenEmptyPreview() {
     TheDayToTheme {
         StatsScreen(
             uiState = StatsUiState(isEmpty = true, isLoading = false),
-            onNavigateBack = {}
+            onNavigateBack = {},
         )
     }
 }
@@ -196,7 +199,7 @@ private fun StatsScreenLoadingPreview() {
     TheDayToTheme {
         StatsScreen(
             uiState = StatsUiState(isLoading = true),
-            onNavigateBack = {}
+            onNavigateBack = {},
         )
     }
 }

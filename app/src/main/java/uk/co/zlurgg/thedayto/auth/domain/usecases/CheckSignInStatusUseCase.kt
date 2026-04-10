@@ -15,7 +15,7 @@ import uk.co.zlurgg.thedayto.auth.domain.repository.AuthStateRepository
  */
 class CheckSignInStatusUseCase(
     private val authRepository: AuthRepository,
-    private val authStateRepository: AuthStateRepository
+    private val authStateRepository: AuthStateRepository,
 ) {
     operator fun invoke(): Boolean {
         val isSignedIn = authStateRepository.getSignedInState()

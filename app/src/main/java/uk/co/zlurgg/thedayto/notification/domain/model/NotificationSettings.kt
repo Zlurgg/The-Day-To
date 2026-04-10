@@ -14,7 +14,7 @@ package uk.co.zlurgg.thedayto.notification.domain.model
 data class NotificationSettings(
     val enabled: Boolean = false,
     val hour: Int = DEFAULT_HOUR,
-    val minute: Int = DEFAULT_MINUTE
+    val minute: Int = DEFAULT_MINUTE,
 ) {
     init {
         require(hour in 0..MAX_HOUR) { "Hour must be 0-$MAX_HOUR, was $hour" }

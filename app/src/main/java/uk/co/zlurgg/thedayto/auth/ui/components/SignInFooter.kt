@@ -13,7 +13,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 @Composable
 fun SignInFooter(
     showButton: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Spacer(modifier = Modifier.height(paddingMedium))
     Text(
@@ -21,6 +21,6 @@ fun SignInFooter(
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.4f),
         textAlign = TextAlign.Center,
-        modifier = modifier.alpha(if (showButton) 1f else 0f)
+        modifier = modifier.alpha(if (showButton) 1f else 0f),
     )
 }

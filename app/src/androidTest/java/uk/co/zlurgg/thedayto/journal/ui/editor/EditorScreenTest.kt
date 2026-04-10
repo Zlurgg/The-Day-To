@@ -31,7 +31,7 @@ class EditorScreenTest : ComposeTest() {
     private val testMoodColors = listOf(
         MoodColor(id = 1, mood = "Happy", color = "4CAF50", dateStamp = System.currentTimeMillis()),
         MoodColor(id = 2, mood = "Sad", color = "2196F3", dateStamp = System.currentTimeMillis()),
-        MoodColor(id = 3, mood = "Calm", color = "9C27B0", dateStamp = System.currentTimeMillis())
+        MoodColor(id = 3, mood = "Calm", color = "9C27B0", dateStamp = System.currentTimeMillis()),
     )
 
     // ============================================================
@@ -51,7 +51,7 @@ class EditorScreenTest : ComposeTest() {
                     onDeleteMoodColor = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = {},
-                    onSaveMoodColor = { _, _ -> }
+                    onSaveMoodColor = { _, _ -> },
                 )
             }
         }
@@ -90,7 +90,7 @@ class EditorScreenTest : ComposeTest() {
                     onDeleteMoodColor = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = {},
-                    onSaveMoodColor = { _, _ -> }
+                    onSaveMoodColor = { _, _ -> },
                 )
             }
         }
@@ -124,7 +124,7 @@ class EditorScreenTest : ComposeTest() {
                     onDeleteMoodColor = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = { toggleCalled = true },
-                    onSaveMoodColor = { _, _ -> }
+                    onSaveMoodColor = { _, _ -> },
                 )
             }
         }
@@ -154,7 +154,7 @@ class EditorScreenTest : ComposeTest() {
                     onDeleteMoodColor = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = { toggleCalled = true },
-                    onSaveMoodColor = { _, _ -> }
+                    onSaveMoodColor = { _, _ -> },
                 )
             }
         }
@@ -188,7 +188,7 @@ class EditorScreenTest : ComposeTest() {
                     hint = "Any additional info?",
                     isHintVisible = false, // Hide hint when content exists
                     onContentChange = {},
-                    onFocusChange = {}
+                    onFocusChange = {},
                 )
             }
         }

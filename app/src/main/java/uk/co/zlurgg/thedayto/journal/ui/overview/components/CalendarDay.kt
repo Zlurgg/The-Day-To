@@ -32,17 +32,17 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 fun CalendarDay(
     entry: EntryWithMoodColor,
     modifier: Modifier = Modifier,
-    cornerRadius: Dp = CalendarConstants.DAY_CORNER_RADIUS
+    cornerRadius: Dp = CalendarConstants.DAY_CORNER_RADIUS,
 ) {
     val color = getColorSafe(entry.moodColor)
     val dayNumber = DateFormatter.formatDay(entry.dateStamp)
     val dayDescription = stringResource(
         R.string.calendar_day_with_entry,
         dayNumber,
-        entry.moodName
+        entry.moodName,
     )
     Box(
-        modifier = modifier.semantics { contentDescription = dayDescription }
+        modifier = modifier.semantics { contentDescription = dayDescription },
     ) {
         Canvas(modifier = Modifier.matchParentSize()) {
             val clipPath = Path().apply {
@@ -56,13 +56,13 @@ fun CalendarDay(
                 drawRoundRect(
                     color = color,
                     size = size,
-                    cornerRadius = CornerRadius(cornerRadius.toPx())
+                    cornerRadius = CornerRadius(cornerRadius.toPx()),
                 )
             }
         }
         Box(
             modifier = Modifier.fillMaxSize(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = dayNumber.toString(),
@@ -86,9 +86,9 @@ private fun CalendarDayPreview() {
                 moodName = "Happy",
                 moodColor = "4CAF50",
                 content = "Great day!",
-                dateStamp = System.currentTimeMillis()
+                dateStamp = System.currentTimeMillis(),
             ),
-            modifier = Modifier.size(48.dp)
+            modifier = Modifier.size(48.dp),
         )
     }
 }

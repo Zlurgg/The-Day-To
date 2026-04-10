@@ -37,7 +37,7 @@ class NotificationAuthUseCaseTest {
         useCase = NotificationAuthUseCase(
             settingsRepository = settingsRepository,
             notificationScheduler = notificationScheduler,
-            syncService = syncService
+            syncService = syncService,
         )
     }
 
@@ -63,7 +63,7 @@ class NotificationAuthUseCaseTest {
         // Given: Remote settings with notifications enabled
         syncService.setRemoteSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = true, hour = 14, minute = 45)
+            NotificationSettings(enabled = true, hour = 14, minute = 45),
         )
 
         // When: User signs in
@@ -72,7 +72,7 @@ class NotificationAuthUseCaseTest {
         // Then: Notifications are rescheduled to remote time
         assertTrue(
             "Notification should be scheduled at 14:45",
-            notificationScheduler.isScheduledAt(14, 45)
+            notificationScheduler.isScheduledAt(14, 45),
         )
     }
 
@@ -81,11 +81,11 @@ class NotificationAuthUseCaseTest {
         // Given: Both remote and anonymous settings exist
         syncService.setRemoteSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = true, hour = 10, minute = 0)
+            NotificationSettings(enabled = true, hour = 10, minute = 0),
         )
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 8, minute = 30)
+            NotificationSettings(enabled = true, hour = 8, minute = 30),
         )
 
         // When: User signs in
@@ -107,11 +107,11 @@ class NotificationAuthUseCaseTest {
         // Given: Both remote and anonymous settings exist
         syncService.setRemoteSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = true, hour = 10, minute = 0)
+            NotificationSettings(enabled = true, hour = 10, minute = 0),
         )
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 8, minute = 30)
+            NotificationSettings(enabled = true, hour = 8, minute = 30),
         )
 
         // When: User signs in
@@ -149,7 +149,7 @@ class NotificationAuthUseCaseTest {
         // Given: Anonymous user has notification settings
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 10, minute = 0)
+            NotificationSettings(enabled = true, hour = 10, minute = 0),
         )
 
         // When: User signs in
@@ -164,7 +164,7 @@ class NotificationAuthUseCaseTest {
         // Given: Anonymous settings with notifications enabled
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 14, minute = 45)
+            NotificationSettings(enabled = true, hour = 14, minute = 45),
         )
 
         // When: User signs in
@@ -173,7 +173,7 @@ class NotificationAuthUseCaseTest {
         // Then: Notifications are rescheduled
         assertTrue(
             "Notification should be scheduled at 14:45",
-            notificationScheduler.isScheduledAt(14, 45)
+            notificationScheduler.isScheduledAt(14, 45),
         )
     }
 
@@ -182,7 +182,7 @@ class NotificationAuthUseCaseTest {
         // Given: Anonymous settings with notifications disabled
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = false, hour = 9, minute = 0)
+            NotificationSettings(enabled = false, hour = 9, minute = 0),
         )
 
         // When: User signs in
@@ -191,7 +191,7 @@ class NotificationAuthUseCaseTest {
         // Then: Notifications are not scheduled
         assertFalse(
             "Notification should not be scheduled",
-            notificationScheduler.isScheduledAt(9, 0)
+            notificationScheduler.isScheduledAt(9, 0),
         )
     }
 
@@ -226,7 +226,7 @@ class NotificationAuthUseCaseTest {
         // Given: User has notification settings enabled
         settingsRepository.setSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = true, hour = 8, minute = 0)
+            NotificationSettings(enabled = true, hour = 8, minute = 0),
         )
 
         // When: User signs out
@@ -245,7 +245,7 @@ class NotificationAuthUseCaseTest {
         // Given: User has notification settings disabled
         settingsRepository.setSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = false, hour = 10, minute = 30)
+            NotificationSettings(enabled = false, hour = 10, minute = 30),
         )
 
         // When: User signs out
@@ -262,7 +262,7 @@ class NotificationAuthUseCaseTest {
         // Given: User has notification settings
         settingsRepository.setSettings(
             "firebase_user_123",
-            NotificationSettings(enabled = true, hour = 10, minute = 30)
+            NotificationSettings(enabled = true, hour = 10, minute = 30),
         )
 
         // When: User signs out
@@ -289,11 +289,11 @@ class NotificationAuthUseCaseTest {
         // Given: Multiple users have settings
         settingsRepository.setSettings(
             "user_A",
-            NotificationSettings(enabled = true, hour = 8, minute = 0)
+            NotificationSettings(enabled = true, hour = 8, minute = 0),
         )
         settingsRepository.setSettings(
             "user_B",
-            NotificationSettings(enabled = true, hour = 9, minute = 0)
+            NotificationSettings(enabled = true, hour = 9, minute = 0),
         )
 
         // When: User A signs out
@@ -316,11 +316,11 @@ class NotificationAuthUseCaseTest {
         // And: New anonymous settings exist
         syncService.setRemoteSettings(
             "firebase_user_456",
-            NotificationSettings(enabled = true, hour = 10, minute = 0)
+            NotificationSettings(enabled = true, hour = 10, minute = 0),
         )
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 7, minute = 15)
+            NotificationSettings(enabled = true, hour = 7, minute = 15),
         )
 
         // When: User signs in again
@@ -336,7 +336,7 @@ class NotificationAuthUseCaseTest {
         // Given: New user with anonymous settings, no remote settings
         settingsRepository.setSettings(
             ANONYMOUS_USER_ID,
-            NotificationSettings(enabled = true, hour = 7, minute = 15)
+            NotificationSettings(enabled = true, hour = 7, minute = 15),
         )
 
         // When: User signs in

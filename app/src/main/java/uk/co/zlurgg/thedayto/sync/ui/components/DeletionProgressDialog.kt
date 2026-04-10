@@ -30,7 +30,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
 fun DeletionProgressDialog(
     progress: DeletionProgress,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AlertDialog(
         onDismissRequest = { /* Non-dismissible during deletion */ },
@@ -43,41 +43,48 @@ fun DeletionProgressDialog(
                     is DeletionProgress.Starting -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_starting),
-                            isInProgress = true
+                            isInProgress = true,
                         )
                     }
+
                     is DeletionProgress.CancellingSync -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_cancelling_sync),
-                            isInProgress = true
+                            isInProgress = true,
                         )
                     }
+
                     is DeletionProgress.DeletingRemote -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_deleting_remote),
-                            isInProgress = true
+                            isInProgress = true,
                         )
                     }
+
                     is DeletionProgress.DeletingAccount -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_deleting_account),
-                            isInProgress = true
+                            isInProgress = true,
                         )
                     }
+
                     is DeletionProgress.ClearingLocal -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_clearing_local),
-                            isInProgress = true
+                            isInProgress = true,
                         )
                     }
+
                     is DeletionProgress.Complete -> {
                         ProgressStep(
                             text = stringResource(R.string.delete_account_progress_complete),
-                            isComplete = true
+                            isComplete = true,
                         )
                     }
+
                     is DeletionProgress.RequiresReAuth,
-                    is DeletionProgress.Failed -> {
+                    is DeletionProgress.Failed,
+                        -> {
                         // These are handled outside this dialog
                     }
                 }
@@ -90,7 +97,7 @@ fun DeletionProgressDialog(
                 }
             }
         },
-        modifier = modifier
+        modifier = modifier,
     )
 }
 
@@ -99,25 +106,26 @@ private fun ProgressStep(
     text: String,
     isInProgress: Boolean = false,
     isComplete: Boolean = false,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
+        modifier = modifier,
     ) {
         when {
             isInProgress -> {
                 CircularProgressIndicator(
                     modifier = Modifier.size(20.dp),
-                    strokeWidth = 2.dp
+                    strokeWidth = 2.dp,
                 )
             }
+
             isComplete -> {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(20.dp),
                 )
             }
         }

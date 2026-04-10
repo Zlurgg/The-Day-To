@@ -15,7 +15,7 @@ fun MoodColorEntity.toDomain(): MoodColor {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = syncStatus.toSyncStatusOrDefault()
+        syncStatus = syncStatus.toSyncStatusOrDefault(),
     )
 }
 
@@ -31,6 +31,6 @@ fun MoodColor.toEntity(): MoodColorEntity {
         syncId = syncId,
         userId = userId,
         updatedAt = updatedAt,
-        syncStatus = syncStatus.name
+        syncStatus = syncStatus.name,
     )
 }

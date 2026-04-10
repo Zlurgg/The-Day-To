@@ -29,7 +29,7 @@ object HttpClientFactory {
                     Json {
                         ignoreUnknownKeys = true
                         isLenient = true
-                    }
+                    },
                 )
             }
             install(Logging) {

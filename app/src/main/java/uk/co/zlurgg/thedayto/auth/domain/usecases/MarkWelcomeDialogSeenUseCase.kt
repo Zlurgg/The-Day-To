@@ -14,7 +14,7 @@ import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
  * @param preferencesRepository Repository for persisting welcome dialog state
  */
 class MarkWelcomeDialogSeenUseCase(
-    private val preferencesRepository: PreferencesRepository
+    private val preferencesRepository: PreferencesRepository,
 ) {
     suspend operator fun invoke() {
         preferencesRepository.markWelcomeDialogSeen()

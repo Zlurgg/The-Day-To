@@ -41,7 +41,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 fun ColorWheelButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    size: Dp = 40.dp
+    size: Dp = 40.dp,
 ) {
     val rainbowColors = listOf(
         Color(0xFFFF0000), // Red
@@ -51,7 +51,7 @@ fun ColorWheelButton(
         Color(0xFF0000FF), // Blue
         Color(0xFF4B0082), // Indigo
         Color(0xFF9400D3), // Violet
-        Color(0xFFFF0000) // Back to red to complete the circle
+        Color(0xFFFF0000), // Back to red to complete the circle
     )
 
     Box(
@@ -63,22 +63,22 @@ fun ColorWheelButton(
                 indication = ripple(bounded = true),
                 onClick = onClick,
                 role = Role.Button,
-                onClickLabel = stringResource(R.string.add_mood_color_button_description)
+                onClickLabel = stringResource(R.string.add_mood_color_button_description),
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         // Color wheel background
         Canvas(modifier = Modifier.size(size)) {
             // Fill with sweep gradient
             drawCircle(
                 brush = Brush.sweepGradient(rainbowColors),
-                radius = size.toPx() / 2
+                radius = size.toPx() / 2,
             )
             // Optional: slight inner shadow/darker ring for depth
             drawCircle(
                 color = Color.Black.copy(alpha = 0.1f),
                 radius = size.toPx() / 2 - 2.dp.toPx(),
-                style = Stroke(width = 4.dp.toPx())
+                style = Stroke(width = 4.dp.toPx()),
             )
         }
 
@@ -87,7 +87,7 @@ fun ColorWheelButton(
             imageVector = Icons.Default.Add,
             contentDescription = stringResource(R.string.add_mood_color_button_description),
             tint = Color.White,
-            modifier = Modifier.size(size * 0.5f)
+            modifier = Modifier.size(size * 0.5f),
         )
     }
 }

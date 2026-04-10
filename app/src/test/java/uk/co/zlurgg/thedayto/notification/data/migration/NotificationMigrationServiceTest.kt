@@ -42,7 +42,7 @@ class NotificationMigrationServiceTest {
         migrationService = NotificationMigrationService(
             dao = fakeDao,
             legacyPrefs = mockPrefs,
-            authRepository = fakeAuthRepository
+            authRepository = fakeAuthRepository,
         )
     }
 
@@ -129,8 +129,8 @@ class NotificationMigrationServiceTest {
             UserData(
                 userId = "firebase_user_123",
                 username = "Test User",
-                profilePictureUrl = null
-            )
+                profilePictureUrl = null,
+            ),
         )
         every { mockPrefs.contains("notification_enabled") } returns true
         every { mockPrefs.getBoolean("notification_enabled", false) } returns true
@@ -206,6 +206,6 @@ class NotificationMigrationServiceTest {
             minute = 0,
             syncId = "test-sync-id",
             syncStatus = "SYNCED",
-            updatedAt = System.currentTimeMillis()
+            updatedAt = System.currentTimeMillis(),
         )
 }

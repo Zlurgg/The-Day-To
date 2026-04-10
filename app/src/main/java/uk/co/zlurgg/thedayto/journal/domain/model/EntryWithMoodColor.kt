@@ -9,5 +9,5 @@ data class EntryWithMoodColor(
     val moodName: String,
     val moodColor: String,
     val content: String,
-    val dateStamp: Long
+    val dateStamp: Long,
 )

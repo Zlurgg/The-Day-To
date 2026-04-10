@@ -26,7 +26,7 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getContrastingTextColor
 @Composable
 fun EntryItem(
     entry: EntryWithMoodColor,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val moodColor = getColorSafe(entry.moodColor)
     val textColor = moodColor.getContrastingTextColor()
@@ -35,23 +35,23 @@ fun EntryItem(
         modifier = modifier,
         elevation = CardDefaults.cardElevation(
             defaultElevation = UiConstants.ENTRY_CARD_ELEVATION_DEFAULT,
-            pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED
+            pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED,
         ),
         colors = CardDefaults.cardColors(
-            containerColor = moodColor.copy(alpha = 0.9f)
-        )
+            containerColor = moodColor.copy(alpha = 0.9f),
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(UiConstants.ENTRY_CARD_PADDING),
-            verticalArrangement = Arrangement.spacedBy(UiConstants.ENTRY_ITEM_SPACING)
+            verticalArrangement = Arrangement.spacedBy(UiConstants.ENTRY_ITEM_SPACING),
         ) {
             // Header: Mood (left) + Date (right)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = entry.moodName,
@@ -59,13 +59,13 @@ fun EntryItem(
                     fontWeight = FontWeight.SemiBold,
                     color = textColor,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f, fill = false)
+                    modifier = Modifier.weight(1f, fill = false),
                 )
                 Text(
                     text = DateFormatter.formatDate(entry.dateStamp),
                     style = MaterialTheme.typography.labelLarge,
                     color = textColor.copy(alpha = 0.8f),
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
 
@@ -76,7 +76,7 @@ fun EntryItem(
                     style = MaterialTheme.typography.bodyMedium,
                     color = textColor,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
                 )
             }
         }
@@ -95,8 +95,8 @@ private fun EntryItemPreview() {
                 moodName = "Happy",
                 moodColor = "4CAF50",
                 content = "Had a wonderful day with family and friends. Everything went well!",
-                dateStamp = System.currentTimeMillis()
-            )
+                dateStamp = System.currentTimeMillis(),
+            ),
         )
     }
 }
@@ -112,8 +112,8 @@ private fun EntryItemNoContentPreview() {
                 moodName = "Tired",
                 moodColor = "9C27B0",
                 content = "",
-                dateStamp = System.currentTimeMillis()
-            )
+                dateStamp = System.currentTimeMillis(),
+            ),
         )
     }
 }

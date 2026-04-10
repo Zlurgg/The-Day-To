@@ -56,7 +56,7 @@ fun NotificationSettingsDialog(
     hasPermission: Boolean,
     onDismiss: () -> Unit,
     onRequestPermission: () -> Unit,
-    onSave: (enabled: Boolean, hour: Int, minute: Int) -> Unit
+    onSave: (enabled: Boolean, hour: Int, minute: Int) -> Unit,
 ) {
     var isEnabled by remember { mutableStateOf(enabled) }
     // Track a key to force TimePickerState recreation when preset chips are clicked
@@ -67,7 +67,7 @@ fun NotificationSettingsDialog(
         TimePickerState(
             initialHour = selectedHour,
             initialMinute = selectedMinute,
-            is24Hour = true
+            is24Hour = true,
         )
     }
 
@@ -85,17 +85,17 @@ fun NotificationSettingsDialog(
         },
         text = {
             Column(
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 // Enable/Disable Toggle
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = stringResource(R.string.enable_daily_reminders),
                         style = MaterialTheme.typography.bodyLarge,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     Switch(
                         checked = isEnabled,
@@ -107,7 +107,7 @@ fun NotificationSettingsDialog(
                                 // Either disabling or already has permission
                                 isEnabled = newValue
                             }
-                        }
+                        },
                     )
                 }
 
@@ -118,13 +118,13 @@ fun NotificationSettingsDialog(
                     Text(
                         text = stringResource(R.string.notification_time),
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier.padding(bottom = paddingSmall)
+                        modifier = Modifier.padding(bottom = paddingSmall),
                     )
 
                     // Quick time presets
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
                         FilterChip(
                             selected = timePickerState.hour == 8 && timePickerState.minute == 0,
@@ -137,14 +137,14 @@ fun NotificationSettingsDialog(
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = stringResource(R.string.preset_morning),
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
                                     )
                                     Text(
                                         text = "8:00",
-                                        style = MaterialTheme.typography.bodySmall
+                                        style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
-                            }
+                            },
                         )
                         FilterChip(
                             selected = timePickerState.hour == 12 && timePickerState.minute == 0,
@@ -157,14 +157,14 @@ fun NotificationSettingsDialog(
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = stringResource(R.string.preset_noon),
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
                                     )
                                     Text(
                                         text = "12:00",
-                                        style = MaterialTheme.typography.bodySmall
+                                        style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
-                            }
+                            },
                         )
                         FilterChip(
                             selected = timePickerState.hour == 20 && timePickerState.minute == 0,
@@ -177,14 +177,14 @@ fun NotificationSettingsDialog(
                                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                     Text(
                                         text = stringResource(R.string.preset_evening),
-                                        style = MaterialTheme.typography.labelSmall
+                                        style = MaterialTheme.typography.labelSmall,
                                     )
                                     Text(
                                         text = "20:00",
-                                        style = MaterialTheme.typography.bodySmall
+                                        style = MaterialTheme.typography.bodySmall,
                                     )
                                 }
-                            }
+                            },
                         )
                     }
 
@@ -192,7 +192,7 @@ fun NotificationSettingsDialog(
 
                     TimePicker(
                         state = timePickerState,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     )
                 }
             }
@@ -201,7 +201,7 @@ fun NotificationSettingsDialog(
             TextButton(
                 onClick = {
                     onSave(isEnabled, timePickerState.hour, timePickerState.minute)
-                }
+                },
             ) {
                 Text(text = stringResource(R.string.save))
             }
@@ -210,7 +210,7 @@ fun NotificationSettingsDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
 }
 
@@ -226,7 +226,7 @@ private fun NotificationSettingsDialogEnabledPreview() {
             hasPermission = true,
             onDismiss = {},
             onRequestPermission = {},
-            onSave = { _, _, _ -> }
+            onSave = { _, _, _ -> },
         )
     }
 }
@@ -242,7 +242,7 @@ private fun NotificationSettingsDialogDisabledPreview() {
             hasPermission = false,
             onDismiss = {},
             onRequestPermission = {},
-            onSave = { _, _, _ -> }
+            onSave = { _, _, _ -> },
         )
     }
 }

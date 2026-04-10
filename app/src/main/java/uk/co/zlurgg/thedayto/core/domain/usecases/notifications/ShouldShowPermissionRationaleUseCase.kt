@@ -21,7 +21,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  * @param notificationScheduler Scheduler for notification operations
  */
 class ShouldShowPermissionRationaleUseCase(
-    private val notificationScheduler: NotificationScheduler
+    private val notificationScheduler: NotificationScheduler,
 ) {
     operator fun invoke(): Boolean {
         return notificationScheduler.shouldShowPermissionRationale()

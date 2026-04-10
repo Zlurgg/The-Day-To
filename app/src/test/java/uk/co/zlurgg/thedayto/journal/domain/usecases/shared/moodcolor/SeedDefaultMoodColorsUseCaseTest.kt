@@ -125,7 +125,7 @@ class SeedDefaultMoodColorsUseCaseTest {
      */
     private class FailingMoodColorRepository : MoodColorRepository {
         override suspend fun insertMoodColor(
-            moodColor: MoodColor
+            moodColor: MoodColor,
         ): Result<Long, DataError.Local> {
             return Result.Error(DataError.Local.DATABASE_ERROR)
         }
@@ -145,12 +145,12 @@ class SeedDefaultMoodColorsUseCaseTest {
         override fun getMoodColors(): Flow<List<MoodColor>> = flowOf(emptyList())
 
         override suspend fun updateMoodColor(
-            moodColor: MoodColor
+            moodColor: MoodColor,
         ): EmptyResult<DataError.Local> = Result.Success(Unit)
 
         override suspend fun setFavorite(
             id: Int,
-            isFavorite: Boolean
+            isFavorite: Boolean,
         ): EmptyResult<DataError.Local> = Result.Success(Unit)
 
         override suspend fun restore(id: Int): EmptyResult<DataError.Local> =

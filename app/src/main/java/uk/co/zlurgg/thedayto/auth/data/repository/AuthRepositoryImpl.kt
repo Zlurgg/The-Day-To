@@ -20,18 +20,19 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
  * @param context Application context for GoogleAuthUiClient
  */
 class AuthRepositoryImpl(
-    context: Context
+    context: Context,
 ) : AuthRepository {
 
     private val googleAuthUiClient = GoogleAuthUiClient(context)
 
     override suspend fun signIn(
-        credentialProvider: CredentialProvider
+        credentialProvider: CredentialProvider,
     ): Result<UserData, DataError.Auth> {
         return when (val credentialResult = credentialProvider()) {
             is Result.Success -> {
                 googleAuthUiClient.signInWithCredential(credentialResult.data.idToken)
             }
+
             is Result.Error -> {
                 Result.Error(credentialResult.error)
             }
@@ -55,6 +56,7 @@ class AuthRepositoryImpl(
             is Result.Success -> {
                 googleAuthUiClient.reauthenticateWithCredential(credentialResult.data.idToken)
             }
+
             is Result.Error -> {
                 Result.Error(credentialResult.error)
             }

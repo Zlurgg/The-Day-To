@@ -12,16 +12,16 @@ import androidx.room.PrimaryKey
             entity = MoodColorEntity::class,
             parentColumns = ["id"],
             childColumns = ["moodColorId"],
-            onDelete = ForeignKey.NO_ACTION
-        )
+            onDelete = ForeignKey.NO_ACTION,
+        ),
     ],
     indices = [
         Index(value = ["moodColorId"]),
         Index(value = ["syncId"], unique = true),
         Index(value = ["userId"]),
         Index(value = ["syncStatus"]),
-        Index(value = ["dateStamp", "userId"], unique = true)
-    ]
+        Index(value = ["dateStamp", "userId"], unique = true),
+    ],
 )
 data class EntryEntity(
     val moodColorId: Int,
@@ -32,5 +32,5 @@ data class EntryEntity(
     val userId: String? = null,
     val updatedAt: Long? = null,
     val syncStatus: String = "LOCAL_ONLY",
-    val isDeleted: Boolean = false
+    val isDeleted: Boolean = false,
 )
