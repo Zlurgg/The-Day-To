@@ -8,7 +8,6 @@ import androidx.compose.ui.unit.dp
  */
 object MoodColorConstants {
     // Animation timing
-    const val REORDER_DELAY_MS = 200L
     const val FAVORITE_ANIMATION_DURATION_MS = 200
 
     // Color circle sizes
