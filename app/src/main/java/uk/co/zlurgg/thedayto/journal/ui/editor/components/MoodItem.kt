@@ -7,17 +7,24 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -41,6 +48,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.AddMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.ColorWheelButton
@@ -176,25 +186,53 @@ fun MoodItem(
                 .width(with(LocalDensity.current) { mMoodFieldSize.width.toDp() })
                 .heightIn(max = 300.dp) // Allow scroll for large mood lists
         ) {
-            // Show empty state message when no moods exist
+            // Show empty state callout when no moods exist.
+            // Using a plain Column (not a disabled DropdownMenuItem) because the
+            // empty state isn't meant to be interactive — tapping it would just
+            // collapse the menu with no action.
             if (moodColors.isEmpty()) {
-                DropdownMenuItem(
-                    onClick = { /* No action - just informational */ },
-                    enabled = false,
-                    text = {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = paddingMedium,
+                            vertical = paddingLarge
+                        ),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = stringResource(R.string.empty_mood_list_title),
+                        style = MaterialTheme.typography.titleSmall,
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+                    Spacer(modifier = Modifier.height(paddingSmall))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(paddingSmall)
+                    ) {
                         Text(
-                            text = stringResource(R.string.empty_mood_list_message),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.fillMaxWidth()
+                            text = stringResource(R.string.empty_mood_list_hint),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Icon(
+                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                            contentDescription = null,
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier.size(16.dp)
                         )
                     }
-                )
+                }
             }
 
-            // Mood colors with unified MoodColorRow (compact mode for dropdown)
+            // Mood colors with unified MoodColorRow.
+            // Zero out DropdownMenuItem's default 12dp horizontal padding so
+            // MoodColorRow's own start/end padding is the sole source. This keeps
+            // the star and edit circle visually close to the dropdown edges and
+            // matches the spacing used on the Management screen.
             moodColors.forEach { moodColor ->
                 DropdownMenuItem(
+                    contentPadding = PaddingValues(horizontal = 0.dp),
                     onClick = {
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         moodColor.id?.let { onMoodSelected(it) }
@@ -245,20 +283,34 @@ private fun EmptyDropdownContentPreview() {
             modifier = Modifier
                 .fillMaxWidth()
                 .background(MaterialTheme.colorScheme.surface)
+                .padding(
+                    horizontal = paddingMedium,
+                    vertical = paddingLarge
+                ),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Empty state message
-            DropdownMenuItem(
-                onClick = { },
-                enabled = false,
-                text = {
-                    Text(
-                        text = stringResource(R.string.empty_mood_list_message),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.fillMaxWidth()
-                    )
-                }
+            Text(
+                text = stringResource(R.string.empty_mood_list_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurface
             )
+            Spacer(modifier = Modifier.height(paddingSmall))
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(paddingSmall)
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_mood_list_hint),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }
