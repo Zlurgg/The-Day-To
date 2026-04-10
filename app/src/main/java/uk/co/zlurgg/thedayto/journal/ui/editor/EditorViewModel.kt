@@ -8,7 +8,9 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -421,13 +423,15 @@ class EditorViewModel(
     private fun loadMoodColors() {
         getMoodColorsJob?.cancel()
         getMoodColorsJob = editorUseCases.getMoodColors(
-            MoodColorOrder.Date(
-                OrderType.Descending
-            )
+            MoodColorOrder.Date(OrderType.Descending)
         )
-            .onEach { moodColors ->
-                // Sort by favorites first for the dropdown
-                _uiState.update { it.copy(moodColors = moodColors.sortedByFavorite()) }
+            // Sort by favorites first for the dropdown, inside the flow pipeline
+            // so distinctUntilChanged can short-circuit redundant Room re-emissions
+            // without the ViewModel's state being re-assigned unnecessarily.
+            .map { moodColors -> moodColors.sortedByFavorite() }
+            .distinctUntilChanged()
+            .onEach { sorted ->
+                _uiState.update { it.copy(moodColors = sorted) }
             }
             .launchIn(viewModelScope)
     }
