@@ -16,8 +16,9 @@ object MoodColorConstants {
     val COLOR_CIRCLE_SIZE_LARGE: Dp = 44.dp
 
     // Favorite star sizes (slightly smaller than color circle)
+    // Touch target meets WCAG 2.5.5 minimum (48dp).
     val FAVORITE_ICON_SIZE: Dp = 28.dp
-    val FAVORITE_TOUCH_TARGET: Dp = 40.dp
+    val FAVORITE_TOUCH_TARGET: Dp = 48.dp
 
     // Favorite icon animation
     const val ICON_SCALE_FAVORITE = 1f
