@@ -26,13 +26,18 @@ data class MoodColor(
     val syncStatus: SyncStatus = SyncStatus.LOCAL_ONLY
 ) {
     companion object {
+        /** Fallback color for a brand-new mood color when the user has no prior selection. */
+        const val DEFAULT_EMPTY_COLOR = "CCCCCC"
+
         /**
          * Creates an empty mood color for the add dialog.
-         * Uses unique timestamp to ensure LaunchedEffect re-runs.
+         * Uses a unique timestamp so LaunchedEffect re-runs when the dialog
+         * reopens, and accepts an optional seed color so callers can
+         * remember the user's last-picked color within a session.
          */
-        fun empty() = MoodColor(
+        fun empty(color: String = DEFAULT_EMPTY_COLOR) = MoodColor(
             mood = "",
-            color = "CCCCCC",
+            color = color,
             dateStamp = System.currentTimeMillis()
         )
     }

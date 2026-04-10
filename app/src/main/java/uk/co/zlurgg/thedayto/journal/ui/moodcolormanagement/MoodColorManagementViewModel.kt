@@ -38,6 +38,14 @@ class MoodColorManagementViewModel(
     private val _events = MutableSharedFlow<MoodColorEvent>()
     val events = _events.asSharedFlow()
 
+    /**
+     * Last color the user successfully saved in this session. Seeds the add
+     * dialog so reopening it lands on the same color instead of grey.
+     * Survives dialog cancellation because it only updates on a successful save,
+     * and survives config changes because it lives on the ViewModel.
+     */
+    private var lastSavedColor: String = MoodColor.DEFAULT_EMPTY_COLOR
+
     init {
         // Observe sorted mood colors - Room Flow auto-updates on any write
         useCases.getSortedMoodColors()
@@ -69,7 +77,7 @@ class MoodColorManagementViewModel(
     }
 
     private fun showAddDialog() {
-        _state.update { it.copy(editingMoodColor = MoodColor.empty()) }
+        _state.update { it.copy(editingMoodColor = MoodColor.empty(color = lastSavedColor)) }
     }
 
     private fun showEditDialog(moodColor: MoodColor) {
@@ -88,6 +96,8 @@ class MoodColorManagementViewModel(
         viewModelScope.launch {
             when (val result = useCases.saveMoodColor(moodColor)) {
                 is Result.Success -> {
+                    // Remember the color for the next add-dialog open
+                    lastSavedColor = result.data.color
                     _state.update { it.copy(editingMoodColor = null, dialogError = null) }
                     syncScheduler.requestImmediateSync()
                 }
