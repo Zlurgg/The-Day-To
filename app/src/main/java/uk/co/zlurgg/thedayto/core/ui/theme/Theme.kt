@@ -10,7 +10,6 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
@@ -42,7 +41,6 @@ private val LightColors = lightColorScheme(
     outlineVariant = md_theme_light_outlineVariant,
     scrim = md_theme_light_scrim,
 )
-
 
 private val DarkColors = darkColorScheme(
     primary = md_theme_dark_primary,
@@ -79,14 +77,17 @@ private val DarkColors = darkColorScheme(
 @Composable
 fun TheDayToTheme(
     useDarkTheme: Boolean = isSystemInDarkTheme(),
-    useDynamicColor: Boolean = false,  // Disabled by default to use our custom theme
+    useDynamicColor: Boolean = false, // Disabled by default to use our custom theme
     content: @Composable () -> Unit,
 ) {
     val context = LocalContext.current
     val colors = when {
         useDynamicColor && (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) -> {
-            if (useDarkTheme) dynamicDarkColorScheme(context)
-            else dynamicLightColorScheme(context)
+            if (useDarkTheme) {
+                dynamicDarkColorScheme(context)
+            } else {
+                dynamicLightColorScheme(context)
+            }
         }
 
         useDarkTheme -> DarkColors

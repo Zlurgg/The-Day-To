@@ -45,8 +45,8 @@ class FakeEntryRepository(
                 EntryWithMoodColor(
                     id = entry.id,
                     moodColorId = entry.moodColorId,
-                    moodName = moodColor?.mood ?: "Test Mood",  // Use actual mood name from join
-                    moodColor = moodColor?.color ?: "4CAF50",   // Use actual color from join
+                    moodName = moodColor?.mood ?: "Test Mood", // Use actual mood name from join
+                    moodColor = moodColor?.color ?: "4CAF50", // Use actual color from join
                     content = entry.content,
                     dateStamp = entry.dateStamp,
                 )

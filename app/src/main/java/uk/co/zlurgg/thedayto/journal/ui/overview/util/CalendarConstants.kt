@@ -12,8 +12,8 @@ object CalendarConstants {
     const val INITIAL_PAGER_PAGE = 1_000_000_000
 
     // Sizing - dynamic range for responsive layout
-    val DEFAULT_DAY_SIZE_MIN: Dp = 36.dp  // Lower bound for narrow screens
-    val DEFAULT_DAY_SIZE_MAX: Dp = 56.dp  // Upper bound for tablets
+    val DEFAULT_DAY_SIZE_MIN: Dp = 36.dp // Lower bound for narrow screens
+    val DEFAULT_DAY_SIZE_MAX: Dp = 56.dp // Upper bound for tablets
     val CALENDAR_HORIZONTAL_PADDING: Dp = 16.dp
     val CALENDAR_DAY_SPACING: Dp = 8.dp
     val CALENDAR_ROW_SPACING: Dp = 4.dp

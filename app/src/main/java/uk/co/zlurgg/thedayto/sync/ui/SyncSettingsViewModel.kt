@@ -279,8 +279,7 @@ class SyncSettingsViewModel(
                         Timber.w("Account deletion failed: %s", progress.message)
                     }
 
-                    else -> { /* Progress update - no action needed */
-                    }
+                    else -> Unit // Progress update - no action needed
                 }
             }
         }

@@ -42,7 +42,9 @@ fun MonthStatistics(
     val entryCount = entries.size
     val completionPercentage = if (daysInMonth > 0) {
         (entryCount.toFloat() / daysInMonth * 100).toInt()
-    } else 0
+    } else {
+        0
+    }
 
     val statsDescription = stringResource(R.string.stats_card_description)
 

@@ -9,8 +9,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.md_theme_light_onSurface
 
 // Static text colors that match our theme's onSurface values
 // These don't change with light/dark mode - they're determined solely by background luminance
-private val DarkText = md_theme_light_onSurface  // Warm dark brown for light backgrounds
-private val LightText = md_theme_dark_onSurface  // Warm beige for dark backgrounds
+private val DarkText = md_theme_light_onSurface // Warm dark brown for light backgrounds
+private val LightText = md_theme_dark_onSurface // Warm beige for dark backgrounds
 
 /**
  * Determines the appropriate text color to use on a given background color
@@ -30,9 +30,9 @@ private val LightText = md_theme_dark_onSurface  // Warm beige for dark backgrou
  */
 fun Color.getContrastingTextColor(): Color {
     return if (this.luminance() > 0.5f) {
-        DarkText  // Dark text for light backgrounds
+        DarkText // Dark text for light backgrounds
     } else {
-        LightText  // Light text for dark backgrounds
+        LightText // Light text for dark backgrounds
     }
 }
 
@@ -52,8 +52,8 @@ fun Color.getContrastingTextColor(): Color {
  *
  * Example:
  * ```
- * val color = getColorSafe("#FF5733")      // Returns Color(0xFFFF5733)
- * val color = getColorSafe("invalid")       // Returns Color.Gray, logs warning
+ * val color = getColorSafe("#FF5733") // Returns Color(0xFFFF5733)
+ * val color = getColorSafe("invalid") // Returns Color.Gray, logs warning
  * val color = getColorSafe("bad", Color.Red) // Returns Color.Red, logs warning
  * ```
  */
@@ -66,4 +66,3 @@ fun getColorSafe(colorString: String, fallback: Color = Color.Gray): Color {
         fallback
     }
 }
-

@@ -41,9 +41,9 @@ data class StatsUiState(
      */
     @Immutable
     data class MonthStats(
-        val month: String,      // "October 2024"
+        val month: String, // "October 2024"
         val year: Int,
-        val monthValue: Int,    // 1-12
+        val monthValue: Int, // 1-12
         val entryCount: Int,
         val completionRate: Int, // percentage (0-100)
     )

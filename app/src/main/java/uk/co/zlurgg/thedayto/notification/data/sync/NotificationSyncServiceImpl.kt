@@ -123,7 +123,7 @@ class NotificationSyncServiceImpl(
             is java.net.UnknownHostException,
             is java.net.SocketTimeoutException,
             is java.net.ConnectException,
-                -> DataError.Sync.NETWORK_ERROR
+            -> DataError.Sync.NETWORK_ERROR
 
             else -> DataError.Sync.UNKNOWN
         }

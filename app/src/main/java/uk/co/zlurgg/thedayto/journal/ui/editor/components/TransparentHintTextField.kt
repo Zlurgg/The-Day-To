@@ -50,10 +50,11 @@ fun TransparentHintTextField(
                 )
                 .border(
                     width = if (isFocused) 2.dp else 1.dp,
-                    color = if (isFocused)
+                    color = if (isFocused) {
                         MaterialTheme.colorScheme.primary
-                    else
-                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f),
+                    } else {
+                        MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+                    },
                     shape = RoundedCornerShape(12.dp),
                 )
                 .padding(16.dp),

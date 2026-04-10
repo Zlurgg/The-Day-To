@@ -2,21 +2,6 @@
 <SmellBaseline>
   <ManuallySuppressedIssues/>
   <CurrentIssues>
-    <ID>ArgumentListWrapping:NotificationWorker.kt$NotificationWorker$( Intent.ACTION_VIEW, NOTIFICATION_DEEP_LINK.toUri(), context, MainActivity::class.java, )</ID>
-    <ID>CommentWrapping:DeleteAccountUseCase.kt$DeleteAccountUseCase$/* continue */</ID>
-    <ID>CommentWrapping:NotificationAuthUseCase.kt$NotificationAuthUseCase$/* success */</ID>
-    <ID>CommentWrapping:SyncSettingsViewModel.kt$SyncSettingsViewModel$/* Progress update - no action needed */</ID>
-    <ID>FinalNewline:CheckTodayEntryExistsUseCase.kt$uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase.kt</ID>
-    <ID>FinalNewline:Dimensions.kt$uk.co.zlurgg.thedayto.core.ui.theme.Dimensions.kt</ID>
-    <ID>FinalNewline:EntryOrder.kt$uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder.kt</ID>
-    <ID>FinalNewline:EntryRepository.kt$uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository.kt</ID>
-    <ID>FinalNewline:MoodColorOrder.kt$uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder.kt</ID>
-    <ID>FinalNewline:MoodColorRepository.kt$uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository.kt</ID>
-    <ID>Indentation:DeletionProgressDialog.kt$ </ID>
-    <ID>Indentation:NotificationSyncServiceImpl.kt$NotificationSyncServiceImpl$ </ID>
-    <ID>Indentation:OverviewViewModel.kt$OverviewViewModel$ </ID>
-    <ID>Indentation:SyncRepositoryImpl.kt$SyncRepositoryImpl$ </ID>
-    <ID>Indentation:SyncWorker.kt$SyncWorker$ </ID>
     <ID>MagicNumber:CalculateMonthlyBreakdownUseCase.kt$CalculateMonthlyBreakdownUseCase$100</ID>
     <ID>MagicNumber:EntryRepositoryImpl.kt$EntryRepositoryImpl$12</ID>
     <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$100</ID>
@@ -31,54 +16,6 @@
     <ID>MaximumLineLength:EditorScreen.kt$ </ID>
     <ID>MaximumLineLength:OverviewViewModel.kt$OverviewViewModel$ </ID>
     <ID>MaximumLineLength:OverviewViewModelTest.kt$OverviewViewModelTest$ </ID>
-    <ID>MultiLineIfElse:BaseInfoDialog.kt$Modifier</ID>
-    <ID>MultiLineIfElse:BaseInfoDialog.kt$Modifier.verticalScroll(rememberScrollState())</ID>
-    <ID>MultiLineIfElse:CalendarSection.kt$MaterialTheme.colorScheme.onSurface</ID>
-    <ID>MultiLineIfElse:CalendarSection.kt$MaterialTheme.colorScheme.primary</ID>
-    <ID>MultiLineIfElse:EditorScreen.kt$MaterialTheme.colorScheme.onPrimaryContainer</ID>
-    <ID>MultiLineIfElse:EditorScreen.kt$MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)</ID>
-    <ID>MultiLineIfElse:MonthStatistics.kt$0</ID>
-    <ID>MultiLineIfElse:Theme.kt$dynamicDarkColorScheme(context)</ID>
-    <ID>MultiLineIfElse:Theme.kt$dynamicLightColorScheme(context)</ID>
-    <ID>MultiLineIfElse:TransparentHintTextField.kt$MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)</ID>
-    <ID>MultiLineIfElse:TransparentHintTextField.kt$MaterialTheme.colorScheme.primary</ID>
-    <ID>NewLineAtEndOfFile:CheckTodayEntryExistsUseCase.kt$uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase.kt</ID>
-    <ID>NewLineAtEndOfFile:Dimensions.kt$uk.co.zlurgg.thedayto.core.ui.theme.Dimensions.kt</ID>
-    <ID>NewLineAtEndOfFile:EntryOrder.kt$uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder.kt</ID>
-    <ID>NewLineAtEndOfFile:EntryRepository.kt$uk.co.zlurgg.thedayto.journal.domain.repository.EntryRepository.kt</ID>
-    <ID>NewLineAtEndOfFile:MoodColorOrder.kt$uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder.kt</ID>
-    <ID>NewLineAtEndOfFile:MoodColorRepository.kt$uk.co.zlurgg.thedayto.journal.domain.repository.MoodColorRepository.kt</ID>
-    <ID>NoBlankLineBeforeRbrace:OverviewViewModelTest.kt$OverviewViewModelTest$ </ID>
-    <ID>NoConsecutiveBlankLines:CalendarSection.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:ColorUtils.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:EditorScreen.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:InputValidation.kt$InputValidation$ </ID>
-    <ID>NoConsecutiveBlankLines:MainActivity.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:OverviewScreen.kt$ </ID>
-    <ID>NoConsecutiveBlankLines:OverviewViewModelTest.kt$OverviewViewModelTest$ </ID>
-    <ID>NoConsecutiveBlankLines:Theme.kt$ </ID>
-    <ID>NoEmptyFirstLineInMethodBlock:FakeOverviewUseCases.kt$ </ID>
-    <ID>NoMultipleSpaces:AddEntryUseCaseTest.kt$AddEntryUseCaseTest$ </ID>
-    <ID>NoMultipleSpaces:CalendarConstants.kt$CalendarConstants$ </ID>
-    <ID>NoMultipleSpaces:CalendarSection.kt$ </ID>
-    <ID>NoMultipleSpaces:Color.kt$ </ID>
-    <ID>NoMultipleSpaces:ColorUtils.kt$ </ID>
-    <ID>NoMultipleSpaces:EditorUiState.kt$EditorUiState$ </ID>
-    <ID>NoMultipleSpaces:FakeEntryRepository.kt$FakeEntryRepository$ </ID>
-    <ID>NoMultipleSpaces:MoodColorEntity.kt$MoodColorEntity$ </ID>
-    <ID>NoMultipleSpaces:MoodColorMapper.kt$ </ID>
-    <ID>NoMultipleSpaces:NavigationRoutes.kt$EditorRoute$ </ID>
-    <ID>NoMultipleSpaces:NotificationWorker.kt$NotificationWorker$ </ID>
-    <ID>NoMultipleSpaces:OverviewViewModel.kt$OverviewViewModel$ </ID>
-    <ID>NoMultipleSpaces:OverviewViewModelTest.kt$OverviewViewModelTest$ </ID>
-    <ID>NoMultipleSpaces:StatsUiState.kt$StatsUiState.MonthStats$ </ID>
-    <ID>NoMultipleSpaces:StatsUseCasesTest.kt$StatsUseCasesTest$ </ID>
-    <ID>NoMultipleSpaces:Theme.kt$ </ID>
-    <ID>ParameterListWrapping:Resource.kt$Resource$( val data: T? = null, val message: String? = null, )</ID>
     <ID>ThrowsCount:AddEntryUseCase.kt$AddEntryUseCase$@Throws(InvalidEntryException::class) suspend operator fun invoke(entry: Entry)</ID>
-    <ID>Wrapping:CalendarSection.kt$-&gt;</ID>
-    <ID>Wrapping:DeleteAccountUseCase.kt$DeleteAccountUseCase${ /* continue */ }</ID>
-    <ID>Wrapping:NotificationAuthUseCase.kt$NotificationAuthUseCase${ /* success */ }</ID>
-    <ID>Wrapping:SyncSettingsViewModel.kt$SyncSettingsViewModel${ /* Progress update - no action needed */ }</ID>
   </CurrentIssues>
 </SmellBaseline>

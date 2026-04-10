@@ -10,7 +10,7 @@ import java.time.ZoneOffset
 data class EditorUiState(
     // Entry data
     val entryDate: Long = LocalDate.now().atStartOfDay().toEpochSecond(ZoneOffset.UTC),
-    val selectedMoodColorId: Int? = null,  // null indicates no mood selected
+    val selectedMoodColorId: Int? = null, // null indicates no mood selected
     val entryContent: String = "",
     val currentEntryId: Int? = null,
 
@@ -33,7 +33,7 @@ data class EditorUiState(
     val showUnsavedChangesDialog: Boolean = false,
 
     // Hints
-    val moodHint: String = "How're you feeling today?",  // Dynamic hint based on date
+    val moodHint: String = "How're you feeling today?", // Dynamic hint based on date
     val contentHint: String = "Any additional info?",
 
     // Validation errors

@@ -54,8 +54,11 @@ fun BaseInfoDialog(
                 modifier = Modifier
                     .fillMaxWidth()
                     .then(
-                        if (scrollable) Modifier.verticalScroll(rememberScrollState())
-                        else Modifier,
+                        if (scrollable) {
+                            Modifier.verticalScroll(rememberScrollState())
+                        } else {
+                            Modifier
+                        },
                     ),
                 content = content,
             )

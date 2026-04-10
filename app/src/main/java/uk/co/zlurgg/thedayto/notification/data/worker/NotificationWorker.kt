@@ -32,7 +32,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         // Check if notification permission is granted (Android 13+)
         if (!hasNotificationPermission()) {
             Timber.w("Notification permission not granted - skipping notification")
-            return Result.success()  // Not a failure, just can't show notification
+            return Result.success() // Not a failure, just can't show notification
         }
 
         // Simple check: does today's entry exist?
@@ -60,7 +60,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             NotificationManagerCompat.from(applicationContext).areNotificationsEnabled()
         } else {
-            true  // Pre-Android 13: no runtime permission needed
+            true // Pre-Android 13: no runtime permission needed
         }
     }
 
@@ -126,8 +126,10 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
      */
     private fun createPendingIntent(context: Context): PendingIntent? {
         val startActivityIntent = Intent(
-            Intent.ACTION_VIEW, NOTIFICATION_DEEP_LINK.toUri(),
-            context, MainActivity::class.java,
+            Intent.ACTION_VIEW,
+            NOTIFICATION_DEEP_LINK.toUri(),
+            context,
+            MainActivity::class.java,
         )
         val resultPendingIntent: PendingIntent? = TaskStackBuilder.create(context).run {
             addNextIntentWithParentStack(startActivityIntent)

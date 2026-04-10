@@ -48,8 +48,7 @@ class DeleteAccountUseCase(
                 return@flow
             }
 
-            is Result.Success -> { /* continue */
-            }
+            is Result.Success -> Unit // continue
         }
 
         // 4. Delete Firebase Auth account
@@ -69,8 +68,7 @@ class DeleteAccountUseCase(
                 return@flow
             }
 
-            is Result.Success -> { /* continue */
-            }
+            is Result.Success -> Unit // continue
         }
 
         // 5. Clear local data

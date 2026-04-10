@@ -35,7 +35,6 @@ fun createFakeOverviewUseCases(
     authRepository: AuthRepository = FakeAuthRepository(),
     entryRepository: EntryRepository = FakeEntryRepository(),
 ): OverviewUseCases {
-
     // Create real notification use cases with fake dependencies
     val getNotificationSettings = GetNotificationSettingsUseCase(
         settingsRepository = notificationSettingsRepository,

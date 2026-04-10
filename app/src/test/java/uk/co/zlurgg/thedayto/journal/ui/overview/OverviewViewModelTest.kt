@@ -325,7 +325,6 @@ class OverviewViewModelTest {
         viewModel.onNotificationPermissionGranted()
         testScheduler.advanceUntilIdle()
 
-
         // Step 3: User configures notification for 8:30 AM
         viewModel.onAction(
             OverviewAction.SaveNotificationSettings(
@@ -335,7 +334,6 @@ class OverviewViewModelTest {
             ),
         )
         testScheduler.advanceUntilIdle()
-
 
         // Verify notification was scheduled
         assertTrue(
@@ -604,8 +602,8 @@ class OverviewViewModelTest {
     fun `checkTodayEntry - shows reminder when no entry and not shown today`() = runTest {
         // Given: No today entry and reminder not shown (post-tutorial state)
         val fakeEntryRepo = FakeEntryRepository()
-        fakePreferencesRepository.reset()  // Reset to ensure reminder not shown
-        fakePreferencesRepository.markFirstLaunchComplete()  // Simulate post-tutorial state
+        fakePreferencesRepository.reset() // Reset to ensure reminder not shown
+        fakePreferencesRepository.markFirstLaunchComplete() // Simulate post-tutorial state
 
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
@@ -649,7 +647,7 @@ class OverviewViewModelTest {
         // Given: Reminder dialog is showing (post-tutorial state)
         val fakeEntryRepo = FakeEntryRepository()
         fakePreferencesRepository.reset()
-        fakePreferencesRepository.markFirstLaunchComplete()  // Simulate post-tutorial state
+        fakePreferencesRepository.markFirstLaunchComplete() // Simulate post-tutorial state
 
         val useCases = createFakeOverviewUseCases(
             preferencesRepository = fakePreferencesRepository,
@@ -854,5 +852,4 @@ class OverviewViewModelTest {
         assertEquals("Month should be 3", 3, state.displayedMonth)
         assertEquals("Year should be 2023", 2023, state.displayedYear)
     }
-
 }

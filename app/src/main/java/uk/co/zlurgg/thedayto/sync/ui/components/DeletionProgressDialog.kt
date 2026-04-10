@@ -84,7 +84,7 @@ fun DeletionProgressDialog(
 
                     is DeletionProgress.RequiresReAuth,
                     is DeletionProgress.Failed,
-                        -> {
+                    -> {
                         // These are handled outside this dialog
                     }
                 }

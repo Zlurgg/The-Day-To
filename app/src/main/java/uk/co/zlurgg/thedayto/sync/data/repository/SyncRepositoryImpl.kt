@@ -549,7 +549,7 @@ class SyncRepositoryImpl(
             is java.net.UnknownHostException,
             is java.net.SocketTimeoutException,
             is java.net.ConnectException,
-                -> {
+            -> {
                 logEmulatorHint()
                 DataError.Sync.NETWORK_ERROR
             }

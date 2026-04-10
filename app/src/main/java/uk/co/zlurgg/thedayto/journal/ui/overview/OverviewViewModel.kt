@@ -83,11 +83,11 @@ class OverviewViewModel(
 
         // Select time-appropriate greeting list
         val greetingList = when (hour) {
-            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> GreetingConstants.NIGHT_GREETINGS  // 12am - 4am
-            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> GreetingConstants.MORNING_GREETINGS  // 5am - 11am
-            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> GreetingConstants.AFTERNOON_GREETINGS  // 12pm - 4pm
-            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> GreetingConstants.EVENING_GREETINGS  // 5pm - 8pm
-            else -> GreetingConstants.NIGHT_GREETINGS  // 9pm - 11pm (late evening defaults to night)
+            in TimeConstants.NIGHT_START..TimeConstants.NIGHT_END -> GreetingConstants.NIGHT_GREETINGS // 12am - 4am
+            in TimeConstants.MORNING_START..TimeConstants.MORNING_END -> GreetingConstants.MORNING_GREETINGS // 5am - 11am
+            in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -> GreetingConstants.AFTERNOON_GREETINGS // 12pm - 4pm
+            in TimeConstants.EVENING_START..TimeConstants.EVENING_END -> GreetingConstants.EVENING_GREETINGS // 5pm - 8pm
+            else -> GreetingConstants.NIGHT_GREETINGS // 9pm - 11pm (late evening defaults to night)
         }
 
         // Pick random greeting from appropriate list
@@ -180,7 +180,7 @@ class OverviewViewModel(
         _uiState.update {
             it.copy(
                 hasNotificationPermission = true,
-                notificationsEnabled = true,  // Auto-toggle ON in dialog
+                notificationsEnabled = true, // Auto-toggle ON in dialog
             )
         }
         Timber.d("Notification permission granted")
@@ -209,7 +209,7 @@ class OverviewViewModel(
                 _uiState.update {
                     it.copy(
                         hasNotificationPermission = false,
-                        notificationsEnabled = false,  // Reset toggle to OFF
+                        notificationsEnabled = false, // Reset toggle to OFF
                     )
                 }
             }
@@ -353,7 +353,7 @@ class OverviewViewModel(
                             Timber.w("System notifications are disabled")
                             _uiState.update { it.copy(showNotificationSettingsDialog = false) }
                             _uiEvents.emit(OverviewUiEvent.ShowSystemNotificationWarning)
-                            return@launch  // Don't save if system notifications are disabled
+                            return@launch // Don't save if system notifications are disabled
                         }
                     }
 
@@ -434,7 +434,7 @@ class OverviewViewModel(
 
             is OverviewAction.CreateTodayEntry,
             is OverviewAction.CreateNewEntry,
-                -> {
+            -> {
                 _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
             }
         }
@@ -467,7 +467,7 @@ class OverviewViewModel(
                     it.copy(
                         entries = entries,
                         entryOrder = entryOrder,
-                        loadError = null,  // Clear any previous errors
+                        loadError = null, // Clear any previous errors
                     )
                 }
                 // Re-check today's entry whenever entries change (in case user created/deleted today's entry)

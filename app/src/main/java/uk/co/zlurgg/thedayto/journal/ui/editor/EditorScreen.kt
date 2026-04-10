@@ -201,10 +201,11 @@ private fun EditorScreen(
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = stringResource(R.string.save_entry),
-                            tint = if (uiState.canSave)
+                            tint = if (uiState.canSave) {
                                 MaterialTheme.colorScheme.onPrimaryContainer
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f),
+                            } else {
+                                MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.38f)
+                            },
                         )
                     }
                 }
@@ -509,4 +510,3 @@ private fun UnsavedChangesDialog(
         },
     )
 }
-

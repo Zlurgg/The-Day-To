@@ -204,7 +204,6 @@ private fun CalendarContent(
     }
 }
 
-
 /**
  * Month/Year header with home button for returning to current month.
  */
@@ -414,6 +413,18 @@ private fun CalendarMonthGrid(
                                         else -> stringResource(R.string.calendar_day_future, dayNumber)
                                     }
 
+                                    // Extracted to keep the Modifier chain below readable; future
+                                    // (unclickable) days don't receive this.
+                                    val clickableDay = Modifier.clickable {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        onDateClick(null, entryDate)
+                                    }
+                                    val todayBorder = Modifier.border(
+                                        CalendarConstants.TODAY_BORDER_WIDTH,
+                                        MaterialTheme.colorScheme.primary,
+                                        RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS),
+                                    )
+
                                     Box(
                                         modifier = Modifier
                                             .size(daySize)
@@ -424,24 +435,9 @@ private fun CalendarMonthGrid(
                                             .semantics { contentDescription = emptyDayDescription }
                                             .then(
                                                 when {
-                                                    isToday -> Modifier
-                                                        .border(
-                                                            CalendarConstants.TODAY_BORDER_WIDTH,
-                                                            MaterialTheme.colorScheme.primary,
-                                                            RoundedCornerShape(CalendarConstants.DAY_CORNER_RADIUS),
-                                                        )
-                                                        .clickable {
-                                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                            onDateClick(null, entryDate)
-                                                        }
-
-                                                    isPast -> Modifier
-                                                        .clickable {
-                                                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                                            onDateClick(null, entryDate)
-                                                        }
-
-                                                    else -> Modifier  // Future dates not clickable
+                                                    isToday -> todayBorder.then(clickableDay)
+                                                    isPast -> clickableDay
+                                                    else -> Modifier // Future dates not clickable
                                                 },
                                             ),
                                         contentAlignment = Alignment.Center,
@@ -456,8 +452,11 @@ private fun CalendarMonthGrid(
                                             ),
                                             text = "$dayNumber",
                                             style = MaterialTheme.typography.headlineMedium,
-                                            color = if (isToday) MaterialTheme.colorScheme.primary
-                                            else MaterialTheme.colorScheme.onSurface,
+                                            color = if (isToday) {
+                                                MaterialTheme.colorScheme.primary
+                                            } else {
+                                                MaterialTheme.colorScheme.onSurface
+                                            },
                                             overflow = TextOverflow.Ellipsis,
                                         )
                                     }
@@ -498,4 +497,3 @@ private fun CalendarSectionEmptyPreview() {
         )
     }
 }
-

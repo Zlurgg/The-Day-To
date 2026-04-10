@@ -190,12 +190,12 @@ class StatsUseCasesTest {
         val entries = listOf(
             TestDataBuilders.createEntryWithMoodColor(
                 moodName = "Happy",
-                moodColor = "4CAF50",  // Current color from join (green)
+                moodColor = "4CAF50", // Current color from join (green)
                 id = 1,
             ),
             TestDataBuilders.createEntryWithMoodColor(
                 moodName = "Happy",
-                moodColor = "4CAF50",  // Same current color
+                moodColor = "4CAF50", // Same current color
                 id = 2,
             ),
         )

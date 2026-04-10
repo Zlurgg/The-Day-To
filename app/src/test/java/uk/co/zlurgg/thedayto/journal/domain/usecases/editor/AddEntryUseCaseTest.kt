@@ -70,7 +70,7 @@ class AddEntryUseCaseTest {
         // When: Adding entry with unsanitized content
         val entry = TestDataBuilders.createEntry(
             moodColorId = 1,
-            content = "  Test content \u0000\u0001  ",  // Leading/trailing whitespace + control chars
+            content = "  Test content \u0000\u0001  ", // Leading/trailing whitespace + control chars
             id = null,
         )
         addEntryUseCase(entry)

@@ -33,7 +33,7 @@ class SyncWorker(
                 val syncResult = result.data
                 Timber.i(
                     "SyncWorker: Sync completed - uploaded: %d entries, %d moods; " +
-                            "downloaded: %d entries, %d moods; conflicts: %d",
+                        "downloaded: %d entries, %d moods; conflicts: %d",
                     syncResult.entriesUploaded,
                     syncResult.moodColorsUploaded,
                     syncResult.entriesDownloaded,
@@ -54,7 +54,7 @@ class SyncWorker(
 
                     DataError.Sync.NOT_AUTHENTICATED,
                     DataError.Sync.SYNC_DISABLED,
-                        -> {
+                    -> {
                         Timber.d("SyncWorker: Auth/disabled - not retrying")
                         Result.success() // Don't retry if not authenticated or disabled
                     }

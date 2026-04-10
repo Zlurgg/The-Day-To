@@ -24,7 +24,6 @@ object InputValidation {
      */
     const val MAX_CONTENT_LENGTH = 5000
 
-
     /**
      * Sanitize text input by removing control characters and trimming whitespace
      *

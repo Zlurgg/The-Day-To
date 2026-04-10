@@ -71,8 +71,7 @@ class NotificationAuthUseCase(
             // Delete any anonymous settings (account takes precedence)
             when (val deleteResult = settingsRepository.deleteSettings(ANONYMOUS_USER_ID)) {
                 is Result.Error -> Timber.w("Failed to delete anonymous settings: %s", deleteResult.error)
-                is Result.Success -> { /* success */
-                }
+                is Result.Success -> Unit // success
             }
 
             // Reschedule notifications if enabled
@@ -106,13 +105,11 @@ class NotificationAuthUseCase(
 
             when (val saveResult = settingsRepository.saveSettings(userId, anonymousSettings)) {
                 is Result.Error -> Timber.w("Failed to save settings for user: %s", saveResult.error)
-                is Result.Success -> { /* success */
-                }
+                is Result.Success -> Unit // success
             }
             when (val deleteResult = settingsRepository.deleteSettings(ANONYMOUS_USER_ID)) {
                 is Result.Error -> Timber.w("Failed to delete anonymous settings: %s", deleteResult.error)
-                is Result.Success -> { /* success */
-                }
+                is Result.Success -> Unit // success
             }
 
             // Reschedule notifications for new user context if enabled
@@ -153,8 +150,7 @@ class NotificationAuthUseCase(
         // Delete account settings (privacy - don't keep user data locally)
         when (val deleteResult = settingsRepository.deleteSettings(userId)) {
             is Result.Error -> Timber.w("Failed to delete account settings: %s", deleteResult.error)
-            is Result.Success -> { /* success */
-            }
+            is Result.Success -> Unit // success
         }
 
         // Copy to anonymous so notifications continue seamlessly
@@ -167,8 +163,7 @@ class NotificationAuthUseCase(
             )
             when (val saveResult = settingsRepository.saveSettings(ANONYMOUS_USER_ID, accountSettings)) {
                 is Result.Error -> Timber.w("Failed to save anonymous settings: %s", saveResult.error)
-                is Result.Success -> { /* success */
-                }
+                is Result.Success -> Unit // success
             }
 
             if (accountSettings.enabled) {
