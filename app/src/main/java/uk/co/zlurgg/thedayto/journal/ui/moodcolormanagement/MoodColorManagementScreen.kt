@@ -41,6 +41,8 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
@@ -53,6 +55,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.DeleteMoodColorConfirmDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
@@ -60,6 +63,13 @@ import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManag
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorEvent
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorRow
+
+/**
+ * Show the "X / 50" counter in the app bar once the user is close to the cap.
+ * 80% of MAX_MOOD_COLORS keeps the counter out of the way for typical users
+ * while giving power users a heads-up before they hit LimitReached.
+ */
+private const val MOOD_COLOR_COUNTER_THRESHOLD = 40
 
 /**
  * Root composable - handles ViewModel, state collection, and side effects
@@ -152,6 +162,31 @@ private fun MoodColorManagementScreen(
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    // Only show the counter when approaching the cap — most
+                    // users never get close, so it stays out of the way.
+                    val activeCount = state.moodColors.size
+                    if (activeCount >= MOOD_COLOR_COUNTER_THRESHOLD) {
+                        val counterText = stringResource(
+                            R.string.mood_color_count_format,
+                            activeCount,
+                            SaveMoodColorUseCase.MAX_MOOD_COLORS
+                        )
+                        val counterDescription = stringResource(
+                            R.string.mood_color_count_description,
+                            activeCount,
+                            SaveMoodColorUseCase.MAX_MOOD_COLORS
+                        )
+                        Text(
+                            text = counterText,
+                            style = MaterialTheme.typography.labelLarge,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(end = paddingMedium)
+                                .semantics { contentDescription = counterDescription }
                         )
                     }
                 }
