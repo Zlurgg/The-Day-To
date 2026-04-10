@@ -31,8 +31,6 @@ import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -61,6 +59,7 @@ import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.navigation.MoodColorManagementRoute
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
+import uk.co.zlurgg.thedayto.core.ui.components.JournalCard
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
@@ -264,17 +263,11 @@ private fun EditorScreen(
             }
 
             // Entry card - date, mood, and content
-            Card(
+            JournalCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
                     .padding(bottom = EditorUiConstants.ENTRY_CARD_FAB_CLEARANCE),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                ),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = EditorUiConstants.ENTRY_CARD_ELEVATION
-                )
             ) {
                 Column(
                     modifier = Modifier.padding(paddingMedium)

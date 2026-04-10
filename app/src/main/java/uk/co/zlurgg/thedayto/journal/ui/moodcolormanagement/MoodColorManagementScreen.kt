@@ -18,8 +18,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -48,6 +46,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
+import uk.co.zlurgg.thedayto.core.ui.components.JournalCard
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -314,17 +313,12 @@ private fun SwipeToDeleteMoodColorCard(
         enableDismissFromEndToStart = isDeleteEnabled,
         modifier = modifier
     ) {
-        Card(
+        JournalCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .animateContentSize(),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = MoodColorConstants.CARD_ELEVATION_DEFAULT,
-                pressedElevation = MoodColorConstants.CARD_ELEVATION_PRESSED
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
-            )
+            elevation = MoodColorConstants.CARD_ELEVATION_DEFAULT,
+            pressedElevation = MoodColorConstants.CARD_ELEVATION_PRESSED,
         ) {
             MoodColorRow(
                 moodColorWithCount = moodColorWithCount,
