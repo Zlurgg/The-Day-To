@@ -68,11 +68,19 @@ fun EditMoodColorDialog(
         // Capture string resource for use in onClick callback
         val emptyMoodError = stringResource(R.string.mood_name_cannot_be_empty)
 
+        // The dialog is reused for both add (id == null) and edit (id != null),
+        // so the title has to follow the mode.
+        val titleRes = if (moodColor.id == null) {
+            R.string.create_new_mood_color
+        } else {
+            R.string.edit_mood_color
+        }
+
         AlertDialog(
             onDismissRequest = onDismiss,
             title = {
                 Text(
-                    text = stringResource(R.string.edit_mood_color),
+                    text = stringResource(titleRes),
                     style = MaterialTheme.typography.headlineSmall
                 )
             },
