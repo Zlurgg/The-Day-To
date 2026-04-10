@@ -4,6 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 import uk.co.zlurgg.thedayto.journal.data.model.MoodColorEntity
@@ -30,6 +31,29 @@ interface MoodColorDao {
 
     @Query("UPDATE mood_color SET isDeleted = 1 WHERE id = :id")
     suspend fun deleteMoodColor(id: Int)
+
+    /**
+     * Soft-delete a mood color atomically, optionally marking it for sync deletion first.
+     *
+     * Wraps the sync-status update and the isDeleted flip in a single Room transaction
+     * so the row can never be observed in a half-deleted state (isDeleted=0 but
+     * syncStatus=PENDING_DELETE) by another reader. The caller decides whether to
+     * mark for sync based on whether sync is enabled and the row has ever been synced.
+     *
+     * @param id Row ID to soft-delete
+     * @param markPendingDelete If true, set syncStatus=PENDING_DELETE before flipping
+     *   isDeleted. Only takes effect if the row actually has a syncId.
+     */
+    @Transaction
+    suspend fun softDeleteWithSync(id: Int, markPendingDelete: Boolean) {
+        if (markPendingDelete) {
+            val existing = getMoodColorById(id)
+            if (existing?.syncId != null) {
+                updateSyncStatus(id, "PENDING_DELETE")
+            }
+        }
+        deleteMoodColor(id)
+    }
 
     @Query("UPDATE mood_color SET isFavorite = :isFavorite, updatedAt = :updatedAt WHERE id = :id")
     suspend fun updateFavorite(id: Int, isFavorite: Boolean, updatedAt: Long)

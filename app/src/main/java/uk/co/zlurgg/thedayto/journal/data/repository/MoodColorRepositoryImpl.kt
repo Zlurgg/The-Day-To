@@ -34,14 +34,12 @@ class MoodColorRepositoryImpl(
 
     override suspend fun deleteMoodColor(id: Int): EmptyResult<DataError.Local> {
         return ErrorMapper.safeSuspendCall(TAG) {
-            val syncEnabled = preferencesRepository.isSyncEnabled()
-            val moodColor = dao.getMoodColorById(id)
-            if (syncEnabled && moodColor?.syncId != null) {
-                // Mark for sync deletion (soft delete with PENDING_DELETE status)
-                dao.updateSyncStatus(id, SyncStatus.PENDING_DELETE.name)
-            }
-            // Always soft-delete locally
-            dao.deleteMoodColor(id)
+            // Wrap the PENDING_DELETE write and the isDeleted flip in one transaction
+            // so another reader can't catch the row in a half-deleted state.
+            dao.softDeleteWithSync(
+                id = id,
+                markPendingDelete = preferencesRepository.isSyncEnabled()
+            )
         }
     }
 
