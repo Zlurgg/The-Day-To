@@ -41,7 +41,9 @@ fun AnimatedFavoriteIcon(
         targetValue = if (isFavorite) ICON_SCALE_FAVORITE else ICON_SCALE_UNFAVORITE,
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
+            // Medium stiffness settles faster than Low so rapid taps don't
+            // restart a still-settling spring and produce visible jitter.
+            stiffness = Spring.StiffnessMedium
         ),
         label = "favorite_scale"
     )
