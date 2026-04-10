@@ -207,8 +207,7 @@ fun MoodItem(
                             onEdit = {
                                 onEditMoodColor(moodColor)
                                 mExpanded = false
-                            },
-                            compact = true
+                            }
                         )
                     }
                 )
@@ -301,7 +300,7 @@ private fun DropdownWithMoodsPreview() {
                 )
             )
 
-            // Mood colors with unified MoodColorRow (compact mode)
+            // Mood colors with unified MoodColorRow
             moodColors.forEach { moodColor ->
                 DropdownMenuItem(
                     onClick = { },
@@ -309,8 +308,7 @@ private fun DropdownWithMoodsPreview() {
                         MoodColorRow(
                             moodColor = moodColor,
                             onToggleFavorite = { },
-                            onEdit = { },
-                            compact = true
+                            onEdit = { }
                         )
                     }
                 )

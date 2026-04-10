@@ -26,7 +26,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColorInt
 import com.github.skydoves.colorpicker.compose.ColorEnvelope
 import com.github.skydoves.colorpicker.compose.HsvColorPicker
 import com.github.skydoves.colorpicker.compose.rememberColorPickerController
@@ -36,6 +35,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 
 /**
  * Material3 dialog for editing an existing mood color.
@@ -130,11 +130,7 @@ fun EditMoodColorDialog(
 
                     // Set initial color on the picker
                     val initialColor = remember(moodColor) {
-                        try {
-                            Color("#${moodColor.color}".toColorInt())
-                        } catch (_: Exception) {
-                            Color.Black
-                        }
+                        getColorSafe(moodColor.color, fallback = Color.Black)
                     }
 
                     // Use composite key to handle both existing and new mood colors
