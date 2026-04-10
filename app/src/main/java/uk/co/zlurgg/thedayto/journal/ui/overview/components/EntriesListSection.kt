@@ -76,89 +76,89 @@ fun EntriesListSection(
             defaultElevation = UiConstants.STATS_CARD_ELEVATION
         )
     ) {
-    Column(modifier = Modifier.padding(paddingMedium)) {
-        // Sort chips only when there are entries to sort
-        if (entries.isNotEmpty()) {
-            EntrySortSection(
-                modifier = Modifier.padding(vertical = paddingSmall),
-                entryOrder = entryOrder,
-                onOrderChange = onOrderChange
-            )
-            Spacer(modifier = Modifier.height(paddingSmall))
-        }
-
-        // Prompt card for creating today's entry
-        if (showPromptCard) {
-            CreateEntryPromptCard(
-                onClick = onCreateEntry
-            )
+        Column(modifier = Modifier.padding(paddingMedium)) {
+            // Sort chips only when there are entries to sort
             if (entries.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(paddingMedium))
-            }
-        }
-
-        // Entry list
-        if (entries.isNotEmpty()) {
-            val localEntries = remember(entries) {
-                entries.toMutableStateList()
+                EntrySortSection(
+                    modifier = Modifier.padding(vertical = paddingSmall),
+                    entryOrder = entryOrder,
+                    onOrderChange = onOrderChange
+                )
+                Spacer(modifier = Modifier.height(paddingSmall))
             }
 
-            localEntries.forEach { entry ->
-                key(entry.id) {
-                    val dismissState = rememberSwipeToDismissBoxState()
-
-                    LaunchedEffect(dismissState.currentValue) {
-                        if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-                            onDeleteEntry(entry)
-                        }
-                    }
-
-                    LaunchedEffect(entryPendingDelete) {
-                        if (entryPendingDelete == null &&
-                            dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
-                        ) {
-                            dismissState.reset()
-                        }
-                    }
-
-                    SwipeToDismissBox(
-                        state = dismissState,
-                        backgroundContent = {
-                            val direction = dismissState.dismissDirection
-                            if (direction == SwipeToDismissBoxValue.EndToStart) {
-                                Box(
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .background(MaterialTheme.colorScheme.error)
-                                        .padding(horizontal = paddingMedium),
-                                    contentAlignment = Alignment.CenterEnd
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Delete,
-                                        contentDescription = stringResource(R.string.delete_entry),
-                                        tint = MaterialTheme.colorScheme.onError
-                                    )
-                                }
-                            }
-                        },
-                        enableDismissFromStartToEnd = false,
-                        enableDismissFromEndToStart = !isLoading
-                    ) {
-                        EntryItem(
-                            entry = entry,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
-                                    onEntryClick(entry.id)
-                                }
-                        )
-                    }
+            // Prompt card for creating today's entry
+            if (showPromptCard) {
+                CreateEntryPromptCard(
+                    onClick = onCreateEntry
+                )
+                if (entries.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(paddingMedium))
                 }
-                Spacer(modifier = Modifier.height(paddingMedium))
+            }
+
+            // Entry list
+            if (entries.isNotEmpty()) {
+                val localEntries = remember(entries) {
+                    entries.toMutableStateList()
+                }
+
+                localEntries.forEach { entry ->
+                    key(entry.id) {
+                        val dismissState = rememberSwipeToDismissBoxState()
+
+                        LaunchedEffect(dismissState.currentValue) {
+                            if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                                onDeleteEntry(entry)
+                            }
+                        }
+
+                        LaunchedEffect(entryPendingDelete) {
+                            if (entryPendingDelete == null &&
+                                dismissState.currentValue == SwipeToDismissBoxValue.EndToStart
+                            ) {
+                                dismissState.reset()
+                            }
+                        }
+
+                        SwipeToDismissBox(
+                            state = dismissState,
+                            backgroundContent = {
+                                val direction = dismissState.dismissDirection
+                                if (direction == SwipeToDismissBoxValue.EndToStart) {
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(MaterialTheme.colorScheme.error)
+                                            .padding(horizontal = paddingMedium),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = stringResource(R.string.delete_entry),
+                                            tint = MaterialTheme.colorScheme.onError
+                                        )
+                                    }
+                                }
+                            },
+                            enableDismissFromStartToEnd = false,
+                            enableDismissFromEndToStart = !isLoading
+                        ) {
+                            EntryItem(
+                                entry = entry,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                                        onEntryClick(entry.id)
+                                    }
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(paddingMedium))
+                }
             }
         }
-    }
     }
 }
 

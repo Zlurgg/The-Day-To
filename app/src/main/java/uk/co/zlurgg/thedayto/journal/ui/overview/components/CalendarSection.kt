@@ -28,7 +28,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -167,51 +166,50 @@ private fun CalendarContent(
                 defaultElevation = UiConstants.STATS_CARD_ELEVATION
             )
         ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = paddingSmall)
-        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = paddingSmall)
+            ) {
+                // Month/Year header with home button
+                MonthYearHeader(
+                    date = date,
+                    currentDate = currentDate,
+                    onHomeClick = { date = currentDate },
+                    onHeaderClick = { showMonthYearPicker = true },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(paddingSmall)
+                )
 
-        // Month/Year header with home button
-        MonthYearHeader(
-            date = date,
-            currentDate = currentDate,
-            onHomeClick = { date = currentDate },
-            onHeaderClick = { showMonthYearPicker = true },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(paddingSmall)
-        )
-
-        // Month/Year picker dialog
-        AnimatedVisibility(
-            visible = showMonthYearPicker,
-            enter = fadeIn() + scaleIn(),
-            exit = fadeOut() + scaleOut()
-        ) {
-            MonthYearPickerDialog(
-                currentDate = date,
-                onDismiss = { showMonthYearPicker = false },
-                onDateSelected = { newDate ->
-                    date = newDate
+                // Month/Year picker dialog
+                AnimatedVisibility(
+                    visible = showMonthYearPicker,
+                    enter = fadeIn() + scaleIn(),
+                    exit = fadeOut() + scaleOut()
+                ) {
+                    MonthYearPickerDialog(
+                        currentDate = date,
+                        onDismiss = { showMonthYearPicker = false },
+                        onDateSelected = { newDate ->
+                            date = newDate
+                        }
+                    )
                 }
-            )
-        }
 
-        // Calendar grid with infinite pager (includes day-of-week labels as first row)
-        CalendarMonthGrid(
-            date = date,
-            currentDate = currentDate,
-            entries = entries,
-            emptyCellsAtStart = emptyCellsAtStart,
-            totalCells = totalCells,
-            daySize = daySize,
-            onDateChange = { date = it },
-            onDateClick = onDateClick
-        )
-    }
-    }
+                // Calendar grid with infinite pager (includes day-of-week labels as first row)
+                CalendarMonthGrid(
+                    date = date,
+                    currentDate = currentDate,
+                    entries = entries,
+                    emptyCellsAtStart = emptyCellsAtStart,
+                    totalCells = totalCells,
+                    daySize = daySize,
+                    onDateChange = { date = it },
+                    onDateClick = onDateClick
+                )
+            }
+        }
     }
 }
 
