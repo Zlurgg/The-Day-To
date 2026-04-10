@@ -49,6 +49,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -63,10 +64,10 @@ import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.LoadErrorBanner
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
-import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorUiConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
@@ -91,6 +92,7 @@ fun EditorScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
 
     // Handle navigation state
     LaunchedEffect(uiState.shouldNavigateBack) {
@@ -106,6 +108,11 @@ fun EditorScreenRoot(
             when (event) {
                 is EditorUiEvent.ShowSnackbar -> {
                     snackbarHostState.showSnackbar(event.message)
+                }
+                is EditorUiEvent.ShowMoodColorError -> {
+                    snackbarHostState.showSnackbar(
+                        MoodColorErrorFormatter.format(context, event.error)
+                    )
                 }
             }
         }
@@ -143,6 +150,7 @@ private fun EditorScreen(
     modifier: Modifier = Modifier
 ) {
     val haptic = LocalHapticFeedback.current
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -372,7 +380,9 @@ private fun EditorScreen(
                         )
                     }
                 },
-                externalError = uiState.editMoodColorError,
+                externalError = uiState.editMoodColorError?.let {
+                    MoodColorErrorFormatter.format(context, it)
+                },
                 onErrorCleared = {
                     onAction(EditorAction.ClearEditMoodColorError)
                 }

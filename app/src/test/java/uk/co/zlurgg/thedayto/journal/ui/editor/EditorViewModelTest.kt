@@ -29,12 +29,11 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
@@ -85,16 +84,18 @@ class EditorViewModelTest {
     }
 
     private fun createViewModel(): EditorViewModel {
+        val saveMoodColorUseCase = SaveMoodColorUseCase(
+            validate = ValidateMoodColorUseCase(fakeMoodColorRepository),
+            repository = fakeMoodColorRepository
+        )
         val editorUseCases = EditorUseCases(
             getEntryUseCase = GetEntryUseCase(fakeEntryRepository),
             getEntryByDateUseCase = GetEntryByDateUseCase(fakeEntryRepository),
             addEntryUseCase = AddEntryUseCase(fakeEntryRepository, fakeMoodColorRepository),
             getMoodColorUseCase = GetMoodColorUseCase(fakeMoodColorRepository),
-            addMoodColorUseCase = AddMoodColorUseCase(fakeMoodColorRepository),
-            setMoodColorFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
             getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
-            updateMoodColorUseCase = UpdateMoodColorUseCase(fakeMoodColorRepository),
-            updateMoodColorNameUseCase = UpdateMoodColorNameUseCase(fakeMoodColorRepository),
+            saveMoodColor = saveMoodColorUseCase,
+            setMoodColorFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository)
         )
@@ -331,10 +332,12 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveMoodColor(mood = "", colorHex = "FF0000"))
 
-            // Then: Error event should be emitted
+            // Then: Typed mood color error should be emitted
             val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertTrue("Should contain error message", (event as EditorUiEvent.ShowSnackbar).message.isNotEmpty())
+            assertTrue(
+                "Should be ShowMoodColorError event",
+                event is EditorUiEvent.ShowMoodColorError
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -840,12 +843,11 @@ class EditorViewModelTest {
             newColorHex = "FF0000"
         ))
 
-        // Then: Error should be set in state (inline error display)
+        // Then: Typed NotFound error should be set in state (inline error display)
         testScheduler.advanceUntilIdle()
         viewModel.uiState.test {
             val state = awaitItem()
             assertNotNull("editMoodColorError should be set", state.editMoodColorError)
-            assertTrue("Error message should not be empty", state.editMoodColorError!!.isNotEmpty())
             cancelAndIgnoreRemainingEvents()
         }
     }

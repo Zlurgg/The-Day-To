@@ -2,12 +2,10 @@ package uk.co.zlurgg.thedayto.journal.domain.usecases.editor
 
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 
 data class EditorUseCases(
     // Entry UseCases
@@ -16,11 +14,9 @@ data class EditorUseCases(
     val addEntryUseCase: AddEntryUseCase,
     // MoodColor UseCases
     val getMoodColorUseCase: GetMoodColorUseCase,
-    val addMoodColorUseCase: AddMoodColorUseCase,
-    val setMoodColorFavorite: SetMoodColorFavoriteUseCase,
     val getMoodColors: GetMoodColorsUseCase,
-    val updateMoodColorUseCase: UpdateMoodColorUseCase,
-    val updateMoodColorNameUseCase: UpdateMoodColorNameUseCase,
+    val saveMoodColor: SaveMoodColorUseCase,
+    val setMoodColorFavorite: SetMoodColorFavoriteUseCase,
     // Tutorial UseCases
     val checkEditorTutorialSeen: CheckEditorTutorialSeenUseCase,
     val markEditorTutorialSeen: MarkEditorTutorialSeenUseCase

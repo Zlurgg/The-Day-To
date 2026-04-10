@@ -2,6 +2,7 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.state
 
 import androidx.compose.runtime.Stable
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import java.time.LocalDate
 import java.time.ZoneOffset
 
@@ -26,7 +27,7 @@ data class EditorUiState(
     // Edit mood color dialog state
     val showEditMoodColorDialog: Boolean = false,
     val editingMoodColor: MoodColor? = null,
-    val editMoodColorError: String? = null,
+    val editMoodColorError: MoodColorError? = null,
 
     // Unsaved changes dialog
     val showUnsavedChangesDialog: Boolean = false,

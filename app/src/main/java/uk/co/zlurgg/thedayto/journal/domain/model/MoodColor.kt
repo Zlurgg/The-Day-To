@@ -28,5 +28,3 @@ data class MoodColor(
         )
     }
 }
-
-class InvalidMoodColorException(message: String) : Exception(message)

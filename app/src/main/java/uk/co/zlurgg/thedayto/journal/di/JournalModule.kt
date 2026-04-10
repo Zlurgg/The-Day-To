@@ -30,7 +30,6 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntriesUseC
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetMoodColorEntryCountsUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.AddMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
@@ -39,8 +38,6 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.RestoreMoo
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorNameUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.UpdateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMoodDistributionUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.stats.CalculateMonthlyBreakdownUseCase
@@ -83,9 +80,6 @@ val journalModule = module {
 
     single { GetMoodColorsUseCase(repository = get()) }
     single { GetMoodColorUseCase(repository = get()) }
-    single { AddMoodColorUseCase(repository = get()) }
-    single { UpdateMoodColorUseCase(repository = get()) }
-    single { UpdateMoodColorNameUseCase(repository = get()) }
     single { DeleteMoodColorUseCase(repository = get()) }
     single { RestoreMoodColorUseCase(repository = get()) }
     single { SetMoodColorFavoriteUseCase(repository = get()) }
@@ -148,11 +142,9 @@ val journalModule = module {
             getEntryByDateUseCase = get(),
             addEntryUseCase = AddEntryUseCase(repository = get(), moodColorRepository = get()),
             getMoodColors = get(),
-            setMoodColorFavorite = get(),
-            addMoodColorUseCase = get(),
             getMoodColorUseCase = get(),
-            updateMoodColorUseCase = get(),
-            updateMoodColorNameUseCase = get(),
+            saveMoodColor = get(),
+            setMoodColorFavorite = get(),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(preferencesRepository = get()),
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(preferencesRepository = get())
         )
