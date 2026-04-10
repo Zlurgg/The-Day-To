@@ -7,7 +7,7 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
-import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.core.domain.result.Result as DomainResult
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
@@ -22,7 +22,7 @@ import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
  */
 class RescheduleNotificationWorker(
     context: Context,
-    params: WorkerParameters
+    params: WorkerParameters,
 ) : CoroutineWorker(context, params), KoinComponent {
 
     private val settingsRepository: NotificationSettingsRepository by inject()
@@ -34,8 +34,8 @@ class RescheduleNotificationWorker(
             val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
 
             val settings = when (val result = settingsRepository.getSettings(userId)) {
-                is uk.co.zlurgg.thedayto.core.domain.result.Result.Success -> result.data
-                is uk.co.zlurgg.thedayto.core.domain.result.Result.Error -> {
+                is DomainResult.Success -> result.data
+                is DomainResult.Error -> {
                     Timber.e("Failed to get notification settings: %s", result.error)
                     return Result.failure()
                 }
@@ -54,7 +54,7 @@ class RescheduleNotificationWorker(
             Timber.d(
                 "Rescheduling notification for %d:%02d after timezone change",
                 settings.hour,
-                settings.minute
+                settings.minute,
             )
 
             // Use existing scheduler to reschedule
