@@ -13,25 +13,20 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarToday
-import androidx.compose.material.icons.filled.Palette
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.FilledTonalButton
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -40,6 +35,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -72,6 +68,7 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorUiConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
+import uk.co.zlurgg.thedayto.journal.ui.editor.components.ManageMoodColorsCard
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.MoodItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -139,6 +136,7 @@ fun EditorScreenRoot(
 /**
  * Presenter composable - pure UI, no ViewModel dependency
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun EditorScreen(
     uiState: EditorUiState,
@@ -153,50 +151,26 @@ private fun EditorScreen(
 
     Scaffold(
         topBar = {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .systemBarsPadding()
-                    .padding(horizontal = paddingMedium, vertical = paddingSmall),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (showBackButton) {
-                    IconButton(
-                        onClick = { onAction(EditorAction.RequestNavigateBack) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
+            TopAppBar(
+                title = {
+                    Text(
+                        text = stringResource(R.string.editor_title),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                },
+                navigationIcon = {
+                    if (showBackButton) {
+                        IconButton(
+                            onClick = { onAction(EditorAction.RequestNavigateBack) }
+                        ) {
+                            Icon(
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.back)
+                            )
+                        }
                     }
                 }
-                Spacer(modifier = Modifier.weight(1f))
-                FilledTonalButton(
-                    onClick = onNavigateToMoodColorManagement,
-                    shape = MaterialTheme.shapes.small,
-                    colors = ButtonDefaults.filledTonalButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Palette,
-                        contentDescription = null,
-                        modifier = Modifier.size(EditorUiConstants.MANAGE_BUTTON_ICON_SIZE)
-                    )
-                    Spacer(modifier = Modifier.width(paddingSmall))
-                    Text(
-                        text = stringResource(R.string.manage_mood_colors),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                    Spacer(modifier = Modifier.width(paddingExtraSmall))
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        modifier = Modifier.size(EditorUiConstants.MANAGE_BUTTON_ICON_SIZE)
-                    )
-                }
-            }
+            )
         },
         floatingActionButton = {
             // Hide FAB when mood color picker is visible with scale animation
@@ -261,6 +235,11 @@ private fun EditorScreen(
                     Spacer(modifier = Modifier.height(paddingMedium))
                 }
             }
+
+            // Mood Colors management navigation card - mirrors the Stats card
+            // on Overview for a consistent "cards that navigate" pattern.
+            ManageMoodColorsCard(onClick = onNavigateToMoodColorManagement)
+            Spacer(modifier = Modifier.height(paddingMedium))
 
             // Entry card - date, mood, and content
             JournalCard(

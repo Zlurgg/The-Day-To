@@ -58,6 +58,8 @@
     </plurals>
 
     <!-- Add edit daily entry -->
+    <string name="editor_title">Daily Entry</string>
+    <string name="mood_colors_card_title">Mood Colors</string>
     <string name="back">Back</string>
     <string name="save_entry">Save entry</string>
     <string name="date_picker_dropdown_button">Date picker dropdown button</string>
