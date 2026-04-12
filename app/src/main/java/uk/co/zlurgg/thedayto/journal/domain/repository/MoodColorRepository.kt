@@ -26,7 +26,16 @@ interface MoodColorRepository {
     suspend fun getMoodColorById(id: Int): Result<MoodColor?, DataError.Local>
     suspend fun getMoodColorByName(mood: String): Result<MoodColor?, DataError.Local>
     suspend fun getActiveCount(): Result<Int, DataError.Local>
+
+    /**
+     * Returns the set of normalized (lowercase) mood names for all active
+     * (non-deleted) mood colors. Used for bulk duplicate checking by the
+     * random seeder. Unlike other repository methods, this does NOT return
+     * a [Result] — a DAO exception propagates directly. Callers should
+     * handle this at the coroutine level (e.g. try/finally).
+     */
     suspend fun getActiveMoodNames(): Set<String>
+
     fun getMoodColors(): Flow<List<MoodColor>>
     suspend fun updateMoodColor(moodColor: MoodColor): EmptyResult<DataError.Local>
     suspend fun setFavorite(id: Int, isFavorite: Boolean): EmptyResult<DataError.Local>

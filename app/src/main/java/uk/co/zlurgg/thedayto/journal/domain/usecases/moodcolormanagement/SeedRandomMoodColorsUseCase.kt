@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement
 
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.journal.domain.model.CuratedMoods
@@ -33,10 +34,13 @@ class SeedRandomMoodColorsUseCase(
     }
 
     suspend operator fun invoke(): Result<Int, MoodColorError> {
-        // 1. Bulk-read existing mood names (normalized to lowercase by the DAO)
+        // 1. Bulk-read existing mood names (from pre-normalized database column)
         val existingNames = repository.getActiveMoodNames()
 
-        // 2. Filter curated list to moods not already present
+        // 2. Filter curated list to moods not already present.
+        //    Race: another writer (different session, sync) may insert a curated mood
+        //    between this read and our save loop below. SaveMoodColorUseCase handles
+        //    that by returning DuplicateName, which we skip silently (see loop).
         val available = CuratedMoods.ALL.filter { seed ->
             seed.mood.trim().lowercase() !in existingNames
         }
@@ -61,9 +65,11 @@ class SeedRandomMoodColorsUseCase(
             when (val result = saveMoodColor(moodColor)) {
                 is Result.Success -> successCount++
                 is Result.Error -> if (result.error == MoodColorError.LimitReached) {
-                    return Result.Success(successCount) // Hit 50 cap, return what we got
+                    Timber.d("Hit 50-mood cap after %d additions, stopping", successCount)
+                    return Result.Success(successCount)
+                } else {
+                    Timber.d("Skipping '%s': %s", seed.mood, result.error)
                 }
-                // Other errors (DuplicateName race, DB glitch) — skip, try next
             }
         }
 

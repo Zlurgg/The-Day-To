@@ -406,4 +406,54 @@ class MoodColorManagementViewModelTest {
         state = viewModel.state.value
         assertEquals("Updated count should be 2", 2, state.moodColors[0].entryCount)
     }
+
+    // ============================================================
+    // Random Mood Seeding Tests
+    // ============================================================
+
+    @Test
+    fun `RequestSeedRandom shows confirmation dialog`() = runTest {
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.RequestSeedRandom)
+        assertTrue("Dialog should be visible", viewModel.state.value.showSeedRandomDialog)
+    }
+
+    @Test
+    fun `DismissSeedRandomDialog hides confirmation dialog`() = runTest {
+        viewModel = createViewModel()
+        viewModel.onAction(MoodColorManagementAction.RequestSeedRandom)
+        assertTrue("Dialog should be visible", viewModel.state.value.showSeedRandomDialog)
+
+        viewModel.onAction(MoodColorManagementAction.DismissSeedRandomDialog)
+        assertFalse("Dialog should be hidden", viewModel.state.value.showSeedRandomDialog)
+    }
+
+    @Test
+    fun `ConfirmSeedRandom adds moods and closes dialog`() = runTest {
+        viewModel = createViewModel()
+        val initialCount = viewModel.state.value.moodColors.size
+
+        // When: User confirms seeding
+        viewModel.onAction(MoodColorManagementAction.ConfirmSeedRandom)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        // Then: Dialog closed, moods added, not in progress
+        val state = viewModel.state.value
+        assertFalse("Dialog should be closed", state.showSeedRandomDialog)
+        assertFalse("Seeding should be complete", state.isSeedingInProgress)
+        assertTrue(
+            "Should have more moods than before (was $initialCount, now ${state.moodColors.size})",
+            state.moodColors.size > initialCount,
+        )
+    }
+
+    @Test
+    fun `isSeedingInProgress resets after seeding completes`() = runTest {
+        viewModel = createViewModel()
+
+        viewModel.onAction(MoodColorManagementAction.ConfirmSeedRandom)
+        testDispatcher.scheduler.advanceUntilIdle()
+
+        assertFalse("Should not be in progress after completion", viewModel.state.value.isSeedingInProgress)
+    }
 }
