@@ -17,4 +17,6 @@ data class MoodColorManagementUiState(
     val dialogError: MoodColorError? = null,
     val pendingDelete: MoodColor? = null,
     val pendingFavorites: Map<Int, Boolean> = emptyMap(),
+    val showSeedRandomDialog: Boolean = false,
+    val isSeedingInProgress: Boolean = false,
 )

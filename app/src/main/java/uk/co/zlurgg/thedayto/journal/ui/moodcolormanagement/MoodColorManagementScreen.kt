@@ -18,6 +18,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Shuffle
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -57,6 +58,7 @@ import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorWithCount
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.DeleteMoodColorConfirmDialog
+import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.components.SeedRandomMoodColorsDialog
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementUiState
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
@@ -98,6 +100,14 @@ fun MoodColorManagementScreenRoot(
                 }
             }
         }
+    }
+
+    // Seed random mood colors confirmation dialog
+    if (state.showSeedRandomDialog) {
+        SeedRandomMoodColorsDialog(
+            onConfirm = { viewModel.onAction(MoodColorManagementAction.ConfirmSeedRandom) },
+            onDismiss = { viewModel.onAction(MoodColorManagementAction.DismissSeedRandomDialog) },
+        )
     }
 
     // Delete confirmation dialog
@@ -167,6 +177,21 @@ private fun MoodColorManagementScreen(
                     }
                 },
                 actions = {
+                    // Dice button — seed random mood colors from curated pool
+                    IconButton(
+                        onClick = {
+                            haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                            onAction(MoodColorManagementAction.RequestSeedRandom)
+                        },
+                        enabled = !state.isSeedingInProgress &&
+                            state.moodColors.size < SaveMoodColorUseCase.MAX_MOOD_COLORS,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Shuffle,
+                            contentDescription = stringResource(R.string.seed_random_mood_colors),
+                        )
+                    }
+
                     // Only show the counter when approaching the cap — most
                     // users never get close, so it stays out of the way.
                     val activeCount = state.moodColors.size

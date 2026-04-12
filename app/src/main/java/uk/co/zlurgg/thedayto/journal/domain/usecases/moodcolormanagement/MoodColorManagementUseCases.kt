@@ -16,4 +16,5 @@ data class MoodColorManagementUseCases(
     val deleteMoodColor: DeleteMoodColorUseCase,
     val restoreMoodColor: RestoreMoodColorUseCase,
     val setFavorite: SetMoodColorFavoriteUseCase,
+    val seedRandomMoodColors: SeedRandomMoodColorsUseCase,
 )

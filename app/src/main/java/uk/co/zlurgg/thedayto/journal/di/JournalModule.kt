@@ -36,6 +36,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodCol
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetSortedMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.RestoreMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.SeedRandomMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SeedDefaultMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
@@ -86,6 +87,13 @@ val journalModule = module {
     single { ValidateMoodColorUseCase(repository = get()) }
     single { SaveMoodColorUseCase(validate = get(), repository = get()) }
     single { GetSortedMoodColorsUseCase(moodColorRepository = get(), entryRepository = get()) }
+    single {
+        SeedRandomMoodColorsUseCase(
+            saveMoodColor = get(),
+            repository = get(),
+            timeProvider = get(),
+        )
+    }
     single {
         SeedDefaultMoodColorsUseCase(
             moodColorRepository = get(),
@@ -169,6 +177,7 @@ val journalModule = module {
             deleteMoodColor = get(),
             restoreMoodColor = get(),
             setFavorite = get(),
+            seedRandomMoodColors = get(),
         )
     }
 }

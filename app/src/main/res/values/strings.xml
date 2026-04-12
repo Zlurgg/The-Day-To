@@ -35,6 +35,11 @@
     <string name="add_mood_color_button_description">Create new mood color</string>
     <string name="manage_mood_colors">Manage Mood Colors</string>
 
+    <string name="seed_random_mood_colors">Add random mood colors</string>
+    <string name="seed_random_dialog_title">Add random mood colors?</string>
+    <string name="seed_random_dialog_message">A handful of new moods will be added to your palette</string>
+    <string name="seed_random_confirm">Add</string>
+
     <string name="add_mood_color">Add mood color</string>
     <string name="delete_mood_color">Delete mood color</string>
     <string name="no_mood_colors">No mood colors yet</string>

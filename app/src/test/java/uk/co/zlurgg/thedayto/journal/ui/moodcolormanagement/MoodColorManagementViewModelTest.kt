@@ -20,12 +20,14 @@ import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.MoodColorManagementUseCases
+import uk.co.zlurgg.thedayto.journal.domain.usecases.moodcolormanagement.SeedRandomMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.DeleteMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetSortedMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.RestoreMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
+import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 import uk.co.zlurgg.thedayto.journal.ui.moodcolormanagement.state.MoodColorManagementAction
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
@@ -68,12 +70,18 @@ class MoodColorManagementViewModelTest {
 
     private fun createViewModel(): MoodColorManagementViewModel {
         val validateUseCase = ValidateMoodColorUseCase(fakeMoodColorRepository)
+        val saveMoodColorUseCase = SaveMoodColorUseCase(validateUseCase, fakeMoodColorRepository)
         val useCases = MoodColorManagementUseCases(
             getSortedMoodColors = GetSortedMoodColorsUseCase(fakeMoodColorRepository, fakeEntryRepository),
-            saveMoodColor = SaveMoodColorUseCase(validateUseCase, fakeMoodColorRepository),
+            saveMoodColor = saveMoodColorUseCase,
             deleteMoodColor = DeleteMoodColorUseCase(fakeMoodColorRepository),
             restoreMoodColor = RestoreMoodColorUseCase(fakeMoodColorRepository),
             setFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
+            seedRandomMoodColors = SeedRandomMoodColorsUseCase(
+                saveMoodColor = saveMoodColorUseCase,
+                repository = fakeMoodColorRepository,
+                timeProvider = FakeTimeProvider(),
+            ),
         )
         return MoodColorManagementViewModel(
             useCases = useCases,

@@ -17,6 +17,9 @@ interface MoodColorDao {
     @Query("SELECT COUNT(*) FROM mood_color WHERE isDeleted = 0")
     suspend fun getActiveCount(): Int
 
+    @Query("SELECT moodNormalized FROM mood_color WHERE isDeleted = 0")
+    suspend fun getActiveMoodNames(): List<String>
+
     @Query("SELECT * FROM mood_color WHERE id = :id")
     suspend fun getMoodColorById(id: Int): MoodColorEntity?
 

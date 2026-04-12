@@ -16,4 +16,7 @@ sealed interface MoodColorManagementAction {
     data class ToggleFavorite(val id: Int, val currentValue: Boolean) : MoodColorManagementAction
     data object DismissDialog : MoodColorManagementAction
     data object ClearError : MoodColorManagementAction
+    data object RequestSeedRandom : MoodColorManagementAction
+    data object ConfirmSeedRandom : MoodColorManagementAction
+    data object DismissSeedRandomDialog : MoodColorManagementAction
 }

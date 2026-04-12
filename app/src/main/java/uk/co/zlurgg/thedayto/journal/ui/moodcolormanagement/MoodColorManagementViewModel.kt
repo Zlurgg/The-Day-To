@@ -75,6 +75,9 @@ class MoodColorManagementViewModel(
 
             is MoodColorManagementAction.DismissDialog -> dismissDialog()
             is MoodColorManagementAction.ClearError -> clearError()
+            is MoodColorManagementAction.RequestSeedRandom -> showSeedRandomDialog()
+            is MoodColorManagementAction.ConfirmSeedRandom -> seedRandomMoodColors()
+            is MoodColorManagementAction.DismissSeedRandomDialog -> dismissSeedRandomDialog()
         }
     }
 
@@ -135,6 +138,32 @@ class MoodColorManagementViewModel(
 
     private fun dismissDeleteDialog() {
         _state.update { it.copy(pendingDelete = null) }
+    }
+
+    private fun showSeedRandomDialog() {
+        _state.update { it.copy(showSeedRandomDialog = true) }
+    }
+
+    private fun dismissSeedRandomDialog() {
+        _state.update { it.copy(showSeedRandomDialog = false) }
+    }
+
+    private fun seedRandomMoodColors() {
+        _state.update { it.copy(showSeedRandomDialog = false, isSeedingInProgress = true) }
+        viewModelScope.launch {
+            try {
+                when (val result = useCases.seedRandomMoodColors()) {
+                    is Result.Success -> {
+                        if (result.data > 0) syncScheduler.requestImmediateSync()
+                    }
+                    is Result.Error -> { /* absorbed — non-critical action */ }
+                }
+            } finally {
+                // Always re-enable the button, even if the coroutine dies
+                // from an uncaught exception (e.g. getActiveMoodNames() DB failure).
+                _state.update { it.copy(isSeedingInProgress = false) }
+            }
+        }
     }
 
     private fun toggleFavorite(id: Int, currentValue: Boolean) {

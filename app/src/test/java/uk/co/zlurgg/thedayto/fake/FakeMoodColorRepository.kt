@@ -60,6 +60,13 @@ class FakeMoodColorRepository : MoodColorRepository {
         return Result.Success(_moodColors.value.count { !it.isDeleted })
     }
 
+    override suspend fun getActiveMoodNames(): Set<String> {
+        return _moodColors.value
+            .filter { !it.isDeleted }
+            .map { it.mood.trim().lowercase() }
+            .toSet()
+    }
+
     override fun getMoodColors(): Flow<List<MoodColor>> {
         // Only return non-deleted mood colors (matches production behavior)
         // Use map to filter, maintains reactive behavior like Room

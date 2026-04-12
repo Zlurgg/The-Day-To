@@ -61,6 +61,15 @@ class MoodColorRepositoryImpl(
         }
     }
 
+    // Intentionally bare (no ErrorMapper / Result wrapper). This is a non-critical
+    // read used only by the random seeder — if the DAO throws, the exception
+    // propagates to the ViewModel's coroutine which has a finally block that
+    // re-enables the dice button. Adding a Result wrapper would add boilerplate
+    // for no user-visible gain.
+    override suspend fun getActiveMoodNames(): Set<String> {
+        return dao.getActiveMoodNames().toSet()
+    }
+
     override fun getMoodColors(): Flow<List<MoodColor>> {
         return dao.getMoodColors().map { entities ->
             entities.map { it.toDomain() }
