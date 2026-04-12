@@ -13,14 +13,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.defaultMinSize
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowDropDown
@@ -220,10 +218,9 @@ private fun EditorScreen(
     ) { padding ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxSize()
                 .padding(padding)
-                .padding(paddingMedium)
-                .verticalScroll(rememberScrollState()),
+                .padding(paddingMedium),
         ) {
             // Error banner (persistent for load failures) with slide-down animation
             AnimatedVisibility(
@@ -251,7 +248,9 @@ private fun EditorScreen(
             // per Material guidelines, and clearance would steal vertical space
             // from the note field when the keyboard is open on small screens.
             JournalCard(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f),
             ) {
                 Column(
                     modifier = Modifier.padding(paddingMedium),
@@ -330,7 +329,7 @@ private fun EditorScreen(
                         onFocusChange = { focusState ->
                             onAction(EditorAction.ChangeContentFocus(focusState))
                         },
-                        modifier = Modifier.defaultMinSize(minHeight = EditorUiConstants.NOTE_MIN_HEIGHT),
+                        modifier = Modifier.weight(1f),
                     )
                 }
             }
