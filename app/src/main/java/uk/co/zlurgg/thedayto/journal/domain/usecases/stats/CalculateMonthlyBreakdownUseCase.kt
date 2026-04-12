@@ -32,7 +32,7 @@ class CalculateMonthlyBreakdownUseCase {
                     completionRate = completionRate,
                 )
             }
-            .sortedByDescending { it.year * 100 + it.monthValue }
+            .sortedByDescending { it.year * YEAR_MONTH_SORT_MULTIPLIER + it.monthValue }
             .take(limit)
     }
 
@@ -43,4 +43,9 @@ class CalculateMonthlyBreakdownUseCase {
         val entryCount: Int,
         val completionRate: Int,
     )
+
+    companion object {
+        /** Multiplier for combining year + monthValue into a sortable int (e.g. 2024 * 100 + 3 = 202403). */
+        private const val YEAR_MONTH_SORT_MULTIPLIER = 100
+    }
 }

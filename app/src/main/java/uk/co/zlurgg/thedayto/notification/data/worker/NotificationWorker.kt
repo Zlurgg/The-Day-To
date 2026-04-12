@@ -112,7 +112,7 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         channel.enableLights(true)
         channel.lightColor = Color.GREEN
         channel.enableVibration(true)
-        channel.vibrationPattern = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
+        channel.vibrationPattern = VIBRATION_PATTERN
         channel.setSound(ringtoneManager, audioAttributes)
         notificationManager.createNotificationChannel(channel)
 
@@ -151,5 +151,8 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
         // Deep link to editor screen with null entryId (creates new entry)
         private const val NOTIFICATION_DEEP_LINK = "https://thedayto.co.uk/editor?entryId=null&showBackButton=true"
+
+        /** Vibration pattern (ms): pause, vibrate, pause, vibrate, ... */
+        private val VIBRATION_PATTERN = longArrayOf(100, 200, 300, 400, 500, 400, 300, 200, 400)
     }
 }

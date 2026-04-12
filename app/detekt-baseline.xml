@@ -1,21 +1,5 @@
 <?xml version="1.0" ?>
 <SmellBaseline>
   <ManuallySuppressedIssues/>
-  <CurrentIssues>
-    <ID>MagicNumber:CalculateMonthlyBreakdownUseCase.kt$CalculateMonthlyBreakdownUseCase$100</ID>
-    <ID>MagicNumber:EntryRepositoryImpl.kt$EntryRepositoryImpl$12</ID>
-    <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$100</ID>
-    <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$200</ID>
-    <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$300</ID>
-    <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$400</ID>
-    <ID>MagicNumber:NotificationWorker.kt$NotificationWorker$500</ID>
-    <ID>MaxLineLength:EditorScreen.kt$entryContent = "Had a great day at work! Finished the new feature and got positive feedback from the team."</ID>
-    <ID>MaxLineLength:OverviewViewModel.kt$OverviewViewModel$in TimeConstants.AFTERNOON_START..TimeConstants.AFTERNOON_END -&gt; GreetingConstants.AFTERNOON_GREETINGS</ID>
-    <ID>MaxLineLength:OverviewViewModel.kt$OverviewViewModel$in TimeConstants.EVENING_START..TimeConstants.EVENING_END -&gt; GreetingConstants.EVENING_GREETINGS</ID>
-    <ID>MaxLineLength:OverviewViewModel.kt$OverviewViewModel$in TimeConstants.MORNING_START..TimeConstants.MORNING_END -&gt; GreetingConstants.MORNING_GREETINGS</ID>
-    <ID>MaximumLineLength:EditorScreen.kt$ </ID>
-    <ID>MaximumLineLength:OverviewViewModel.kt$OverviewViewModel$ </ID>
-    <ID>MaximumLineLength:OverviewViewModelTest.kt$OverviewViewModelTest$ </ID>
-    <ID>ThrowsCount:AddEntryUseCase.kt$AddEntryUseCase$@Throws(InvalidEntryException::class) suspend operator fun invoke(entry: Entry)</ID>
-  </CurrentIssues>
+  <CurrentIssues/>
 </SmellBaseline>

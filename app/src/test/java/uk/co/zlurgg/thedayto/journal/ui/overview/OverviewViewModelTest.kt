@@ -22,6 +22,7 @@ import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.createFakeOverviewUseCases
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
@@ -373,7 +374,7 @@ class OverviewViewModelTest {
             val event = awaitItem()
             assertTrue(
                 "Should show permanent denial dialog",
-                event is uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog,
+                event is OverviewUiEvent.ShowPermissionPermanentlyDeniedDialog,
             )
         }
 

@@ -440,7 +440,8 @@ private fun EditorScreenEditEntryPreview() {
             uiState = EditorUiState(
                 entryDate = LocalDate.now().minusDays(2).atStartOfDay().toEpochSecond(ZoneOffset.UTC),
                 selectedMoodColorId = 1,
-                entryContent = "Had a great day at work! Finished the new feature and got positive feedback from the team.",
+                entryContent = "Had a great day at work! " +
+                    "Finished the new feature and got positive feedback from the team.",
                 isMoodHintVisible = false,
                 isContentHintVisible = false,
                 currentEntryId = 1,

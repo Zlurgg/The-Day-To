@@ -24,6 +24,7 @@ class AddEntryUseCase(
     private val repository: EntryRepository,
     private val moodColorRepository: MoodColorRepository,
 ) {
+    @Suppress("ThrowsCount") // Validation use case — one throw per field is intentional
     @Throws(InvalidEntryException::class)
     suspend operator fun invoke(entry: Entry) {
         // Validate timestamp

@@ -38,7 +38,7 @@ class EntryRepositoryImpl(
     }
 
     override fun getEntriesForMonth(month: Int, year: Int): Flow<List<EntryWithMoodColor>> {
-        require(month in 1..12) { "Month must be between 1 and 12, got: $month" }
+        require(month in 1..MONTHS_IN_YEAR) { "Month must be between 1 and $MONTHS_IN_YEAR, got: $month" }
         require(year > 0) { "Year must be positive, got: $year" }
 
         val (startEpoch, endEpoch) = getMonthRange(month, year)
@@ -147,6 +147,7 @@ class EntryRepositoryImpl(
 
     companion object {
         private const val TAG = "EntryRepository"
+        private const val MONTHS_IN_YEAR = 12
     }
 
     override fun getMoodColorEntryCounts(): Flow<Map<Int, Int>> {
