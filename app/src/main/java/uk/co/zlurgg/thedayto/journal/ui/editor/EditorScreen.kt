@@ -243,12 +243,14 @@ private fun EditorScreen(
             ManageMoodColorsCard(onClick = onNavigateToMoodColorManagement)
             Spacer(modifier = Modifier.height(paddingMedium))
 
-            // Entry card - date, mood, and content
+            // Entry card - date, mood, and content.
+            // No bottom padding for FAB clearance — the FAB floats over content
+            // per Material guidelines, and clearance would steal vertical space
+            // from the note field when the keyboard is open on small screens.
             JournalCard(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .weight(1f)
-                    .padding(bottom = EditorUiConstants.ENTRY_CARD_FAB_CLEARANCE),
+                    .weight(1f),
             ) {
                 Column(
                     modifier = Modifier.padding(paddingMedium),

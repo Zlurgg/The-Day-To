@@ -50,14 +50,18 @@ fun MoodColorRow(
     val color = remember(moodColor.color) { getColorSafe(moodColor.color) }
     val circleSize = if (entryCount != null) COLOR_CIRCLE_SIZE_LARGE else COLOR_CIRCLE_SIZE_SMALL
 
+    // Compact (Editor dropdown): tighter vertical padding for denser menu.
+    // Detailed (Management card): more breathing room around the row.
+    val verticalPad = if (entryCount != null) paddingSmall else paddingExtraSmall
+
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(
                 start = paddingExtraSmall,
                 end = paddingMedium,
-                top = paddingSmall,
-                bottom = paddingSmall,
+                top = verticalPad,
+                bottom = verticalPad,
             ),
         verticalAlignment = Alignment.CenterVertically,
     ) {
