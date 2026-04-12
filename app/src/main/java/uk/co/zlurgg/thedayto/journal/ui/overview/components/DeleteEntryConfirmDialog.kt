@@ -30,7 +30,7 @@ fun DeleteEntryConfirmDialog(
     onDismiss: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val formattedDate = DateFormatter.formatDate(entry.dateStamp)
+    val formattedDate = DateFormatter.formatDateCompact(entry.dateStamp)
 
     AlertDialog(
         onDismissRequest = onDismiss,

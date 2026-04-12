@@ -260,9 +260,9 @@ private fun EditorScreen(
                 ) {
                     // Date display (clickable to open date picker)
                     // "15th January 2024" with ordinal suffix in superscript,
-                    // matching Overview entry-item sizing (labelLarge).
+                    // matching the Overview calendar header sizing (headlineMedium).
                     val ordinalDate = DateFormatter.formatDateOrdinal(uiState.entryDate)
-                    val dateStyle = MaterialTheme.typography.labelLarge
+                    val dateStyle = MaterialTheme.typography.headlineMedium
                     val superscriptStyle = dateStyle.toSpanStyle().copy(
                         baselineShift = BaselineShift.Superscript,
                         fontSize = dateStyle.fontSize * 0.7f,

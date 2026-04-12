@@ -18,11 +18,9 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PageSize
 import androidx.compose.foundation.pager.PagerDefaults
@@ -68,9 +66,7 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.util.CalendarConstants
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.SampleEntries
 import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
-import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 /**
  * Self-contained calendar section with month navigation and date selection.
@@ -249,13 +245,7 @@ private fun MonthYearHeader(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
-                    style = MaterialTheme.typography.headlineMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                )
-                Spacer(modifier = Modifier.width(paddingSmall))
-                Text(
-                    text = date.year.toString(),
+                    text = DateFormatter.formatMonthYear(date),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.onSurface,
                 )

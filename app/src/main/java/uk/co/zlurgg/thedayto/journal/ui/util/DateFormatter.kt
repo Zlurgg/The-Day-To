@@ -1,32 +1,45 @@
 package uk.co.zlurgg.thedayto.journal.ui.util
 
 import uk.co.zlurgg.thedayto.core.data.util.toLocalDate
+import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
 /**
- * Stateless date formatting utilities for UI display.
+ * Single source of truth for date formatting across the app.
  *
- * Uses pure extension functions for epoch conversion - no dependencies needed.
- * All methods convert storage epoch (UTC midnight) to display format.
+ * All UI date rendering should go through this object so the app
+ * presents a consistent style. Uses pure extension functions for
+ * epoch conversion — no injected dependencies needed.
+ *
+ * **Formats:**
+ * - [formatDateCompact]: "15th Jan 2024" — entry cards, dialogs, secondary labels
+ * - [formatDateOrdinal]: [OrdinalDate] parts for superscript rendering — Editor heading
+ * - [formatMonthYear]: "January 2024" — calendar header
+ * - [formatMonthShort]: "Jan" — month picker chips
  */
 object DateFormatter {
 
+    // ==================== Full-date formats ====================
+
     /**
-     * Formats epoch seconds to display string: "15 Jan 2024"
+     * Compact date with ordinal: "15th Jan 2024".
+     * Used in entry cards, delete dialogs, and other space-constrained contexts.
      */
-    fun formatDate(epochSeconds: Long): String {
+    fun formatDateCompact(epochSeconds: Long): String {
         val date = epochSeconds.toLocalDate()
-        val day = date.dayOfMonth.toString().padStart(2, '0')
+        val day = date.dayOfMonth
+        val suffix = ordinalSuffix(day)
         val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
-        val year = date.year
-        return "$day $month $year"
+        return "$day$suffix $month ${date.year}"
     }
 
     /**
-     * Returns the parts needed to render a date with an ordinal suffix,
-     * e.g. "15th January 2024". The suffix is separated so the UI layer
-     * can render it as superscript.
+     * Returns pre-split parts for rendering a date with superscript ordinal,
+     * e.g. "15ᵗʰ January 2024". The suffix is separated so the UI layer can
+     * apply [BaselineShift.Superscript] to just that span.
+     *
+     * Used in the Editor heading where the date is the primary element.
      */
     fun formatDateOrdinal(epochSeconds: Long): OrdinalDate {
         val date = epochSeconds.toLocalDate()
@@ -39,18 +52,7 @@ object DateFormatter {
     }
 
     /**
-     * English ordinal suffix for a day number: "st", "nd", "rd", or "th".
-     */
-    private fun ordinalSuffix(day: Int): String = when {
-        day in 11..13 -> "th" // 11th, 12th, 13th are special
-        day % 10 == 1 -> "st"
-        day % 10 == 2 -> "nd"
-        day % 10 == 3 -> "rd"
-        else -> "th"
-    }
-
-    /**
-     * Pre-split date parts for ordinal rendering.
+     * Pre-split date parts for ordinal rendering with superscript.
      */
     data class OrdinalDate(
         val day: Int,
@@ -58,6 +60,27 @@ object DateFormatter {
         val month: String,
         val year: Int,
     )
+
+    // ==================== Month/year formats ====================
+
+    /**
+     * Full month name + year: "January 2024".
+     * Used in the calendar header.
+     */
+    fun formatMonthYear(date: LocalDate): String {
+        val month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault())
+        return "$month ${date.year}"
+    }
+
+    /**
+     * Short month name: "Jan".
+     * Used in month picker chips.
+     */
+    fun formatMonthShort(date: LocalDate): String {
+        return date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+    }
+
+    // ==================== Component helpers ====================
 
     /**
      * Extracts day of month from epoch seconds.
@@ -67,17 +90,7 @@ object DateFormatter {
     }
 
     /**
-     * Extracts month display name from epoch seconds: "January"
-     */
-    fun formatMonth(epochSeconds: Long): String {
-        return epochSeconds.toLocalDate().month.getDisplayName(
-            TextStyle.FULL,
-            Locale.getDefault(),
-        )
-    }
-
-    /**
-     * Extracts month value from epoch seconds: 1-12
+     * Extracts month value from epoch seconds: 1-12.
      */
     fun formatMonthValue(epochSeconds: Long): Int {
         return epochSeconds.toLocalDate().monthValue
@@ -88,5 +101,18 @@ object DateFormatter {
      */
     fun formatYear(epochSeconds: Long): Int {
         return epochSeconds.toLocalDate().year
+    }
+
+    // ==================== Internal ====================
+
+    /**
+     * English ordinal suffix for a day number: "st", "nd", "rd", or "th".
+     */
+    private fun ordinalSuffix(day: Int): String = when {
+        day in 11..13 -> "th" // 11th, 12th, 13th are special
+        day % 10 == 1 -> "st"
+        day % 10 == 2 -> "nd"
+        day % 10 == 3 -> "rd"
+        else -> "th"
     }
 }

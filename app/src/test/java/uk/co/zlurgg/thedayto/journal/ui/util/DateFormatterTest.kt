@@ -29,13 +29,41 @@ class DateFormatterTest {
     }
 
     @Test
-    fun `formatDate returns formatted string`() {
+    fun `formatDateCompact returns ordinal date with short month`() {
         val epoch = LocalDate.of(2024, 1, 5).toStorageEpoch()
-        val formatted = DateFormatter.formatDate(epoch)
+        val formatted = DateFormatter.formatDateCompact(epoch)
 
-        // Check contains expected parts (locale-independent)
-        assertEquals(true, formatted.contains("05"))
+        // Check contains ordinal day + year (locale-independent)
+        assertEquals(true, formatted.contains("5th"))
         assertEquals(true, formatted.contains("2024"))
+    }
+
+    @Test
+    fun `formatDateOrdinal returns correct ordinal suffixes`() {
+        fun suffix(day: Int): String {
+            val epoch = LocalDate.of(2024, 1, day).toStorageEpoch()
+            return DateFormatter.formatDateOrdinal(epoch).suffix
+        }
+        assertEquals("st", suffix(1))
+        assertEquals("nd", suffix(2))
+        assertEquals("rd", suffix(3))
+        assertEquals("th", suffix(4))
+        assertEquals("th", suffix(11))
+        assertEquals("th", suffix(12))
+        assertEquals("th", suffix(13))
+        assertEquals("st", suffix(21))
+        assertEquals("nd", suffix(22))
+        assertEquals("rd", suffix(23))
+        assertEquals("st", suffix(31))
+    }
+
+    @Test
+    fun `formatMonthYear returns full month and year`() {
+        val date = LocalDate.of(2024, 1, 15)
+        val formatted = DateFormatter.formatMonthYear(date)
+        assertEquals(true, formatted.contains("2024"))
+        // Full month name (locale-dependent, but "January" in English)
+        assertEquals(true, formatted.length > 8) // "X 2024" minimum
     }
 
     @Test

@@ -62,7 +62,7 @@ fun EntryItem(
                     modifier = Modifier.weight(1f, fill = false),
                 )
                 Text(
-                    text = DateFormatter.formatDate(entry.dateStamp),
+                    text = DateFormatter.formatDateCompact(entry.dateStamp),
                     style = MaterialTheme.typography.labelLarge,
                     color = textColor.copy(alpha = 0.8f),
                     overflow = TextOverflow.Ellipsis,

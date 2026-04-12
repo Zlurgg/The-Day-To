@@ -28,10 +28,9 @@ import androidx.compose.ui.text.style.TextAlign
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.UiConstants
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
 import java.time.Month
-import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun MonthYearPickerDialog(
@@ -120,7 +119,7 @@ fun MonthYearPickerDialog(
                             onClick = { selectedMonth = month.value },
                             label = {
                                 Text(
-                                    text = month.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                                    text = DateFormatter.formatMonthShort(LocalDate.of(selectedYear, month, 1)),
                                     style = MaterialTheme.typography.labelMedium,
                                     modifier = Modifier.fillMaxWidth(),
                                     textAlign = TextAlign.Center,
