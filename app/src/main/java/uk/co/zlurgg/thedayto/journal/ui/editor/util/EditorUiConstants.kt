@@ -9,4 +9,7 @@ import androidx.compose.ui.unit.dp
 object EditorUiConstants {
     // Date display icons
     val DATE_ICON_SIZE: Dp = 24.dp
+
+    // Minimum height for the notes field so it's visually present even when empty
+    val NOTE_MIN_HEIGHT: Dp = 120.dp
 }
