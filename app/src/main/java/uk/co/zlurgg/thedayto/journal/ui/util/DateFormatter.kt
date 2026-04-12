@@ -24,6 +24,42 @@ object DateFormatter {
     }
 
     /**
+     * Returns the parts needed to render a date with an ordinal suffix,
+     * e.g. "15th January 2024". The suffix is separated so the UI layer
+     * can render it as superscript.
+     */
+    fun formatDateOrdinal(epochSeconds: Long): OrdinalDate {
+        val date = epochSeconds.toLocalDate()
+        return OrdinalDate(
+            day = date.dayOfMonth,
+            suffix = ordinalSuffix(date.dayOfMonth),
+            month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+            year = date.year,
+        )
+    }
+
+    /**
+     * English ordinal suffix for a day number: "st", "nd", "rd", or "th".
+     */
+    private fun ordinalSuffix(day: Int): String = when {
+        day in 11..13 -> "th" // 11th, 12th, 13th are special
+        day % 10 == 1 -> "st"
+        day % 10 == 2 -> "nd"
+        day % 10 == 3 -> "rd"
+        else -> "th"
+    }
+
+    /**
+     * Pre-split date parts for ordinal rendering.
+     */
+    data class OrdinalDate(
+        val day: Int,
+        val suffix: String,
+        val month: String,
+        val year: Int,
+    )
+
+    /**
      * Extracts day of month from epoch seconds.
      */
     fun formatDay(epochSeconds: Long): Int {

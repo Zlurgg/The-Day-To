@@ -102,7 +102,7 @@ fun MoodItem(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(paddingSmall),
     ) {
         ExposedDropdownMenuBox(
             expanded = mExpanded,

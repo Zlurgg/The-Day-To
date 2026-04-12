@@ -46,6 +46,9 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -256,6 +259,15 @@ private fun EditorScreen(
                     modifier = Modifier.padding(paddingMedium),
                 ) {
                     // Date display (clickable to open date picker)
+                    // "15th January 2024" with ordinal suffix in superscript,
+                    // matching Overview entry-item sizing (labelLarge).
+                    val ordinalDate = DateFormatter.formatDateOrdinal(uiState.entryDate)
+                    val dateStyle = MaterialTheme.typography.labelLarge
+                    val superscriptStyle = dateStyle.toSpanStyle().copy(
+                        baselineShift = BaselineShift.Superscript,
+                        fontSize = dateStyle.fontSize * 0.7f,
+                    )
+
                     Row(
                         modifier = Modifier.clickable {
                             onAction(EditorAction.ToggleDatePicker)
@@ -270,8 +282,14 @@ private fun EditorScreen(
                             modifier = Modifier.size(EditorUiConstants.DATE_ICON_SIZE),
                         )
                         Text(
-                            text = DateFormatter.formatDate(uiState.entryDate),
-                            style = MaterialTheme.typography.displaySmall,
+                            text = buildAnnotatedString {
+                                append("${ordinalDate.day}")
+                                withStyle(superscriptStyle) {
+                                    append(ordinalDate.suffix)
+                                }
+                                append(" ${ordinalDate.month} ${ordinalDate.year}")
+                            },
+                            style = dateStyle,
                             color = MaterialTheme.colorScheme.onSurface,
                         )
                         Icon(
