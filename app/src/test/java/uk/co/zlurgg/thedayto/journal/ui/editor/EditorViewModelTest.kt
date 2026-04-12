@@ -30,7 +30,7 @@ import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.MarkEditorTutorialSe
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryByDateUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.entry.GetEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorUseCase
-import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetMoodColorsUseCase
+import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.GetSortedMoodColorsUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SaveMoodColorUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.SetMoodColorFavoriteUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.shared.moodcolor.ValidateMoodColorUseCase
@@ -93,7 +93,7 @@ class EditorViewModelTest {
             getEntryByDateUseCase = GetEntryByDateUseCase(fakeEntryRepository),
             addEntryUseCase = AddEntryUseCase(fakeEntryRepository, fakeMoodColorRepository),
             getMoodColorUseCase = GetMoodColorUseCase(fakeMoodColorRepository),
-            getMoodColors = GetMoodColorsUseCase(fakeMoodColorRepository),
+            getSortedMoodColors = GetSortedMoodColorsUseCase(fakeMoodColorRepository, fakeEntryRepository),
             saveMoodColor = saveMoodColorUseCase,
             setMoodColorFavorite = SetMoodColorFavoriteUseCase(fakeMoodColorRepository),
             checkEditorTutorialSeen = CheckEditorTutorialSeenUseCase(fakePreferencesRepository),

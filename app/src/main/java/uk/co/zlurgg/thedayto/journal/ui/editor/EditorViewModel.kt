@@ -16,13 +16,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
-import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
-import uk.co.zlurgg.thedayto.journal.domain.model.sortedByFavorite
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
-import uk.co.zlurgg.thedayto.journal.domain.util.MoodColorOrder
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiState
@@ -433,16 +430,15 @@ class EditorViewModel(
 
     private fun loadMoodColors() {
         getMoodColorsJob?.cancel()
-        getMoodColorsJob = editorUseCases.getMoodColors(
-            MoodColorOrder.Date(OrderType.Descending),
-        )
-            // Sort by favorites first for the dropdown, inside the flow pipeline
-            // so distinctUntilChanged can short-circuit redundant Room re-emissions
-            // without the ViewModel's state being re-assigned unnecessarily.
-            .map { moodColors -> moodColors.sortedByFavorite() }
+        // Reuse the same sorted flow as the Management screen so both
+        // lists show identical ordering (favorites → usage → alphabetical).
+        // Map MoodColorWithCount → MoodColor since the Editor dropdown
+        // doesn't display entry counts.
+        getMoodColorsJob = editorUseCases.getSortedMoodColors()
+            .map { sorted -> sorted.map { it.moodColor } }
             .distinctUntilChanged()
-            .onEach { sorted ->
-                _uiState.update { it.copy(moodColors = sorted) }
+            .onEach { moodColors ->
+                _uiState.update { it.copy(moodColors = moodColors) }
             }
             .launchIn(viewModelScope)
     }
