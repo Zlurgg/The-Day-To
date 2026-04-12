@@ -38,6 +38,7 @@ import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
 import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
+import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
 import java.time.Instant
 import java.time.LocalDate
@@ -100,7 +101,7 @@ class EditorViewModelTest {
             markEditorTutorialSeen = MarkEditorTutorialSeenUseCase(fakePreferencesRepository),
         )
         val syncScheduler = mockk<SyncScheduler>(relaxed = true)
-        return EditorViewModel(editorUseCases, syncScheduler, savedStateHandle)
+        return EditorViewModel(editorUseCases, syncScheduler, FakeTimeProvider(), savedStateHandle)
     }
 
     // ============================================================

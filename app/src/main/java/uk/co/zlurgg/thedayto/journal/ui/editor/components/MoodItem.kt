@@ -46,6 +46,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
+import timber.log.Timber
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
@@ -236,6 +237,7 @@ fun MoodItem(
                         onClick = {
                             haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                             moodColor.id?.let { onMoodSelected(it) }
+                                ?: Timber.w("MoodColor has null ID: %s", moodColor.mood)
                             mExpanded = false
                         },
                         text = {

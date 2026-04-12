@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.result.Result
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorUiEvent
@@ -25,6 +26,7 @@ class MoodColorActionDelegate(
     private val uiState: MutableStateFlow<EditorUiState>,
     private val uiEvents: MutableSharedFlow<EditorUiEvent>,
     private val scope: CoroutineScope,
+    private val timeProvider: TimeProvider,
     private val onSyncRequired: () -> Unit,
 ) {
     fun handleSelectMoodColor(moodColorId: Int) {
@@ -47,7 +49,7 @@ class MoodColorActionDelegate(
             val newMoodColor = MoodColor(
                 mood = mood,
                 color = colorHex,
-                dateStamp = System.currentTimeMillis(),
+                dateStamp = timeProvider.instant().toEpochMilli(),
             )
             when (val result = editorUseCases.saveMoodColor(newMoodColor)) {
                 is Result.Success -> {
@@ -112,7 +114,7 @@ class MoodColorActionDelegate(
                 id = moodColorId,
                 mood = newMood,
                 color = newColorHex,
-                dateStamp = System.currentTimeMillis(),
+                dateStamp = timeProvider.instant().toEpochMilli(),
             )
             when (val result = editorUseCases.saveMoodColor(updated)) {
                 is Result.Success -> {

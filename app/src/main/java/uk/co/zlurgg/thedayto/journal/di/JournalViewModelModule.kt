@@ -15,6 +15,7 @@ val journalViewModelModule = module {
         EditorViewModel(
             editorUseCases = get(),
             syncScheduler = get(),
+            timeProvider = get(),
             savedStateHandle = savedStateHandle,
         )
     }

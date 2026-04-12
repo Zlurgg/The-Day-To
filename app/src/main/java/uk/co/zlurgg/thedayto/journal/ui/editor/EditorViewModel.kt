@@ -16,6 +16,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
@@ -32,6 +33,7 @@ import java.time.ZoneOffset
 class EditorViewModel(
     private val editorUseCases: EditorUseCases,
     private val syncScheduler: SyncScheduler,
+    private val timeProvider: TimeProvider,
     savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
@@ -63,6 +65,7 @@ class EditorViewModel(
         uiState = _uiState,
         uiEvents = _uiEvents,
         scope = viewModelScope,
+        timeProvider = timeProvider,
         onSyncRequired = ::triggerSync,
     )
 
