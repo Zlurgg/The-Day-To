@@ -1,22 +1,25 @@
 package uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor
 
-import android.content.Context
+import androidx.annotation.StringRes
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 
 /**
- * Formats [MoodColorError] into user-facing messages using string resources.
+ * Maps [MoodColorError] variants to string resource IDs.
  *
- * Lives in the UI layer (not domain) because it depends on [Context].
+ * Context-free: the Composable resolves the ID via `stringResource()` (for
+ * persistent UI) or `resources.getString()` (for one-shot snackbars in
+ * LaunchedEffect).
  */
 object MoodColorErrorFormatter {
-    fun format(context: Context, error: MoodColorError): String = when (error) {
-        MoodColorError.BlankName -> context.getString(R.string.error_blank_name)
-        MoodColorError.NameTooLong -> context.getString(R.string.error_name_too_long)
-        MoodColorError.InvalidColor -> context.getString(R.string.error_invalid_color)
-        MoodColorError.DuplicateName -> context.getString(R.string.error_duplicate_name)
-        MoodColorError.LimitReached -> context.getString(R.string.error_limit_reached)
-        MoodColorError.NotFound -> context.getString(R.string.error_database)
-        MoodColorError.DatabaseError -> context.getString(R.string.error_database)
+    @StringRes
+    fun resourceId(error: MoodColorError): Int = when (error) {
+        MoodColorError.BlankName -> R.string.error_blank_name
+        MoodColorError.NameTooLong -> R.string.error_name_too_long
+        MoodColorError.InvalidColor -> R.string.error_invalid_color
+        MoodColorError.DuplicateName -> R.string.error_duplicate_name
+        MoodColorError.LimitReached -> R.string.error_limit_reached
+        MoodColorError.NotFound -> R.string.error_database
+        MoodColorError.DatabaseError -> R.string.error_database
     }
 }

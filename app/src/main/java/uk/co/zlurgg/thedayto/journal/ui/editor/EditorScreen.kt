@@ -93,7 +93,7 @@ fun EditorScreenRoot(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalContext.current.resources
 
     // Handle navigation state
     LaunchedEffect(uiState.shouldNavigateBack) {
@@ -103,7 +103,9 @@ fun EditorScreenRoot(
         }
     }
 
-    // Handle one-time UI events (snackbars)
+    // Handle one-time UI events (snackbars).
+    // Uses resources.getString() (not context.getString()) to avoid the
+    // LocalContextGetResourceValueCall lint issue inside LaunchedEffect.
     LaunchedEffect(key1 = true) {
         viewModel.uiEvents.collectLatest { event ->
             when (event) {
@@ -113,19 +115,19 @@ fun EditorScreenRoot(
 
                 is EditorUiEvent.ShowMoodColorError -> {
                     snackbarHostState.showSnackbar(
-                        MoodColorErrorFormatter.format(context, event.error),
+                        resources.getString(MoodColorErrorFormatter.resourceId(event.error)),
                     )
                 }
 
                 is EditorUiEvent.ShowEntryError -> {
                     snackbarHostState.showSnackbar(
-                        EntryErrorFormatter.format(context, event.error),
+                        resources.getString(EntryErrorFormatter.resourceId(event.error)),
                     )
                 }
 
                 is EditorUiEvent.ShowMoodColorUpdated -> {
                     snackbarHostState.showSnackbar(
-                        context.getString(R.string.mood_color_updated_format, event.moodName),
+                        resources.getString(R.string.mood_color_updated_format, event.moodName),
                     )
                 }
             }
@@ -165,7 +167,6 @@ private fun EditorScreen(
     modifier: Modifier = Modifier,
 ) {
     val haptic = LocalHapticFeedback.current
-    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -248,7 +249,7 @@ private fun EditorScreen(
                 Column {
                     LoadErrorBanner(
                         errorMessage = uiState.loadError?.let {
-                            EntryErrorFormatter.format(context, it)
+                            stringResource(EntryErrorFormatter.resourceId(it))
                         } ?: "",
                         onRetry = { onAction(EditorAction.RetryLoadEntry) },
                         onDismiss = { onAction(EditorAction.DismissLoadError) },
@@ -347,7 +348,7 @@ private fun EditorScreen(
                     // Show validation error if present
                     uiState.moodError?.let { error ->
                         Text(
-                            text = EntryErrorFormatter.format(context, error),
+                            text = stringResource(EntryErrorFormatter.resourceId(error)),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall),
@@ -395,7 +396,7 @@ private fun EditorScreen(
                     }
                 },
                 externalError = uiState.editMoodColorError?.let {
-                    MoodColorErrorFormatter.format(context, it)
+                    stringResource(MoodColorErrorFormatter.resourceId(it))
                 },
                 onErrorCleared = {
                     onAction(EditorAction.ClearEditMoodColorError)

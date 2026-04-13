@@ -83,9 +83,11 @@ fun MoodColorManagementScreenRoot(
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
-    val context = LocalContext.current
+    val resources = LocalContext.current.resources
 
-    // Handle one-time UI events (errors only)
+    // Handle one-time UI events (errors only).
+    // Uses resources.getString() (not context.getString()) to avoid the
+    // LocalContextGetResourceValueCall lint issue inside LaunchedEffect.
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
             when (event) {
@@ -95,7 +97,9 @@ fun MoodColorManagementScreenRoot(
 
                 is MoodColorEvent.ShowError -> {
                     snackbarHostState.showSnackbar(
-                        message = MoodColorErrorFormatter.format(context, event.error),
+                        message = resources.getString(
+                            MoodColorErrorFormatter.resourceId(event.error),
+                        ),
                     )
                 }
             }
@@ -132,7 +136,9 @@ fun MoodColorManagementScreenRoot(
                     ),
                 )
             },
-            externalError = state.dialogError?.let { MoodColorErrorFormatter.format(context, it) },
+            externalError = state.dialogError?.let {
+                stringResource(MoodColorErrorFormatter.resourceId(it))
+            },
             onErrorCleared = { viewModel.onAction(MoodColorManagementAction.ClearError) },
         )
     }

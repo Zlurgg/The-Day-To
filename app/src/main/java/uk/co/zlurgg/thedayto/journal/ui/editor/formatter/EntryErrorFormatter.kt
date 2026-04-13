@@ -1,21 +1,25 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.formatter
 
-import android.content.Context
+import androidx.annotation.StringRes
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryError
 
 /**
- * Formats [EntryError] into user-facing messages using string resources.
+ * Maps [EntryError] variants to string resource IDs.
  *
- * Lives in the UI layer (not domain) because it depends on [Context].
+ * Context-free: the Composable resolves the ID via `stringResource()` (for
+ * persistent UI) or `resources.getString()` (for one-shot snackbars in
+ * LaunchedEffect). This avoids the `LocalContextGetResourceValueCall` lint
+ * issue and ensures config-change correctness.
  */
 object EntryErrorFormatter {
-    fun format(context: Context, error: EntryError): String = when (error) {
-        EntryError.NotFound -> context.getString(R.string.error_entry_not_found)
-        EntryError.LoadFailed -> context.getString(R.string.error_entry_load_failed)
-        EntryError.DateLoadFailed -> context.getString(R.string.error_entry_date_load_failed)
-        EntryError.NoMoodSelected -> context.getString(R.string.error_no_mood_selected)
-        EntryError.SaveFailed -> context.getString(R.string.error_entry_save_failed)
-        EntryError.RetryFailed -> context.getString(R.string.error_retry_failed)
+    @StringRes
+    fun resourceId(error: EntryError): Int = when (error) {
+        EntryError.NotFound -> R.string.error_entry_not_found
+        EntryError.LoadFailed -> R.string.error_entry_load_failed
+        EntryError.DateLoadFailed -> R.string.error_entry_date_load_failed
+        EntryError.NoMoodSelected -> R.string.error_no_mood_selected
+        EntryError.SaveFailed -> R.string.error_entry_save_failed
+        EntryError.RetryFailed -> R.string.error_retry_failed
     }
 }
