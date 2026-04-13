@@ -10,25 +10,24 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -243,6 +242,7 @@ fun OverviewScreenRoot(
 /**
  * Presenter composable - pure UI, no ViewModel dependency
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun OverviewScreen(
     uiState: OverviewUiState,
@@ -267,35 +267,31 @@ private fun OverviewScreen(
             floatingActionButton = {},
             modifier = modifier,
             topBar = {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .systemBarsPadding()
-                        .padding(paddingSmall),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically,
-                ) {
-                    Text(
-                        text = uiState.greeting,
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = MaterialTheme.colorScheme.onSurface,
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f),
-                    )
-                    IconButton(onClick = onNavigateToAccount) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = stringResource(R.string.icon_description_account),
+                TopAppBar(
+                    title = {
+                        Text(
+                            text = uiState.greeting,
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
                         )
-                    }
-                    SettingsMenu(
-                        onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
-                        onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
-                        onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
-                        onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
-                    )
-                }
+                    },
+                    actions = {
+                        IconButton(onClick = onNavigateToAccount) {
+                            Icon(
+                                imageVector = Icons.Default.Person,
+                                contentDescription = stringResource(R.string.icon_description_account),
+                            )
+                        }
+                        SettingsMenu(
+                            onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
+                            onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
+                            onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
+                            onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
+                        )
+                    },
+                )
             },
             content = { padding ->
                 Column(
