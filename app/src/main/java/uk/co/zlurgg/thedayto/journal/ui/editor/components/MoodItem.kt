@@ -132,12 +132,9 @@ fun MoodItem(
                 ),
                 colors = OutlinedTextFieldDefaults.colors(
                     cursorColor = MaterialTheme.colorScheme.primary,
-                    // Use primary color border when mood is selected, outline when not
-                    focusedBorderColor = if (selectedMoodColorId != null) {
-                        MaterialTheme.colorScheme.primary
-                    } else {
-                        MaterialTheme.colorScheme.outline
-                    },
+                    // Unfocused: subtle outline. Focused: always primary (purple),
+                    // whether or not a mood has been selected yet.
+                    focusedBorderColor = MaterialTheme.colorScheme.primary,
                     unfocusedBorderColor = if (selectedMoodColorId != null) {
                         MaterialTheme.colorScheme.primary
                     } else {
@@ -164,7 +161,7 @@ fun MoodItem(
                     if (selectedMoodColorId == null) {
                         Text(
                             text = hint,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            color = MaterialTheme.colorScheme.primary,
                             style = MaterialTheme.typography.titleMedium,
                         )
                     } else {
