@@ -15,6 +15,7 @@ import uk.co.zlurgg.thedayto.base.ComposeTest
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.EditMoodColorDialog
 
 /**
  * UI tests for EditMoodColorDialog.

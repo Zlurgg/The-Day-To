@@ -48,7 +48,7 @@ class EditorScreenTest : ComposeTest() {
                     hint = "How're you feeling today?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
-                    onDeleteMoodColor = {},
+                    onToggleFavorite = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = {},
                     onSaveMoodColor = { _, _ -> },
@@ -87,7 +87,7 @@ class EditorScreenTest : ComposeTest() {
                     hint = "How're you feeling today?",
                     showMoodColorDialog = false,
                     onMoodSelected = { selectedMoodId = it },
-                    onDeleteMoodColor = {},
+                    onToggleFavorite = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = {},
                     onSaveMoodColor = { _, _ -> },
@@ -121,7 +121,7 @@ class EditorScreenTest : ComposeTest() {
                     hint = "How're you feeling today?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
-                    onDeleteMoodColor = {},
+                    onToggleFavorite = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = { toggleCalled = true },
                     onSaveMoodColor = { _, _ -> },
@@ -140,7 +140,7 @@ class EditorScreenTest : ComposeTest() {
     }
 
     @Test
-    fun add_mood_button_in_dropdown_triggers_toggle_callback() {
+    fun color_wheel_button_triggers_toggle_callback() {
         var toggleCalled = false
 
         composeTestRule.setContent {
@@ -151,7 +151,7 @@ class EditorScreenTest : ComposeTest() {
                     hint = "How're you feeling today?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
-                    onDeleteMoodColor = {},
+                    onToggleFavorite = {},
                     onEditMoodColor = {},
                     onToggleMoodColorDialog = { toggleCalled = true },
                     onSaveMoodColor = { _, _ -> },
@@ -159,14 +159,9 @@ class EditorScreenTest : ComposeTest() {
             }
         }
 
-        // Open dropdown
+        // Click the color wheel button (next to the dropdown, not inside it)
         composeTestRule
-            .onNodeWithText("How're you feeling today?")
-            .performClick()
-
-        // Click the "add custom mood color" option in dropdown
-        composeTestRule
-            .onNodeWithText("add custom mood color")
+            .onNodeWithContentDescription("Create new mood color")
             .performClick()
 
         // Verify callback was triggered

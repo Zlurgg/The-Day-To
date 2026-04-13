@@ -13,6 +13,7 @@ import org.junit.runner.RunWith
 import uk.co.zlurgg.thedayto.base.ComposeTest
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.util.InputValidation
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.AddMoodColorDialog
 
 /**
  * UI tests for MoodColorPickerDialog.
@@ -34,7 +35,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
     fun empty_mood_shows_error_on_save() {
         composeTestRule.setContent {
             TheDayToTheme {
-                MoodColorPickerDialog(
+                AddMoodColorDialog(
                     showDialog = true,
                     onDismiss = {},
                     onSave = { _, _ -> },
@@ -69,7 +70,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
 
         composeTestRule.setContent {
             TheDayToTheme {
-                MoodColorPickerDialog(
+                AddMoodColorDialog(
                     showDialog = true,
                     onDismiss = {},
                     onSave = { mood, color ->
@@ -101,7 +102,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
 
         composeTestRule.setContent {
             TheDayToTheme {
-                MoodColorPickerDialog(
+                AddMoodColorDialog(
                     showDialog = true,
                     onDismiss = { dismissCalled = true },
                     onSave = { _, _ -> },
@@ -126,7 +127,7 @@ class MoodColorPickerDialogTest : ComposeTest() {
     fun character_counter_displays_initial_count() {
         composeTestRule.setContent {
             TheDayToTheme {
-                MoodColorPickerDialog(
+                AddMoodColorDialog(
                     showDialog = true,
                     onDismiss = {},
                     onSave = { _, _ -> },
