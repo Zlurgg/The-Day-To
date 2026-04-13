@@ -30,10 +30,14 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.foundation.text.input.TextFieldLineLimits
+import androidx.compose.foundation.text.input.rememberTextFieldState
+import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Size
@@ -99,6 +103,12 @@ fun MoodItem(
     val selectedMoodColor = moodColors.find { it.id == selectedMoodColorId }
     val displayText = selectedMoodColor?.mood ?: ""
 
+    // TextFieldState for the new M3 API — synced from the external selection
+    val textFieldState = rememberTextFieldState(displayText)
+    LaunchedEffect(displayText) {
+        textFieldState.setTextAndPlaceCursorAtEnd(displayText)
+    }
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -112,9 +122,14 @@ fun MoodItem(
             modifier = Modifier.weight(1f),
         ) {
             OutlinedTextField(
-                value = displayText,
-                onValueChange = { /* Read-only, changes via dropdown */ },
+                state = textFieldState,
                 textStyle = MaterialTheme.typography.headlineSmall,
+                contentPadding = PaddingValues(
+                    start = paddingSmall,
+                    end = paddingSmall,
+                    top = paddingSmall,
+                    bottom = paddingSmall,
+                ),
                 colors = OutlinedTextFieldDefaults.colors(
                     cursorColor = MaterialTheme.colorScheme.primary,
                     // Use primary color border when mood is selected, outline when not
@@ -134,7 +149,7 @@ fun MoodItem(
                     keyboardType = KeyboardType.Ascii,
                 ),
                 readOnly = true,
-                singleLine = true,
+                lineLimits = TextFieldLineLimits.SingleLine,
                 modifier = Modifier
                     .fillMaxWidth()
                     .menuAnchor(ExposedDropdownMenuAnchorType.PrimaryEditable, true)
@@ -142,13 +157,15 @@ fun MoodItem(
                         mMoodFieldSize = coordinates.size.toSize()
                     },
                 label = {
-                    // Empty: hint fills the field as a prompt (larger text).
-                    // Filled: "Mood" floats above the border (smaller label).
+                    // Empty: hint fills the field as a contextual prompt.
+                    // titleMedium (16sp, medium weight) fits the longest prompts
+                    // (~30 chars) without overflowing the field width.
+                    // Filled: "Mood" floats above the border as a standard M3 label.
                     if (selectedMoodColorId == null) {
                         Text(
                             text = hint,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyLarge,
+                            style = MaterialTheme.typography.titleMedium,
                         )
                     } else {
                         Text(
