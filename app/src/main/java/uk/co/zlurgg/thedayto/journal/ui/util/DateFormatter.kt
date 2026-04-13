@@ -35,9 +35,8 @@ object DateFormatter {
     }
 
     /**
-     * Returns pre-split parts for rendering a date with superscript ordinal,
-     * e.g. "15ᵗʰ January 2024". The suffix is separated so the UI layer can
-     * apply [BaselineShift.Superscript] to just that span.
+     * Returns pre-split parts for rendering a date with superscript ordinal
+     * and full month name, e.g. "15ᵗʰ January 2024".
      *
      * Used in the Editor heading where the date is the primary element.
      */
@@ -47,6 +46,22 @@ object DateFormatter {
             day = date.dayOfMonth,
             suffix = ordinalSuffix(date.dayOfMonth),
             month = date.month.getDisplayName(TextStyle.FULL, Locale.getDefault()),
+            year = date.year,
+        )
+    }
+
+    /**
+     * Returns pre-split parts for rendering a date with superscript ordinal
+     * and short month name, e.g. "15ᵗʰ Jan 2024".
+     *
+     * Used in Overview entry cards where horizontal space is constrained.
+     */
+    fun formatDateOrdinalCompact(epochSeconds: Long): OrdinalDate {
+        val date = epochSeconds.toLocalDate()
+        return OrdinalDate(
+            day = date.dayOfMonth,
+            suffix = ordinalSuffix(date.dayOfMonth),
+            month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
             year = date.year,
         )
     }

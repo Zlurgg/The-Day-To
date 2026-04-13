@@ -13,8 +13,11 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
@@ -61,9 +64,21 @@ fun EntryItem(
                     overflow = TextOverflow.Ellipsis,
                     modifier = Modifier.weight(1f, fill = false),
                 )
+                val ordinalDate = DateFormatter.formatDateOrdinalCompact(entry.dateStamp)
+                val dateStyle = MaterialTheme.typography.labelLarge
+                val superscriptStyle = dateStyle.toSpanStyle().copy(
+                    baselineShift = BaselineShift.Superscript,
+                    fontSize = dateStyle.fontSize * 0.7f,
+                )
                 Text(
-                    text = DateFormatter.formatDateCompact(entry.dateStamp),
-                    style = MaterialTheme.typography.labelLarge,
+                    text = buildAnnotatedString {
+                        append("${ordinalDate.day}")
+                        withStyle(superscriptStyle) {
+                            append(ordinalDate.suffix)
+                        }
+                        append(" ${ordinalDate.month} ${ordinalDate.year}")
+                    },
+                    style = dateStyle,
                     color = textColor.copy(alpha = 0.8f),
                     overflow = TextOverflow.Ellipsis,
                 )

@@ -45,6 +45,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.BaselineShift
@@ -94,10 +95,13 @@ fun EditorScreenRoot(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalContext.current.resources
+    val keyboardController = LocalSoftwareKeyboardController.current
 
-    // Handle navigation state
+    // Handle navigation state — dismiss keyboard first so it doesn't
+    // linger during the back-navigation animation.
     LaunchedEffect(uiState.shouldNavigateBack) {
         if (uiState.shouldNavigateBack) {
+            keyboardController?.hide()
             navController.navigateUp()
             viewModel.onNavigationHandled()
         }
@@ -326,7 +330,6 @@ private fun EditorScreen(
                     MoodItem(
                         selectedMoodColorId = uiState.selectedMoodColorId,
                         moodColors = uiState.moodColors,
-                        hint = uiState.moodHint,
                         showMoodColorDialog = uiState.isMoodColorSectionVisible,
                         onMoodSelected = { moodColorId ->
                             onAction(EditorAction.SelectMoodColor(moodColorId))

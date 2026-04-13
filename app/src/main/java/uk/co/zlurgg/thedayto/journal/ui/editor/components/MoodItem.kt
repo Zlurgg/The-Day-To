@@ -69,7 +69,6 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
  *
  * @param selectedMoodColorId The currently selected mood color ID (null if none selected)
  * @param moodColors List of available mood-color combinations (sorted by favorites)
- * @param hint Hint text to display
  * @param showMoodColorDialog Whether to show the mood color picker dialog
  * @param onMoodSelected Callback when a mood is selected (moodColorId)
  * @param onToggleFavorite Callback to toggle mood color favorite status
@@ -83,7 +82,6 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 fun MoodItem(
     selectedMoodColorId: Int?,
     moodColors: List<MoodColor>,
-    hint: String,
     showMoodColorDialog: Boolean,
     onMoodSelected: (moodColorId: Int) -> Unit,
     onToggleFavorite: (MoodColor) -> Unit,
@@ -143,21 +141,11 @@ fun MoodItem(
                         mMoodFieldSize = coordinates.size.toSize()
                     },
                 label = {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = hint,
-                            color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                        Text(
-                            text = "*",
-                            color = MaterialTheme.colorScheme.error,
-                            style = MaterialTheme.typography.labelMedium,
-                        )
-                    }
+                    Text(
+                        text = stringResource(R.string.mood),
+                        color = MaterialTheme.colorScheme.primary,
+                        style = MaterialTheme.typography.labelMedium,
+                    )
                 },
                 leadingIcon = {
                     // Show color indicator when a mood is selected
