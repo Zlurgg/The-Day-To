@@ -121,3 +121,12 @@ sealed interface DataError {
 - ❌ Using `!!` operator (use safe calls or require())
 - ❌ Manual dependency instantiation (use Koin injection)
 - ❌ Context in ViewModels (inject what you need instead)
+- ❌ Replicating a known-wrong pattern for "consistency" — fix the original instead
+
+## Dealing with Existing Violations
+
+When you encounter an existing pattern that violates these principles:
+
+1. **Flag it** — don't silently copy it. Consistency with a wrong pattern is still wrong.
+2. **Fix both** — correct the original and the new code in the same change.
+3. **If fixing the original is out of scope**, document it explicitly as tech debt with a clear explanation of what's wrong and what the correct approach is. Never describe a violation as "acceptable" or "consistent with existing patterns" — that normalises the mistake for the next person who reads the code.
