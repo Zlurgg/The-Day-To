@@ -127,7 +127,7 @@ class MoodColorActionDelegate(
                         )
                     }
                     Timber.i("Successfully updated mood color: %s", result.data.mood)
-                    uiEvents.emit(EditorUiEvent.ShowSnackbar("\"${result.data.mood}\" updated"))
+                    uiEvents.emit(EditorUiEvent.ShowMoodColorUpdated(result.data.mood))
                 }
 
                 is Result.Error -> {

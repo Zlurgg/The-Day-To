@@ -1,10 +1,13 @@
-package uk.co.zlurgg.thedayto.journal.domain.model
+package uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor
 
 import android.content.Context
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 
 /**
- * Formats MoodColorError into user-friendly messages.
+ * Formats [MoodColorError] into user-facing messages using string resources.
+ *
+ * Lives in the UI layer (not domain) because it depends on [Context].
  */
 object MoodColorErrorFormatter {
     fun format(context: Context, error: MoodColorError): String = when (error) {

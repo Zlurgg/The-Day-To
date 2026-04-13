@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.editor.state
 
 import androidx.compose.runtime.Stable
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryError
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorError
 import java.time.LocalDate
@@ -37,10 +38,10 @@ data class EditorUiState(
     val contentHint: String = "Any additional info?",
 
     // Validation errors
-    val moodError: String? = null,
+    val moodError: EntryError? = null,
 
     // Load error (persistent, for critical failures)
-    val loadError: String? = null,
+    val loadError: EntryError? = null,
 
     // Loading state
     val isLoading: Boolean = false,

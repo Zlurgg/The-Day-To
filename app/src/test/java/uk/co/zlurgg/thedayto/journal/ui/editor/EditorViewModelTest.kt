@@ -23,6 +23,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.fake.FakeEntryRepository
 import uk.co.zlurgg.thedayto.fake.FakeMoodColorRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryError
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.AddEntryUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.CheckEditorTutorialSeenUseCase
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
@@ -461,7 +462,7 @@ class EditorViewModelTest {
 
         // Then: Inline error should be set in state
         val state = viewModel.uiState.value
-        assertEquals("Should show inline error", "Please select or create a mood", state.moodError)
+        assertEquals("Should show inline error", EntryError.NoMoodSelected, state.moodError)
 
         // And: No entry should be saved
         val entries = fakeEntryRepository.getEntriesSync()
@@ -477,10 +478,9 @@ class EditorViewModelTest {
         viewModel.uiEvents.test {
             viewModel.onAction(EditorAction.SaveEntry)
 
-            // Then: Error event should be emitted (foreign key violation)
+            // Then: Entry error event should be emitted (foreign key violation)
             val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertTrue("Should contain error message", (event as EditorUiEvent.ShowSnackbar).message.isNotEmpty())
+            assertTrue("Should be ShowEntryError event", event is EditorUiEvent.ShowEntryError)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -783,10 +783,14 @@ class EditorViewModelTest {
                 ),
             )
 
-            // Then: Success event should be emitted
+            // Then: Success event should be emitted with mood name
             val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertTrue("Should show success message", (event as EditorUiEvent.ShowSnackbar).message.contains("updated"))
+            assertTrue("Should be ShowMoodColorUpdated event", event is EditorUiEvent.ShowMoodColorUpdated)
+            assertEquals(
+                "Should contain mood name",
+                originalMood.mood,
+                (event as EditorUiEvent.ShowMoodColorUpdated).moodName,
+            )
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -826,8 +830,8 @@ class EditorViewModelTest {
 
             // Then: Success event should be emitted with new name
             val event = awaitItem()
-            assertTrue("Should be ShowSnackbar event", event is EditorUiEvent.ShowSnackbar)
-            assertTrue("Should contain new name", (event as EditorUiEvent.ShowSnackbar).message.contains(newMood))
+            assertTrue("Should be ShowMoodColorUpdated event", event is EditorUiEvent.ShowMoodColorUpdated)
+            assertEquals("Should contain new name", newMood, (event as EditorUiEvent.ShowMoodColorUpdated).moodName)
             cancelAndIgnoreRemainingEvents()
         }
 
@@ -1085,11 +1089,7 @@ class EditorViewModelTest {
         // Then: Load error should be set
         viewModel.uiState.test {
             val state = awaitItem()
-            assertTrue("Load error should be set", state.loadError != null)
-            assertTrue(
-                "Error message should mention not found",
-                state.loadError?.contains("not found", ignoreCase = true) == true,
-            )
+            assertEquals("Should be NotFound error", EntryError.NotFound, state.loadError)
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -1151,13 +1151,10 @@ class EditorViewModelTest {
         // When: Try to retry without stored entry ID
         viewModel.onAction(EditorAction.RetryLoadEntry)
 
-        // Then: Should show error about missing entry ID
+        // Then: Should show retry failed error
         viewModel.uiState.test {
             val state = awaitItem()
-            assertTrue(
-                "Should show error about cannot retry",
-                state.loadError?.contains("Cannot retry", ignoreCase = true) == true,
-            )
+            assertEquals("Should be RetryFailed error", EntryError.RetryFailed, state.loadError)
             cancelAndIgnoreRemainingEvents()
         }
     }

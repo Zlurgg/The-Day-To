@@ -19,6 +19,7 @@ import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
 import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
 import uk.co.zlurgg.thedayto.journal.domain.model.Entry
+import uk.co.zlurgg.thedayto.journal.domain.model.EntryError
 import uk.co.zlurgg.thedayto.journal.domain.model.InvalidEntryException
 import uk.co.zlurgg.thedayto.journal.domain.usecases.editor.EditorUseCases
 import uk.co.zlurgg.thedayto.journal.ui.editor.state.EditorAction
@@ -145,20 +146,14 @@ class EditorViewModel(
                     loadingJob.cancel()
                     Timber.w("Entry not found with ID: $entryId")
                     _uiState.update { state ->
-                        state.copy(
-                            isLoading = false,
-                            loadError = "Entry not found. It may have been deleted.",
-                        )
+                        state.copy(isLoading = false, loadError = EntryError.NotFound)
                     }
                 }
             } catch (e: Exception) {
                 loadingJob.cancel()
                 Timber.e(e, "Failed to load entry with ID: $entryId")
                 _uiState.update { state ->
-                    state.copy(
-                        isLoading = false,
-                        loadError = "Failed to load entry: ${e.message ?: "Unknown error"}",
-                    )
+                    state.copy(isLoading = false, loadError = EntryError.LoadFailed)
                 }
             }
         }
@@ -315,9 +310,7 @@ class EditorViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "Failed to load entry for date: $date")
                 resetToBlankState(date)
-                _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = "Failed to load entry for this date"),
-                )
+                _uiEvents.emit(EditorUiEvent.ShowEntryError(EntryError.DateLoadFailed))
             }
         }
     }
@@ -351,7 +344,7 @@ class EditorViewModel(
 
             val moodColorId = state.selectedMoodColorId
             if (moodColorId == null) {
-                _uiState.update { it.copy(moodError = "Please select or create a mood") }
+                _uiState.update { it.copy(moodError = EntryError.NoMoodSelected) }
                 return@launch
             }
 
@@ -378,9 +371,7 @@ class EditorViewModel(
                 loadingJob.cancel()
                 Timber.e(e, "Failed to save entry")
                 _uiState.update { it.copy(isLoading = false) }
-                _uiEvents.emit(
-                    EditorUiEvent.ShowSnackbar(message = e.message ?: "Couldn't save entry"),
-                )
+                _uiEvents.emit(EditorUiEvent.ShowEntryError(EntryError.SaveFailed))
             }
         }
     }
@@ -413,7 +404,7 @@ class EditorViewModel(
             loadEntry(entryId)
         } ?: run {
             Timber.w("Cannot retry: no entry ID stored")
-            _uiState.update { it.copy(loadError = "Cannot retry: no entry ID") }
+            _uiState.update { it.copy(loadError = EntryError.RetryFailed) }
         }
     }
 

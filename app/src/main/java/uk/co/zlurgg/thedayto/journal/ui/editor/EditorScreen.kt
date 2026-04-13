@@ -66,7 +66,8 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
-import uk.co.zlurgg.thedayto.journal.domain.model.MoodColorErrorFormatter
+import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorErrorFormatter
+import uk.co.zlurgg.thedayto.journal.ui.editor.formatter.EntryErrorFormatter
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.ContentItem
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorDatePickerDialog
 import uk.co.zlurgg.thedayto.journal.ui.editor.components.EditorTutorialDialog
@@ -113,6 +114,18 @@ fun EditorScreenRoot(
                 is EditorUiEvent.ShowMoodColorError -> {
                     snackbarHostState.showSnackbar(
                         MoodColorErrorFormatter.format(context, event.error),
+                    )
+                }
+
+                is EditorUiEvent.ShowEntryError -> {
+                    snackbarHostState.showSnackbar(
+                        EntryErrorFormatter.format(context, event.error),
+                    )
+                }
+
+                is EditorUiEvent.ShowMoodColorUpdated -> {
+                    snackbarHostState.showSnackbar(
+                        context.getString(R.string.mood_color_updated_format, event.moodName),
                     )
                 }
             }
@@ -234,7 +247,9 @@ private fun EditorScreen(
             ) {
                 Column {
                     LoadErrorBanner(
-                        errorMessage = uiState.loadError ?: "",
+                        errorMessage = uiState.loadError?.let {
+                            EntryErrorFormatter.format(context, it)
+                        } ?: "",
                         onRetry = { onAction(EditorAction.RetryLoadEntry) },
                         onDismiss = { onAction(EditorAction.DismissLoadError) },
                     )
@@ -330,9 +345,9 @@ private fun EditorScreen(
                     )
 
                     // Show validation error if present
-                    uiState.moodError?.let { errorMessage ->
+                    uiState.moodError?.let { error ->
                         Text(
-                            text = errorMessage,
+                            text = EntryErrorFormatter.format(context, error),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(start = paddingExtraSmall, top = paddingExtraSmall),
