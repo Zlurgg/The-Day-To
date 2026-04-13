@@ -45,6 +45,7 @@ class EditorScreenTest : ComposeTest() {
                 MoodItem(
                     selectedMoodColorId = null,
                     moodColors = testMoodColors,
+                    hint = "How are you feeling?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
                     onToggleFavorite = {},
@@ -57,7 +58,7 @@ class EditorScreenTest : ComposeTest() {
 
         // Click on the dropdown to expand it
         composeTestRule
-            .onNodeWithText("Mood")
+            .onNodeWithText("How are you feeling?")
             .performClick()
 
         // Verify mood options are displayed
@@ -83,6 +84,7 @@ class EditorScreenTest : ComposeTest() {
                 MoodItem(
                     selectedMoodColorId = null,
                     moodColors = testMoodColors,
+                    hint = "How are you feeling?",
                     showMoodColorDialog = false,
                     onMoodSelected = { selectedMoodId = it },
                     onToggleFavorite = {},
@@ -95,7 +97,7 @@ class EditorScreenTest : ComposeTest() {
 
         // Click on the dropdown to expand it
         composeTestRule
-            .onNodeWithText("Mood")
+            .onNodeWithText("How are you feeling?")
             .performClick()
 
         // Select a mood
@@ -116,6 +118,7 @@ class EditorScreenTest : ComposeTest() {
                 MoodItem(
                     selectedMoodColorId = null,
                     moodColors = testMoodColors,
+                    hint = "How are you feeling?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
                     onToggleFavorite = {},
@@ -145,6 +148,7 @@ class EditorScreenTest : ComposeTest() {
                 MoodItem(
                     selectedMoodColorId = null,
                     moodColors = testMoodColors,
+                    hint = "How are you feeling?",
                     showMoodColorDialog = false,
                     onMoodSelected = {},
                     onToggleFavorite = {},

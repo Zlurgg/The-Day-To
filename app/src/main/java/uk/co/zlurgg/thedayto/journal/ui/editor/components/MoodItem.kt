@@ -82,6 +82,7 @@ import uk.co.zlurgg.thedayto.journal.ui.util.getColorSafe
 fun MoodItem(
     selectedMoodColorId: Int?,
     moodColors: List<MoodColor>,
+    hint: String,
     showMoodColorDialog: Boolean,
     onMoodSelected: (moodColorId: Int) -> Unit,
     onToggleFavorite: (MoodColor) -> Unit,
@@ -141,11 +142,21 @@ fun MoodItem(
                         mMoodFieldSize = coordinates.size.toSize()
                     },
                 label = {
-                    Text(
-                        text = stringResource(R.string.mood),
-                        color = MaterialTheme.colorScheme.primary,
-                        style = MaterialTheme.typography.labelMedium,
-                    )
+                    // Empty: hint fills the field as a prompt (larger text).
+                    // Filled: "Mood" floats above the border (smaller label).
+                    if (selectedMoodColorId == null) {
+                        Text(
+                            text = hint,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            style = MaterialTheme.typography.bodyLarge,
+                        )
+                    } else {
+                        Text(
+                            text = stringResource(R.string.mood),
+                            color = MaterialTheme.colorScheme.primary,
+                            style = MaterialTheme.typography.labelMedium,
+                        )
+                    }
                 },
                 leadingIcon = {
                     // Show color indicator when a mood is selected

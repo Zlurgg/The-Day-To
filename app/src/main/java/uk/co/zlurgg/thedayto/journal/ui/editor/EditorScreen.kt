@@ -330,6 +330,7 @@ private fun EditorScreen(
                     MoodItem(
                         selectedMoodColorId = uiState.selectedMoodColorId,
                         moodColors = uiState.moodColors,
+                        hint = uiState.moodHint,
                         showMoodColorDialog = uiState.isMoodColorSectionVisible,
                         onMoodSelected = { moodColorId ->
                             onAction(EditorAction.SelectMoodColor(moodColorId))
