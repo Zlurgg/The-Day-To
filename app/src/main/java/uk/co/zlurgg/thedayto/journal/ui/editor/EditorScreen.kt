@@ -28,6 +28,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -207,11 +208,19 @@ private fun EditorScreen(
                         haptic.performHapticFeedback(HapticFeedbackType.LongPress)
                         onAction(EditorAction.SaveEntry)
                     },
+                    modifier = Modifier.padding(
+                        end = paddingSmall,
+                        bottom = paddingSmall,
+                    ),
                     containerColor = when {
                         uiState.isLoading -> MaterialTheme.colorScheme.secondary
                         !uiState.canSave -> MaterialTheme.colorScheme.surfaceVariant
                         else -> MaterialTheme.colorScheme.primaryContainer
                     },
+                    elevation = FloatingActionButtonDefaults.elevation(
+                        defaultElevation = 8.dp,
+                        pressedElevation = 12.dp,
+                    ),
                 ) {
                     if (uiState.isLoading) {
                         CircularProgressIndicator(
