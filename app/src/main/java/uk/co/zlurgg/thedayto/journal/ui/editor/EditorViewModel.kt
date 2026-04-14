@@ -164,8 +164,7 @@ class EditorViewModel(
      *
      * Returns a random prompt from:
      * - TODAY_PROMPTS if date is today
-     * - PAST_PROMPTS if date is in the past
-     * - FUTURE_PROMPTS if date is in the future
+     * - PAST_PROMPTS otherwise
      *
      * @param dateEpochSeconds The date in epoch seconds (UTC)
      * @return A contextual mood prompt string
@@ -174,10 +173,10 @@ class EditorViewModel(
         val selectedDate = Instant.ofEpochSecond(dateEpochSeconds).atZone(ZoneOffset.UTC).toLocalDate()
         val today = LocalDate.now()
 
-        return when {
-            selectedDate.isEqual(today) -> EditorPromptConstants.TODAY_PROMPTS.random()
-            selectedDate.isBefore(today) -> EditorPromptConstants.PAST_PROMPTS.random()
-            else -> EditorPromptConstants.FUTURE_PROMPTS.random()
+        return if (selectedDate.isEqual(today)) {
+            EditorPromptConstants.TODAY_PROMPTS.random()
+        } else {
+            EditorPromptConstants.PAST_PROMPTS.random()
         }
     }
 

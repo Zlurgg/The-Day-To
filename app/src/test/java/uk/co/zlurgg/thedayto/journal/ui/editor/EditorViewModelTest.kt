@@ -604,12 +604,12 @@ class EditorViewModelTest {
         // When: Date is changed to future
         viewModel.onAction(EditorAction.EnteredDate(futureDate))
 
-        // Then: Mood hint should be from FUTURE_PROMPTS
+        // Then: Mood hint should be from PAST_PROMPTS (non-today dates use past prompts)
         viewModel.uiState.test {
             val state = awaitItem()
             assertTrue(
-                "Mood hint should be from FUTURE_PROMPTS for future date",
-                EditorPromptConstants.FUTURE_PROMPTS.contains(state.moodHint),
+                "Mood hint should be from PAST_PROMPTS for non-today date",
+                EditorPromptConstants.PAST_PROMPTS.contains(state.moodHint),
             )
             cancelAndIgnoreRemainingEvents()
         }

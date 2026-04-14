@@ -8,6 +8,9 @@ package uk.co.zlurgg.thedayto.journal.ui.editor.util
  */
 object EditorPromptConstants {
 
+    /** Alpha applied to hint text in the editor (mood and notes fields). */
+    const val HINT_ALPHA = 0.8f
+
     /**
      * Prompts for today's entry
      */
@@ -24,23 +27,11 @@ object EditorPromptConstants {
      * Prompts for past dates
      */
     val PAST_PROMPTS = listOf(
-        "How were you feeling that day?",
+        "How were you feeling?",
         "How did you feel?",
         "What was your mood?",
         "How were you doing?",
-        "What was your vibe that day?",
+        "What was your vibe?",
         "How did that day go?",
-    )
-
-    /**
-     * Prompts for future dates (if needed)
-     */
-    val FUTURE_PROMPTS = listOf(
-        "How do you think you'll feel?",
-        "What mood are you anticipating?",
-        "How might you feel?",
-        "What's your expected mood?",
-        "How do you expect to feel?",
-        "Planning your future mood?",
     )
 }
