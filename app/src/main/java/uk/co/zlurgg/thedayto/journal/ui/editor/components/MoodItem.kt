@@ -57,6 +57,7 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.AddMoodColorDialog
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.ColorWheelButton
 import uk.co.zlurgg.thedayto.journal.ui.shared.moodcolor.MoodColorRow
@@ -125,7 +126,7 @@ fun MoodItem(
                 state = textFieldState,
                 textStyle = MaterialTheme.typography.headlineSmall,
                 contentPadding = PaddingValues(
-                    start = paddingSmall,
+                    start = paddingMedium,
                     end = paddingSmall,
                     top = paddingSmall,
                     bottom = paddingSmall,
@@ -161,7 +162,7 @@ fun MoodItem(
                     if (selectedMoodColorId == null) {
                         Text(
                             text = hint,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = EditorPromptConstants.HINT_ALPHA),
                             style = MaterialTheme.typography.titleMedium,
                         )
                     } else {
@@ -172,9 +173,8 @@ fun MoodItem(
                         )
                     }
                 },
-                leadingIcon = {
-                    // Show color indicator when a mood is selected
-                    selectedMoodColor?.let { mood ->
+                leadingIcon = selectedMoodColor?.let { mood ->
+                    {
                         Box(
                             modifier = Modifier
                                 .size(24.dp)
@@ -268,9 +268,12 @@ fun MoodItem(
             }
         }
 
-        // Color wheel button - always visible for easy access to create new mood colors
+        // Color wheel button - always visible for easy access to create new mood colors.
+        // Top padding offsets for the OutlinedTextField's floating label space,
+        // which makes CenterVertically visually misaligned with the textbox.
         ColorWheelButton(
             onClick = onToggleMoodColorDialog,
+            modifier = Modifier.padding(top = paddingSmall),
         )
     }
 

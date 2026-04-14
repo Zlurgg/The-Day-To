@@ -23,6 +23,7 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingExtraSmall
+import uk.co.zlurgg.thedayto.journal.ui.editor.util.EditorPromptConstants
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMediumSmall
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
@@ -92,7 +93,7 @@ fun TransparentHintTextField(
                 Text(
                     text = hint,
                     style = textStyle,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = EditorPromptConstants.HINT_ALPHA),
                 )
             }
         }
