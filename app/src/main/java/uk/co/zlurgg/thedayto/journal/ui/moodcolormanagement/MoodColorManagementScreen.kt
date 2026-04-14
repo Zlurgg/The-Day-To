@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -39,6 +40,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -53,6 +55,7 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.JournalCard
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.cardCornerRadius
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.MoodColor
@@ -374,6 +377,7 @@ private fun SwipeToDeleteMoodColorCard(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
+                        .clip(RoundedCornerShape(cardCornerRadius))
                         .background(MaterialTheme.colorScheme.error)
                         .padding(horizontal = paddingMedium),
                     contentAlignment = Alignment.CenterEnd,

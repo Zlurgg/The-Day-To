@@ -41,7 +41,7 @@ fun EntryItem(
             pressedElevation = UiConstants.ENTRY_CARD_ELEVATION_PRESSED,
         ),
         colors = CardDefaults.cardColors(
-            containerColor = moodColor.copy(alpha = 0.9f),
+            containerColor = moodColor,
         ),
     ) {
         Column(

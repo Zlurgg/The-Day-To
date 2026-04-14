@@ -14,3 +14,6 @@ val paddingVeryLarge: Dp = 48.dp
 val paddingExtraLarge: Dp = 64.dp
 val paddingXXLarge: Dp = 128.dp
 val paddingXXXLarge: Dp = 256.dp
+
+/** Material 3 default card corner radius — use to match swipe backgrounds to card shape. */
+val cardCornerRadius: Dp = 12.dp

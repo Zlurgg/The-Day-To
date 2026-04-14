@@ -4,6 +4,7 @@ import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,6 +25,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
@@ -32,6 +34,7 @@ import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.ui.components.JournalCard
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.theme.cardCornerRadius
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
@@ -119,6 +122,7 @@ fun EntriesListSection(
                                     Box(
                                         modifier = Modifier
                                             .fillMaxSize()
+                                            .clip(RoundedCornerShape(cardCornerRadius))
                                             .background(MaterialTheme.colorScheme.error)
                                             .padding(horizontal = paddingMedium),
                                         contentAlignment = Alignment.CenterEnd,
