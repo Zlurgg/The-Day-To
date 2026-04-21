@@ -20,6 +20,9 @@ import uk.co.zlurgg.thedayto.fake.FakeNotificationScheduler
 import uk.co.zlurgg.thedayto.fake.FakeNotificationSettingsRepository
 import uk.co.zlurgg.thedayto.fake.FakePreferencesRepository
 import uk.co.zlurgg.thedayto.fake.createFakeOverviewUseCases
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.GetThemeModeUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.SetThemeModeUseCase
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
@@ -77,7 +80,13 @@ class OverviewViewModelTest {
             notificationSettingsRepository = fakeNotificationSettingsRepository,
             authRepository = fakeAuthRepository,
         )
-        viewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        viewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
     }
 
     @After
@@ -102,7 +111,13 @@ class OverviewViewModelTest {
             notificationSettingsRepository = fakeNotificationSettingsRepository,
             authRepository = fakeAuthRepository,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Then: State should reflect loaded settings
@@ -128,7 +143,13 @@ class OverviewViewModelTest {
         )
 
         // When: ViewModel initializes
-        OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Then: setupDailyNotification should be called as fail-safe
@@ -161,7 +182,13 @@ class OverviewViewModelTest {
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         val initialState = testViewModel.uiState.value
@@ -214,7 +241,13 @@ class OverviewViewModelTest {
             notificationSettingsRepository = fakeNotificationSettingsRepository,
             authRepository = fakeAuthRepository,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // When: User disables notifications
@@ -258,7 +291,13 @@ class OverviewViewModelTest {
             notificationScheduler = fakeNotificationScheduler,
             notificationSettingsRepository = failingSettingsRepository,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // When: User tries to save settings
@@ -297,7 +336,13 @@ class OverviewViewModelTest {
             preferencesRepository = fakePreferencesRepository,
             notificationScheduler = fakeNotificationScheduler,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Then: State should reflect no permission
@@ -468,7 +513,13 @@ class OverviewViewModelTest {
             notificationScheduler = fakeNotificationScheduler,
             entryRepository = fakeEntryRepo,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Show confirmation dialog first
@@ -515,7 +566,13 @@ class OverviewViewModelTest {
             notificationScheduler = fakeNotificationScheduler,
             entryRepository = fakeEntryRepo,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Show confirmation dialog first
@@ -556,7 +613,13 @@ class OverviewViewModelTest {
             notificationScheduler = fakeNotificationScheduler,
             entryRepository = fakeEntryRepo,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Show confirmation dialog first
@@ -613,7 +676,13 @@ class OverviewViewModelTest {
         )
 
         // When: ViewModel initializes (calls checkTodayEntry)
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Then: Reminder dialog should be shown
@@ -635,7 +704,13 @@ class OverviewViewModelTest {
         )
 
         // When: ViewModel initializes
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         // Then: Reminder dialog should NOT be shown
@@ -655,7 +730,13 @@ class OverviewViewModelTest {
             notificationScheduler = fakeNotificationScheduler,
             entryRepository = fakeEntryRepo,
         )
-        val testViewModel = OverviewViewModel(useCases, mockSyncScheduler, fakeTimeProvider)
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
         testScheduler.advanceUntilIdle()
 
         assertTrue("Reminder should be showing", testViewModel.uiState.value.showEntryReminderDialog)
@@ -852,5 +933,37 @@ class OverviewViewModelTest {
         val state = viewModel.uiState.value
         assertEquals("Month should be 3", 3, state.displayedMonth)
         assertEquals("Year should be 2023", 2023, state.displayedYear)
+    }
+
+    // Theme Tests
+
+    @Test
+    fun `init - theme mode defaults to SYSTEM`() = runTest {
+        testScheduler.advanceUntilIdle()
+        assertEquals(ThemeMode.SYSTEM, viewModel.uiState.value.currentThemeMode)
+    }
+
+    @Test
+    fun `setThemeMode - updates uiState with new theme`() = runTest {
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onAction(OverviewAction.SetThemeMode(ThemeMode.DARK))
+        testScheduler.advanceUntilIdle()
+
+        assertEquals(ThemeMode.DARK, viewModel.uiState.value.currentThemeMode)
+    }
+
+    @Test
+    fun `setThemeMode - persists theme selection`() = runTest {
+        testScheduler.advanceUntilIdle()
+
+        viewModel.onAction(OverviewAction.SetThemeMode(ThemeMode.LIGHT))
+        testScheduler.advanceUntilIdle()
+
+        // Verify persisted via repository
+        fakePreferencesRepository.observeThemeMode().test {
+            assertEquals(ThemeMode.LIGHT, awaitItem())
+            cancelAndIgnoreRemainingEvents()
+        }
     }
 }

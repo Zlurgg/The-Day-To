@@ -1,7 +1,12 @@
 package uk.co.zlurgg.thedayto.core.data.repository
 
 import android.content.Context
+import android.content.SharedPreferences
 import androidx.core.content.edit
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import java.time.LocalDate
 
@@ -152,6 +157,30 @@ class PreferencesRepositoryImpl(
      * Removes all stored preferences, returning the app to a fresh state.
      * Used during account deletion to ensure no user data remains.
      */
+    // ==================== Theme ====================
+
+    override fun observeThemeMode(): Flow<ThemeMode> = callbackFlow {
+        // Emit current value immediately
+        val currentKey = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.key) ?: ThemeMode.SYSTEM.key
+        trySend(ThemeMode.fromKey(currentKey))
+
+        val listener = SharedPreferences.OnSharedPreferenceChangeListener { _, key ->
+            if (key == KEY_THEME_MODE) {
+                val modeKey = prefs.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.key) ?: ThemeMode.SYSTEM.key
+                trySend(ThemeMode.fromKey(modeKey))
+            }
+        }
+        prefs.registerOnSharedPreferenceChangeListener(listener)
+
+        awaitClose {
+            prefs.unregisterOnSharedPreferenceChangeListener(listener)
+        }
+    }
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        prefs.edit { putString(KEY_THEME_MODE, mode.key) }
+    }
+
     override suspend fun clear() {
         prefs.edit { clear() }
     }
@@ -164,5 +193,6 @@ class PreferencesRepositoryImpl(
         private const val KEY_EDITOR_TUTORIAL_SEEN = "editor_tutorial_seen"
         private const val KEY_SYNC_ENABLED = "sync_enabled"
         private const val KEY_LAST_SYNC_TIMESTAMP = "last_sync_timestamp"
+        private const val KEY_THEME_MODE = "theme_mode"
     }
 }

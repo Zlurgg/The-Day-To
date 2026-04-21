@@ -1,5 +1,6 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
 
@@ -31,4 +32,7 @@ sealed interface OverviewAction {
     data object DismissEntryReminder : OverviewAction
     data object CreateTodayEntry : OverviewAction
     data object CreateNewEntry : OverviewAction
+
+    // Theme actions
+    data class SetThemeMode(val mode: ThemeMode) : OverviewAction
 }

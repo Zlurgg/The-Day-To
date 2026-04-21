@@ -26,6 +26,8 @@ val journalViewModelModule = module {
             overviewUseCases = get(),
             syncScheduler = get(),
             timeProvider = get(),
+            getThemeModeUseCase = get(),
+            setThemeModeUseCase = get(),
         )
     }
 

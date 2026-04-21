@@ -8,7 +8,11 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import org.koin.android.ext.android.inject
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.GetThemeModeUseCase
 import uk.co.zlurgg.thedayto.core.ui.TheDayToApp
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 
@@ -28,16 +32,25 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
  */
 class MainActivity : ComponentActivity() {
 
+    private val getThemeModeUseCase: GetThemeModeUseCase by inject()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
         enableEdgeToEdge()
         super.onCreate(savedInstanceState)
 
         setContent {
-            TheDayToTheme {
-                // Sync system bar appearance with the current theme so the
-                // status bar and navigation bar icons match dark/light mode.
-                SystemBarEffect()
+            val themeMode = getThemeModeUseCase()
+                .collectAsStateWithLifecycle(initialValue = ThemeMode.SYSTEM)
+
+            val useDarkTheme = when (themeMode.value) {
+                ThemeMode.LIGHT -> false
+                ThemeMode.DARK -> true
+                ThemeMode.SYSTEM -> isSystemInDarkTheme()
+            }
+
+            TheDayToTheme(useDarkTheme = useDarkTheme) {
+                SystemBarEffect(isDark = useDarkTheme)
                 TheDayToApp()
             }
         }
@@ -46,13 +59,11 @@ class MainActivity : ComponentActivity() {
     /**
      * Keeps the system bar icon style in sync with the Compose theme.
      *
-     * Called inside [TheDayToTheme] so [isSystemInDarkTheme] reflects the
-     * current mode. Re-calls [enableEdgeToEdge] with the appropriate
+     * Re-calls [enableEdgeToEdge] with the appropriate
      * [SystemBarStyle] when the theme changes.
      */
     @Composable
-    private fun SystemBarEffect() {
-        val isDark = isSystemInDarkTheme()
+    private fun SystemBarEffect(isDark: Boolean) {
         LaunchedEffect(isDark) {
             enableEdgeToEdge(
                 statusBarStyle = if (isDark) {

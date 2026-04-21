@@ -1,5 +1,8 @@
 package uk.co.zlurgg.thedayto.fake
 
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
 import java.time.LocalDate
 
@@ -14,6 +17,7 @@ class FakePreferencesRepository : PreferencesRepository {
     private var editorTutorialSeen: Boolean = false
     private var syncEnabled: Boolean = false
     private var lastSyncTimestamp: Long? = null
+    private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
 
     override suspend fun hasShownEntryReminderToday(): Boolean {
         return entryReminderDate == LocalDate.now()
@@ -53,6 +57,14 @@ class FakePreferencesRepository : PreferencesRepository {
         lastSyncTimestamp = timestamp
     }
 
+    // ==================== Theme ====================
+
+    override fun observeThemeMode(): Flow<ThemeMode> = _themeMode
+
+    override suspend fun setThemeMode(mode: ThemeMode) {
+        _themeMode.value = mode
+    }
+
     override suspend fun clear() {
         entryReminderDate = null
         isFirstLaunch = true
@@ -60,5 +72,6 @@ class FakePreferencesRepository : PreferencesRepository {
         editorTutorialSeen = false
         syncEnabled = false
         lastSyncTimestamp = null
+        _themeMode.value = ThemeMode.SYSTEM
     }
 }

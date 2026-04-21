@@ -48,7 +48,11 @@ import androidx.lifecycle.compose.LifecycleEventEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.core.ui.util.InAppReviewLauncher
+import uk.co.zlurgg.thedayto.core.ui.util.findActivity
+import uk.co.zlurgg.thedayto.journal.ui.overview.components.ThemeSelectorDialog
 import uk.co.zlurgg.thedayto.core.ui.components.AboutDialog
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.HelpDialog
@@ -91,7 +95,10 @@ fun OverviewScreenRoot(
     var showAboutDialog by remember { mutableStateOf(false) }
     var showSystemNotificationDialog by remember { mutableStateOf(false) }
     var showPermissionDeniedDialog by remember { mutableStateOf(false) }
+    var showThemeDialog by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val reviewLauncher = koinInject<InAppReviewLauncher>()
+    val activity = context.findActivity()
 
     // Permission launcher for Android 13+
     val notificationPermissionLauncher = rememberLauncherForActivityResult(
@@ -202,6 +209,18 @@ fun OverviewScreenRoot(
         )
     }
 
+    // Theme selector dialog
+    if (showThemeDialog) {
+        ThemeSelectorDialog(
+            currentTheme = uiState.currentThemeMode,
+            onThemeSelected = { mode ->
+                viewModel.onAction(OverviewAction.SetThemeMode(mode))
+                showThemeDialog = false
+            },
+            onDismiss = { showThemeDialog = false },
+        )
+    }
+
     // Permission permanently denied dialog
     if (showPermissionDeniedDialog) {
         PermissionPermanentlyDeniedDialog(
@@ -235,6 +254,8 @@ fun OverviewScreenRoot(
         onNavigateToAccount = {
             navController.navigate(AccountRoute)
         },
+        onRateApp = { activity?.let { reviewLauncher.launchReviewFlow(it) } },
+        onShowThemeSelector = { showThemeDialog = true },
         snackbarHostState = snackbarHostState,
     )
 }
@@ -251,6 +272,8 @@ private fun OverviewScreen(
     onNavigateToStats: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
     onNavigateToAccount: () -> Unit,
+    onRateApp: () -> Unit,
+    onShowThemeSelector: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
@@ -286,8 +309,10 @@ private fun OverviewScreen(
                         }
                         SettingsMenu(
                             onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },
+                            onShowThemeSelector = onShowThemeSelector,
                             onShowHelp = { onAction(OverviewAction.RequestShowHelp) },
                             onShowAbout = { onAction(OverviewAction.RequestShowAbout) },
+                            onRateApp = onRateApp,
                             onNavigateToMoodColorManagement = onNavigateToMoodColorManagement,
                         )
                     },
@@ -423,6 +448,8 @@ private fun OverviewScreenPreview() {
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
+            onRateApp = {},
+            onShowThemeSelector = {},
             snackbarHostState = remember { SnackbarHostState() },
         )
     }
@@ -443,6 +470,8 @@ private fun OverviewScreenSingleEntryPreview() {
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
+            onRateApp = {},
+            onShowThemeSelector = {},
             snackbarHostState = remember { SnackbarHostState() },
         )
     }
@@ -463,6 +492,8 @@ private fun OverviewScreenEmptyPreview() {
             onNavigateToStats = {},
             onNavigateToMoodColorManagement = {},
             onNavigateToAccount = {},
+            onRateApp = {},
+            onShowThemeSelector = {},
             snackbarHostState = remember { SnackbarHostState() },
         )
     }

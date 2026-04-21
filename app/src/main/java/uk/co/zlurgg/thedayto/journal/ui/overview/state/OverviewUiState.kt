@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview.state
 
 import androidx.compose.runtime.Stable
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.journal.domain.model.EntryWithMoodColor
 import uk.co.zlurgg.thedayto.journal.domain.util.EntryOrder
@@ -41,6 +42,9 @@ data class OverviewUiState(
     val notificationMinute: Int = 0,
     val hasNotificationPermission: Boolean = false,
     val showNotificationSettingsDialog: Boolean = false,
+
+    // Theme state
+    val currentThemeMode: ThemeMode = ThemeMode.SYSTEM,
 
     // Navigation state
     val navigationTarget: OverviewNavigationTarget? = null,

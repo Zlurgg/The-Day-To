@@ -8,6 +8,10 @@ import uk.co.zlurgg.thedayto.core.data.database.TheDayToDatabase
 import uk.co.zlurgg.thedayto.core.data.network.HttpClientFactory
 import uk.co.zlurgg.thedayto.core.data.repository.LocalDataClearerImpl
 import uk.co.zlurgg.thedayto.core.data.repository.PreferencesRepositoryImpl
+import uk.co.zlurgg.thedayto.core.data.util.InAppReviewLauncherImpl
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.GetThemeModeUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.SetThemeModeUseCase
+import uk.co.zlurgg.thedayto.core.ui.util.InAppReviewLauncher
 import uk.co.zlurgg.thedayto.core.data.util.SystemTimeProvider
 import uk.co.zlurgg.thedayto.core.domain.repository.LocalDataClearer
 import uk.co.zlurgg.thedayto.core.domain.repository.PreferencesRepository
@@ -36,6 +40,13 @@ val coreModule = module {
     // Preferences
     single { PreferencesRepositoryImpl(androidContext()) }
     single<PreferencesRepository> { get<PreferencesRepositoryImpl>() }
+
+    // In-App Review
+    single<InAppReviewLauncher> { InAppReviewLauncherImpl() }
+
+    // Theme Use Cases
+    factory { GetThemeModeUseCase(preferencesRepository = get()) }
+    factory { SetThemeModeUseCase(preferencesRepository = get()) }
 
     // Local Data Clearer (for account deletion)
     single<LocalDataClearer> {

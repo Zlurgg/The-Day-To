@@ -1,5 +1,8 @@
 package uk.co.zlurgg.thedayto.core.domain.repository
 
+import kotlinx.coroutines.flow.Flow
+import uk.co.zlurgg.thedayto.core.domain.model.ThemeMode
+
 /**
  * Repository interface for managing app-wide preferences.
  *
@@ -120,6 +123,25 @@ interface PreferencesRepository {
      * @param timestamp epoch millis of the sync completion
      */
     suspend fun setLastSyncTimestamp(timestamp: Long)
+
+    // ==================== Theme ====================
+
+    /**
+     * Observe the current theme mode as a reactive Flow.
+     *
+     * Emits the current value immediately, then emits again whenever
+     * the theme preference changes.
+     *
+     * @return Flow emitting the current ThemeMode
+     */
+    fun observeThemeMode(): Flow<ThemeMode>
+
+    /**
+     * Set the app theme mode.
+     *
+     * @param mode the desired ThemeMode (SYSTEM, LIGHT, or DARK)
+     */
+    suspend fun setThemeMode(mode: ThemeMode)
 
     /**
      * Clear all preferences.

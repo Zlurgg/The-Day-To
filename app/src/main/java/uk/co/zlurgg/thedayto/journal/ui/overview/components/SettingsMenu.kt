@@ -8,6 +8,8 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Palette
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.outlined.Brightness6
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -28,8 +30,10 @@ import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 @Composable
 fun SettingsMenu(
     onOpenNotificationSettings: () -> Unit,
+    onShowThemeSelector: () -> Unit,
     onShowHelp: () -> Unit,
     onShowAbout: () -> Unit,
+    onRateApp: () -> Unit,
     onNavigateToMoodColorManagement: () -> Unit,
 ) {
     var expanded by remember { mutableStateOf(false) }
@@ -77,6 +81,21 @@ fun SettingsMenu(
                 },
             )
 
+            // Theme
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.theme)) },
+                onClick = {
+                    expanded = false
+                    onShowThemeSelector()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Brightness6,
+                        contentDescription = stringResource(R.string.icon_description_theme),
+                    )
+                },
+            )
+
             // Help & Tutorial
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.help_and_tutorial)) },
@@ -106,6 +125,21 @@ fun SettingsMenu(
                     )
                 },
             )
+
+            // Rate This App
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.rate_this_app)) },
+                onClick = {
+                    expanded = false
+                    onRateApp()
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = Icons.Default.Star,
+                        contentDescription = stringResource(R.string.icon_description_rate),
+                    )
+                },
+            )
         }
     }
 }
@@ -117,8 +151,10 @@ private fun SettingsMenuPreview() {
     TheDayToTheme {
         SettingsMenu(
             onOpenNotificationSettings = {},
+            onShowThemeSelector = {},
             onShowHelp = {},
             onShowAbout = {},
+            onRateApp = {},
             onNavigateToMoodColorManagement = {},
         )
     }

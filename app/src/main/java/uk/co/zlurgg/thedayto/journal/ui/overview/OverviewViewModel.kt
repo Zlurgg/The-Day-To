@@ -16,6 +16,8 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.result.getOrNull
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.GetThemeModeUseCase
+import uk.co.zlurgg.thedayto.core.domain.usecases.theme.SetThemeModeUseCase
 import uk.co.zlurgg.thedayto.core.domain.util.OrderType
 import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.core.ui.util.launchDebouncedLoading
@@ -37,6 +39,8 @@ class OverviewViewModel(
     private val overviewUseCases: OverviewUseCases,
     private val syncScheduler: SyncScheduler,
     private val timeProvider: TimeProvider,
+    private val getThemeModeUseCase: GetThemeModeUseCase,
+    private val setThemeModeUseCase: SetThemeModeUseCase,
 ) : ViewModel() {
 
     // Single source of truth for UI state
@@ -54,10 +58,22 @@ class OverviewViewModel(
         updateGreeting()
         checkTodayEntry()
         loadNotificationSettings()
+        collectThemeMode()
         // Fail-safe: ensure periodic notification is scheduled on app startup
         overviewUseCases.setupDailyNotification()
         // Trigger sync on app startup (if signed in)
         triggerStartupSync()
+    }
+
+    /**
+     * Collect theme mode changes and update UI state.
+     */
+    private fun collectThemeMode() {
+        getThemeModeUseCase()
+            .onEach { mode ->
+                _uiState.update { it.copy(currentThemeMode = mode) }
+            }
+            .launchIn(viewModelScope)
     }
 
     /**
@@ -441,6 +457,12 @@ class OverviewViewModel(
             is OverviewAction.CreateNewEntry,
             -> {
                 _uiState.update { it.copy(navigationTarget = OverviewNavigationTarget.ToEditor(null)) }
+            }
+
+            is OverviewAction.SetThemeMode -> {
+                viewModelScope.launch {
+                    setThemeModeUseCase(action.mode)
+                }
             }
         }
     }
