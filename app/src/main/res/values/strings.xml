@@ -241,6 +241,14 @@
     <string name="icon_description_notifications">Notification settings</string>
     <string name="icon_description_help">Help and tutorial</string>
     <string name="icon_description_about">About The Day To</string>
+    <string name="rate_this_app">Rate This App</string>
+    <string name="icon_description_rate">Rate this app</string>
+    <string name="theme">Theme</string>
+    <string name="select_theme">Select Theme</string>
+    <string name="theme_system">System Default</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="icon_description_theme">Theme selector</string>
     <string name="icon_description_sign_out">Sign out</string>
 
     <!-- Update Checker -->
@@ -271,7 +279,7 @@
     <string name="about_dialog_privacy_title">Privacy &amp; Data</string>
     <string name="about_dialog_privacy_content">Your journal entries are stored locally on your device. You can optionally enable cloud sync to backup your data across devices. Your personal data remains private and under your control.</string>
     <string name="privacy_policy">Privacy Policy</string>
-    <string name="privacy_policy_url">https://zlurgg.github.io/the-day-to/privacy</string>
+    <string name="privacy_policy_url">https://zlurgg.github.io/The-Day-To/privacy.html</string>
     <string name="about_dialog_open_source_title">Open Source</string>
     <string name="about_dialog_open_source_content">The Day To is an open-source project built with modern Android technologies. Visit our GitHub repository to view the source code, report issues, or contribute to development.</string>
     <string name="about_dialog_credits_title">Credits</string>
