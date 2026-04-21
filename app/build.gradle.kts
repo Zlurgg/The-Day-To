@@ -33,7 +33,7 @@ android {
         applicationId = "uk.co.zlurgg.thedayto"
         minSdk = 27
         targetSdk = 36
-        versionCode = 16
+        versionCode = 17
         versionName = "2.1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
