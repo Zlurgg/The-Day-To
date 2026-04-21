@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.auth.domain.repository
 
-import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.result.EmptyResult
@@ -19,15 +19,12 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
  */
 interface AuthRepository {
     /**
-     * Signs in using credentials provided by the caller.
+     * Signs in using a Google ID token.
      *
-     * The credentialProvider lambda allows the UI layer (which has Activity context)
-     * to provide credentials without passing Android types through the domain layer.
-     *
-     * @param credentialProvider Suspend lambda that fetches Google credentials
+     * @param idToken Type-safe wrapper for the Google ID token
      * @return Result containing UserData on success or DataError.Auth on failure
      */
-    suspend fun signIn(credentialProvider: CredentialProvider): Result<UserData, DataError.Auth>
+    suspend fun signIn(idToken: IdToken): Result<UserData, DataError.Auth>
 
     /**
      * Signs out the current user.
@@ -56,11 +53,10 @@ interface AuthRepository {
      * Re-authenticates with fresh credentials (required for sensitive operations).
      *
      * Firebase requires recent authentication for sensitive operations like
-     * account deletion. This method allows re-authentication using the same
-     * credential provider pattern as signIn.
+     * account deletion.
      *
-     * @param credentialProvider Suspend lambda that fetches Google credentials
+     * @param idToken Type-safe wrapper for the Google ID token
      * @return EmptyResult with success or DataError.Auth on failure
      */
-    suspend fun reauthenticate(credentialProvider: CredentialProvider): EmptyResult<DataError.Auth>
+    suspend fun reauthenticate(idToken: IdToken): EmptyResult<DataError.Auth>
 }

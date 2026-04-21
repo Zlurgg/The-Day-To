@@ -1,7 +1,6 @@
 package uk.co.zlurgg.thedayto.sync.ui
 
 import android.content.res.Configuration
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -52,14 +51,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.data.service.GoogleCredentialFetcher
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
-import uk.co.zlurgg.thedayto.auth.ui.CredentialProviderFactory
 import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingMedium
+import uk.co.zlurgg.thedayto.core.ui.util.findActivity
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingSmall
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncResult
 import uk.co.zlurgg.thedayto.sync.domain.model.SyncState
@@ -74,14 +73,12 @@ import java.util.Date
 @Composable
 fun AccountScreenRoot(
     viewModel: SyncSettingsViewModel = koinViewModel(),
-    credentialProviderFactory: CredentialProviderFactory = koinInject(),
     onNavigateBack: () -> Unit,
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Get Activity for credential manager
-    val activity = LocalActivity.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     val serverClientId = stringResource(R.string.web_client_id)
 
     LaunchedEffect(uiState.error) {
@@ -104,9 +101,8 @@ fun AccountScreenRoot(
         onNavigateBack = onNavigateBack,
         onSyncNowClicked = viewModel::onSyncNowClicked,
         onSignInClick = {
-            activity?.let { act ->
-                viewModel.signIn(credentialProviderFactory.create(act, serverClientId))
-            }
+            val activity = context.findActivity() ?: return@AccountScreen
+            viewModel.signIn { GoogleCredentialFetcher.fetch(activity, serverClientId) }
         },
         onDevSignInClick = viewModel::devSignIn,
         onSignOutClick = viewModel::signOut,
@@ -115,9 +111,8 @@ fun AccountScreenRoot(
         onDeleteAccountCancel = viewModel::onDeleteAccountCancelled,
         onDeletionProgressDismiss = viewModel::onDeletionProgressDismissed,
         onReAuthConfirm = {
-            activity?.let { act ->
-                viewModel.onReAuthCompleted(credentialProviderFactory.create(act, serverClientId))
-            }
+            val activity = context.findActivity() ?: return@AccountScreen
+            viewModel.onReAuthCompleted { GoogleCredentialFetcher.fetch(activity, serverClientId) }
         },
         onReAuthDismiss = viewModel::onReAuthDismissed,
     )

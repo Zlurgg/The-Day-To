@@ -9,9 +9,10 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.usecases.AccountUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DeletionProgress
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.error.ErrorFormatter
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.notification.domain.usecase.NotificationAuthUseCase
@@ -58,9 +59,9 @@ class SyncSettingsViewModel(
                     )
                 }
 
-                Timber.d("Account state loaded: signedIn=$isSignedIn")
+                Timber.tag(TAG).d("Account state loaded: signedIn=%s", isSignedIn)
             } catch (e: Exception) {
-                Timber.e(e, "Error loading account state")
+                Timber.tag(TAG).e(e, "Error loading account state")
                 _uiState.update {
                     it.copy(
                         isLoading = false,
@@ -87,7 +88,7 @@ class SyncSettingsViewModel(
 
     fun onSyncNowClicked() {
         viewModelScope.launch {
-            Timber.d("Manual sync requested")
+            Timber.tag(TAG).d("Manual sync requested")
             syncScheduler.requestImmediateSync()
         }
     }
@@ -100,12 +101,29 @@ class SyncSettingsViewModel(
      * Sign in with Google credentials.
      * Called when user taps Sign In button in Account settings.
      * Automatically enables sync on successful sign-in.
+     *
+     * @param fetchCredential Suspend lambda that fetches Google credentials.
+     *   Lambda captures Activity — invoke immediately, do not store.
      */
-    fun signIn(credentialProvider: CredentialProvider) {
+    fun signIn(fetchCredential: suspend () -> Result<IdToken, DataError.Auth>) {
         viewModelScope.launch {
             _uiState.update { it.copy(isSigningIn = true, error = null) }
 
-            when (val result = accountUseCases.signIn(credentialProvider)) {
+            val idToken = when (val fetchResult = fetchCredential()) {
+                is Result.Success -> fetchResult.data
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isSigningIn = false,
+                            error = ErrorFormatter.format(fetchResult.error, "sign in"),
+                        )
+                    }
+                    Timber.tag(TAG).w("Credential fetch failed: %s", fetchResult.error)
+                    return@launch
+                }
+            }
+
+            when (val result = accountUseCases.signIn(idToken)) {
                 is Result.Success -> {
                     handleSignInSuccess()
                 }
@@ -117,7 +135,7 @@ class SyncSettingsViewModel(
                             error = ErrorFormatter.format(result.error, "sign in"),
                         )
                     }
-                    Timber.w("Sign in failed: ${result.error}")
+                    Timber.tag(TAG).w("Sign in failed: %s", result.error)
                 }
             }
         }
@@ -146,7 +164,7 @@ class SyncSettingsViewModel(
                             error = ErrorFormatter.format(result.error, "dev sign in"),
                         )
                     }
-                    Timber.w("Dev sign in failed: ${result.error}")
+                    Timber.tag(TAG).w("Dev sign in failed: %s", result.error)
                 }
             }
         }
@@ -184,7 +202,7 @@ class SyncSettingsViewModel(
                 shouldNavigateBack = true,
             )
         }
-        Timber.i("Sign in successful: %s", user.username)
+        Timber.tag(TAG).i("Sign in successful: %s", user.username)
     }
 
     /**
@@ -222,7 +240,7 @@ class SyncSettingsViewModel(
                     shouldNavigateBack = true,
                 )
             }
-            Timber.i("Sign out successful")
+            Timber.tag(TAG).i("Sign out successful")
         }
     }
 
@@ -263,7 +281,7 @@ class SyncSettingsViewModel(
                                 shouldNavigateBack = true,
                             )
                         }
-                        Timber.i("Account deletion completed")
+                        Timber.tag(TAG).i("Account deletion completed")
                     }
 
                     is DeletionProgress.RequiresReAuth -> {
@@ -276,7 +294,7 @@ class SyncSettingsViewModel(
                         _uiState.update {
                             it.copy(deletionProgress = null, error = progress.message)
                         }
-                        Timber.w("Account deletion failed: %s", progress.message)
+                        Timber.tag(TAG).w("Account deletion failed: %s", progress.message)
                     }
 
                     else -> Unit // Progress update - no action needed
@@ -288,12 +306,29 @@ class SyncSettingsViewModel(
     /**
      * Handle re-authentication completion.
      * Called after user signs in again for account deletion.
+     *
+     * @param fetchCredential Suspend lambda that fetches Google credentials.
+     *   Lambda captures Activity — invoke immediately, do not store.
      */
-    fun onReAuthCompleted(credentialProvider: CredentialProvider) {
+    fun onReAuthCompleted(fetchCredential: suspend () -> Result<IdToken, DataError.Auth>) {
         viewModelScope.launch {
             _uiState.update { it.copy(showReAuthDialog = false, isLoading = true) }
 
-            when (val result = accountUseCases.reauthenticate(credentialProvider)) {
+            val idToken = when (val fetchResult = fetchCredential()) {
+                is Result.Success -> fetchResult.data
+                is Result.Error -> {
+                    _uiState.update {
+                        it.copy(
+                            isLoading = false,
+                            error = ErrorFormatter.format(fetchResult.error, "re-authenticate"),
+                        )
+                    }
+                    Timber.tag(TAG).w("Credential fetch for re-auth failed: %s", fetchResult.error)
+                    return@launch
+                }
+            }
+
+            when (val result = accountUseCases.reauthenticate(idToken)) {
                 is Result.Success -> {
                     _uiState.update { it.copy(isLoading = false) }
                     onDeleteAccountConfirmed() // Retry deletion
@@ -306,7 +341,7 @@ class SyncSettingsViewModel(
                             error = ErrorFormatter.format(result.error, "re-authenticate"),
                         )
                     }
-                    Timber.w("Re-authentication failed: %s", result.error)
+                    Timber.tag(TAG).w("Re-authentication failed: %s", result.error)
                 }
             }
         }
@@ -334,6 +369,7 @@ class SyncSettingsViewModel(
     }
 
     companion object {
+        private const val TAG = "SyncSettingsViewModel"
         private const val COMPLETION_DELAY_MS = 500L
     }
 }

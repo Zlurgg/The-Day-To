@@ -8,8 +8,9 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCases
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInNavigationTarget
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInState
 import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
@@ -57,16 +58,28 @@ class SignInViewModel(
     /**
      * Initiates Google Sign-In flow.
      *
-     * The credentialProvider is created by the UI layer with Activity context,
-     * allowing this ViewModel to remain Activity-independent (testable, no memory leaks).
+     * The ViewModel owns the coroutine — it invokes the fetch lambda, then
+     * passes the resulting IdToken to the UseCase. Both credential fetch
+     * errors and sign-in errors flow through the same error path.
      *
-     * @param credentialProvider Suspend lambda that fetches Google credentials
+     * @param fetchCredential Suspend lambda that fetches Google credentials.
+     *   Lambda captures Activity — invoke immediately, do not store.
      */
-    fun signIn(credentialProvider: CredentialProvider) {
+    fun signIn(fetchCredential: suspend () -> Result<IdToken, DataError.Auth>) {
         viewModelScope.launch {
             _state.update { it.copy(isSignInSuccessful = false, signInError = null) }
 
-            when (val result = signInUseCases.signIn(credentialProvider)) {
+            val idToken = when (val fetchResult = fetchCredential()) {
+                is Result.Success -> fetchResult.data
+                is Result.Error -> {
+                    val errorMessage = ErrorFormatter.format(fetchResult.error, "sign in")
+                    _state.update { it.copy(isSignInSuccessful = false, signInError = errorMessage) }
+                    _uiEvents.emit(SignInUiEvent.ShowSnackbar(errorMessage))
+                    return@launch
+                }
+            }
+
+            when (val result = signInUseCases.signIn(idToken)) {
                 is Result.Success -> {
                     // Sign-in successful
                     _state.update { it.copy(isSignInSuccessful = true, signInError = null) }

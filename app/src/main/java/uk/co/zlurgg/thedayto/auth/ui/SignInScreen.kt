@@ -1,6 +1,5 @@
 package uk.co.zlurgg.thedayto.auth.ui
 
-import androidx.activity.compose.LocalActivity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,8 +22,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
-import org.koin.compose.koinInject
 import uk.co.zlurgg.thedayto.R
+import uk.co.zlurgg.thedayto.auth.data.service.GoogleCredentialFetcher
 import uk.co.zlurgg.thedayto.auth.ui.components.DevSignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInButton
 import uk.co.zlurgg.thedayto.auth.ui.components.SignInFooter
@@ -34,6 +33,7 @@ import uk.co.zlurgg.thedayto.auth.ui.state.SignInUiEvent
 import uk.co.zlurgg.thedayto.core.ui.components.CustomSnackbarHost
 import uk.co.zlurgg.thedayto.core.ui.components.WelcomeDialog
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
+import uk.co.zlurgg.thedayto.core.ui.util.findActivity
 import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 
 /**
@@ -42,14 +42,12 @@ import uk.co.zlurgg.thedayto.core.ui.theme.paddingLarge
 @Composable
 fun SignInScreenRoot(
     viewModel: SignInViewModel = koinViewModel(),
-    credentialProviderFactory: CredentialProviderFactory = koinInject(),
     onNavigateToOverview: () -> Unit,
 ) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
 
-    // Get Activity for credential manager
-    val activity = LocalActivity.current
+    val context = androidx.compose.ui.platform.LocalContext.current
     val serverClientId = stringResource(R.string.web_client_id)
 
     // Handle navigation state
@@ -83,9 +81,8 @@ fun SignInScreenRoot(
         showWelcomeDialog = state.showWelcomeDialog,
         onDismissWelcomeDialog = { viewModel.dismissWelcomeDialog() },
         onSignInClick = {
-            activity?.let { act ->
-                viewModel.signIn(credentialProviderFactory.create(act, serverClientId))
-            }
+            val activity = context.findActivity() ?: return@SignInScreen
+            viewModel.signIn { GoogleCredentialFetcher.fetch(activity, serverClientId) }
         },
         onDevSignInClick = { viewModel.devSignIn() },
         isDevSignInAvailable = state.isDevSignInAvailable,

@@ -18,10 +18,10 @@ import uk.co.zlurgg.thedayto.core.domain.result.Result
  *
  * This class handles Firebase sign-in with Google credentials.
  * Credential fetching (which requires Activity context) is handled
- * separately by CredentialManagerUtil.
+ * separately by GoogleCredentialFetcher.
  *
  * Split responsibilities:
- * - CredentialManagerUtil: Fetches credentials (needs Activity)
+ * - GoogleCredentialFetcher: Fetches credentials (needs Activity)
  * - GoogleAuthUiClient: Firebase sign-in (needs Application context only)
  */
 class GoogleAuthUiClient(
@@ -34,9 +34,9 @@ class GoogleAuthUiClient(
      * Signs in to Firebase using a Google ID token.
      *
      * This method does not require Activity context - the credential
-     * has already been obtained via CredentialManagerUtil.
+     * has already been obtained via GoogleCredentialFetcher.
      *
-     * @param idToken The Google ID token from CredentialManagerUtil
+     * @param idToken The Google ID token from GoogleCredentialFetcher
      * @return Result with UserData on success or DataError.Auth on failure
      */
     suspend fun signInWithCredential(idToken: String): Result<UserData, DataError.Auth> {
