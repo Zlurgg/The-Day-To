@@ -164,6 +164,9 @@ dependencies {
     // Ktor (HTTP client)
     implementation(libs.bundles.ktor)
 
+    // In-App Review
+    implementation(libs.play.review.ktx)
+
     // Location Services
     implementation(libs.play.services.location)
 

@@ -19,6 +19,7 @@ activityCompose = "1.13.0"
 composeBom = "2026.03.01"
 opencsv = "5.12.0"
 pagingCompose = "3.4.2"
+playReview = "2.0.2"
 playServicesLocation = "21.3.0"
 preferenceKtx = "1.2.1"
 room = "2.8.4"
@@ -102,6 +103,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose-material-icons-extended" }
 
 opencsv = { module = "com.opencsv:opencsv", version.ref = "opencsv" }
+play-review-ktx = { module = "com.google.android.play:review-ktx", version.ref = "playReview" }
 play-services-location = { module = "com.google.android.gms:play-services-location", version.ref = "playServicesLocation" }
 roomCompiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
