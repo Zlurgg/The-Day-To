@@ -6,9 +6,8 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
-import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
@@ -33,9 +32,7 @@ class SignInUseCaseTest {
         profilePictureUrl = "https://example.com/profile.jpg",
     )
 
-    private val mockCredentialProvider: suspend () -> Result<GoogleCredential, DataError.Auth> = {
-        Result.Success(GoogleCredential("mock_id_token"))
-    }
+    private val testIdToken = IdToken("mock_id_token")
 
     @Before
     fun setup() {
@@ -51,7 +48,7 @@ class SignInUseCaseTest {
         fakeAuthRepository.setSignedInUser(testUser)
 
         // When: Signing in
-        val result = useCase(mockCredentialProvider)
+        val result = useCase(testIdToken)
 
         // Then: Returns success with user data
         assertTrue(result is Result.Success)
@@ -65,7 +62,7 @@ class SignInUseCaseTest {
         fakeAuthStateRepository.setSignedInState(false)
 
         // When: Signing in
-        useCase(mockCredentialProvider)
+        useCase(testIdToken)
 
         // Then: Sign-in state is updated to true
         assertTrue(fakeAuthStateRepository.getSignedInState())
@@ -77,7 +74,7 @@ class SignInUseCaseTest {
         fakeAuthRepository.shouldReturnError = true
 
         // When: Signing in
-        val result = useCase(mockCredentialProvider)
+        val result = useCase(testIdToken)
 
         // Then: Returns error
         assertTrue(result is Result.Error)
@@ -90,7 +87,7 @@ class SignInUseCaseTest {
         fakeAuthStateRepository.setSignedInState(false)
 
         // When: Signing in
-        useCase(mockCredentialProvider)
+        useCase(testIdToken)
 
         // Then: Sign-in state remains false
         assertFalse(fakeAuthStateRepository.getSignedInState())

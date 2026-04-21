@@ -16,8 +16,7 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
-import uk.co.zlurgg.thedayto.auth.domain.model.GoogleCredential
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.usecases.AccountUseCases
 import uk.co.zlurgg.thedayto.auth.domain.usecases.DeleteAccountUseCase
@@ -27,6 +26,7 @@ import uk.co.zlurgg.thedayto.auth.domain.usecases.ReauthenticateUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignInUseCase
 import uk.co.zlurgg.thedayto.auth.domain.usecases.SignOutUseCase
 import uk.co.zlurgg.thedayto.core.domain.repository.LocalDataClearer
+import uk.co.zlurgg.thedayto.core.domain.error.DataError
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.fake.FakeAuthRepository
 import uk.co.zlurgg.thedayto.fake.FakeAuthStateRepository
@@ -80,9 +80,9 @@ class SyncSettingsViewModelTest {
         profilePictureUrl = null,
     )
 
-    // Mock credential provider for tests
-    private val mockCredentialProvider: CredentialProvider = {
-        Result.Success(GoogleCredential("mock_id_token"))
+    // Mock fetch credential lambda for tests
+    private val mockFetchCredential: suspend () -> Result<IdToken, DataError.Auth> = {
+        Result.Success(IdToken("mock_id_token"))
     }
 
     @Before
@@ -220,7 +220,7 @@ class SyncSettingsViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn(mockCredentialProvider)
+        viewModel.signIn(mockFetchCredential)
 
         // Then: State reflects successful sign-in
         viewModel.uiState.test {
@@ -243,7 +243,7 @@ class SyncSettingsViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn(mockCredentialProvider)
+        viewModel.signIn(mockFetchCredential)
 
         // Then: Sync is enabled
         assertTrue("Sync should be enabled", fakePreferencesRepository.isSyncEnabled())
@@ -264,7 +264,7 @@ class SyncSettingsViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn(mockCredentialProvider)
+        viewModel.signIn(mockFetchCredential)
 
         // Then: State reflects error
         viewModel.uiState.test {
@@ -348,7 +348,7 @@ class SyncSettingsViewModelTest {
         // Given: ViewModel with error state
         fakeAuthRepository.shouldReturnError = true
         viewModel = createViewModel()
-        viewModel.signIn(mockCredentialProvider)
+        viewModel.signIn(mockFetchCredential)
 
         // Verify error exists
         viewModel.uiState.test {
@@ -425,7 +425,7 @@ class SyncSettingsViewModelTest {
         viewModel = createViewModel()
 
         // When: User signs in
-        viewModel.signIn(mockCredentialProvider)
+        viewModel.signIn(mockFetchCredential)
 
         // Then: Settings migrated to signed-in user
         val userSettings = fakeNotificationSettingsRepository.getSettingsDirectly(testUser.userId)

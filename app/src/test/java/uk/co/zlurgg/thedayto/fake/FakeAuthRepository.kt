@@ -1,6 +1,6 @@
 package uk.co.zlurgg.thedayto.fake
 
-import uk.co.zlurgg.thedayto.auth.domain.model.CredentialProvider
+import uk.co.zlurgg.thedayto.auth.domain.model.IdToken
 import uk.co.zlurgg.thedayto.auth.domain.model.UserData
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.error.DataError
@@ -26,10 +26,7 @@ class FakeAuthRepository : AuthRepository {
     // Call tracking for verification
     var signOutCalled = false
 
-    override suspend fun signIn(
-        credentialProvider: CredentialProvider,
-    ): Result<UserData, DataError.Auth> {
-        // In tests, we ignore the credentialProvider and use our configured behavior
+    override suspend fun signIn(idToken: IdToken): Result<UserData, DataError.Auth> {
         return if (shouldReturnError) {
             Result.Error(authError)
         } else {
@@ -65,9 +62,7 @@ class FakeAuthRepository : AuthRepository {
         }
     }
 
-    override suspend fun reauthenticate(
-        credentialProvider: CredentialProvider,
-    ): EmptyResult<DataError.Auth> {
+    override suspend fun reauthenticate(idToken: IdToken): EmptyResult<DataError.Auth> {
         return if (shouldReturnError) {
             Result.Error(authError)
         } else {
