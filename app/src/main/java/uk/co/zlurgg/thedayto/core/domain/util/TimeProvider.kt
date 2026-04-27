@@ -10,6 +10,12 @@ import java.time.LocalDateTime
  * Provides current date/time and atomic convenience methods.
  * Implementations: [SystemTimeProvider] for production, [FakeTimeProvider] for tests.
  *
+ * **java.time in domain:** We considered extracting this to the data layer with a
+ * primitive-based mapper in domain (returning Longs/Ints) for strict layer purity.
+ * We chose to keep java.time here because it is a JDK standard library type — not
+ * an Android/framework dependency — and wrapping it would add friction to every
+ * use case that does date logic without meaningful architectural benefit.
+ *
  * Note: Storage conversion (epoch <-> LocalDate) is handled by pure extension
  * functions in DateStorageExt.kt, not this interface.
  */

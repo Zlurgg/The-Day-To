@@ -15,15 +15,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLocale
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import uk.co.zlurgg.thedayto.R
 import uk.co.zlurgg.thedayto.core.ui.theme.TheDayToTheme
 import uk.co.zlurgg.thedayto.journal.ui.stats.StatsConstants
+import uk.co.zlurgg.thedayto.journal.ui.util.DateFormatter
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 @Composable
 fun TotalStatsCard(
@@ -59,7 +59,7 @@ fun TotalStatsCard(
                 )
                 StatItem(
                     label = stringResource(R.string.stats_avg_per_month_label),
-                    value = String.format(Locale.getDefault(), "%.1f", averageEntriesPerMonth),
+                    value = String.format(LocalLocale.current.platformLocale, "%.1f", averageEntriesPerMonth),
                 )
             }
 
@@ -67,7 +67,7 @@ fun TotalStatsCard(
                 Text(
                     text = stringResource(
                         R.string.stats_first_entry_format,
-                        firstEntryDate.format(DateTimeFormatter.ofPattern("MMM d, yyyy")),
+                        DateFormatter.formatDateShort(firstEntryDate),
                     ),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,

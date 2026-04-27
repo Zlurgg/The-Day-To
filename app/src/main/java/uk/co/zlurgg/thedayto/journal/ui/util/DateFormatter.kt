@@ -95,6 +95,15 @@ object DateFormatter {
         return date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
     }
 
+    /**
+     * Short month, day, and year: "Jan 15, 2024".
+     * Used in stats for first entry date display.
+     */
+    fun formatDateShort(date: LocalDate): String {
+        val month = date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        return "$month ${date.dayOfMonth}, ${date.year}"
+    }
+
     // ==================== Component helpers ====================
 
     /**
