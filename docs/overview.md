@@ -19,6 +19,14 @@ The Day To is a daily mood logging Android application built with Kotlin and Jet
 ./gradlew assembleRelease
 ```
 
+## Local-Only Mode
+
+Cloud sync and Google sign-in are currently disabled. Firestore does not encrypt journal data at rest, so all data stays on-device until encryption is implemented.
+
+- **Feature flag:** `CLOUD_SYNC_ENABLED` in `core/data/util/Constants.kt`
+- **Set to `true`** to re-enable the account button, Google sign-in, and cloud sync
+- **Content to revert:** `strings.xml` about dialog text and `docs/privacy.html` were simplified for local-only and will need updating when cloud sync returns
+
 ## Firebase Emulator (Debug Builds)
 
 Debug builds auto-connect to local Firebase Auth Emulator.

@@ -1,6 +1,7 @@
 package uk.co.zlurgg.thedayto.journal.ui.overview
 
 import android.Manifest
+import uk.co.zlurgg.thedayto.core.data.util.CLOUD_SYNC_ENABLED
 import android.content.res.Configuration
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -301,11 +302,13 @@ private fun OverviewScreen(
                         )
                     },
                     actions = {
-                        IconButton(onClick = onNavigateToAccount) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = stringResource(R.string.icon_description_account),
-                            )
+                        if (CLOUD_SYNC_ENABLED) {
+                            IconButton(onClick = onNavigateToAccount) {
+                                Icon(
+                                    imageVector = Icons.Default.Person,
+                                    contentDescription = stringResource(R.string.icon_description_account),
+                                )
+                            }
                         }
                         SettingsMenu(
                             onOpenNotificationSettings = { onAction(OverviewAction.OpenNotificationSettings) },

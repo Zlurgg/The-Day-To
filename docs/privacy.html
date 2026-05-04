@@ -185,7 +185,7 @@
         <!-- Header -->
         <header class="header">
             <h1>Privacy Policy</h1>
-            <p class="subtitle">Last updated: April 2025</p>
+            <p class="subtitle">Last updated: May 2026</p>
         </header>
 
         <!-- Introduction -->
@@ -216,19 +216,14 @@
                 </thead>
                 <tbody>
                     <tr>
-                        <td><strong>Email address</strong></td>
-                        <td>Account identification (Google Sign-In)</td>
-                        <td>Firebase Authentication</td>
-                    </tr>
-                    <tr>
                         <td><strong>Journal entries</strong></td>
                         <td>Core app functionality</td>
-                        <td>Local device; Firebase Firestore (if sync enabled)</td>
+                        <td>Local device only</td>
                     </tr>
                     <tr>
                         <td><strong>Mood colors</strong></td>
                         <td>Personalization</td>
-                        <td>Local device; Firebase Firestore (if sync enabled)</td>
+                        <td>Local device only</td>
                     </tr>
                     <tr>
                         <td><strong>Notification preferences</strong></td>
@@ -243,6 +238,7 @@
                 <li>We do not collect analytics or usage data</li>
                 <li>We do not use advertising trackers</li>
                 <li>We do not access your contacts, location, or other device data</li>
+                <li>We do not transmit any data off your device</li>
             </ul>
         </section>
 
@@ -251,7 +247,6 @@
             <h2>How We Use Your Information</h2>
             <p>Your data is used solely to provide the app's functionality:</p>
             <ul>
-                <li><strong>Email address:</strong> To identify your account and enable cloud sync across devices</li>
                 <li><strong>Journal entries:</strong> To display your mood history, calendar view, and statistics</li>
                 <li><strong>Mood colors:</strong> To personalize your mood tracking experience</li>
                 <li><strong>Notification preferences:</strong> To send daily reminder notifications at your chosen time</li>
@@ -265,38 +260,14 @@
 
             <h3>Local Storage</h3>
             <p>
-                By default, all your data is stored locally on your device using an encrypted SQLite database.
-                This data never leaves your device unless you enable cloud sync.
+                All your data is stored locally on your device using an encrypted SQLite database.
+                Your data never leaves your device.
             </p>
 
-            <h3>Cloud Sync (Optional)</h3>
+            <h3>No Third-Party Services</h3>
             <p>
-                If you sign in with Google and enable cloud sync, your journal entries and mood colors are
-                stored in Firebase Firestore. This allows you to access your data across multiple devices.
-            </p>
-            <ul>
-                <li>Data is encrypted in transit using HTTPS/TLS</li>
-                <li>Data is stored in Google Cloud infrastructure with industry-standard security</li>
-                <li>Only you can access your data through your authenticated account</li>
-            </ul>
-        </section>
-
-        <!-- Third-Party Services -->
-        <section class="content-card">
-            <h2>Third-Party Services</h2>
-            <p>The app uses the following third-party services:</p>
-
-            <h3>Firebase Authentication (Google)</h3>
-            <p>
-                Used for secure sign-in with your Google account. Firebase Authentication stores your email
-                address and authentication tokens.
-                <a href="https://firebase.google.com/support/privacy" target="_blank">Firebase Privacy Policy</a>
-            </p>
-
-            <h3>Firebase Firestore (Google)</h3>
-            <p>
-                Used for optional cloud sync of your journal data. Data is stored in Google Cloud data centers.
-                <a href="https://cloud.google.com/security/privacy" target="_blank">Google Cloud Privacy</a>
+                The Day To does not connect to any external servers or third-party services.
+                No data is transmitted off your device at any time.
             </p>
         </section>
 
@@ -310,26 +281,8 @@
 
             <h3>Delete Your Data</h3>
             <p>
-                You can delete your account and all associated data directly in the app through
-                Account Settings. This permanently removes:
-            </p>
-            <ul>
-                <li>All journal entries from cloud storage</li>
-                <li>All mood colors from cloud storage</li>
-                <li>Your Firebase Authentication account</li>
-                <li>All local data on your device</li>
-            </ul>
-
-            <h3>Export Your Data</h3>
-            <p>
-                Your data is stored in standard formats and can be accessed through the app.
-                Future versions may include explicit export functionality.
-            </p>
-
-            <h3>Opt Out of Cloud Sync</h3>
-            <p>
-                You can use the app entirely offline without signing in. Your data will remain
-                on your device only.
+                You can delete individual journal entries within the app. Uninstalling the app
+                removes all data permanently from your device.
             </p>
         </section>
 

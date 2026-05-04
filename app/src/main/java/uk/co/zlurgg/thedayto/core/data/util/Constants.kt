@@ -6,3 +6,6 @@ const val FIRST_TIME_USER = "FIRST_TIME_USER"
 const val ENTRY_DATE = "DAILY_ENTRY_DATE"
 const val NOTIFICATIONS_ALLOWED = "NOTIFICATIONS_ALLOWED"
 const val SIGNED_IN_STATE = "SIGNED_IN_STATE"
+
+/** Feature flag: set to true to re-enable Google sign-in and cloud sync. */
+const val CLOUD_SYNC_ENABLED = false
