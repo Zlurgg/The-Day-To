@@ -31,7 +31,7 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 
 🔒 **Privacy-First**
 - All data stored locally on your device (Room database)
-- Google Sign-In for authentication only
+- No account or sign-in required — open the app and start journaling
 - No cloud sync, no data collection, no tracking
 - Your journal stays completely private
 
@@ -49,11 +49,6 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 - WCAG-compliant touch targets (48dp minimum)
 
 ## Screenshots
-
-### Sign-In
-| Sign In | Google Auth |
-|---------|-------------|
-| ![Sign In](docs/screenshots/sign_in_screen_day.png) | ![Google Auth](docs/screenshots/sign_in_screen_googleauth_day.png) |
 
 ### Calendar Overview
 | Calendar | Menu |
@@ -79,13 +74,13 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 
 | Category | Technology |
 |----------|------------|
-| **Language** | Kotlin 2.2.21 |
+| **Language** | Kotlin 2.3.21 |
 | **UI** | Jetpack Compose + Material 3 |
 | **Architecture** | Clean Architecture (MVVM) |
-| **Database** | Room 2.8.3 |
-| **DI** | Koin 4.1.1 |
-| **Background Work** | WorkManager 2.11.0 |
-| **Auth** | Credential Manager API (Google Sign-In) |
+| **Database** | Room 2.8.4 |
+| **DI** | Koin 4.2.2 |
+| **Background Work** | WorkManager 2.11.2 |
+| **Auth** | None — fully local, no account required |
 | **Navigation** | Jetpack Navigation Compose |
 | **Logging** | Timber |
 
@@ -119,7 +114,6 @@ app/
 ## Requirements
 
 - Android 8.1+ (API 27)
-- Google account for sign-in
 
 ## Building
 
@@ -133,6 +127,15 @@ app/
 # Full check (lint + tests)
 ./gradlew check
 ```
+
+## Development
+
+Two branches:
+
+- **`local-only`** — the current **release branch** that ships to the Play Store (no sign-in / cloud sync).
+- **`main`** — development branch with the full cloud-sync feature set (not shipped).
+
+See [docs/overview.md](docs/overview.md) for architecture, the release flow, and the `CLOUD_SYNC_ENABLED` feature flag.
 
 ## Download
 
