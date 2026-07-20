@@ -106,8 +106,7 @@ app/
 
 ## Quality
 
-- **182 Tests** (162 unit + 20 instrumented)
-- ViewModels: 100% test coverage
+- **448 Tests** (400 unit + 48 instrumented)
 - Repository integration tests with real Room database
 - Turbine for Flow testing
 
