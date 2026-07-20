@@ -46,6 +46,7 @@ ktor = "3.5.1"
 
 # Static Analysis
 detekt = "1.23.8"
+kover = "0.9.9"
 
 # Testing
 mockk = "1.14.11"
@@ -160,6 +161,7 @@ google-services = { id = "com.google.gms.google-services", version.ref = "google
 kotlin-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize", version.ref = "kotlinPlugin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+kover = { id = "org.jetbrains.kotlinx.kover", version.ref = "kover" }
 
 [bundles]
 compose = [
