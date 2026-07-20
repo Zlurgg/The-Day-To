@@ -2,6 +2,15 @@
 
 The Day To is a daily mood logging Android application built with Kotlin and Jetpack Compose.
 
+## Branch Strategy
+
+> ⚠️ **`local-only` is the current release branch — it is what ships to the Play Store.**
+
+- **`local-only`** — the active **release branch**. Google Sign-In / cloud sync are disabled (see [Local-Only Mode](#local-only-mode)). All Play Store releases are cut from here (tag `vX.Y.Z` → see [Releasing](#releasing)).
+- **`main`** — development-only. Holds the full cloud-sync feature set; **not** shipped.
+
+Cut releases from `local-only` and cherry-pick fixes between the two branches.
+
 ## Quick Start
 
 ```bash
@@ -18,6 +27,17 @@ The Day To is a daily mood logging Android application built with Kotlin and Jet
 # Release
 ./gradlew assembleRelease
 ```
+
+## Releasing
+
+Releases ship from the **`local-only`** branch via GitHub Actions (`.github/workflows/release.yml`):
+
+1. Bump `versionCode` + `versionName` in `app/build.gradle.kts` (commit as `chore(release): bump version to X.Y.Z`).
+2. Push the branch, then push a tag `vX.Y.Z` — **pushing a `v*` tag triggers the release workflow.**
+3. CI builds the signed AAB (`bundleRelease`) and uploads it to the Play Store **internal** track as a **draft** (it does not auto-publish).
+4. Review/roll out the draft in the Play Console, test, then **promote to production manually** (or run the workflow's `workflow_dispatch` with `track: production`).
+
+Each upload needs a unique, higher `versionCode`. Signing keys come from repo secrets in CI (locally: `keystore.properties` + `.jks` at repo root).
 
 ## Local-Only Mode
 
