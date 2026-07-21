@@ -9,9 +9,9 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.work.Constraints
 import androidx.work.Data
-import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.ExistingWorkPolicy
 import androidx.work.NetworkType
-import androidx.work.PeriodicWorkRequest
+import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -21,12 +21,12 @@ import timber.log.Timber
 import uk.co.zlurgg.thedayto.auth.domain.repository.AuthRepository
 import uk.co.zlurgg.thedayto.core.domain.result.Result
 import uk.co.zlurgg.thedayto.core.domain.usecases.notifications.CheckTodayEntryExistsUseCase
+import uk.co.zlurgg.thedayto.core.domain.util.TimeProvider
 import uk.co.zlurgg.thedayto.notification.data.migration.NotificationMigrationService.Companion.ANONYMOUS_USER_ID
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker
 import uk.co.zlurgg.thedayto.notification.data.worker.NotificationWorker.Companion.NOTIFICATION_ID
 import uk.co.zlurgg.thedayto.notification.domain.repository.NotificationSettingsRepository
 import uk.co.zlurgg.thedayto.notification.domain.scheduler.NotificationScheduler
-import java.time.LocalDateTime
 import java.time.ZoneId
 import java.util.concurrent.TimeUnit
 
@@ -39,41 +39,56 @@ import java.util.concurrent.TimeUnit
  * @param settingsRepository Repository for reading notification settings
  * @param authRepository Repository for getting current user
  * @param checkTodayEntryExists Use case to check if today's entry exists
+ * @param timeProvider Source of the current time (injectable for testability)
  */
 class NotificationSchedulerImpl(
     private val context: Context,
     private val settingsRepository: NotificationSettingsRepository,
     private val authRepository: AuthRepository,
     private val checkTodayEntryExists: CheckTodayEntryExistsUseCase,
+    private val timeProvider: TimeProvider,
 ) : NotificationScheduler {
 
     private val schedulerScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 
     override fun setupDailyNotification() {
         Timber.d("setupDailyNotification called - checking settings")
-        schedulerScope.launch {
-            try {
-                val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
-                val settings = when (val settingsResult = settingsRepository.getSettings(userId)) {
-                    is Result.Success -> settingsResult.data
-                    is Result.Error -> {
-                        Timber.e("Failed to get notification settings: %s", settingsResult.error)
-                        cancelNotifications()
-                        return@launch
-                    }
-                }
+        schedulerScope.launch { scheduleFromSettings() }
+    }
 
-                if (settings == null || !settings.enabled) {
-                    Timber.d("Notifications disabled or not configured - skipping schedule")
+    override suspend fun scheduleNextNotification() {
+        scheduleFromSettings()
+    }
+
+    /**
+     * Reads the current notification settings and schedules the next single fire at the
+     * stored time, or cancels if notifications are disabled / unconfigured.
+     *
+     * Shared by [setupDailyNotification] (app startup) and [scheduleNextNotification]
+     * (the worker continuing the daily chain).
+     */
+    private suspend fun scheduleFromSettings() {
+        try {
+            val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
+            val settings = when (val settingsResult = settingsRepository.getSettings(userId)) {
+                is Result.Success -> settingsResult.data
+                is Result.Error -> {
+                    Timber.e("Failed to get notification settings: %s", settingsResult.error)
                     cancelNotifications()
-                    return@launch
+                    return
                 }
-
-                Timber.d("Notifications enabled: hour=%d, minute=%d", settings.hour, settings.minute)
-                scheduleNotification(settings.hour, settings.minute)
-            } catch (e: Exception) {
-                Timber.e(e, "Failed to setup daily notification")
             }
+
+            if (settings == null || !settings.enabled) {
+                Timber.d("Notifications disabled or not configured - skipping schedule")
+                cancelNotifications()
+                return
+            }
+
+            Timber.d("Notifications enabled: hour=%d, minute=%d", settings.hour, settings.minute)
+            scheduleNotification(settings.hour, settings.minute)
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to setup daily notification")
         }
     }
 
@@ -157,32 +172,27 @@ class NotificationSchedulerImpl(
     }
 
     /**
-     * Schedules a periodic daily notification using WorkManager.
+     * Schedules a single notification at the given time using a one-time WorkManager
+     * request. After it fires, [NotificationWorker] calls [scheduleNextNotification] to
+     * enqueue the following day, always re-anchored to the stored time. This self-
+     * rescheduling chain is what prevents the fire time from drifting later each day
+     * (unlike a [androidx.work.PeriodicWorkRequest], whose window re-anchors to the last
+     * actual — potentially Doze-deferred — run).
      */
     private fun scheduleNotification(hour: Int, minute: Int) {
         try {
             Timber.d(
-                "Scheduling periodic notification for %d:%s",
+                "Scheduling notification for %d:%s",
                 hour,
                 minute.toString().padStart(2, '0'),
             )
 
-            val systemZone = ZoneId.systemDefault()
-            val now = LocalDateTime.now(systemZone)
-
-            var nextNotificationTime = now
-                .withHour(hour)
-                .withMinute(minute)
-                .withSecond(0)
-                .withNano(0)
-
-            if (nextNotificationTime.isBefore(now) || nextNotificationTime.isEqual(now)) {
-                nextNotificationTime = nextNotificationTime.plusDays(1)
-            }
-
-            val currentEpoch = now.atZone(systemZone).toEpochSecond()
-            val nextEpoch = nextNotificationTime.atZone(systemZone).toEpochSecond()
-            val initialDelay = nextEpoch - currentEpoch
+            val initialDelay = NotificationSchedule.initialDelaySeconds(
+                now = timeProvider.now(),
+                zone = ZoneId.systemDefault(),
+                hour = hour,
+                minute = minute,
+            )
 
             Timber.d(
                 "Initial delay: %ds (%dh %dm)",
@@ -199,36 +209,31 @@ class NotificationSchedulerImpl(
                 .setRequiredNetworkType(NetworkType.NOT_REQUIRED)
                 .build()
 
-            val notificationWorker = PeriodicWorkRequest.Builder(
-                NotificationWorker::class.java,
-                HOURS_PER_DAY.toLong(),
-                TimeUnit.HOURS,
-            )
+            val notificationWorker = OneTimeWorkRequest.Builder(NotificationWorker::class.java)
                 .setInputData(data)
                 .setInitialDelay(initialDelay, TimeUnit.SECONDS)
                 .setConstraints(constraints)
                 .build()
 
-            WorkManager.getInstance(context).enqueueUniquePeriodicWork(
+            WorkManager.getInstance(context).enqueueUniqueWork(
                 NotificationWorker.NOTIFICATION_WORK,
-                ExistingPeriodicWorkPolicy.UPDATE,
+                ExistingWorkPolicy.REPLACE,
                 notificationWorker,
             )
 
             Timber.i(
-                "Periodic notification scheduled: first in %ds, then every 24h at %d:%s",
+                "Notification scheduled: fires in %ds at %d:%s (re-scheduled after each fire)",
                 initialDelay,
                 hour,
                 minute.toString().padStart(2, '0'),
             )
         } catch (e: Exception) {
-            Timber.e(e, "Failed to schedule periodic notification")
+            Timber.e(e, "Failed to schedule notification")
         }
     }
 
     companion object {
         private const val SECONDS_PER_HOUR = 3600
         private const val SECONDS_PER_MINUTE = 60
-        private const val HOURS_PER_DAY = 24
     }
 }

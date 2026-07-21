@@ -56,21 +56,6 @@ interface NotificationSettingsDao {
     suspend fun getPendingSync(userId: String): NotificationSettingsEntity?
 
     /**
-     * Update last notified date and mark for sync.
-     *
-     * Called after showing a notification to prevent duplicate notifications.
-     * Marks as PENDING_SYNC so the date syncs across devices.
-     */
-    @Query(
-        """
-        UPDATE notification_settings
-        SET lastNotifiedDateEpoch = :dateEpoch, syncStatus = 'PENDING_SYNC'
-        WHERE userId = :userId
-        """,
-    )
-    suspend fun updateLastNotifiedDate(userId: String, dateEpoch: Long)
-
-    /**
      * Delete all notification settings from the database.
      * Used during account deletion to clear all local data.
      */

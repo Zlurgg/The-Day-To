@@ -20,9 +20,15 @@ open class FakeNotificationScheduler : NotificationScheduler {
     var cancelNotificationsCalled: Boolean = false
     var updateNotificationTimeCalled: Boolean = false
     var updateNotificationTimeThrows: Boolean = false
+    var scheduleNextNotificationCalled: Boolean = false
 
     override fun setupDailyNotification() {
         setupDailyNotificationCalled = true
+        notificationScheduled = true
+    }
+
+    override suspend fun scheduleNextNotification() {
+        scheduleNextNotificationCalled = true
         notificationScheduled = true
     }
 
@@ -72,6 +78,7 @@ open class FakeNotificationScheduler : NotificationScheduler {
         cancelNotificationsCalled = false
         updateNotificationTimeCalled = false
         updateNotificationTimeThrows = false
+        scheduleNextNotificationCalled = false
     }
 
     /**

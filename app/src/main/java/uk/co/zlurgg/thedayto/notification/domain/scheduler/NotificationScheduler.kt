@@ -35,6 +35,16 @@ interface NotificationScheduler {
     fun updateNotificationTime(hour: Int, minute: Int)
 
     /**
+     * Schedules the next single notification at the user-configured time.
+     *
+     * Called by [NotificationWorker] after each fire to continue the daily chain.
+     * Reads the current settings fresh and re-anchors to the stored time-of-day, so the
+     * fire time cannot drift later day over day. If notifications are disabled (or not
+     * configured), it cancels instead, which stops the chain.
+     */
+    suspend fun scheduleNextNotification()
+
+    /**
      * Checks if the app has notification permission.
      *
      * @return true if permission is granted, false otherwise.

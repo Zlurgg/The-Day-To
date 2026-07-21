@@ -29,25 +29,27 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
     private val notificationScheduler: NotificationScheduler by inject()
 
     override fun doWork(): Result {
-        // Check if notification permission is granted (Android 13+)
+        // Decide whether to post the reminder, then always chain the next day's fire.
         if (!hasNotificationPermission()) {
+            // Not a failure, just can't show a notification right now.
             Timber.w("Notification permission not granted - skipping notification")
-            return Result.success() // Not a failure, just can't show notification
+        } else {
+            // Simple check: does today's entry exist? Keeping this minimal ensures
+            // notifications fire reliably even when the app is killed.
+            val shouldSend = runBlocking { notificationScheduler.shouldSendNotification() }
+            if (shouldSend) {
+                val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
+                createNotification(id)
+            } else {
+                Timber.d("Notification not needed - entry exists for today")
+            }
         }
 
-        // Simple check: does today's entry exist?
-        // Keeping this minimal ensures notifications fire reliably even when app is killed
-        val shouldSend = runBlocking {
-            notificationScheduler.shouldSendNotification()
-        }
-
-        if (!shouldSend) {
-            Timber.d("Notification not needed - entry exists for today")
-            return Result.success()
-        }
-
-        val id = inputData.getLong(NOTIFICATION_ID, 0).toInt()
-        createNotification(id)
+        // Re-anchor and schedule tomorrow's notification from the stored time. This
+        // self-rescheduling chain (rather than a periodic request) is what keeps the
+        // fire time from drifting later each day. If notifications have since been
+        // disabled, scheduleNextNotification cancels instead, ending the chain.
+        runBlocking { notificationScheduler.scheduleNextNotification() }
 
         return Result.success()
     }

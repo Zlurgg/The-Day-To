@@ -33,15 +33,6 @@ class FakeNotificationSettingsDao : NotificationSettingsDao {
         return settingsMap[userId]?.takeIf { it.syncStatus == "PENDING_SYNC" }
     }
 
-    override suspend fun updateLastNotifiedDate(userId: String, dateEpoch: Long) {
-        settingsMap[userId]?.let {
-            settingsMap[userId] = it.copy(
-                lastNotifiedDateEpoch = dateEpoch,
-                syncStatus = "PENDING_SYNC",
-            )
-        }
-    }
-
     override suspend fun deleteAll() {
         settingsMap.clear()
     }

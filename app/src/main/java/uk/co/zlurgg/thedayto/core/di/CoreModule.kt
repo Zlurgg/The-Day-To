@@ -72,6 +72,7 @@ val coreModule = module {
             settingsRepository = get(),
             authRepository = get(),
             checkTodayEntryExists = get(),
+            timeProvider = get(),
         )
     }
 }
