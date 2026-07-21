@@ -30,8 +30,6 @@ import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiState
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
 import uk.co.zlurgg.thedayto.journal.ui.overview.util.TimeConstants
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
-import java.time.LocalDate
-import java.time.LocalTime
 import java.util.Locale
 import kotlin.random.Random
 
@@ -90,8 +88,8 @@ class OverviewViewModel(
      * preventing the greeting from changing on every screen visit.
      */
     private fun updateGreeting() {
-        val hour = LocalTime.now().hour
-        val today = LocalDate.now()
+        val hour = timeProvider.now().hour
+        val today = timeProvider.today()
 
         // Use date as seed for consistent greeting throughout the day
         val seed = today.year * 10000 + today.monthValue * 100 + today.dayOfMonth

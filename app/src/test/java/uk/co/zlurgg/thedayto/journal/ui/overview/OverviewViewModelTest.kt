@@ -25,11 +25,14 @@ import uk.co.zlurgg.thedayto.core.domain.usecases.theme.GetThemeModeUseCase
 import uk.co.zlurgg.thedayto.core.domain.usecases.theme.SetThemeModeUseCase
 import uk.co.zlurgg.thedayto.journal.domain.model.toEntry
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewAction
+import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewNavigationTarget
 import uk.co.zlurgg.thedayto.journal.ui.overview.state.OverviewUiEvent
+import uk.co.zlurgg.thedayto.journal.ui.overview.util.GreetingConstants
 import uk.co.zlurgg.thedayto.notification.domain.model.NotificationSettings
 import uk.co.zlurgg.thedayto.sync.data.worker.SyncScheduler
 import uk.co.zlurgg.thedayto.testutil.FakeTimeProvider
 import uk.co.zlurgg.thedayto.testutil.TestDataBuilders
+import java.time.LocalTime
 
 /**
  * Unit tests for OverviewViewModel notification functionality.
@@ -890,6 +893,205 @@ class OverviewViewModelTest {
         assertTrue(
             "Greeting should be from valid greeting lists",
             allGreetings.contains(greeting),
+        )
+    }
+
+    @Test
+    fun `updateGreeting - night hour selects a night greeting`() = runTest {
+        // Given: Current time is in the early-hours night window (12am-4am)
+        fakeTimeProvider.setTime(LocalTime.of(2, 0))
+
+        // When: Greeting refreshes (e.g. screen resumed)
+        viewModel.onScreenResumed()
+        testScheduler.advanceUntilIdle()
+
+        // Then: A night greeting is shown
+        assertTrue(
+            "Should show a night greeting",
+            GreetingConstants.NIGHT_GREETINGS.contains(viewModel.uiState.value.greeting),
+        )
+    }
+
+    @Test
+    fun `updateGreeting - morning hour selects a morning greeting`() = runTest {
+        // Given: Current time is in the morning window (5am-11am)
+        fakeTimeProvider.setTime(LocalTime.of(8, 0))
+
+        // When: Greeting refreshes
+        viewModel.onScreenResumed()
+        testScheduler.advanceUntilIdle()
+
+        // Then: A morning greeting is shown
+        assertTrue(
+            "Should show a morning greeting",
+            GreetingConstants.MORNING_GREETINGS.contains(viewModel.uiState.value.greeting),
+        )
+    }
+
+    @Test
+    fun `updateGreeting - afternoon hour selects an afternoon greeting`() = runTest {
+        // Given: Current time is in the afternoon window (12pm-4pm)
+        fakeTimeProvider.setTime(LocalTime.of(14, 0))
+
+        // When: Greeting refreshes
+        viewModel.onScreenResumed()
+        testScheduler.advanceUntilIdle()
+
+        // Then: An afternoon greeting is shown
+        assertTrue(
+            "Should show an afternoon greeting",
+            GreetingConstants.AFTERNOON_GREETINGS.contains(viewModel.uiState.value.greeting),
+        )
+    }
+
+    @Test
+    fun `updateGreeting - evening hour selects an evening greeting`() = runTest {
+        // Given: Current time is in the evening window (5pm-8pm)
+        fakeTimeProvider.setTime(LocalTime.of(18, 0))
+
+        // When: Greeting refreshes
+        viewModel.onScreenResumed()
+        testScheduler.advanceUntilIdle()
+
+        // Then: An evening greeting is shown
+        assertTrue(
+            "Should show an evening greeting",
+            GreetingConstants.EVENING_GREETINGS.contains(viewModel.uiState.value.greeting),
+        )
+    }
+
+    @Test
+    fun `updateGreeting - late evening hour falls back to a night greeting`() = runTest {
+        // Given: Current time is after the evening window (9pm-11pm, the else branch)
+        fakeTimeProvider.setTime(LocalTime.of(22, 0))
+
+        // When: Greeting refreshes
+        viewModel.onScreenResumed()
+        testScheduler.advanceUntilIdle()
+
+        // Then: A night greeting is shown
+        assertTrue(
+            "Should show a night greeting for late evening",
+            GreetingConstants.NIGHT_GREETINGS.contains(viewModel.uiState.value.greeting),
+        )
+    }
+
+    // Help / About / Tutorial Event Tests
+
+    @Test
+    fun `RequestShowHelp action - emits show help dialog event`() = runTest {
+        // When: User requests help from the settings menu
+        viewModel.uiEvents.test {
+            viewModel.onAction(OverviewAction.RequestShowHelp)
+            testScheduler.advanceUntilIdle()
+
+            // Then: Show help dialog event should be emitted
+            val event = awaitItem()
+            assertTrue(
+                "Should emit show help dialog event",
+                event is OverviewUiEvent.ShowHelpDialog,
+            )
+        }
+    }
+
+    @Test
+    fun `RequestShowAbout action - emits show about dialog event`() = runTest {
+        // When: User requests the about screen from the settings menu
+        viewModel.uiEvents.test {
+            viewModel.onAction(OverviewAction.RequestShowAbout)
+            testScheduler.advanceUntilIdle()
+
+            // Then: Show about dialog event should be emitted
+            val event = awaitItem()
+            assertTrue(
+                "Should emit show about dialog event",
+                event is OverviewUiEvent.ShowAboutDialog,
+            )
+        }
+    }
+
+    @Test
+    fun `DismissTutorial action - hides tutorial and marks first launch complete`() = runTest {
+        // Given: First-launch state with the tutorial showing
+        val fakeEntryRepo = FakeEntryRepository()
+        fakePreferencesRepository.reset() // isFirstLaunch = true, no today entry
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationScheduler = fakeNotificationScheduler,
+            entryRepository = fakeEntryRepo,
+        )
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
+        testScheduler.advanceUntilIdle()
+        assertTrue("Tutorial should be showing", testViewModel.uiState.value.showTutorialDialog)
+
+        // When: User dismisses the tutorial
+        testViewModel.onAction(OverviewAction.DismissTutorial)
+        testScheduler.advanceUntilIdle()
+
+        // Then: Tutorial should be hidden
+        assertFalse("Tutorial should be hidden", testViewModel.uiState.value.showTutorialDialog)
+
+        // And: First launch marked complete and the reminder marked shown for today
+        assertFalse("First launch should be complete", fakePreferencesRepository.isFirstLaunch())
+        assertTrue(
+            "Entry reminder should be marked shown",
+            fakePreferencesRepository.hasShownEntryReminderToday(),
+        )
+    }
+
+    @Test
+    fun `onNavigationHandled - clears navigation target`() = runTest {
+        // Given: A pending navigation to the editor
+        viewModel.onAction(OverviewAction.CreateNewEntry)
+        testScheduler.advanceUntilIdle()
+        assertTrue(
+            "Should have a navigation target",
+            viewModel.uiState.value.navigationTarget is OverviewNavigationTarget.ToEditor,
+        )
+
+        // When: The UI reports navigation has been handled
+        viewModel.onNavigationHandled()
+        testScheduler.advanceUntilIdle()
+
+        // Then: Navigation target should be cleared
+        assertEquals(
+            "Navigation target should be cleared",
+            null,
+            viewModel.uiState.value.navigationTarget,
+        )
+    }
+
+    @Test
+    fun `getEntries - sets loadError when the entries flow fails`() = runTest {
+        // Given: A repository whose month query fails
+        val fakeEntryRepo = FakeEntryRepository()
+        fakeEntryRepo.shouldThrowOnGetEntriesForMonth = true
+        val useCases = createFakeOverviewUseCases(
+            preferencesRepository = fakePreferencesRepository,
+            notificationScheduler = fakeNotificationScheduler,
+            entryRepository = fakeEntryRepo,
+        )
+
+        // When: The ViewModel initializes and loads entries
+        val testViewModel = OverviewViewModel(
+            useCases,
+            mockSyncScheduler,
+            fakeTimeProvider,
+            GetThemeModeUseCase(fakePreferencesRepository),
+            SetThemeModeUseCase(fakePreferencesRepository),
+        )
+        testScheduler.advanceUntilIdle()
+
+        // Then: The load error should be surfaced in state
+        assertTrue(
+            "Load error should be set when entries fail to load",
+            testViewModel.uiState.value.loadError != null,
         )
     }
 

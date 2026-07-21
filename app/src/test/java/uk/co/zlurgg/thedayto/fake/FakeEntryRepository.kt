@@ -33,6 +33,9 @@ class FakeEntryRepository(
     /** Set to true to make read operations return errors */
     var shouldReturnError = false
 
+    /** Set to true to make the getEntriesForMonth Flow throw (for error-path tests) */
+    var shouldThrowOnGetEntriesForMonth = false
+
     override fun getEntries(): Flow<List<Entry>> = _entries
 
     override fun getEntriesWithMoodColors(): Flow<List<EntryWithMoodColor>> {
@@ -61,6 +64,9 @@ class FakeEntryRepository(
         val (startEpoch, endEpoch) = getMonthRange(month, year)
 
         return _entries.map { entries ->
+            if (shouldThrowOnGetEntriesForMonth) {
+                throw RuntimeException("Simulated database error loading entries")
+            }
             entries
                 .filter { it.dateStamp >= startEpoch && it.dateStamp < endEpoch }
                 .map { entry ->
@@ -179,6 +185,7 @@ class FakeEntryRepository(
         nextId = 1
         shouldThrowOnDelete = false
         shouldReturnError = false
+        shouldThrowOnGetEntriesForMonth = false
     }
 
     /**

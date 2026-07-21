@@ -330,6 +330,30 @@ class SignInViewModelTest {
         }
     }
 
+    @Test
+    fun `onNavigationHandled clears navigation target`() = runTest {
+        // Given: A signed-in user, producing a navigation target
+        val testUser = UserData(
+            userId = "test_123",
+            username = "Test User",
+            profilePictureUrl = null,
+        )
+        fakeAuthRepository.setSignedInUser(testUser)
+        fakeAuthStateRepository.setSignedInState(true)
+        viewModel = createViewModel()
+        viewModel.checkSignInStatus()
+
+        // When: The UI reports navigation has been handled
+        viewModel.onNavigationHandled()
+
+        // Then: Navigation target should be cleared
+        viewModel.state.test {
+            val state = awaitItem()
+            assertEquals("Navigation target should be cleared", null, state.navigationTarget)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
     // ============================================================
     // Dev Sign-In Tests
     // ============================================================

@@ -141,6 +141,26 @@ class EditorViewModelTest {
     }
 
     @Test
+    fun `onNavigationHandled clears the navigate back flag`() = runTest {
+        // Given: A back navigation was requested with no unsaved changes
+        viewModel = createViewModel()
+        viewModel.onAction(EditorAction.RequestNavigateBack)
+        assertTrue(
+            "Should be navigating back",
+            viewModel.uiState.value.shouldNavigateBack,
+        )
+
+        // When: The UI reports navigation has been handled
+        viewModel.onNavigationHandled()
+
+        // Then: The navigate-back flag should be cleared
+        assertFalse(
+            "Navigate back flag should be cleared",
+            viewModel.uiState.value.shouldNavigateBack,
+        )
+    }
+
+    @Test
     fun `loads existing entry when editing`() = runTest {
         // Given: An existing entry
         val moodColor = TestDataBuilders.createMoodColor(id = 1)
