@@ -41,8 +41,12 @@ interface NotificationScheduler {
      * Reads the current settings fresh and re-anchors to the stored time-of-day, so the
      * fire time cannot drift later day over day. If notifications are disabled (or not
      * configured), it cancels instead, which stops the chain.
+     *
+     * @return true if the chain was handled (next fire scheduled, or deliberately ended
+     * because notifications are disabled); false if scheduling failed (e.g. settings
+     * could not be read) and the caller should retry so the chain is not lost.
      */
-    suspend fun scheduleNextNotification()
+    suspend fun scheduleNextNotification(): Boolean
 
     /**
      * Checks if the app has notification permission.

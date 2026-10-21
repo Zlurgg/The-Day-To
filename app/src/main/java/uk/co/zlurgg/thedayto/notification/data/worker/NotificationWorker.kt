@@ -30,7 +30,11 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
 
     override fun doWork(): Result {
         // Decide whether to post the reminder, then always chain the next day's fire.
-        if (!hasNotificationPermission()) {
+        if (runAttemptCount > 0) {
+            // A retry only exists because chaining failed last attempt; the reminder was
+            // already handled then, so don't post it a second time.
+            Timber.d("Retry attempt %d - skipping notification, rescheduling only", runAttemptCount)
+        } else if (!hasNotificationPermission()) {
             // Not a failure, just can't show a notification right now.
             Timber.w("Notification permission not granted - skipping notification")
         } else {
@@ -49,7 +53,13 @@ class NotificationWorker(context: Context, params: WorkerParameters) : Worker(co
         // self-rescheduling chain (rather than a periodic request) is what keeps the
         // fire time from drifting later each day. If notifications have since been
         // disabled, scheduleNextNotification cancels instead, ending the chain.
-        runBlocking { notificationScheduler.scheduleNextNotification() }
+        val scheduled = runBlocking { notificationScheduler.scheduleNextNotification() }
+        if (!scheduled) {
+            // Without a retry nothing would be queued and reminders would stop until the
+            // app is next opened. WorkManager backs off exponentially between attempts.
+            Timber.w("Failed to schedule next notification - retrying")
+            return Result.retry()
+        }
 
         return Result.success()
     }

@@ -56,9 +56,7 @@ class NotificationSchedulerImpl(
         schedulerScope.launch { scheduleFromSettings() }
     }
 
-    override suspend fun scheduleNextNotification() {
-        scheduleFromSettings()
-    }
+    override suspend fun scheduleNextNotification(): Boolean = scheduleFromSettings()
 
     /**
      * Reads the current notification settings and schedules the next single fire at the
@@ -66,29 +64,35 @@ class NotificationSchedulerImpl(
      *
      * Shared by [setupDailyNotification] (app startup) and [scheduleNextNotification]
      * (the worker continuing the daily chain).
+     *
+     * On failure this deliberately does NOT cancel: when called from the running
+     * [NotificationWorker], cancelling the unique work would also cancel the worker's own
+     * retry, ending the chain until the app is next opened.
+     *
+     * @return true if handled (scheduled, or cancelled because disabled), false on failure
      */
-    private suspend fun scheduleFromSettings() {
-        try {
+    private suspend fun scheduleFromSettings(): Boolean {
+        return try {
             val userId = authRepository.getSignedInUser()?.userId ?: ANONYMOUS_USER_ID
             val settings = when (val settingsResult = settingsRepository.getSettings(userId)) {
                 is Result.Success -> settingsResult.data
                 is Result.Error -> {
                     Timber.e("Failed to get notification settings: %s", settingsResult.error)
-                    cancelNotifications()
-                    return
+                    return false
                 }
             }
 
             if (settings == null || !settings.enabled) {
                 Timber.d("Notifications disabled or not configured - skipping schedule")
                 cancelNotifications()
-                return
+                return true
             }
 
             Timber.d("Notifications enabled: hour=%d, minute=%d", settings.hour, settings.minute)
             scheduleNotification(settings.hour, settings.minute)
         } catch (e: Exception) {
             Timber.e(e, "Failed to setup daily notification")
+            false
         }
     }
 
@@ -178,9 +182,11 @@ class NotificationSchedulerImpl(
      * rescheduling chain is what prevents the fire time from drifting later each day
      * (unlike a [androidx.work.PeriodicWorkRequest], whose window re-anchors to the last
      * actual — potentially Doze-deferred — run).
+     *
+     * @return true if the work was enqueued, false if scheduling failed
      */
-    private fun scheduleNotification(hour: Int, minute: Int) {
-        try {
+    private fun scheduleNotification(hour: Int, minute: Int): Boolean {
+        return try {
             Timber.d(
                 "Scheduling notification for %d:%s",
                 hour,
@@ -227,8 +233,10 @@ class NotificationSchedulerImpl(
                 hour,
                 minute.toString().padStart(2, '0'),
             )
+            true
         } catch (e: Exception) {
             Timber.e(e, "Failed to schedule notification")
+            false
         }
     }
 
