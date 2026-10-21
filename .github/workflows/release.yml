@@ -69,11 +69,20 @@ jobs:
           name: app-release
           path: app/build/outputs/bundle/release/app-release.aab
 
+      - name: Read version name
+        id: version
+        run: |
+          name=$(sed -nE 's/^[[:space:]]*versionName = "([^"]+)".*/\1/p' app/build.gradle.kts)
+          test -n "$name" || { echo "versionName not found in app/build.gradle.kts"; exit 1; }
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
           packageName: uk.co.zlurgg.thedayto
           releaseFiles: app/build/outputs/bundle/release/app-release.aab
+          releaseName: ${{ steps.version.outputs.name }}
+          whatsNewDirectory: distribution/whatsnew
           tracks: ${{ github.event.inputs.track || 'internal' }}
           status: draft

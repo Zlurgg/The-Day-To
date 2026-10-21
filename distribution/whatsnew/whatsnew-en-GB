@@ -1,0 +1,3 @@
+• Daily reminders now arrive at the time you set, every day. Previously they could slowly drift later.
+• Reminders are more reliable: if one can't be scheduled, the app now tries again automatically.
+• Updated to the latest Android libraries for better stability and performance.

@@ -1,34 +1,35 @@
 # Release Command
 
-Create a new release for The Day To app.
+Prepare and ship a new release of The Day To to the Play Store.
 
 ## Arguments
-Version number: $ARGUMENTS (e.g., "1.0.3")
+Version number: $ARGUMENTS (e.g., "2.2.4")
 
 ## Instructions
 
-1. **Validate version format** - Must be semver (x.y.z)
+Releases are cut from `main`. Pushing a `vX.Y.Z` tag runs `.github/workflows/release.yml`,
+which builds the signed AAB and uploads it as a **draft** to the Play Store **internal** track.
+Do NOT create GitHub Releases or attach APKs — the app ships only through Google Play.
 
-2. **Update version numbers**:
-   - `app/build.gradle.kts`: Increment `versionCode` by 1, set `versionName` to the new version
-   - `ARCHITECTURE.md`: Update "Current version" in the Metrics section
+1. **Validate version format** - Must be semver (x.y.z). If no version is provided, show the
+   current `versionName` from `app/build.gradle.kts` and ask what the new version should be.
 
-3. **Build release APK**:
-   - Run `./gradlew assembleRelease`
-   - Verify build succeeds
-   - Report APK size
+2. **Write the release notes** - Summarise user-visible changes since the last tag
+   (`git log $(git describe --tags --abbrev=0)..HEAD`) into `distribution/whatsnew/whatsnew-en-GB`.
+   Plain text, user-facing language, max 500 characters. Leave out internal-only changes.
+   Show the notes to the user for approval.
 
-4. **Generate changelog**:
-   - Get commits since the last tag using `git log`
-   - Summarize changes into categories: Features, Improvements, Bug Fixes
+3. **Update version numbers** - In `app/build.gradle.kts`, increment `versionCode` by 1 and set
+   `versionName` to the new version. The workflow reads `versionName` for the Play release name.
 
-5. **Create GitHub release**:
-   - Use `gh release create` with the version tag
-   - Attach the APK from `app/build/outputs/apk/release/app-release.apk`
-   - Include the generated changelog
+4. **Verify** - Run `./gradlew testDebugUnitTest assembleRelease` and confirm both succeed.
 
-6. **Report completion**:
-   - Show the release URL
-   - Remind user to commit and push the version changes
+5. **Commit** - `chore(release): bump version to X.Y.Z` (include the whatsnew file). No
+   `Co-Authored-By` trailers.
 
-If no version is provided, show the current version and ask what the new version should be.
+6. **Ask before shipping** - Confirm with the user, then:
+   `git push origin main && git tag -a vX.Y.Z -m "Release X.Y.Z" && git push origin vX.Y.Z`
+
+7. **Watch the workflow** - `gh run list --workflow "Release to Play Store"` / `gh run watch`.
+   On success, remind the user to roll out the internal draft and promote to production in the
+   Play Console.
