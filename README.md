@@ -74,15 +74,17 @@ Your personal daily mood journal for Android. Track your emotional wellbeing wit
 
 | Category | Technology |
 |----------|------------|
-| **Language** | Kotlin 2.3.21 |
+| **Language** | Kotlin |
 | **UI** | Jetpack Compose + Material 3 |
 | **Architecture** | Clean Architecture (MVVM) |
-| **Database** | Room 2.8.4 |
-| **DI** | Koin 4.2.2 |
-| **Background Work** | WorkManager 2.11.2 |
+| **Database** | Room |
+| **DI** | Koin |
+| **Background Work** | WorkManager |
 | **Auth** | None — fully local, no account required |
 | **Navigation** | Jetpack Navigation Compose |
 | **Logging** | Timber |
+
+Library versions are defined in [`gradle/libs.versions.toml`](gradle/libs.versions.toml).
 
 ## Architecture
 
@@ -106,8 +108,8 @@ app/
 
 ## Quality
 
-- **460 Tests** (412 unit + 48 instrumented)
-- ViewModels: ~96% line coverage (Kover — run `./gradlew koverXmlReport`)
+- Unit tests for ViewModels, use cases, and pure logic (JUnit, MockK, Robolectric)
+- Line coverage via Kover — run `./gradlew koverXmlReport`
 - Repository integration tests with real Room database
 - Turbine for Flow testing
 
@@ -121,8 +123,11 @@ app/
 # Debug build
 ./gradlew assembleDebug
 
-# Run tests
+# Run unit tests
 ./gradlew test
+
+# Run instrumented tests (device/emulator required)
+./gradlew connectedAndroidTest
 
 # Full check (lint + tests)
 ./gradlew check
